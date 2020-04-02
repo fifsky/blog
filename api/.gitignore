@@ -1,3 +1,4 @@
 blogapi.pid
 blogapi
 .env
+.env.prod
