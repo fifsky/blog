@@ -1,19 +1,8 @@
-build:export CGO_ENABLED=0
+.PHONY: build
 build:
-	go build -o blogapi main.go
+	CGO_ENABLED=0 go build -o blogapi main.go
 
-install:
-	go run main.go install
-
-stop:
-	cat blogapi.pid | xargs kill
-
-start:
-	./blogapi > /dev/null 2>&1 &
-
-restart:
-	cat blogapi.pid | xargs kill
-	./blogapi > /dev/null 2>&1 &
+.PHONY: test
 test:
 	go test ./...
 
