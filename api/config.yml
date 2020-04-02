@@ -1,0 +1,30 @@
+env: local
+common:
+  debug: 'on'
+  storage_path: storage/
+  session_secret: fifsky
+  robot_token: ''
+  tcaptcha_id: ''
+  tcaptcha_secret: ''
+  ding_app_secret: ''
+  token_secret: ''
+database:
+  default:
+    enable: true
+    driver: mysql
+    dsn: ''
+    max_open_conns: 10
+    max_idle_conns: 20
+    show_sql: false
+log:
+  log_mode: file
+  log_level: info
+  log_max_files: 15
+  log_sentry_dsn: ''
+  log_sentry_type: blog
+  log_detail: true
+oss:
+  access_key: ''
+  access_secret: ''
+  endpoint: 'oss-cn-shanghai-internal.aliyuncs.com'
+  bucket: ''

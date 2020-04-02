@@ -1,0 +1,63 @@
+name: blog
+on: [push]
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go
+
+      - name: Set up Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Build Golang
+        run: |
+          cd api
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o blogapi main.go
+
+      - name: Build VUE
+        run: |
+          npm install && npm run build
+
+      - name: Publish to OSS
+        run: |
+          wget http://gosspublic.alicdn.com/ossutil/1.6.6/ossutil32
+          chmod 755 ossutil32
+          ASSETSPATH=$PWD/dist/assets/
+          ./ossutil32 --recursive  cp ${ASSETSPATH} oss://${{secrets.oss_bucket}}/`basename ${ASSETSPATH}` -f -e ${{secrets.oss_endpoint}} -i ${{secrets.oss_accesskeyid}} -k ${{secrets.oss_accesskeysecret}}
+
+      - name: Build the Docker image
+        run: |
+          docker login --username=${{secrets.DOCKER_USERNAME}} --password=${{secrets.DOCKER_PASSWORD}} registry.cn-shanghai.aliyuncs.com
+          docker build . --file Dockerfile --tag registry.cn-shanghai.aliyuncs.com/fifsky/blog-web
+          docker push registry.cn-shanghai.aliyuncs.com/fifsky/blog-web
+
+          cd api
+          echo ${{secrets.ENV}} > .env
+          docker build . --file Dockerfile --tag registry.cn-shanghai.aliyuncs.com/fifsky/blog
+          docker push registry.cn-shanghai.aliyuncs.com/fifsky/blog
+
+      - name: Pull docker and restart
+        run: |
+          curl -s "https://hook.fifsky.com/?token=${{secrets.WEBHOOK_TOKEN}}&script=blog"
+
+      - name: Dingtalk message
+        uses: fifsky/dingtalk-action@master
+        with:
+          url: ${{ secrets.DINGTALK_WEBHOOK}}
+          type: markdown
+          content: |
+            ## Github Action
+            > blog deploy successful
+            > ^_^
