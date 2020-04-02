@@ -38,15 +38,13 @@ jobs:
           ./ossutil32 --recursive  cp ${ASSETSPATH} oss://${{secrets.oss_bucket}}/`basename ${ASSETSPATH}` -f -e ${{secrets.oss_endpoint}} -i ${{secrets.oss_accesskeyid}} -k ${{secrets.oss_accesskeysecret}}
 
       - name: Build the Docker image
-        env:
-          ENV: ${{secrets.ENV}}
         run: |
           docker login --username=${{secrets.DOCKER_USERNAME}} --password=${{secrets.DOCKER_PASSWORD}} registry.cn-shanghai.aliyuncs.com
           docker build . --file Dockerfile --tag registry.cn-shanghai.aliyuncs.com/fifsky/blog-web
           docker push registry.cn-shanghai.aliyuncs.com/fifsky/blog-web
 
           cd api
-          echo "$ENV" > .env
+          echo "${{secrets.ENV}}" > .env
           docker build . --file Dockerfile --tag registry.cn-shanghai.aliyuncs.com/fifsky/blog
           docker push registry.cn-shanghai.aliyuncs.com/fifsky/blog
 
