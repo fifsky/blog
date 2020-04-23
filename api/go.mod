@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.0.6+incompatible
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
+	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/goapt/envconf v0.0.1
@@ -18,7 +19,6 @@ require (
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/rs/cors v1.7.0
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/pretty v1.0.1 // indirect
