@@ -11,7 +11,12 @@ import (
 func Route(router *gee.Engine) {
 
 	// if CORS the remove annotation
-	router.Use(gee.Wrap(cors.AllowAll()))
+	router.Use(gee.Wrap(cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://fifsky.com", "http://www.fifsky.com", "https://fifsky.com", "https://www.fifsky.com"},
+		AllowedHeaders:   []string{"*"},
+		MaxAge:           86400,
+		AllowCredentials: false,
+	})))
 
 	// 中间件
 	router.Use(gee.Wrap(middleware.Ginrus()))
