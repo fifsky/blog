@@ -39,11 +39,11 @@ func message(content string, v *model.Reminds) {
 	err := robot.CardMessage("⏰重要提醒⏰", content, []map[string]string{
 		{
 			"title":     "收到提醒",
-			"actionURL": "https://www.fifsky.com/api/remind/change?token=" + url.QueryEscape(token),
+			"actionURL": "https://fifsky.com/api/remind/change?token=" + url.QueryEscape(token),
 		},
 		{
 			"title":     "稍后提醒",
-			"actionURL": "https://www.fifsky.com/api/remind/delay?token=" + url.QueryEscape(token),
+			"actionURL": "https://fifsky.com/api/remind/delay?token=" + url.QueryEscape(token),
 		},
 	})
 	if err != nil {
