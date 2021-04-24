@@ -78,14 +78,14 @@
       },
       createEditor() {
         this.editor = new WangEditor('#editor')
-        this.editor.customConfig.uploadImgMaxSize = 3 * 1024 * 1024
-        this.editor.customConfig.uploadImgMaxLength = 5
-        this.editor.customConfig.uploadImgServer = 'https://api.fifsky.com/api/admin/upload'
-        this.editor.customConfig.uploadFileName = 'uploadFile'
-        this.editor.customConfig.uploadImgHeaders = {
+        this.editor.config.uploadImgMaxSize = 3 * 1024 * 1024
+        this.editor.config.uploadImgMaxLength = 5
+        this.editor.config.uploadImgServer = 'https://api.fifsky.com/api/admin/upload'
+        this.editor.config.uploadFileName = 'uploadFile'
+        this.editor.config.uploadImgHeaders = {
           "Access-Token": getAccessToken()
         }
-        this.editor.customConfig.uploadImgHooks = {
+        this.editor.config.uploadImgHooks = {
           error: function (xhr, editor) {
             // 图片上传出错时触发
             // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象
