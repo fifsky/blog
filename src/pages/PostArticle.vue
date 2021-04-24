@@ -93,8 +93,8 @@
           }
         }
         let self = this
-        this.editor.change = function () {
-            self.article.content = this.txt.html()
+        this.editor.change = function (newHtml) {
+            self.article.content = newHtml
         }
         this.editor.create()
       }
