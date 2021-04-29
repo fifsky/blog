@@ -8,7 +8,7 @@
             <ul>
                 <li><router-link to="/">首页</router-link></li>
                 <li><a href="https://github.com/fifsky" target="_blank">Github</a></li>
-                <li><a href="http://blog.fifsky.com/">技术</a></li>
+                <li><a href="https://gist.github.com/fifsky">技术</a></li>
                 <li><router-link to="/about">关于</router-link></li>
                 <li><a href="https://caixudong.com">简历</a></li>
                 <li><router-link to="/admin/index" v-if="isLogin">管理中心</router-link></li>
