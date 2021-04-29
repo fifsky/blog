@@ -28,6 +28,10 @@ var AdminArticlePost gee.HandlerFunc = func(c *gee.Context) gee.Response {
 		return c.Fail(201, "文章标题不能为空")
 	}
 
+	if post.CateId < 1 {
+		return c.Fail(201, "请选择文章分类")
+	}
+
 	if post.Id > 0 {
 		if _, err := gosql.Model(post).Update(); err != nil {
 			logger.Error(err)

@@ -70,6 +70,15 @@
     methods: {
       submit() {
         let {id, cate_id, title, content, type, url} = this.article
+
+        if(title.length === 0){
+          this.$message.success("标题不能为空")
+        }
+
+        if(cate_id < 1){
+          this.$message.success("请选择分类")
+        }
+
         let data = {id, cate_id, title, content, type, url}
         sync(async () => {
           let ret = await articlePostApi(data)
@@ -93,7 +102,7 @@
           }
         }
         let self = this
-        this.editor.change = function (newHtml) {
+        this.editor.onchange = function (newHtml) {
             self.article.content = newHtml
         }
         this.editor.create()
@@ -111,6 +120,11 @@
         this.article.cate_id = this.article.cate_id || this.cates[0].id
       })
     },
+    beforeDestroy() {
+      // 销毁编辑器
+      this.editor.destroy()
+      this.editor = null
+    }
   }
 </script>
 
