@@ -46,6 +46,7 @@ var HTTPCmd = cli.Command{
 			log.Println("HTTP Server exiting")
 		})
 
+		log.Println("[HTTP] Server listen:" + ctx.String("addr"))
 		// service connections
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("HTTP listen: %s\n", err)

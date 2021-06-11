@@ -86,26 +86,26 @@
         })
       },
       createEditor() {
-        this.editor = new WangEditor('#editor')
-        this.editor.config.uploadImgMaxSize = 3 * 1024 * 1024
-        this.editor.config.uploadImgMaxLength = 5
-        this.editor.config.uploadImgServer = 'https://api.fifsky.com/api/admin/upload'
-        this.editor.config.uploadFileName = 'uploadFile'
-        this.editor.config.uploadImgHeaders = {
+        const editor = new WangEditor('#editor')
+        editor.config.uploadImgMaxSize = 3 * 1024 * 1024
+        editor.config.uploadImgMaxLength = 5
+        editor.config.uploadImgServer = 'https://api.fifsky.com/api/admin/upload'
+        editor.config.uploadFileName = 'uploadFile'
+        editor.config.uploadImgHeaders = {
           "Access-Token": getAccessToken()
         }
-        this.editor.config.uploadImgHooks = {
+        editor.config.uploadImgHooks = {
           error: function (xhr, editor) {
             // 图片上传出错时触发
             // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象
             console.log(xhr)
           }
         }
-        let self = this
-        this.editor.onchange = function (newHtml) {
-            self.article.content = newHtml
+        editor.config.onchange = (newHtml) => {
+          this.article.content = newHtml
         }
-        this.editor.create()
+        editor.create()
+        this.editor = editor
       }
     },
     mounted() {

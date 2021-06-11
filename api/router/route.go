@@ -3,6 +3,7 @@ package router
 import (
 	"time"
 
+	"app/config"
 	"github.com/gin-contrib/cors"
 	"github.com/goapt/gee"
 
@@ -12,9 +13,15 @@ import (
 
 func Route(router *gee.Engine) {
 
+	origins := []string{"http://fifsky.com", "http://www.fifsky.com", "https://fifsky.com", "https://www.fifsky.com"}
+
+	if config.App.Env == "dev" {
+		origins = []string{"*"}
+	}
+
 	// if CORS the remove annotation
 	router.Use(gee.Wrap(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://fifsky.com", "http://www.fifsky.com", "https://fifsky.com", "https://www.fifsky.com"},
+		AllowOrigins:     origins,
 		AllowHeaders:     []string{"*"},
 		MaxAge:           24 * time.Hour,
 		AllowCredentials: false,
