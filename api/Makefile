@@ -2,6 +2,10 @@
 build:
 	CGO_ENABLED=0 go build -o blogapi main.go
 
+.PHONY: run
+run:
+	go run main.go http --addr=:"8889"
+
 .PHONY: test
 test:
 	go test ./...

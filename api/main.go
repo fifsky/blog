@@ -13,8 +13,6 @@ import (
 )
 
 func main() {
-	gee.SuccessCode = 200
-
 	_ = gosql.Connect(config.App.DB)
 	robot.Init(ding.NewRobot())
 	robot.SetToken(config.App.Common.RobotToken)

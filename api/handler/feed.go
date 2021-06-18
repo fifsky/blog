@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"app/response"
 	"github.com/goapt/gee"
 	"github.com/goapt/golib/convert"
 	"github.com/gorilla/feeds"
@@ -15,7 +16,7 @@ var FeedGet gee.HandlerFunc = func(c *gee.Context) gee.Response {
 	now := time.Now()
 	options, err := model.GetOptions()
 	if err != nil {
-		c.Fail(202, err)
+		response.Fail(c, 202, err)
 	}
 
 	feed := &feeds.Feed{
@@ -36,7 +37,7 @@ var FeedGet gee.HandlerFunc = func(c *gee.Context) gee.Response {
 	posts, err := model.PostGetList(post, 1, 10, "", "")
 
 	if err != nil {
-		return c.Fail(500, err)
+		return response.Fail(c, 500, err)
 	}
 
 	for _, v := range posts {
@@ -51,7 +52,7 @@ var FeedGet gee.HandlerFunc = func(c *gee.Context) gee.Response {
 
 	err = feed.WriteAtom(c.Writer)
 	if err != nil {
-		return c.Fail(500, err)
+		return response.Fail(c, 500, err)
 	}
 	return nil
 }

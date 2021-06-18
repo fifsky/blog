@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"app/response"
 	"github.com/gin-gonic/gin"
 	"github.com/goapt/gee"
 	"github.com/goapt/golib/pagination"
@@ -14,7 +15,7 @@ var MoodList gee.HandlerFunc = func(c *gee.Context) gee.Response {
 		Page int `json:"page"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		c.Fail(201, "参数错误")
+		response.Fail(c, 201, "参数错误")
 	}
 
 	h := gin.H{}
@@ -27,8 +28,8 @@ var MoodList gee.HandlerFunc = func(c *gee.Context) gee.Response {
 	h["pageTotal"] = pager.TotalPages()
 
 	if err != nil {
-		return c.Fail(500, err)
+		return response.Fail(c, 500, err)
 	}
 
-	return c.Success(h)
+	return response.Success(c, h)
 }

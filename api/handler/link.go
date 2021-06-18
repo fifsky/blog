@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"app/response"
 	"github.com/goapt/gee"
 
 	"app/model"
@@ -17,5 +18,5 @@ var LinkAll gee.HandlerFunc = func(c *gee.Context) gee.Response {
 		})
 	}
 
-	return c.Success(data)
+	return response.Success(c, data)
 }

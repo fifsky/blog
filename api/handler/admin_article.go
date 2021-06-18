@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"app/response"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/gin-gonic/gin"
 	"github.com/goapt/gee"
@@ -18,33 +19,33 @@ import (
 var AdminArticlePost gee.HandlerFunc = func(c *gee.Context) gee.Response {
 	post := &model.Posts{}
 	if err := c.ShouldBindJSON(post); err != nil {
-		return c.Fail(201, "参数错误:"+err.Error())
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	post.Status = 1
 	post.UserId = getLoginUser(c).Id
 
 	if post.Title == "" {
-		return c.Fail(201, "文章标题不能为空")
+		return response.Fail(c, 201, "文章标题不能为空")
 	}
 
 	if post.CateId < 1 {
-		return c.Fail(201, "请选择文章分类")
+		return response.Fail(c, 201, "请选择文章分类")
 	}
 
 	if post.Id > 0 {
 		if _, err := gosql.Model(post).Update(); err != nil {
 			logger.Error(err)
-			return c.Fail(201, "更新文章失败")
+			return response.Fail(c, 201, "更新文章失败")
 		}
 	} else {
 		if _, err := gosql.Model(post).Create(); err != nil {
 			logger.Error(err)
-			return c.Fail(201, "发表文章失败")
+			return response.Fail(c, 201, "发表文章失败")
 		}
 	}
 
-	return c.Success(post)
+	return response.Success(c, post)
 }
 
 var AdminArticleDelete gee.HandlerFunc = func(c *gee.Context) gee.Response {
@@ -53,15 +54,15 @@ var AdminArticleDelete gee.HandlerFunc = func(c *gee.Context) gee.Response {
 	}{}
 
 	if err := c.ShouldBindJSON(p); err != nil {
-		return c.Fail(201, "参数错误:"+err.Error())
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	post := &model.Posts{Id: p.Id, Status: 2}
 	if _, err := gosql.Model(post).Update(); err != nil {
 		logger.Error(err)
-		return c.Fail(201, "删除失败")
+		return response.Fail(c, 201, "删除失败")
 	}
-	return c.Success(nil)
+	return response.Success(c, nil)
 }
 
 var AdminUploadPost gee.HandlerFunc = func(c *gee.Context) gee.Response {

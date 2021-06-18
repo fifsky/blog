@@ -3,6 +3,7 @@ package middleware
 import (
 	"strings"
 
+	"app/response"
 	"github.com/goapt/gee"
 	"github.com/goapt/logger"
 
@@ -19,7 +20,7 @@ var AuthLogin gee.HandlerFunc = func(c *gee.Context) gee.Response {
 
 	if accessToken == "" {
 		c.Abort()
-		return c.Fail(201, "Access Token不能为空")
+		return response.Fail(c, 201, "Access Token不能为空")
 	}
 
 	cipherText, err := aesutil.AesDecode(config.App.Common.TokenSecret, accessToken)
@@ -29,7 +30,7 @@ var AuthLogin gee.HandlerFunc = func(c *gee.Context) gee.Response {
 			"err":   err,
 		}).Error("Access Token错误")
 		c.Abort()
-		return c.Fail(201, "Access Token错误")
+		return response.Fail(c, 201, "Access Token错误")
 	}
 
 	v := strings.Split(cipherText, ":")
@@ -39,14 +40,14 @@ var AuthLogin gee.HandlerFunc = func(c *gee.Context) gee.Response {
 			"cipherText": cipherText,
 		}).Error("Access Token不合法")
 		c.Abort()
-		return c.Fail(201, "Access Token不合法")
+		return response.Fail(c, 201, "Access Token不合法")
 	}
 
 	user := &model.Users{}
 	err = gosql.Model(user).Where("id = ?", v[0]).Get()
 	if err != nil {
 		c.Abort()
-		return c.Fail(201, "Access Token错误，用户不存在")
+		return response.Fail(c, 201, "Access Token错误，用户不存在")
 	}
 
 	c.Set("userInfo", user)

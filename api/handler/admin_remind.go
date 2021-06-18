@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"app/response"
 	"github.com/goapt/golib/pagination"
 
 	"app/model"
@@ -16,7 +17,7 @@ var AdminRemindList gee.HandlerFunc = func(c *gee.Context) gee.Response {
 		Page int `json:"page"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		c.Fail(201, "参数错误")
+		response.Fail(c, 201, "参数错误")
 	}
 
 	h := gin.H{}
@@ -29,35 +30,35 @@ var AdminRemindList gee.HandlerFunc = func(c *gee.Context) gee.Response {
 	h["pageTotal"] = pager.TotalPages()
 
 	if err != nil {
-		return c.Fail(500, err)
+		return response.Fail(c, 500, err)
 	}
 
-	return c.Success(h)
+	return response.Success(c, h)
 }
 
 var AdminRemindPost gee.HandlerFunc = func(c *gee.Context) gee.Response {
 	remind := &model.Reminds{}
 	if err := c.ShouldBindJSON(remind); err != nil {
-		return c.Fail(201, "参数错误:"+err.Error())
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	if remind.Content == "" {
-		return c.Fail(201, "提醒内容不能为空")
+		return response.Fail(c, 201, "提醒内容不能为空")
 	}
 
 	if remind.Id > 0 {
 		remind.Status = 1
 		if _, err := gosql.Model(remind).Update(); err != nil {
 			logger.Error(err)
-			return c.Fail(201, "更新失败:"+err.Error())
+			return response.Fail(c, 201, "更新失败:"+err.Error())
 		}
 	} else {
 		if _, err := gosql.Model(remind).Create(); err != nil {
 			logger.Error(err)
-			return c.Fail(201, "创建失败"+err.Error())
+			return response.Fail(c, 201, "创建失败"+err.Error())
 		}
 	}
-	return c.Success(remind)
+	return response.Success(c, remind)
 }
 
 var AdminRemindDelete gee.HandlerFunc = func(c *gee.Context) gee.Response {
@@ -65,12 +66,12 @@ var AdminRemindDelete gee.HandlerFunc = func(c *gee.Context) gee.Response {
 		Id int `json:"id"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		c.Fail(201, "参数错误")
+		response.Fail(c, 201, "参数错误")
 	}
 
 	if _, err := gosql.Model(&model.Reminds{Id: p.Id}).Delete(); err != nil {
 		logger.Error(err)
-		return c.Fail(201, "删除失败")
+		return response.Fail(c, 201, "删除失败")
 	}
-	return c.Success(nil)
+	return response.Success(c, nil)
 }

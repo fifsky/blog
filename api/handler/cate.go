@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 
+	"app/response"
 	"github.com/goapt/gee"
 
 	"app/model"
@@ -19,5 +20,5 @@ var CateAll gee.HandlerFunc = func(c *gee.Context) gee.Response {
 		})
 	}
 
-	return c.Success(data)
+	return response.Success(c, data)
 }

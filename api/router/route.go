@@ -78,5 +78,5 @@ func Route(router *gee.Engine) {
 	}
 
 	// debug handler
-	gee.DebugRoute(router.Engine)
+	gee.DebugRoute(router)
 }

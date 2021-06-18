@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 
+	"app/response"
 	"github.com/gin-gonic/gin"
 	"github.com/goapt/gee"
 	"github.com/goapt/golib/convert"
@@ -27,13 +28,13 @@ var ArchiveArticle gee.HandlerFunc = func(c *gee.Context) gee.Response {
 		})
 	}
 
-	return c.Success(data)
+	return response.Success(c, data)
 }
 
 var ListArticle gee.HandlerFunc = func(c *gee.Context) gee.Response {
 	options, err := model.GetOptions()
 	if err != nil {
-		c.Fail(202, err)
+		response.Fail(c, 202, err)
 	}
 
 	num, err := convert.StrTo(options["post_num"]).Int()
@@ -50,7 +51,7 @@ var ListArticle gee.HandlerFunc = func(c *gee.Context) gee.Response {
 		Type    int    `json:"type"`
 	}{}
 	if err := c.ShouldBindJSON(req); err != nil {
-		c.Fail(201, "参数错误")
+		response.Fail(c, 201, "参数错误")
 	}
 
 	cate := &model.Cates{}
@@ -78,7 +79,7 @@ var ListArticle gee.HandlerFunc = func(c *gee.Context) gee.Response {
 
 	posts, err := model.PostGetList(post, page, num, artdate, req.Keyword)
 	if err != nil {
-		return c.Fail(500, err)
+		return response.Fail(c, 500, err)
 	}
 
 	h := gin.H{}
@@ -99,9 +100,9 @@ var ListArticle gee.HandlerFunc = func(c *gee.Context) gee.Response {
 	h["pageTotal"] = pager.TotalPages()
 
 	if err != nil {
-		return c.Fail(500, err)
+		return response.Fail(c, 500, err)
 	}
-	return c.Success(h)
+	return response.Success(c, h)
 }
 
 var PrevNextArticle gee.HandlerFunc = func(c *gee.Context) gee.Response {
@@ -109,7 +110,7 @@ var PrevNextArticle gee.HandlerFunc = func(c *gee.Context) gee.Response {
 		Id int `json:"id"`
 	}{}
 	if err := c.ShouldBindJSON(req); err != nil {
-		return c.Fail(201, "参数错误")
+		return response.Fail(c, 201, "参数错误")
 	}
 
 	h := gin.H{}
@@ -130,7 +131,7 @@ var PrevNextArticle gee.HandlerFunc = func(c *gee.Context) gee.Response {
 			"title": next.Title,
 		}
 	}
-	return c.Success(h)
+	return response.Success(c, h)
 }
 
 var DetailArticle gee.HandlerFunc = func(c *gee.Context) gee.Response {
@@ -139,7 +140,7 @@ var DetailArticle gee.HandlerFunc = func(c *gee.Context) gee.Response {
 		Url string `json:"url"`
 	}{}
 	if err := c.ShouldBindJSON(req); err != nil {
-		return c.Fail(201, "参数错误")
+		return response.Fail(c, 201, "参数错误")
 	}
 
 	post := &model.UserPosts{}
@@ -154,8 +155,8 @@ var DetailArticle gee.HandlerFunc = func(c *gee.Context) gee.Response {
 
 	err := gosql.Model(post).Where("status = 1").Get()
 	if err != nil {
-		return c.Fail(202, "您访问的文章不存在或已经删除！")
+		return response.Fail(c, 202, "您访问的文章不存在或已经删除！")
 	}
 
-	return c.Success(post)
+	return response.Success(c, post)
 }

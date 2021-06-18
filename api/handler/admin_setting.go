@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"app/response"
 	"github.com/goapt/gee"
 	"github.com/ilibs/gosql/v2"
 	"github.com/tidwall/gjson"
@@ -11,17 +12,17 @@ import (
 var AdminSetting gee.HandlerFunc = func(c *gee.Context) gee.Response {
 	m, err := model.GetOptions()
 	if err != nil {
-		c.Fail(202, err)
+		response.Fail(c, 202, err)
 	}
 
-	return c.Success(m)
+	return response.Success(c, m)
 }
 
 var AdminSettingPost gee.HandlerFunc = func(c *gee.Context) gee.Response {
 
 	body, err := c.GetRawData()
 	if err != nil {
-		return c.Fail(202, err)
+		return response.Fail(c, 202, err)
 	}
 
 	options := gjson.ParseBytes(body)
@@ -32,5 +33,5 @@ var AdminSettingPost gee.HandlerFunc = func(c *gee.Context) gee.Response {
 		}).Where("option_key = ?", k).Update()
 	}
 
-	return c.Success(options)
+	return response.Success(c, options)
 }

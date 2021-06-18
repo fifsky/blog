@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/goapt/acm"
 	"github.com/goapt/envconf"
 	"github.com/goapt/gee"
 	"github.com/goapt/logger"
@@ -25,6 +26,7 @@ type common struct {
 	TCaptchaId     string `yml:"tcaptcha_id"`
 	TCaptchaSecret string `yml:"tcaptcha_secret"`
 	DingAppSecret  string `yml:"ding_app_secret"`
+	EnvType        string `yml:"env_type"`
 }
 
 type ossConf struct {
@@ -34,6 +36,16 @@ type ossConf struct {
 	Bucket       string `yml:"bucket"`
 }
 
+type acmConf struct {
+	AccessKey    string `yml:"access_key"`
+	AccessSecret string `yml:"access_secret"`
+	Endpoint     string `yml:"endpoint"`
+	RoleName     string `yml:"role_name"`
+	Group        string `yml:"group"`
+	Namespace    string `yml:"namespace"`
+	DataId       string `yml:"data_id"`
+}
+
 type app struct {
 	Env       string
 	Path      string
@@ -41,6 +53,7 @@ type app struct {
 	Log       logger.Config            `yml:"log"`
 	DB        map[string]*gosql.Config `yml:"database"`
 	OSS       ossConf                  `yml:"oss"`
+	Acm       acmConf                  `yml:"acm"`
 	StartTime time.Time
 	IsTesting bool
 }
@@ -96,9 +109,31 @@ func Load(args map[string]string) {
 		log.Fatalf("config error %s", err.Error())
 	}
 
-	// load config
-	if err := conf.Env(filepath.Join(appPath, ".env")); err != nil {
-		log.Fatal("config env error:", err)
+	if err := conf.Unmarshal(App); err != nil {
+		log.Fatal("config unmarshal error:", err)
+	}
+
+	if App.Common.EnvType == "acm" {
+		acmconf := acm.NewAcm(func(c *acm.Acm) {
+			c.SpasSecretKey = App.Acm.AccessKey
+			c.SpasSecretKey = App.Acm.AccessSecret
+			c.RoleName = App.Acm.RoleName
+		})
+
+		content, err := acmconf.Get(App.Acm.Namespace, App.Acm.Group, App.Acm.DataId)
+		if err != nil {
+			log.Fatal("acm config get error:", err)
+		}
+		// load env config
+		if err := conf.EnvWithReader(strings.NewReader(content)); err != nil {
+			log.Fatal("config env error:", err)
+		}
+
+	} else {
+		// load config
+		if err := conf.Env(filepath.Join(appPath, ".env")); err != nil {
+			log.Fatal("config env error:", err)
+		}
 	}
 
 	if err := conf.Unmarshal(App); err != nil {

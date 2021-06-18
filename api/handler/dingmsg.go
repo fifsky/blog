@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"io/ioutil"
 
+	"app/response"
 	"github.com/goapt/gee"
 	"github.com/goapt/logger"
 
@@ -16,7 +17,7 @@ var DingMsg gee.HandlerFunc = func(c *gee.Context) gee.Response {
 
 	tt := c.GetHeader("timestamp")
 	sign := c.GetHeader("sign")
-	algorithm := hmac.New(sha256.New,[]byte(config.App.Common.DingAppSecret))
+	algorithm := hmac.New(sha256.New, []byte(config.App.Common.DingAppSecret))
 	algorithm.Write([]byte(tt + "\n" + config.App.Common.DingAppSecret))
 	sign2 := base64.StdEncoding.EncodeToString(algorithm.Sum(nil))
 
@@ -29,7 +30,7 @@ var DingMsg gee.HandlerFunc = func(c *gee.Context) gee.Response {
 			"sign2": sign2,
 			"tt":    tt,
 		})
-		return c.Fail(202, "签名错误")
+		return response.Fail(c, 202, "签名错误")
 	}
 
 	return c.JSON(map[string]interface{}{

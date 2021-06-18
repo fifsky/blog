@@ -8,6 +8,7 @@ common:
   tcaptcha_secret: ''
   ding_app_secret: ''
   token_secret: ''
+  env_type: 'acm'
 database:
   default:
     enable: true
@@ -28,3 +29,11 @@ oss:
   access_secret: ''
   endpoint: 'oss-cn-shanghai-internal.aliyuncs.com'
   bucket: ''
+acm:
+  access_key: ''
+  access_secret: ''
+  data_id: 'blog'
+  group: 'DEFAULT_GROUP'
+  namespace: '26f1d5e2-b698-49cd-9cd9-f534661c388a'
+  endpoint: 'acm.aliyun.com'
+  role_name: 'BlogACMRole'

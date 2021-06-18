@@ -9,6 +9,7 @@ import (
 
 	"app/config"
 	"app/model"
+	"app/response"
 
 	"github.com/goapt/gee"
 	"github.com/ilibs/identicon"
@@ -23,7 +24,7 @@ func getLoginUser(c *gee.Context) *model.Users {
 }
 
 var Handle404 gee.HandlerFunc = func(c *gee.Context) gee.Response {
-	return c.Fail(404, "接口不存在")
+	return response.Fail(c, 404, "接口不存在")
 }
 
 var Avatar gee.HandlerFunc = func(c *gee.Context) gee.Response {
