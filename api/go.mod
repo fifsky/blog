@@ -10,6 +10,7 @@ require (
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/goapt/acm v1.0.0
+	github.com/goapt/dbunit v0.0.3 // indirect
 	github.com/goapt/envconf v0.0.4
 	github.com/goapt/gee v1.5.0
 	github.com/goapt/golib v1.0.5

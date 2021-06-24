@@ -1,0 +1,14 @@
+
+#Created At:2021-06-24 65:32:42
+- id: 1
+  option_key: site_name
+  option_value: 無處告別
+- id: 2
+  option_key: site_desc
+  option_value: Done is better than perfect!
+- id: 3
+  option_key: site_keyword
+  option_value: fifsky,rita,生活,博客,豆豆,玥玥
+- id: 10
+  option_key: post_num
+  option_value: "10"

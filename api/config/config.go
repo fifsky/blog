@@ -1,7 +1,6 @@
 package config
 
 import (
-	"database/sql"
 	"log"
 	"os"
 	"path/filepath"
@@ -169,15 +168,4 @@ func Load(args map[string]string) {
 			d.ShowSql = false
 		}
 	}
-
-	// test
-	if os.Getenv("MYSQL_TEST_DSN") != "" {
-		App.DB["default"].Dsn = os.Getenv("MYSQL_TEST_DSN")
-	}
-}
-
-func ImportDB() ([]sql.Result, error) {
-	sqlpath := "./blog.sql"
-	rst, err := gosql.Import(sqlpath)
-	return rst, err
 }
