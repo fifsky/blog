@@ -1,14 +1,23 @@
+FROM golang:1.15 as builder
+WORKDIR /app
+ENV GOPROXY=https://goproxy.cn,direct GOPRIVATE="" GOSUMDB="sum.golang.google.cn"
+WORKDIR /build
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make
+
 FROM alpine:3.11
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 RUN apk update && \
   apk add --no-cache ca-certificates \
    tzdata
 
-WORKDIR /blog/
+WORKDIR /app
 
-COPY ./blogapi ./config.yml ./.env ./
+COPY --from=builder /build/app ./
+COPY --from=builder /build/.env ./
+COPY --from=builder /build/config.yml ./
 
 ENV TZ=Asia/Shanghai
 EXPOSE 80
 
-ENTRYPOINT ["./blogapi","http","--addr=:80"]
+ENTRYPOINT ["./app","http","--addr=:80"]

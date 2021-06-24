@@ -1,15 +1,26 @@
 package cmd
 
 import (
-	"github.com/urfave/cli"
+	"reflect"
+
+	"github.com/google/wire"
+	"github.com/urfave/cli/v2"
 )
 
-var cmds cli.Commands
+func NewCommands(cmd *Commands) cli.Commands {
+	var cmds cli.Commands
+	v := reflect.Indirect(reflect.ValueOf(cmd))
+	ct := reflect.TypeOf(&cli.Command{})
+	for i := 0; i < v.NumField(); i++ {
+		cmds = append(cmds, v.Field(i).Convert(ct).Interface().(*cli.Command))
+	}
 
-func register(cmd cli.Command) {
-	cmds = append(cmds, cmd)
-}
-
-func Commands() cli.Commands {
 	return cmds
 }
+
+type Commands struct {
+	HttpCmd    HttpCmd
+	InstallCmd InstallCmd
+}
+
+var ProviderSet = wire.NewSet(NewHttp, NewInstallCmd, NewCommands, wire.Struct(new(Commands), "*"))

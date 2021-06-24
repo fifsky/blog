@@ -1,14 +1,26 @@
 package handler
 
 import (
+	model2 "app/provider/model"
+	"app/provider/repo"
 	"app/response"
+	"github.com/gin-gonic/gin"
 	"github.com/goapt/gee"
-
-	"app/model"
+	"github.com/goapt/logger"
+	"github.com/ilibs/gosql/v2"
 )
 
-var LinkAll gee.HandlerFunc = func(c *gee.Context) gee.Response {
-	links := model.GetAllLinks()
+type Link struct {
+	db       *gosql.DB
+	linkRepo *repo.Link
+}
+
+func NewLink(db *gosql.DB, linkRepo *repo.Link) *Link {
+	return &Link{db: db, linkRepo: linkRepo}
+}
+
+func (l *Link) All(c *gee.Context) gee.Response {
+	links := l.linkRepo.GetAllLinks()
 	data := make([]map[string]string, 0)
 
 	for _, v := range links {
@@ -19,4 +31,55 @@ var LinkAll gee.HandlerFunc = func(c *gee.Context) gee.Response {
 	}
 
 	return response.Success(c, data)
+}
+
+func (l *Link) List(c *gee.Context) gee.Response {
+	links := l.linkRepo.GetAllLinks()
+	return response.Success(c, gin.H{
+		"list":      links,
+		"pageTotal": len(links),
+	})
+}
+
+func (l *Link) Post(c *gee.Context) gee.Response {
+	link := &model2.Links{}
+	if err := c.ShouldBindJSON(link); err != nil {
+		return response.Fail(c, 201, "参数错误:"+err.Error())
+	}
+
+	if link.Name == "" {
+		return response.Fail(c, 201, "连接名称不能为空")
+	}
+
+	if link.Url == "" {
+		return response.Fail(c, 201, "连接地址不能为空")
+	}
+
+	if link.Id > 0 {
+		if _, err := l.db.Model(link).Update(); err != nil {
+			logger.Error(err)
+			return response.Fail(c, 201, "更新失败")
+		}
+	} else {
+		if _, err := l.db.Model(link).Create(); err != nil {
+			logger.Error(err)
+			return response.Fail(c, 201, "创建失败")
+		}
+	}
+	return response.Success(c, link)
+}
+
+func (l *Link) Delete(c *gee.Context) gee.Response {
+	p := &struct {
+		Id int `json:"id"`
+	}{}
+	if err := c.ShouldBindJSON(p); err != nil {
+		response.Fail(c, 201, "参数错误")
+	}
+
+	if _, err := l.db.Model(&model2.Links{Id: p.Id}).Delete(); err != nil {
+		logger.Error(err)
+		return response.Fail(c, 201, "删除失败")
+	}
+	return response.Success(c, nil)
 }

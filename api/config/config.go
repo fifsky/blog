@@ -18,15 +18,12 @@ import (
 )
 
 type common struct {
-	Debug          string `yml:"debug"`
-	StoragePath    string `yml:"storage_path"`
-	RobotToken     string `yml:"robot_token"`
-	SessionSecret  string `yml:"session_secret"`
-	TokenSecret    string `yml:"token_secret"`
-	TCaptchaId     string `yml:"tcaptcha_id"`
-	TCaptchaSecret string `yml:"tcaptcha_secret"`
-	DingAppSecret  string `yml:"ding_app_secret"`
-	EnvType        string `yml:"env_type"`
+	Debug         string `yml:"debug"`
+	StoragePath   string `yml:"storage_path"`
+	RobotToken    string `yml:"robot_token"`
+	TokenSecret   string `yml:"token_secret"`
+	DingAppSecret string `yml:"ding_app_secret"`
+	EnvType       string `yml:"env_type"`
 }
 
 type ossConf struct {
@@ -46,9 +43,10 @@ type acmConf struct {
 	DataId       string `yml:"data_id"`
 }
 
-type app struct {
+type Config struct {
 	Env       string
 	Path      string
+	AppName   string                   `yml:"app_name"`
 	Common    common                   `yml:"common"`
 	Log       logger.Config            `yml:"log"`
 	DB        map[string]*gosql.Config `yml:"database"`
@@ -58,7 +56,7 @@ type app struct {
 	IsTesting bool
 }
 
-var App = &app{
+var App = &Config{
 	StartTime: time.Now(),
 }
 
@@ -113,7 +111,7 @@ func Load(args map[string]string) {
 		log.Fatal("config unmarshal error:", err)
 	}
 
-	if App.Common.EnvType == "acm" {
+	if App.Common.EnvType == "acm" && App.Env != "local" {
 		acmconf := acm.NewAcm(func(c *acm.Acm) {
 			c.SpasSecretKey = App.Acm.AccessKey
 			c.SpasSecretKey = App.Acm.AccessSecret
@@ -171,16 +169,6 @@ func Load(args map[string]string) {
 			d.ShowSql = false
 		}
 	}
-
-	logger.Setting(func(c *logger.Config) {
-		c.LogMode = App.Log.LogMode
-		c.LogLevel = App.Log.LogLevel
-		c.LogMaxFiles = App.Log.LogMaxFiles
-		c.LogPath = filepath.Join(App.Common.StoragePath, "logs")
-		c.LogSentryDSN = App.Log.LogSentryDSN
-		c.LogSentryType = App.Log.LogSentryType
-		c.LogDetail = App.Log.LogDetail
-	})
 
 	// test
 	if os.Getenv("MYSQL_TEST_DSN") != "" {

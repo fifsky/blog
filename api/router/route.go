@@ -1,82 +1,113 @@
 package router
 
 import (
+	"context"
+	"log"
+	"net/http"
+	"os"
 	"time"
 
-	"app/config"
-	"github.com/gin-contrib/cors"
+	"app/response"
 	"github.com/goapt/gee"
+	"github.com/google/wire"
 
 	"app/handler"
-	"app/router/middleware"
+	"app/middleware"
 )
 
-func Route(router *gee.Engine) {
+type Router struct {
+	handler    *handler.Handler
+	middleware *middleware.Middleware
+}
 
-	origins := []string{"http://fifsky.com", "http://www.fifsky.com", "https://fifsky.com", "https://www.fifsky.com"}
-
-	if config.App.Env == "dev" {
-		origins = []string{"*"}
+func NewRouter(handler *handler.Handler, middleware *middleware.Middleware) Router {
+	return Router{
+		handler:    handler,
+		middleware: middleware,
 	}
+}
 
-	// if CORS the remove annotation
-	router.Use(gee.Wrap(cors.New(cors.Config{
-		AllowOrigins:     origins,
-		AllowHeaders:     []string{"*"},
-		MaxAge:           24 * time.Hour,
-		AllowCredentials: false,
-	})))
+func (r *Router) Run(addr string) {
+	srv := &http.Server{
+		Addr:    addr,
+		Handler: r.route(r.handler, r.middleware),
+	}
+	log.Println("[HTTP] Server listen:" + addr)
+	gee.RegisterShutDown(func(sig os.Signal) {
+		ctxw, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		_ = srv.Close()
+		if err := srv.Shutdown(ctxw); err != nil {
+			log.Fatal("HTTP Server Shutdown:", err)
+		}
+		log.Println("HTTP Server exiting")
+	})
 
-	// 中间件
-	router.Use(gee.Wrap(middleware.Ginrus()))
+	// service connections
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("HTTP listen: %s\n", err)
+	}
+}
 
-	router.NoRoute(handler.Handle404)
+func (r *Router) route(handler *handler.Handler, middleware *middleware.Middleware) http.Handler {
+	router := gee.New()
+	// panic recover middleware
+	router.Use(gee.HandlerFunc(r.middleware.Recover))
+	// log middleware use for all handle
+	router.Use(gee.HandlerFunc(r.middleware.AccessLog))
 
-	router.POST("/api/dingmsg", handler.DingMsg)
-	router.POST("/api/login", handler.Login)
-	router.POST("/api/mood/list", handler.MoodList)
-	router.POST("/api/cate/all", handler.CateAll)
-	router.POST("/api/article/archive", handler.ArchiveArticle)
-	router.POST("/api/article/prevnext", handler.PrevNextArticle)
-	router.POST("/api/article/list", handler.ListArticle)
-	router.POST("/api/article/detail", handler.DetailArticle)
-	router.POST("/api/link/all", handler.LinkAll)
-	router.POST("/api/comment/new", handler.NewComment)
-	router.POST("/api/comment/list", handler.CommentList)
-	router.POST("/api/comment/post", handler.CommentPost)
-	router.GET("/api/avatar", handler.Avatar)
-	router.GET("/api/remind/change", middleware.RemindAuth, handler.RemindChange)
-	router.GET("/api/remind/delay", middleware.RemindAuth, handler.RemindDelay)
-	router.POST("/api/setting", handler.AdminSetting)
-	router.GET("/feed.xml", handler.FeedGet)
+	router.NoRoute(func(c *gee.Context) gee.Response {
+		return response.Fail(c, 404, "接口不存在")
+	})
+
+	router.POST("/api/dingmsg", handler.Comment.DingMsg)
+	router.POST("/api/login", handler.User.Login)
+	router.POST("/api/mood/list", handler.Mood.List)
+	router.POST("/api/cate/all", handler.Cate.All)
+	router.POST("/api/article/archive", handler.Article.Archive)
+	router.POST("/api/article/prevnext", handler.Article.PrevNext)
+	router.POST("/api/article/list", handler.Article.List)
+	router.POST("/api/article/detail", handler.Article.Detail)
+	router.POST("/api/link/all", handler.Link.All)
+	// router.POST("/api/comment/new", handler.Comment.Add)
+	// router.POST("/api/comment/list", handler.Comment.List)
+	// router.POST("/api/comment/post", handler.Comment.Post)
+	router.GET("/api/avatar", handler.Comment.Avatar)
+	router.GET("/api/remind/change", gee.HandlerFunc(middleware.RemindAuth), handler.Remind.Change)
+	router.GET("/api/remind/delay", gee.HandlerFunc(middleware.RemindAuth), handler.Remind.Delay)
+	router.POST("/api/setting", handler.Setting.Get)
+	router.GET("/feed.xml", handler.Article.Feed)
 
 	admin := router.Group("/api/admin")
-	admin.Use(middleware.AuthLogin)
+	admin.Use(gee.HandlerFunc(middleware.AuthLogin))
 	{
-		admin.POST("/loginuser", handler.AdminLoginUser)
-		admin.POST("/article/post", handler.AdminArticlePost)
-		admin.POST("/article/delete", handler.AdminArticleDelete)
-		admin.POST("/upload", handler.AdminUploadPost)
-		admin.POST("/setting/post", handler.AdminSettingPost)
-		admin.POST("/comment/list", handler.AdminCommentList)
-		admin.POST("/comment/delete", handler.AdminCommentDelete)
-		admin.POST("/mood/post", handler.AdminMoodPost)
-		admin.POST("/mood/delete", handler.AdminMoodDelete)
-		admin.POST("/cate/post", handler.AdminCatePost)
-		admin.POST("/cate/list", handler.AdminCateList)
-		admin.POST("/cate/delete", handler.AdminCateDelete)
-		admin.POST("/link/post", handler.AdminLinkPost)
-		admin.POST("/link/list", handler.AdminLinkList)
-		admin.POST("/link/delete", handler.AdminLinkDelete)
-		admin.POST("/remind/post", handler.AdminRemindPost)
-		admin.POST("/remind/list", handler.AdminRemindList)
-		admin.POST("/remind/delete", handler.AdminRemindDelete)
-		admin.POST("/user/get", handler.AdminUserGet)
-		admin.POST("/user/post", handler.AdminUserPost)
-		admin.POST("/user/list", handler.AdminUserList)
-		admin.POST("/user/status", handler.AdminUserStatus)
+		admin.POST("/loginuser", handler.User.LoginUser)
+		admin.POST("/article/post", handler.Article.Post)
+		admin.POST("/article/delete", handler.Article.Delete)
+		admin.POST("/upload", handler.Article.Upload)
+		admin.POST("/setting/post", handler.Setting.Post)
+		admin.POST("/comment/list", handler.Comment.List)
+		admin.POST("/comment/delete", handler.Comment.Delete)
+		admin.POST("/mood/post", handler.Mood.Post)
+		admin.POST("/mood/delete", handler.Mood.Delete)
+		admin.POST("/cate/post", handler.Cate.Post)
+		admin.POST("/cate/list", handler.Cate.List)
+		admin.POST("/cate/delete", handler.Cate.Delete)
+		admin.POST("/link/post", handler.Link.Post)
+		admin.POST("/link/list", handler.Link.List)
+		admin.POST("/link/delete", handler.Link.Delete)
+		admin.POST("/remind/post", handler.Remind.Post)
+		admin.POST("/remind/list", handler.Remind.List)
+		admin.POST("/remind/delete", handler.Remind.Delete)
+		admin.POST("/user/get", handler.User.Get)
+		admin.POST("/user/post", handler.User.Post)
+		admin.POST("/user/list", handler.User.List)
+		admin.POST("/user/status", handler.User.Status)
 	}
 
 	// debug handler
 	gee.DebugRoute(router)
+	return router
 }
+
+var ProviderSet = wire.NewSet(NewRouter)

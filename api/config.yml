@@ -1,11 +1,9 @@
 env: local
+app_name: "blog"
 common:
   debug: 'on'
   storage_path: storage/
-  session_secret: fifsky
   robot_token: ''
-  tcaptcha_id: ''
-  tcaptcha_secret: ''
   ding_app_secret: ''
   token_secret: ''
   env_type: 'acm'

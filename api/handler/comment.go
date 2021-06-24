@@ -4,16 +4,27 @@ import (
 	"fmt"
 	"time"
 
+	"app/provider/model"
+	"app/provider/repo"
 	"app/response"
+	"github.com/gin-gonic/gin"
 	"github.com/goapt/gee"
+	"github.com/goapt/golib/pagination"
 	"github.com/goapt/golib/robot"
 	"github.com/goapt/logger"
 	"github.com/ilibs/gosql/v2"
-
-	"app/model"
 )
 
-var CommentList gee.HandlerFunc = func(c *gee.Context) gee.Response {
+type Comment struct {
+	db          *gosql.DB
+	commentRepo *repo.Comment
+}
+
+func NewComment() *Comment {
+	return &Comment{}
+}
+
+func (m *Comment) List(c *gee.Context) gee.Response {
 	p := &struct {
 		Id int `json:"id"`
 	}{}
@@ -21,7 +32,7 @@ var CommentList gee.HandlerFunc = func(c *gee.Context) gee.Response {
 		response.Fail(c, 201, "参数错误")
 	}
 
-	comments, err := model.PostComments(p.Id, 1, 100)
+	comments, err := m.commentRepo.PostComments(p.Id, 1, 100)
 	if err != nil {
 		response.Fail(c, 500, err)
 	}
@@ -29,9 +40,7 @@ var CommentList gee.HandlerFunc = func(c *gee.Context) gee.Response {
 	return response.Success(c, comments)
 }
 
-var CommentPost gee.HandlerFunc = func(c *gee.Context) gee.Response {
-	return response.Fail(c, 201, "该功能已下线，请按 Ctrl + F5 强制刷新页面！")
-
+func (m *Comment) Post(c *gee.Context) gee.Response {
 	comment := &model.Comments{}
 	if err := c.ShouldBindJSON(comment); err != nil {
 		return response.Fail(c, 201, "参数错误:"+err.Error())
@@ -48,10 +57,6 @@ var CommentPost gee.HandlerFunc = func(c *gee.Context) gee.Response {
 	if comment.PostId <= 0 {
 		return response.Fail(c, 201, "非法评论")
 	}
-
-	//if err := TCaptchaVerify(c.PostForm("ticket"), c.PostForm("randstr"), c.ClientIP()); err != nil {
-	//	return response.Fail(c, 201, err)
-	//}
 
 	post := &model.Posts{}
 	err := gosql.Model(post).Where("id = ?", comment.PostId).Get()
@@ -78,8 +83,8 @@ var CommentPost gee.HandlerFunc = func(c *gee.Context) gee.Response {
 	return response.Success(c, comment)
 }
 
-var NewComment gee.HandlerFunc = func(c *gee.Context) gee.Response {
-	comments, err := model.NewComments()
+func (m *Comment) Add(c *gee.Context) gee.Response {
+	comments, err := m.commentRepo.NewComments()
 	if err != nil {
 		logger.Error(err)
 	}
@@ -100,4 +105,43 @@ var NewComment gee.HandlerFunc = func(c *gee.Context) gee.Response {
 	}
 
 	return response.Success(c, data)
+}
+
+func (m *Comment) AdminList(c *gee.Context) gee.Response {
+	p := &struct {
+		Page int `json:"page"`
+	}{}
+	if err := c.ShouldBindJSON(p); err != nil {
+		response.Fail(c, 201, "参数错误")
+	}
+
+	h := gin.H{}
+	num := 10
+	comments, err := m.commentRepo.CommentList(p.Page, num)
+	h["list"] = comments
+
+	total, err := gosql.Model(&model.Comments{}).Count()
+	pager := pagination.New(int(total), num, p.Page, 2)
+	h["pageTotal"] = pager.TotalPages()
+
+	if err != nil {
+		return response.Fail(c, 500, err)
+	}
+
+	return response.Success(c, h)
+}
+
+func (m *Comment) Delete(c *gee.Context) gee.Response {
+	p := &struct {
+		Id int `json:"id"`
+	}{}
+	if err := c.ShouldBindJSON(p); err != nil {
+		response.Fail(c, 201, "参数错误")
+	}
+
+	if _, err := gosql.Model(&model.Comments{Id: p.Id}).Delete(); err != nil {
+		logger.Error(err)
+		return response.Fail(c, 201, "删除失败")
+	}
+	return response.Success(c, nil)
 }

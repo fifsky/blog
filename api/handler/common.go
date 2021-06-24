@@ -1,19 +1,17 @@
 package handler
 
 import (
-	"errors"
-	"fmt"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
 	"io/ioutil"
-	"net/http"
-	"net/url"
 
 	"app/config"
-	"app/model"
+	"app/provider/model"
 	"app/response"
-
 	"github.com/goapt/gee"
+	"github.com/goapt/logger"
 	"github.com/ilibs/identicon"
-	"github.com/tidwall/gjson"
 )
 
 func getLoginUser(c *gee.Context) *model.Users {
@@ -23,11 +21,14 @@ func getLoginUser(c *gee.Context) *model.Users {
 	return nil
 }
 
-var Handle404 gee.HandlerFunc = func(c *gee.Context) gee.Response {
-	return response.Fail(c, 404, "接口不存在")
+type Common struct {
 }
 
-var Avatar gee.HandlerFunc = func(c *gee.Context) gee.Response {
+func NewCommon() *Common {
+	return &Common{}
+}
+
+func (m *Comment) Avatar(c *gee.Context) gee.Response {
 	name := c.DefaultQuery("name", "default")
 
 	// New Generator: Rehuse
@@ -47,35 +48,34 @@ var Avatar gee.HandlerFunc = func(c *gee.Context) gee.Response {
 		return nil
 	}
 	// Takes the size in pixels and any io.Writer
-	ii.Png(300, c.Writer) // 300px * 300px
+	_ = ii.Png(300, c.Writer) // 300px * 300px
 	return nil
 }
 
-func TCaptchaVerify(ticket, randstr, ip string) error {
-	p := &url.Values{}
-	p.Add("aid", config.App.Common.TCaptchaId)
-	p.Add("AppSecretKey", config.App.Common.TCaptchaSecret)
-	p.Add("Ticket", ticket)
-	p.Add("Randstr", randstr)
-	p.Add("UserIP", ip)
+func (m *Comment) DingMsg(c *gee.Context) gee.Response {
 
-	fmt.Println("https://ssl.captcha.qq.com/ticket/verify?" + p.Encode())
+	tt := c.GetHeader("timestamp")
+	sign := c.GetHeader("sign")
+	algorithm := hmac.New(sha256.New, []byte(config.App.Common.DingAppSecret))
+	algorithm.Write([]byte(tt + "\n" + config.App.Common.DingAppSecret))
+	sign2 := base64.StdEncoding.EncodeToString(algorithm.Sum(nil))
 
-	req, err := http.Get("https://ssl.captcha.qq.com/ticket/verify?" + p.Encode())
+	body, _ := ioutil.ReadAll(c.Request.Body)
+	logger.Info("body:", string(body))
 
-	if err != nil {
-		return err
-	}
-	defer req.Body.Close()
-
-	str, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		return err
-	}
-	ret := gjson.ParseBytes(str)
-	if ret.Get("response").Int() != 1 {
-		return errors.New(ret.Get("err_msg").String())
+	if sign != sign2 {
+		logger.Error("sign error", map[string]interface{}{
+			"sign":  sign,
+			"sign2": sign2,
+			"tt":    tt,
+		})
+		return response.Fail(c, 202, "签名错误")
 	}
 
-	return nil
+	return c.JSON(map[string]interface{}{
+		"msgtype": "text",
+		"text": map[string]interface{}{
+			"content": "我还在开发哦……",
+		},
+	})
 }
