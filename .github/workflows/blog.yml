@@ -33,8 +33,7 @@ jobs:
           TZ: Asia/Shanghai
         run: |
           cd api
-          make && make test
-          bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN}}
+          make && make test && bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN}}
 
       - name: Build VUE
         run: |
