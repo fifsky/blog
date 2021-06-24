@@ -24,7 +24,7 @@ jobs:
       - name: Build Golang
         run: |
           cd api
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o blogapi main.go
+          make && make test
 
       - name: Build VUE
         run: |

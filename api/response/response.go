@@ -9,7 +9,7 @@ import (
 type ApiResponse struct {
 	Context *gee.Context `json:"-"`
 	Code    int          `json:"code"`
-	Data    interface{}  `json:"data"`
+	Data    interface{}  `json:"data,omitempty"`
 	Msg     string       `json:"msg"`
 }
 
