@@ -29,12 +29,12 @@ func (m *Comment) List(c *gee.Context) gee.Response {
 		Id int `json:"id"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误")
 	}
 
 	comments, err := m.commentRepo.PostComments(p.Id, 1, 100)
 	if err != nil {
-		response.Fail(c, 500, err)
+		return response.Fail(c, 500, err)
 	}
 
 	return response.Success(c, comments)
@@ -112,7 +112,7 @@ func (m *Comment) AdminList(c *gee.Context) gee.Response {
 		Page int `json:"page"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误")
 	}
 
 	h := gin.H{}
@@ -136,7 +136,7 @@ func (m *Comment) Delete(c *gee.Context) gee.Response {
 		Id int `json:"id"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误")
 	}
 
 	if _, err := gosql.Model(&model.Comments{Id: p.Id}).Delete(); err != nil {

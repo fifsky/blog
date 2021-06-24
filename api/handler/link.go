@@ -74,7 +74,7 @@ func (l *Link) Delete(c *gee.Context) gee.Response {
 		Id int `json:"id"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误")
 	}
 
 	if _, err := l.db.Model(&model2.Links{Id: p.Id}).Delete(); err != nil {

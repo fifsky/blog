@@ -21,7 +21,7 @@ func NewSetting(db *gosql.DB, settingRepo *repo.Setting) *Setting {
 func (s *Setting) Get(c *gee.Context) gee.Response {
 	m, err := s.settingRepo.GetOptions()
 	if err != nil {
-		response.Fail(c, 202, err)
+		return response.Fail(c, 202, err)
 	}
 
 	return response.Success(c, m)

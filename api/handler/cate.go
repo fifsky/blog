@@ -76,7 +76,7 @@ func (a *Cate) Delete(c *gee.Context) gee.Response {
 		Id int `json:"id"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误")
 	}
 
 	total, _ := a.db.Model(&model.Posts{}).Where("cate_id = ?", p.Id).Count()

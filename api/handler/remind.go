@@ -66,7 +66,7 @@ func (r *Remind) List(c *gee.Context) gee.Response {
 		Page int `json:"page"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误")
 	}
 
 	h := gin.H{}
@@ -115,7 +115,7 @@ func (r *Remind) Delete(c *gee.Context) gee.Response {
 		Id int `json:"id"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误")
 	}
 
 	if _, err := r.db.Model(&model2.Reminds{Id: p.Id}).Delete(); err != nil {

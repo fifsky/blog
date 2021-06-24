@@ -72,7 +72,7 @@ func (u *User) Get(c *gee.Context) gee.Response {
 		Id int `json:"id"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误")
 	}
 
 	user := &model.Users{Id: p.Id}
@@ -89,7 +89,7 @@ func (u *User) List(c *gee.Context) gee.Response {
 		Page int `json:"page"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误")
 	}
 
 	h := gin.H{}

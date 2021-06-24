@@ -25,7 +25,7 @@ func (m *Mood) List(c *gee.Context) gee.Response {
 		Page int `json:"page"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误")
 	}
 
 	h := gin.H{}
@@ -76,7 +76,7 @@ func (m *Mood) Delete(c *gee.Context) gee.Response {
 		Id int `json:"id"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误")
 	}
 
 	if _, err := m.db.Model(&model2.Moods{Id: p.Id}).Delete(); err != nil {

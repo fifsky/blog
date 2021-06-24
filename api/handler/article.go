@@ -50,7 +50,7 @@ func (a *Article) Archive(c *gee.Context) gee.Response {
 func (a *Article) List(c *gee.Context) gee.Response {
 	options, err := a.settingRepo.GetOptions()
 	if err != nil {
-		response.Fail(c, 202, err)
+		return response.Fail(c, 202, err)
 	}
 
 	num, err := convert.StrTo(options["post_num"]).Int()
@@ -67,14 +67,17 @@ func (a *Article) List(c *gee.Context) gee.Response {
 		Type    int    `json:"type"`
 	}{}
 	if err := c.ShouldBindJSON(req); err != nil {
-		response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误")
 	}
 
 	cate := &model.Cates{}
 
 	if req.Domain != "" {
 		cate.Domain = req.Domain
-		a.db.Model(cate).Get()
+		err := a.db.Model(cate).Get()
+		if err != nil {
+			return response.Fail(c, 202, err)
+		}
 	}
 
 	artdate := ""
@@ -170,7 +173,7 @@ func (a *Article) Feed(c *gee.Context) gee.Response {
 	now := time.Now()
 	options, err := a.settingRepo.GetOptions()
 	if err != nil {
-		response.Fail(c, 202, err)
+		return response.Fail(c, 202, err)
 	}
 
 	feed := &feeds.Feed{
