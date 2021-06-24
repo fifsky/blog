@@ -127,9 +127,11 @@ func Load(args map[string]string) {
 		}
 
 	} else {
-		// load config
-		if err := conf.Env(filepath.Join(appPath, ".env")); err != nil {
-			log.Fatal("config env error:", err)
+		if !App.IsTesting {
+			// load config
+			if err := conf.Env(filepath.Join(appPath, ".env")); err != nil {
+				log.Fatal("config env error:", err)
+			}
 		}
 	}
 
