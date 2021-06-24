@@ -60,7 +60,7 @@ func TestFixtures(t *testing.T) {
 	})
 
 	t.Run("moods", func(t *testing.T) {
-		_, err := dbunit.Dump(db("blog"), testutil.Fixture("moons"), "select * from moods limit 2")
+		_, err := dbunit.Dump(db("blog"), testutil.Fixture("moods"), "select * from moods limit 2")
 		if err != nil {
 			panic(err)
 		}
