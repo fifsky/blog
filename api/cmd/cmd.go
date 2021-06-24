@@ -19,8 +19,7 @@ func NewCommands(cmd *Commands) cli.Commands {
 }
 
 type Commands struct {
-	HttpCmd    HttpCmd
-	InstallCmd InstallCmd
+	HttpCmd HttpCmd
 }
 
-var ProviderSet = wire.NewSet(NewHttp, NewInstallCmd, NewCommands, wire.Struct(new(Commands), "*"))
+var ProviderSet = wire.NewSet(NewHttp, NewCommands, wire.Struct(new(Commands), "*"))
