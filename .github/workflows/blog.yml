@@ -28,7 +28,7 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
 
-      - name: Build Golang
+      - name: Build Golang and Test
         env:
           TZ: Asia/Shanghai
         run: |

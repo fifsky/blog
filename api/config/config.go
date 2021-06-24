@@ -161,13 +161,7 @@ func Load(args map[string]string) {
 		App.Log.LogMode = "std"
 	}
 
-	if args["show-sql"] == "on" {
-		for _, d := range App.DB {
-			d.ShowSql = true
-		}
-	} else if args["show-sql"] == "off" {
-		for _, d := range App.DB {
-			d.ShowSql = false
-		}
+	for _, d := range App.DB {
+		d.ShowSql = args["show-sql"] == "on"
 	}
 }
