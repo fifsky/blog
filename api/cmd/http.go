@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"log"
+
+	"app/config"
 	"github.com/urfave/cli/v2"
 
 	"app/router"
@@ -22,6 +25,7 @@ func NewHttp(router router.Router) HttpCmd {
 			if !ctx.IsSet("addr") {
 				_ = ctx.Set("addr", ":8080")
 			}
+			log.Println("[Env] Run profile:" + config.App.Env)
 			router.Run(ctx.String("addr"))
 			return nil
 		},

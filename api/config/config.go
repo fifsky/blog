@@ -106,6 +106,10 @@ func Load(args map[string]string) {
 		log.Fatalf("config error %s", err.Error())
 	}
 
+	if args["env"] != "" {
+		conf.Set("env", args["env"])
+	}
+
 	if err := conf.Unmarshal(App); err != nil {
 		log.Fatal("config unmarshal error:", err)
 	}

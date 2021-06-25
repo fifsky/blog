@@ -51,6 +51,8 @@ func (r *Router) Run(addr string) {
 
 func (r *Router) route(handler *handler.Handler, middleware *middleware.Middleware) http.Handler {
 	router := gee.New()
+	// cors middleware
+	router.Use(gee.HandlerFunc(r.middleware.Cors))
 	// panic recover middleware
 	router.Use(gee.HandlerFunc(r.middleware.Recover))
 	// log middleware use for all handle

@@ -71,10 +71,8 @@ func Initialize() cli.Commands {
 	}
 	routerRouter := router.NewRouter(handlerHandler, middlewareMiddleware)
 	httpCmd := cmd.NewHttp(routerRouter)
-	installCmd := cmd.NewInstallCmd()
 	commands := &cmd.Commands{
-		HttpCmd:    httpCmd,
-		InstallCmd: installCmd,
+		HttpCmd: httpCmd,
 	}
 	cliCommands := cmd.NewCommands(commands)
 	return cliCommands

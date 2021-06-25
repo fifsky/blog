@@ -14,10 +14,12 @@ RUN apk update && \
 WORKDIR /app
 
 COPY --from=builder /build/app ./
-COPY --from=builder /build/.env ./
+COPY --from=builder /build/storage/ ./
 COPY --from=builder /build/config.yml ./
+
+RUN
 
 ENV TZ=Asia/Shanghai
 EXPOSE 80
 
-ENTRYPOINT ["./app","http","--addr=:80"]
+ENTRYPOINT ["./app","http","--addr=:80","--env=prod"]
