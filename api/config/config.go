@@ -157,14 +157,6 @@ func Load(args map[string]string) {
 		App.Common.Debug = args["debug"]
 	}
 
-	// debug
-	if App.Common.Debug == "on" {
-		// log level
-		App.Log.LogLevel = "debug"
-		// log model
-		App.Log.LogMode = "std"
-	}
-
 	for _, d := range App.DB {
 		d.ShowSql = args["show-sql"] == "on"
 	}

@@ -16,11 +16,13 @@ database:
     max_idle_conns: 20
     show_sql: false
 log:
-  log_mode: file
-  log_level: info
+  log_mode: "file"
+  log_path: "./storage/logs/"
+  log_format: "json"
+  log_level: "info"
   log_max_files: 15
-  log_sentry_dsn: ''
-  log_sentry_type: blog
+  log_sentry_dsn: ""
+  log_sentry_type: "go"
   log_detail: true
 oss:
   access_key: ''

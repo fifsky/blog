@@ -14,10 +14,8 @@ RUN apk update && \
 WORKDIR /app
 
 COPY --from=builder /build/app ./
-COPY --from=builder /build/storage/ ./storage
+COPY --from=builder /build/storage/ ./storage/
 COPY --from=builder /build/config.yml ./
-
-RUN
 
 ENV TZ=Asia/Shanghai
 EXPOSE 80
