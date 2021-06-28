@@ -18,3 +18,14 @@ func TestUser_GetList(t *testing.T) {
 		assert.Equal(t, "rita", users[0].Name)
 	})
 }
+
+func TestUser_GetUser(t *testing.T) {
+	dbunit.New(t, func(d *dbunit.DBUnit) {
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixture("users"))
+		repoUser := NewUser(db)
+		ret, err := repoUser.GetUser(1)
+		assert.NoError(t, err)
+		assert.NotNil(t, ret)
+		assert.Equal(t, "test", ret.Name)
+	})
+}

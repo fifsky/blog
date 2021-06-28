@@ -62,7 +62,7 @@ func (a *Article) PostNext(id int) (*model.Posts, error) {
 
 func (a *Article) PostArchive() ([]map[string]string, error) {
 	m := make([]map[string]string, 0)
-	result, err := gosql.Queryx("select ym,count(ym) total from (select DATE_FORMAT(created_at,'%Y/%m') as ym from posts where type = 1 and status = 1) s group by ym order by ym desc")
+	result, err := a.db.Queryx("select ym,count(ym) total from (select DATE_FORMAT(created_at,'%Y/%m') as ym from posts where type = 1 and status = 1) s group by ym order by ym desc")
 
 	if err != nil {
 		return nil, err
