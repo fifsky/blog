@@ -20,8 +20,8 @@ type Comment struct {
 	commentRepo *repo.Comment
 }
 
-func NewComment() *Comment {
-	return &Comment{}
+func NewComment(db *gosql.DB, commentRepo *repo.Comment) *Comment {
+	return &Comment{db: db, commentRepo: commentRepo}
 }
 
 func (m *Comment) List(c *gee.Context) gee.Response {
@@ -59,7 +59,7 @@ func (m *Comment) Post(c *gee.Context) gee.Response {
 	}
 
 	post := &model.Posts{}
-	err := gosql.Model(post).Where("id = ?", comment.PostId).Get()
+	err := m.db.Model(post).Where("id = ?", comment.PostId).Get()
 	if err != nil {
 		return response.Fail(c, 201, "文章不存在")
 	}
@@ -67,7 +67,7 @@ func (m *Comment) Post(c *gee.Context) gee.Response {
 	comment.CreatedAt = time.Now()
 	comment.IP = c.ClientIP()
 
-	if _, err := gosql.Model(comment).Create(); err != nil {
+	if _, err := m.db.Model(comment).Create(); err != nil {
 		logger.Error(err)
 		return response.Fail(c, 201, "评论失败"+err.Error())
 	}
@@ -120,7 +120,7 @@ func (m *Comment) AdminList(c *gee.Context) gee.Response {
 	comments, err := m.commentRepo.CommentList(p.Page, num)
 	h["list"] = comments
 
-	total, err := gosql.Model(&model.Comments{}).Count()
+	total, err := m.db.Model(&model.Comments{}).Count()
 	pager := pagination.New(int(total), num, p.Page, 2)
 	h["pageTotal"] = pager.TotalPages()
 
@@ -139,7 +139,7 @@ func (m *Comment) Delete(c *gee.Context) gee.Response {
 		return response.Fail(c, 201, "参数错误")
 	}
 
-	if _, err := gosql.Model(&model.Comments{Id: p.Id}).Delete(); err != nil {
+	if _, err := m.db.Model(&model.Comments{Id: p.Id}).Delete(); err != nil {
 		logger.Error(err)
 		return response.Fail(c, 201, "删除失败")
 	}
