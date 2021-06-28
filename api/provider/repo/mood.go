@@ -25,11 +25,13 @@ func (m *Mood) MoodGetList(start int, num int) ([]*UserMoods, error) {
 	var moods = make([]*UserMoods, 0)
 	start = (start - 1) * num
 
-	err := gosql.Model(&moods).Limit(num).Offset(start).OrderBy("id desc").All()
+	err := m.db.Model(gosql.NewModelWrapper(map[string]*gosql.DB{
+		"default": m.db,
+	}, &moods)).Limit(num).Offset(start).OrderBy("id desc").All()
 
 	if err != nil {
 		return nil, err
 	}
 
-	return moods, err
+	return moods, nil
 }

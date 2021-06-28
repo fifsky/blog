@@ -20,7 +20,12 @@ func NewLink(db *gosql.DB, linkRepo *repo.Link) *Link {
 }
 
 func (l *Link) All(c *gee.Context) gee.Response {
-	links := l.linkRepo.GetAllLinks()
+	links, err := l.linkRepo.GetAllLinks()
+
+	if err != nil {
+		return response.Fail(c, 203, err)
+	}
+
 	data := make([]map[string]string, 0)
 
 	for _, v := range links {
@@ -34,7 +39,11 @@ func (l *Link) All(c *gee.Context) gee.Response {
 }
 
 func (l *Link) List(c *gee.Context) gee.Response {
-	links := l.linkRepo.GetAllLinks()
+	links, err := l.linkRepo.GetAllLinks()
+	if err != nil {
+		return response.Fail(c, 203, err)
+	}
+
 	return response.Success(c, gin.H{
 		"list":      links,
 		"pageTotal": len(links),

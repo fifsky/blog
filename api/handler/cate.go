@@ -22,7 +22,11 @@ func NewCate(db *gosql.DB, cateRepo *repo.Cate) *Cate {
 }
 
 func (a *Cate) All(c *gee.Context) gee.Response {
-	cates := a.cateRepo.GetAllCates()
+	cates, err := a.cateRepo.GetAllCates()
+	if err != nil {
+		return response.Fail(c, 203, err)
+	}
+
 	data := make([]map[string]string, 0)
 
 	for _, v := range cates {
@@ -36,7 +40,10 @@ func (a *Cate) All(c *gee.Context) gee.Response {
 }
 
 func (a *Cate) List(c *gee.Context) gee.Response {
-	cates := a.cateRepo.GetAllCates()
+	cates, err := a.cateRepo.GetAllCates()
+	if err != nil {
+		return response.Fail(c, 203, err)
+	}
 	return response.Success(c, gin.H{
 		"list":      cates,
 		"pageTotal": len(cates),

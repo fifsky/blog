@@ -327,6 +327,8 @@ github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:
 github.com/ilibs/gosql/v2 v2.0.5/go.mod h1:kU5sf2paHLCtYaM446ZHYBxwlFo4Kuk/BGrKEJfb7x4=
 github.com/ilibs/gosql/v2 v2.1.0 h1:Qc9C2zZP422FAd/8zmoVIHsbTQixToI7uL9mp+Q5HWU=
 github.com/ilibs/gosql/v2 v2.1.0/go.mod h1:kU5sf2paHLCtYaM446ZHYBxwlFo4Kuk/BGrKEJfb7x4=
+github.com/ilibs/gosql/v2 v2.1.1 h1:LTV7OczHXKG2XRRa0OCXeDNouOHFE+zPEAgVgr5f2yY=
+github.com/ilibs/gosql/v2 v2.1.1/go.mod h1:FqK1UpRwNTK24aI2f+Mz4hxIu3P7BDmK+OX7rxwqhow=
 github.com/ilibs/identicon v1.0.0 h1:vvRZnmw6JgbBqaV//Aw8vWXuWWUF6ZeCoQ/y9vE3D1s=
 github.com/ilibs/identicon v1.0.0/go.mod h1:GKc1qyWBLQdt5ygVh/8VdnELSMH7LnDCLi3Qr0JDIqM=
 github.com/ilibs/jsontime v1.0.3/go.mod h1:t0x7FSBsZ5UWE7Ge/4dv5wdIacTq9idHDKmu7wNIo00=

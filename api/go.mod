@@ -19,7 +19,7 @@ require (
 	github.com/goapt/test v1.0.0
 	github.com/google/wire v0.5.0
 	github.com/gorilla/feeds v1.1.1
-	github.com/ilibs/gosql/v2 v2.1.0
+	github.com/ilibs/gosql/v2 v2.1.1
 	github.com/ilibs/identicon v1.0.0
 	github.com/jmoiron/sqlx v1.3.4 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible

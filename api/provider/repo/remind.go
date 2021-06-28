@@ -18,7 +18,7 @@ func NewRemind(db *gosql.DB) *Remind {
 func (r *Remind) RemindGetList(start int, num int) ([]*model.Reminds, error) {
 	var m = make([]*model.Reminds, 0)
 	start = (start - 1) * num
-	err := gosql.Model(&m).OrderBy("id desc").Limit(num).Offset(start).All()
+	err := r.db.Model(&m).OrderBy("id desc").Limit(num).Offset(start).All()
 	if err != nil {
 		return nil, err
 	}

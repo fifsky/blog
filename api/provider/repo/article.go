@@ -41,7 +41,7 @@ func (a *Article) PostPrev(id int) (*model.Posts, error) {
 	m := &model.Posts{
 		Type: 1,
 	}
-	err := gosql.Model(m).Where("id < ? and status = 1", id).OrderBy("id desc").Limit(1).Get()
+	err := a.db.Model(m).Where("id < ? and status = 1", id).OrderBy("id desc").Limit(1).Get()
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (a *Article) PostNext(id int) (*model.Posts, error) {
 	m := &model.Posts{
 		Type: 1,
 	}
-	err := gosql.Model(m).Where("id > ? and status = 1", id).OrderBy("id asc").Limit(1).Get()
+	err := a.db.Model(m).Where("id > ? and status = 1", id).OrderBy("id asc").Limit(1).Get()
 
 	if err != nil {
 		return nil, err
@@ -107,7 +107,7 @@ func (a *Article) PostGetList(p *model.Posts, start int, num int, artdate, keywo
 		args = append(args, "%"+keyword+"%")
 	}
 
-	err := gosql.Model(&posts).Where(where, args...).Limit(num).Offset(start).OrderBy("id desc").All()
+	err := a.db.Model(&posts).Where(where, args...).Limit(num).Offset(start).OrderBy("id desc").All()
 
 	if err != nil {
 		return nil, err
