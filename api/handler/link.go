@@ -1,7 +1,7 @@
 package handler
 
 import (
-	model2 "app/provider/model"
+	"app/provider/model"
 	"app/provider/repo"
 	"app/response"
 	"github.com/gin-gonic/gin"
@@ -51,7 +51,7 @@ func (l *Link) List(c *gee.Context) gee.Response {
 }
 
 func (l *Link) Post(c *gee.Context) gee.Response {
-	link := &model2.Links{}
+	link := &model.Links{}
 	if err := c.ShouldBindJSON(link); err != nil {
 		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
@@ -86,7 +86,7 @@ func (l *Link) Delete(c *gee.Context) gee.Response {
 		return response.Fail(c, 201, "参数错误")
 	}
 
-	if _, err := l.db.Model(&model2.Links{Id: p.Id}).Delete(); err != nil {
+	if _, err := l.db.Model(&model.Links{Id: p.Id}).Delete(); err != nil {
 		logger.Error(err)
 		return response.Fail(c, 201, "删除失败")
 	}
