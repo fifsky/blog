@@ -23,7 +23,7 @@ func TestLink_All(t *testing.T) {
 		resp, err := req.JSON(nil)
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.Equal(t, int64(200), resp.GetJsonBody("code"))
+		require.Equal(t, int64(200), resp.GetJsonBody("code").Int())
 		require.Equal(t, "圆子", resp.GetJsonBody("data.0.content").String())
 	})
 }
@@ -37,6 +37,7 @@ func TestLink_List(t *testing.T) {
 		resp, err := req.JSON(map[string]interface{}{"page": 1})
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, resp.Code)
+		require.Equal(t, int64(200), resp.GetJsonBody("code").Int())
 		require.True(t, resp.GetJsonBody("data.list").Exists())
 	})
 }
