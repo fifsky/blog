@@ -84,7 +84,7 @@ func (u *User) List(c *gee.Context) gee.Response {
 		Page int `json:"page" binding:"required"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	h := gin.H{}
