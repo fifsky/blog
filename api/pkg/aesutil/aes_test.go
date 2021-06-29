@@ -1,35 +1,47 @@
 package aesutil
 
 import (
-	"fmt"
-	"net/url"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
+const testSecret = "abcdabcdabcdabcd"
+
 func TestAesEncode(t *testing.T) {
-	secret := "Cif$kyL!1024@iLU"
+	t.Run("encode", func(t *testing.T) {
+		str, err := AesEncode(testSecret, "123")
+		assert.NoError(t, err)
+		assert.Equal(t, `R0I+Owj5eBnU5dNFKbtCXw==`, str)
+	})
 
-	str, err := AesEncode(secret, "123")
-	if err != nil {
-		t.Error(err)
-	}
-	fmt.Println(url.QueryEscape(str))
+	t.Run("error", func(t *testing.T) {
+		errSecret := "abcdabcdabcdabc"
+		_, err := AesEncode(errSecret, "123")
+		assert.Error(t, err)
+	})
 
-	ori, err := AesDecode(secret, str)
-	if err != nil {
-		t.Error(err)
-	}
-	fmt.Println(ori)
 }
 
 func TestAesDecode(t *testing.T) {
-	secret := "Cif$kyL!1024@iLU"
+	t.Run("decode", func(t *testing.T) {
+		str := "R0I+Owj5eBnU5dNFKbtCXw=="
 
-	str := "ug2+QKXIrvkMN/g7zKIwFg=="
+		ori, err := AesDecode(testSecret, str)
+		assert.NoError(t, err)
+		assert.Equal(t, `123`, ori)
+	})
 
-	ori, err := AesDecode(secret, str)
-	if err != nil {
-		t.Error(err)
-	}
-	fmt.Println(ori)
+	t.Run("decode", func(t *testing.T) {
+		str := "R0I+Owj5eBnU5dNFKbtCXw="
+		_, err := AesDecode(testSecret, str)
+		assert.Error(t, err)
+	})
+
+	t.Run("decode", func(t *testing.T) {
+		str := "R0I+Owj5eBnU5dNFKbtCXw=="
+		errSecret := "abcdabcdabcdabc"
+		_, err := AesDecode(errSecret, str)
+		assert.Error(t, err)
+	})
 }
