@@ -213,7 +213,7 @@ func TestUser_Post(t *testing.T) {
 			},
 			{
 				"params error",
-				gee.H{"name": "demo2", "password": "123"},
+				gee.H{"name": "demo2", "password": "123", "type": 1},
 				`{"code":201,"msg":"参数错误:缺少nick_name"}`,
 			},
 			{
