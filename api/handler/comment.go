@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"time"
 
 	"app/provider/model"
 	"app/provider/repo"
@@ -52,7 +51,6 @@ func (m *Comment) Post(c *gee.Context) gee.Response {
 		return response.Fail(c, 201, "文章不存在")
 	}
 
-	comment.CreatedAt = time.Now()
 	comment.IP = c.ClientIP()
 
 	if _, err := m.db.Model(comment).Create(); err != nil {

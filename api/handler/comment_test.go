@@ -64,7 +64,7 @@ func TestComment_Post(t *testing.T) {
 			{
 				"success",
 				gee.H{"post_id": 7, "pid": 0, "name": "demo", "content": "test", "ip": "127.0.0.1", "created_at": "2021-06-29 11:55:09"},
-				`{"code":200,"data":{"id":11,"post_id":7,"pid":0,"name":"demo","content":"test","ip":"","created_at":"2021-06-29 14:30:03"},"msg":"success"}`,
+				`{"code":200,"data":{"id":11,"post_id":7,"pid":0,"name":"demo","content":"test","ip":"","created_at":"2021-06-29 11:55:09"},"msg":"success"}`,
 			},
 			{
 				"post not found",
