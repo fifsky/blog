@@ -63,10 +63,10 @@ func (r *Remind) Delay(c *gee.Context) gee.Response {
 
 func (r *Remind) List(c *gee.Context) gee.Response {
 	p := &struct {
-		Page int `json:"page"`
+		Page int `json:"page" binding:"required"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	h := gin.H{}
