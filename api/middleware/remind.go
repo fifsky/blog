@@ -1,9 +1,7 @@
 package middleware
 
 import (
-	"fmt"
-
-	model2 "app/provider/model"
+	"app/provider/model"
 	"app/response"
 	"github.com/goapt/gee"
 	"github.com/goapt/golib/convert"
@@ -15,7 +13,7 @@ import (
 
 type RemindAuth gee.HandlerFunc
 
-func NewRemindAuth() RemindAuth {
+func NewRemindAuth(db *gosql.DB) RemindAuth {
 	return func(c *gee.Context) gee.Response {
 		token := c.Query("token")
 
@@ -27,14 +25,14 @@ func NewRemindAuth() RemindAuth {
 		id, err := aesutil.AesDecode(config.App.Common.TokenSecret, token)
 		if err != nil {
 			c.Abort()
-			return response.Fail(c, 202, fmt.Sprintf("error:%s token:%s", err, token))
+			return response.Fail(c, 202, "Token错误")
 		}
 
-		remind := &model2.Reminds{Id: convert.StrTo(id).MustInt()}
-		err = gosql.Model(remind).Get()
+		remind := &model.Reminds{Id: convert.StrTo(id).MustInt()}
+		err = db.Model(remind).Get()
 		if err != nil {
 			c.Abort()
-			return response.Fail(c, 203, fmt.Sprintf("error:%s token:%s", err, token))
+			return response.Fail(c, 203, "数据不存在")
 		}
 
 		c.Set("remind", remind)
