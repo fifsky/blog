@@ -1,7 +1,7 @@
 package handler
 
 import (
-	model2 "app/provider/model"
+	"app/provider/model"
 	"app/provider/repo"
 	"app/response"
 	"github.com/gin-gonic/gin"
@@ -22,10 +22,10 @@ func NewMood(db *gosql.DB, moodRepo *repo.Mood) *Mood {
 
 func (m *Mood) List(c *gee.Context) gee.Response {
 	p := &struct {
-		Page int `json:"page"`
+		Page int `json:"page" binding:"required"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	h := gin.H{}
@@ -33,7 +33,7 @@ func (m *Mood) List(c *gee.Context) gee.Response {
 	moods, err := m.moodRepo.MoodGetList(p.Page, num)
 	h["list"] = moods
 
-	total, err := m.db.Model(&model2.Moods{}).Count()
+	total, err := m.db.Model(&model.Moods{}).Count()
 	pager := pagination.New(int(total), num, p.Page, 2)
 	h["pageTotal"] = pager.TotalPages()
 
@@ -45,16 +45,12 @@ func (m *Mood) List(c *gee.Context) gee.Response {
 }
 
 func (m *Mood) Post(c *gee.Context) gee.Response {
-	mood := &model2.Moods{}
+	mood := &model.Moods{}
 	if err := c.ShouldBindJSON(mood); err != nil {
 		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	mood.UserId = getLoginUser(c).Id
-
-	if mood.Content == "" {
-		return response.Fail(c, 201, "内容不能为空")
-	}
 
 	if mood.Id > 0 {
 		if _, err := m.db.Model(mood).Update(); err != nil {
@@ -73,13 +69,13 @@ func (m *Mood) Post(c *gee.Context) gee.Response {
 
 func (m *Mood) Delete(c *gee.Context) gee.Response {
 	p := &struct {
-		Id int `json:"id"`
+		Id int `json:"id" binding:"required"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
-	if _, err := m.db.Model(&model2.Moods{Id: p.Id}).Delete(); err != nil {
+	if _, err := m.db.Model(&model.Moods{Id: p.Id}).Delete(); err != nil {
 		logger.Error(err)
 		return response.Fail(c, 201, "删除失败")
 	}
