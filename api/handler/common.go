@@ -28,7 +28,7 @@ func NewCommon() *Common {
 	return &Common{}
 }
 
-func (m *Comment) Avatar(c *gee.Context) gee.Response {
+func (m *Common) Avatar(c *gee.Context) gee.Response {
 	name := c.DefaultQuery("name", "default")
 
 	// New Generator: Rehuse
@@ -52,7 +52,7 @@ func (m *Comment) Avatar(c *gee.Context) gee.Response {
 	return nil
 }
 
-func (m *Comment) DingMsg(c *gee.Context) gee.Response {
+func (m *Common) DingMsg(c *gee.Context) gee.Response {
 
 	tt := c.GetHeader("timestamp")
 	sign := c.GetHeader("sign")

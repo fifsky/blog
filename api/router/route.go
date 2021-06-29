@@ -62,7 +62,7 @@ func (r *Router) route(handler *handler.Handler, middleware *middleware.Middlewa
 		return response.Fail(c, 404, "接口不存在")
 	})
 
-	router.POST("/api/dingmsg", handler.Comment.DingMsg)
+	router.POST("/api/dingmsg", handler.Common.DingMsg)
 	router.POST("/api/login", handler.User.Login)
 	router.POST("/api/mood/list", handler.Mood.List)
 	router.POST("/api/cate/all", handler.Cate.All)
@@ -74,7 +74,7 @@ func (r *Router) route(handler *handler.Handler, middleware *middleware.Middlewa
 	// router.POST("/api/comment/new", handler.Comment.Add)
 	// router.POST("/api/comment/list", handler.Comment.List)
 	// router.POST("/api/comment/post", handler.Comment.Post)
-	router.GET("/api/avatar", handler.Comment.Avatar)
+	router.GET("/api/avatar", handler.Common.Avatar)
 	router.GET("/api/remind/change", gee.HandlerFunc(middleware.RemindAuth), handler.Remind.Change)
 	router.GET("/api/remind/delay", gee.HandlerFunc(middleware.RemindAuth), handler.Remind.Delay)
 	router.POST("/api/setting", handler.Setting.Get)

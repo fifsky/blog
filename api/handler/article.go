@@ -63,11 +63,11 @@ func (a *Article) List(c *gee.Context) gee.Response {
 		Month   string `json:"month"`
 		Domain  string `json:"domain"`
 		Keyword string `json:"keyword"`
-		Page    int    `json:"page"`
+		Page    int    `json:"page" binding:"required"`
 		Type    int    `json:"type"`
 	}{}
 	if err := c.ShouldBindJSON(req); err != nil {
-		return response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	cate := &model.Cates{}
@@ -126,10 +126,10 @@ func (a *Article) List(c *gee.Context) gee.Response {
 
 func (a *Article) PrevNext(c *gee.Context) gee.Response {
 	req := &struct {
-		Id int `json:"id"`
+		Id int `json:"id" binding:"required"`
 	}{}
 	if err := c.ShouldBindJSON(req); err != nil {
-		return response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	h := gin.H{}
@@ -161,6 +161,11 @@ func (a *Article) Detail(c *gee.Context) gee.Response {
 	if err := c.ShouldBindJSON(req); err != nil {
 		return response.Fail(c, 201, "参数错误")
 	}
+
+	if req.Id < 1 && req.Url == "" {
+		return response.Fail(c, 201, "参数错误")
+	}
+
 	post, err := a.artRepo.GetUserPost(req.Id, req.Url)
 	if err != nil {
 		return response.Fail(c, 202, "您访问的文章不存在或已经删除！")
@@ -248,7 +253,7 @@ func (a *Article) Post(c *gee.Context) gee.Response {
 
 func (a *Article) Delete(c *gee.Context) gee.Response {
 	p := &struct {
-		Id int `json:"id"`
+		Id int `json:"id" binding:"required"`
 	}{}
 
 	if err := c.ShouldBindJSON(p); err != nil {
