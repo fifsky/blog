@@ -73,8 +73,8 @@ func TestComment_Post(t *testing.T) {
 			},
 			{
 				"params error",
-				gee.H{"name": "demo2", "password": "123"},
-				`{"code":201,"msg":"参数错误:缺少post_id"}`,
+				gee.H{"post_id": 7, "name": "demo"},
+				`{"code":201,"msg":"参数错误:缺少content"}`,
 			},
 		}
 
