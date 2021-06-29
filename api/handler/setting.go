@@ -1,7 +1,7 @@
 package handler
 
 import (
-	model2 "app/provider/model"
+	"app/provider/model"
 	"app/provider/repo"
 	"app/response"
 	"github.com/goapt/gee"
@@ -36,11 +36,18 @@ func (s *Setting) Post(c *gee.Context) gee.Response {
 
 	options := gjson.ParseBytes(body)
 
+	m := make(map[string]string)
+
 	for k, v := range options.Map() {
-		s.db.Model(&model2.Options{
+		_, err := s.db.Model(&model.Options{
 			OptionValue: v.String(),
 		}).Where("option_key = ?", k).Update()
+
+		if err != nil {
+			return response.Fail(c, 203, err)
+		}
+		m[k] = v.String()
 	}
 
-	return response.Success(c, options)
+	return response.Success(c, m)
 }

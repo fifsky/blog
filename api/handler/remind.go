@@ -3,7 +3,7 @@ package handler
 import (
 	"time"
 
-	model2 "app/provider/model"
+	"app/provider/model"
 	"app/provider/repo"
 	"app/response"
 	"github.com/gin-gonic/gin"
@@ -30,9 +30,9 @@ func (r *Remind) Change(c *gee.Context) gee.Response {
 		return response.Fail(c, 202, "记录未找到")
 	}
 
-	v := remind.(*model2.Reminds)
+	v := remind.(*model.Reminds)
 
-	_, err := r.db.Model(&model2.Reminds{Status: 1}).Where("id = ?", v.Id).Update()
+	_, err := r.db.Model(&model.Reminds{Status: 1}).Where("id = ?", v.Id).Update()
 
 	if err != nil {
 		return response.Fail(c, 203, err)
@@ -49,10 +49,10 @@ func (r *Remind) Delay(c *gee.Context) gee.Response {
 		return response.Fail(c, 202, "记录未找到")
 	}
 
-	v := remind.(*model2.Reminds)
+	v := remind.(*model.Reminds)
 
 	nextTime := time.Now().Add(10 * time.Minute)
-	_, err := r.db.Model(&model2.Reminds{NextTime: nextTime}).Where("id = ?", v.Id).Update()
+	_, err := r.db.Model(&model.Reminds{NextTime: nextTime}).Where("id = ?", v.Id).Update()
 
 	if err != nil {
 		return response.Fail(c, 203, err)
@@ -74,7 +74,7 @@ func (r *Remind) List(c *gee.Context) gee.Response {
 	reminds, err := r.remindRepo.RemindGetList(p.Page, num)
 	h["list"] = reminds
 
-	total, err := r.db.Model(&model2.Reminds{}).Count()
+	total, err := r.db.Model(&model.Reminds{}).Count()
 	pager := pagination.New(int(total), num, p.Page, 2)
 	h["pageTotal"] = pager.TotalPages()
 
@@ -86,13 +86,9 @@ func (r *Remind) List(c *gee.Context) gee.Response {
 }
 
 func (r *Remind) Post(c *gee.Context) gee.Response {
-	remind := &model2.Reminds{}
+	remind := &model.Reminds{}
 	if err := c.ShouldBindJSON(remind); err != nil {
 		return response.Fail(c, 201, "参数错误:"+err.Error())
-	}
-
-	if remind.Content == "" {
-		return response.Fail(c, 201, "提醒内容不能为空")
 	}
 
 	if remind.Id > 0 {
@@ -112,13 +108,13 @@ func (r *Remind) Post(c *gee.Context) gee.Response {
 
 func (r *Remind) Delete(c *gee.Context) gee.Response {
 	p := &struct {
-		Id int `json:"id"`
+		Id int `json:"id" binding:"required"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
-	if _, err := r.db.Model(&model2.Reminds{Id: p.Id}).Delete(); err != nil {
+	if _, err := r.db.Model(&model.Reminds{Id: p.Id}).Delete(); err != nil {
 		logger.Error(err)
 		return response.Fail(c, 201, "删除失败")
 	}

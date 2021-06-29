@@ -56,14 +56,6 @@ func (l *Link) Post(c *gee.Context) gee.Response {
 		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
-	if link.Name == "" {
-		return response.Fail(c, 201, "连接名称不能为空")
-	}
-
-	if link.Url == "" {
-		return response.Fail(c, 201, "连接地址不能为空")
-	}
-
 	if link.Id > 0 {
 		if _, err := l.db.Model(link).Update(); err != nil {
 			logger.Error(err)
@@ -80,10 +72,10 @@ func (l *Link) Post(c *gee.Context) gee.Response {
 
 func (l *Link) Delete(c *gee.Context) gee.Response {
 	p := &struct {
-		Id int `json:"id"`
+		Id int `json:"id" binding:"required"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	if _, err := l.db.Model(&model.Links{Id: p.Id}).Delete(); err != nil {

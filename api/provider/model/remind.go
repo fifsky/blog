@@ -5,17 +5,17 @@ import (
 )
 
 type Reminds struct {
-	Id        int       `form:"id" json:"id" db:"id"`
-	Type      int       `form:"type" json:"type" db:"type"`
-	Content   string    `form:"content" json:"content" db:"content"`
-	Month     int       `form:"month" json:"month" db:"month"`
-	Week      int       `form:"week" json:"week" db:"week"`
-	Day       int       `form:"day" json:"day" db:"day"`
-	Hour      int       `form:"hour" json:"hour" db:"hour"`
-	Minute    int       `form:"minute" json:"minute" db:"minute"`
-	Status    int       `form:"-" json:"status" db:"status"`
-	NextTime  time.Time `form:"-" json:"next_time" db:"next_time"`
-	CreatedAt time.Time `form:"-" json:"created_at" time_format:"2006-01-02 15:04:05" db:"created_at"`
+	Id        int       `json:"id" db:"id"`
+	Type      int       `json:"type" db:"type" binding:"required"`
+	Content   string    `json:"content" db:"content" binding:"required"`
+	Month     int       `json:"month" db:"month"`
+	Week      int       `json:"week" db:"week"`
+	Day       int       `json:"day" db:"day"`
+	Hour      int       `json:"hour" db:"hour"`
+	Minute    int       `json:"minute" db:"minute"`
+	Status    int       `json:"status" db:"status"`
+	NextTime  time.Time `json:"next_time" db:"next_time"`
+	CreatedAt time.Time `json:"created_at" time_format:"2006-01-02 15:04:05" db:"created_at"`
 }
 
 func (r *Reminds) TableName() string {
