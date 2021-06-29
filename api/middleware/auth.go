@@ -3,7 +3,7 @@ package middleware
 import (
 	"strings"
 
-	model2 "app/provider/model"
+	"app/provider/model"
 	"app/response"
 	"github.com/goapt/gee"
 	"github.com/goapt/logger"
@@ -17,7 +17,7 @@ import (
 
 type AuthLogin gee.HandlerFunc
 
-func NewAuthLogin() AuthLogin {
+func NewAuthLogin(db *gosql.DB) AuthLogin {
 	return func(c *gee.Context) gee.Response {
 		accessToken := c.Request.Header.Get("Access-Token")
 
@@ -46,8 +46,8 @@ func NewAuthLogin() AuthLogin {
 			return response.Fail(c, 201, "Access Token不合法")
 		}
 
-		user := &model2.Users{}
-		err = gosql.Model(user).Where("id = ?", v[0]).Get()
+		user := &model.Users{}
+		err = db.Model(user).Where("id = ?", v[0]).Get()
 		if err != nil {
 			c.Abort()
 			return response.Fail(c, 201, "Access Token错误，用户不存在")
