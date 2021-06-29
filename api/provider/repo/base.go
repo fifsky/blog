@@ -11,29 +11,15 @@ type Base struct {
 }
 
 func (b *Base) Create(m gosql.IModel) (int64, error) {
-	id, err := b.db.Model(m).Create()
-	if err != nil {
-		return 0, err
-	}
-	return id, nil
+	return b.db.Model(m).Create()
 }
 
 func (b *Base) Update(m gosql.IModel) (int64, error) {
-	aff, err := b.db.Model(m).Update()
-	if err != nil {
-		return 0, err
-	}
-	return aff, nil
+	return b.db.Model(m).Update()
 }
 
 func (b *Base) Find(m gosql.IModel) error {
-	err := b.db.Model(m).Get()
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return b.db.Model(m).Get()
 }
 
 func (b *Base) FindAll(m interface{}, fn ...BuilderFunc) error {
@@ -45,9 +31,5 @@ func (b *Base) FindAll(m interface{}, fn ...BuilderFunc) error {
 		}
 	}
 
-	err := builder.All()
-	if err != nil {
-		return err
-	}
-	return nil
+	return builder.All()
 }
