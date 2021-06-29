@@ -31,7 +31,7 @@ func Initialize() cli.Commands {
 	handlerArticle := handler.NewArticle(db, article, setting)
 	cate := repo.NewCate(db)
 	handlerCate := handler.NewCate(db, cate)
-	handlerComment := handler.NewComment()
+	handlerComment := handler.NewComment(db, comment)
 	common := handler.NewCommon()
 	link := repo.NewLink(db)
 	handlerLink := handler.NewLink(db, link)
@@ -59,8 +59,8 @@ func Initialize() cli.Commands {
 	cors := middleware.NewCors()
 	limiter := connect.NewRateLimiter()
 	middlewareLimiter := middleware.NewLimiter(limiter)
-	remindAuth := middleware.NewRemindAuth()
-	authLogin := middleware.NewAuthLogin()
+	remindAuth := middleware.NewRemindAuth(db)
+	authLogin := middleware.NewAuthLogin(db)
 	middlewareMiddleware := &middleware.Middleware{
 		AccessLog:  accessLog,
 		Recover:    middlewareRecover,
