@@ -26,10 +26,10 @@ func NewComment(db *gosql.DB, commentRepo *repo.Comment) *Comment {
 
 func (m *Comment) List(c *gee.Context) gee.Response {
 	p := &struct {
-		Id int `json:"id"`
+		Id int `json:"id" binding:"required"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	comments, err := m.commentRepo.PostComments(p.Id, 1, 100)
@@ -44,18 +44,6 @@ func (m *Comment) Post(c *gee.Context) gee.Response {
 	comment := &model.Comments{}
 	if err := c.ShouldBindJSON(comment); err != nil {
 		return response.Fail(c, 201, "参数错误:"+err.Error())
-	}
-
-	if comment.Name == "" {
-		return response.Fail(c, 201, "昵称不能为空")
-	}
-
-	if comment.Content == "" {
-		return response.Fail(c, 201, "评论内容不能为空")
-	}
-
-	if comment.PostId <= 0 {
-		return response.Fail(c, 201, "非法评论")
 	}
 
 	post := &model.Posts{}
@@ -83,7 +71,7 @@ func (m *Comment) Post(c *gee.Context) gee.Response {
 	return response.Success(c, comment)
 }
 
-func (m *Comment) Add(c *gee.Context) gee.Response {
+func (m *Comment) Top(c *gee.Context) gee.Response {
 	comments, err := m.commentRepo.NewComments()
 	if err != nil {
 		logger.Error(err)
@@ -109,10 +97,10 @@ func (m *Comment) Add(c *gee.Context) gee.Response {
 
 func (m *Comment) AdminList(c *gee.Context) gee.Response {
 	p := &struct {
-		Page int `json:"page"`
+		Page int `json:"page" binding:"required"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	h := gin.H{}
@@ -133,10 +121,10 @@ func (m *Comment) AdminList(c *gee.Context) gee.Response {
 
 func (m *Comment) Delete(c *gee.Context) gee.Response {
 	p := &struct {
-		Id int `json:"id"`
+		Id int `json:"id" binding:"required"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	if _, err := m.db.Model(&model.Comments{Id: p.Id}).Delete(); err != nil {
