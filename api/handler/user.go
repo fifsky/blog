@@ -27,16 +27,12 @@ func NewUser(db *gosql.DB, userRepo *repo.User) *User {
 
 func (u *User) Login(c *gee.Context) gee.Response {
 	p := &struct {
-		UserName string `json:"user_name"`
-		Password string `json:"password"`
+		UserName string `json:"user_name" binding:"required"`
+		Password string `json:"password" binding:"required"`
 	}{}
 
 	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, err)
-	}
-
-	if p.UserName == "" || p.Password == "" {
-		return response.Fail(c, 201, "用户名密码不能为空")
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	user := &model.Users{Name: p.UserName, Password: hashing.Md5(p.Password)}
@@ -68,10 +64,10 @@ func (u *User) LoginUser(c *gee.Context) gee.Response {
 
 func (u *User) Get(c *gee.Context) gee.Response {
 	p := &struct {
-		Id int `json:"id"`
+		Id int `json:"id" binding:"required"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	user := &model.Users{Id: p.Id}
@@ -85,7 +81,7 @@ func (u *User) Get(c *gee.Context) gee.Response {
 
 func (u *User) List(c *gee.Context) gee.Response {
 	p := &struct {
-		Page int `json:"page"`
+		Page int `json:"page" binding:"required"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
 		return response.Fail(c, 201, "参数错误")
@@ -113,18 +109,10 @@ func (u *User) Post(c *gee.Context) gee.Response {
 		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
-	if users.Name == "" {
-		return response.Fail(c, 201, "用户名不能为空")
-	}
-
 	if users.Id == 0 && users.Password == "" {
 		return response.Fail(c, 201, "密码不能为空")
 	} else {
 		users.Password = hashing.Md5(users.Password)
-	}
-
-	if users.NickName == "" {
-		return response.Fail(c, 201, "昵称不能为空")
 	}
 
 	if users.Id > 0 {
@@ -144,7 +132,7 @@ func (u *User) Post(c *gee.Context) gee.Response {
 
 func (u *User) Status(c *gee.Context) gee.Response {
 	p := &struct {
-		Id int `json:"id"`
+		Id int `json:"id" binding:"required"`
 	}{}
 
 	if err := c.ShouldBindJSON(p); err != nil {
@@ -153,7 +141,7 @@ func (u *User) Status(c *gee.Context) gee.Response {
 	user := &model.Users{Id: p.Id}
 	err := u.db.Model(user).Get()
 	if err != nil {
-		return response.Fail(c, 202, "用户不存在:"+err.Error())
+		return response.Fail(c, 202, "用户不存在")
 	}
 
 	status := user.Status
