@@ -24,10 +24,11 @@ type Article struct {
 	db          *gosql.DB
 	artRepo     *repo.Article
 	settingRepo *repo.Setting
+	httpClient  *http.Client
 }
 
 func NewArticle(db *gosql.DB, artRepo *repo.Article, settingRepo *repo.Setting) *Article {
-	return &Article{db: db, artRepo: artRepo, settingRepo: settingRepo}
+	return &Article{db: db, artRepo: artRepo, settingRepo: settingRepo, httpClient: http.DefaultClient}
 }
 
 func (a *Article) Archive(c *gee.Context) gee.Response {
@@ -272,9 +273,11 @@ func (a *Article) Upload(c *gee.Context) gee.Response {
 	file, _, err := c.Request.FormFile("uploadFile")
 	if err != nil {
 		c.Status(http.StatusBadRequest)
-		return c.String("Bad request")
+		return c.String("Bad request\n" + err.Error())
 	}
-	client, err := oss.New(config.App.OSS.Endpoint, config.App.OSS.AccessKey, config.App.OSS.AccessSecret)
+	client, err := oss.New(config.App.OSS.Endpoint, config.App.OSS.AccessKey, config.App.OSS.AccessSecret, func(client *oss.Client) {
+		client.HTTPClient = a.httpClient
+	})
 
 	if err != nil {
 		return c.JSON(gin.H{
@@ -282,7 +285,15 @@ func (a *Article) Upload(c *gee.Context) gee.Response {
 		})
 	}
 
-	bucket, _ := client.Bucket(config.App.OSS.Bucket)
+	bucket, err := client.Bucket(config.App.OSS.Bucket)
+
+	if err != nil {
+		logger.Error(err)
+		return c.JSON(gin.H{
+			"errno": 201,
+		})
+	}
+
 	day := time.Now().Format("20060102")
 
 	filename := "upload/" + day + "/" + hashing.Md5File(file) + ".png"

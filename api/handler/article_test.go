@@ -1,10 +1,15 @@
 package handler
 
 import (
+	"bytes"
+	"io"
+	"mime/multipart"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 
+	"app/config"
 	"app/provider/repo"
 	"app/testutil"
 	"github.com/goapt/dbunit"
@@ -252,5 +257,45 @@ func TestArticle_Delete(t *testing.T) {
 				require.Equal(t, tt.responseBody, resp.GetBodyString())
 			})
 		}
+	})
+}
+
+var httpSuites = []test.HttpClientSuite{
+	{
+		URI:          "*",
+		ResponseBody: `{"retcode":200}`,
+	},
+}
+
+func TestArticle_Upload(t *testing.T) {
+	config.App.OSS.Bucket = "test"
+
+	dbunit.New(t, func(d *dbunit.DBUnit) {
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
+
+		httpClient := test.NewHttpClientSuite(httpSuites)
+
+		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db))
+		handler.httpClient = httpClient
+
+		rr, err := os.Open(testutil.TestDataPath("go.png"))
+		require.NoError(t, err)
+		defer rr.Close()
+
+		bb := &bytes.Buffer{}
+		writer := multipart.NewWriter(bb)
+		part, err := writer.CreateFormFile("uploadFile", "go.png")
+		require.NoError(t, err)
+
+		_, err = io.Copy(part, rr)
+		require.NoError(t, err)
+		writer.Close()
+
+		require.NoError(t, err)
+		req := test.NewRequest("/api/admin/article/upload", handler.Upload)
+		resp, err := req.Post(writer.FormDataContentType(), bb)
+		require.NoError(t, err)
+		require.Equal(t, http.StatusOK, resp.Code)
+		require.Equal(t, `{"data":["https://static.fifsky.com/upload/20210629/0030cebb1a617c0841726b1ec3121fe0.png!blog"],"errno":0}`, resp.GetBodyString())
 	})
 }
