@@ -56,14 +56,6 @@ func (a *Cate) Post(c *gee.Context) gee.Response {
 		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
-	if cate.Name == "" {
-		return response.Fail(c, 201, "分类名不能为空")
-	}
-
-	if cate.Domain == "" {
-		return response.Fail(c, 201, "分类缩略名不能为空")
-	}
-
 	if cate.Id > 0 {
 		if _, err := a.db.Model(cate).Update(); err != nil {
 			logger.Error(err)
@@ -80,10 +72,10 @@ func (a *Cate) Post(c *gee.Context) gee.Response {
 
 func (a *Cate) Delete(c *gee.Context) gee.Response {
 	p := &struct {
-		Id int `json:"id"`
+		Id int `json:"id" binding:"required"`
 	}{}
 	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误")
+		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
 	total, _ := a.db.Model(&model.Posts{}).Where("cate_id = ?", p.Id).Count()

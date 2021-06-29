@@ -32,42 +32,40 @@ func setLoginUser(c *gee.Context) gee.Response {
 
 func TestMood_List(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		dbunit.New(t, func(d *dbunit.DBUnit) {
-			db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("moods", "users")...)
-			handler := NewMood(db, repo.NewMood(db))
-			tests := []struct {
-				name        string
-				requestBody gee.H
-				checkFunc   func(t *testing.T, resp *test.Response)
-			}{
-				{
-					"success",
-					gee.H{"page": 1},
-					func(t *testing.T, resp *test.Response) {
-						assert.True(t, len(resp.GetJsonBody("data.list").Array()) > 0)
-					},
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("moods", "users")...)
+		handler := NewMood(db, repo.NewMood(db))
+		tests := []struct {
+			name        string
+			requestBody gee.H
+			checkFunc   func(t *testing.T, resp *test.Response)
+		}{
+			{
+				"success",
+				gee.H{"page": 1},
+				func(t *testing.T, resp *test.Response) {
+					assert.True(t, len(resp.GetJsonBody("data.list").Array()) > 0)
 				},
-				{
-					"params error",
-					gee.H{},
-					func(t *testing.T, resp *test.Response) {
-						assert.Equal(t, `{"code":201,"msg":"参数错误:缺少page"}`, resp.GetBodyString())
-					},
+			},
+			{
+				"params error",
+				gee.H{},
+				func(t *testing.T, resp *test.Response) {
+					assert.Equal(t, `{"code":201,"msg":"参数错误:缺少page"}`, resp.GetBodyString())
 				},
-			}
+			},
+		}
 
-			for _, tt := range tests {
-				t.Run(tt.name, func(t *testing.T) {
-					req := test.NewRequest("/api/admin/mood/list", setLoginUser, handler.List)
-					resp, err := req.JSON(tt.requestBody)
-					require.NoError(t, err)
-					require.Equal(t, http.StatusOK, resp.Code)
-					if tt.checkFunc != nil {
-						tt.checkFunc(t, resp)
-					}
-				})
-			}
-		})
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				req := test.NewRequest("/api/admin/mood/list", setLoginUser, handler.List)
+				resp, err := req.JSON(tt.requestBody)
+				require.NoError(t, err)
+				require.Equal(t, http.StatusOK, resp.Code)
+				if tt.checkFunc != nil {
+					tt.checkFunc(t, resp)
+				}
+			})
+		}
 	})
 }
 
