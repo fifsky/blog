@@ -84,16 +84,31 @@ func TestCate_Post(t *testing.T) {
 		tests := []struct {
 			name         string
 			requestBody  gee.H
+			assertType   string
 			responseBody string
 		}{
 			{
 				"success",
 				gee.H{"name": "demo", "domain": "demo", "desc": "demo", "created_at": "2021-06-29 11:55:09", "updated_at": "2021-06-29 11:55:09"},
+				"equal",
 				`{"code":200,"data":{"id":2,"name":"demo","desc":"demo","domain":"demo","created_at":"2021-06-29 11:55:09","updated_at":"2021-06-29 11:55:09"},"msg":"success"}`,
+			},
+			{
+				"update success",
+				gee.H{"id": 1, "domain": "test2", "name": "test2", "desc": "test2", "updated_at": "2021-06-29 11:55:09"},
+				"contains",
+				`"name":"test2"`,
+			},
+			{
+				"update error",
+				gee.H{"id": 1, "domain": "demo", "name": "demo", "desc": "demo"},
+				"equal",
+				`{"code":201,"msg":"更新失败"}`,
 			},
 			{
 				"params error",
 				gee.H{"name": "demo", "desc": "demo"},
+				"equal",
 				`{"code":201,"msg":"参数错误:缺少domain"}`,
 			},
 		}
@@ -104,7 +119,13 @@ func TestCate_Post(t *testing.T) {
 				resp, err := req.JSON(tt.requestBody)
 				require.NoError(t, err)
 				require.Equal(t, http.StatusOK, resp.Code)
-				require.Equal(t, tt.responseBody, resp.GetBodyString())
+
+				switch tt.assertType {
+				case "equal":
+					require.Equal(t, tt.responseBody, resp.GetBodyString())
+				case "contains":
+					require.Contains(t, resp.GetBodyString(), tt.responseBody)
+				}
 			})
 		}
 	})
