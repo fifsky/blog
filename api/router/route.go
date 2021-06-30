@@ -88,7 +88,7 @@ func (r *Router) route(handler *handler.Handler, middleware *middleware.Middlewa
 		admin.POST("/article/delete", handler.Article.Delete)
 		admin.POST("/upload", handler.Article.Upload)
 		admin.POST("/setting/post", handler.Setting.Post)
-		admin.POST("/comment/list", handler.Comment.List)
+		admin.POST("/comment/list", handler.Comment.AdminList)
 		admin.POST("/comment/delete", handler.Comment.Delete)
 		admin.POST("/mood/post", handler.Mood.Post)
 		admin.POST("/mood/delete", handler.Mood.Delete)
