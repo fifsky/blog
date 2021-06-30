@@ -3,6 +3,7 @@ package middleware
 import (
 	"testing"
 
+	"app/config"
 	"github.com/goapt/gee"
 	"github.com/goapt/test"
 	"github.com/stretchr/testify/assert"
@@ -16,8 +17,24 @@ func TestMiddleware_Cors(t *testing.T) {
 		})
 	}
 
-	req := test.NewRequest("/dummy/impl", gee.HandlerFunc(NewCors()), testHandler)
-	resp, err := req.Get()
-	assert.NoError(t, err)
-	assert.Equal(t, `{"code":10000,"msg":"success"}`, resp.GetBodyString())
+	{
+		req := test.NewRequest("/dummy/impl", gee.HandlerFunc(NewCors()), testHandler)
+		req.Host = "fifsky.com"
+		req.Header.Set("Origin", "http://fifsky.com")
+
+		resp, err := req.JSON(``)
+		assert.NoError(t, err)
+		assert.Equal(t, `{"code":10000,"msg":"success"}`, resp.GetBodyString())
+	}
+
+	{
+		config.App.Env = "dev"
+		req := test.NewRequest("/dummy/impl", gee.HandlerFunc(NewCors()), testHandler)
+		req.Host = "test.com"
+		req.Header.Set("Origin", "http://test.com")
+
+		resp, err := req.JSON(``)
+		assert.NoError(t, err)
+		assert.Equal(t, `{"code":10000,"msg":"success"}`, resp.GetBodyString())
+	}
 }
