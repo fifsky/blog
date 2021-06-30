@@ -19,8 +19,5 @@ func (r *Remind) RemindGetList(start int, num int) ([]*model.Reminds, error) {
 	var m = make([]*model.Reminds, 0)
 	start = (start - 1) * num
 	err := r.db.Model(&m).OrderBy("id desc").Limit(num).Offset(start).All()
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
+	return m, err
 }

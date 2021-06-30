@@ -18,8 +18,5 @@ func NewLink(db *gosql.DB) *Link {
 func (l *Link) GetAllLinks() ([]*model.Links, error) {
 	links := make([]*model.Links, 0)
 	err := l.db.Model(&links).All()
-	if err != nil {
-		return nil, err
-	}
-	return links, nil
+	return links, err
 }

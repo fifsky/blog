@@ -30,11 +30,7 @@ func (a *Article) GetUserPost(id int, url string) (*UserPosts, error) {
 	post.Url = url
 
 	err := a.db.Model(post).Where("status = 1").Get()
-
-	if err != nil {
-		return nil, err
-	}
-	return post, nil
+	return post, err
 }
 
 func (a *Article) PostPrev(id int) (*model.Posts, error) {
@@ -42,10 +38,7 @@ func (a *Article) PostPrev(id int) (*model.Posts, error) {
 		Type: 1,
 	}
 	err := a.db.Model(m).Where("id < ? and status = 1", id).OrderBy("id desc").Limit(1).Get()
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
+	return m, err
 }
 
 func (a *Article) PostNext(id int) (*model.Posts, error) {
@@ -53,11 +46,7 @@ func (a *Article) PostNext(id int) (*model.Posts, error) {
 		Type: 1,
 	}
 	err := a.db.Model(m).Where("id > ? and status = 1", id).OrderBy("id asc").Limit(1).Get()
-
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
+	return m, err
 }
 
 func (a *Article) PostArchive() ([]map[string]string, error) {

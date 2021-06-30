@@ -20,10 +20,7 @@ func (o *Comment) PostComments(postId, start, num int) ([]*model.Comments, error
 	var m = make([]*model.Comments, 0)
 	start = (start - 1) * num
 	err := o.db.Model(&m).Where("post_id = ?", postId).OrderBy("id asc").Limit(num).Offset(start).All()
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
+	return m, err
 }
 
 type NewComments struct {
@@ -36,20 +33,14 @@ type NewComments struct {
 func (o *Comment) NewComments() ([]*NewComments, error) {
 	var m = make([]*NewComments, 0)
 	err := o.db.Select(&m, "select p.type,p.title,c.* from comments c left join posts p on c.post_id = p.id order by c.id desc limit 10")
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
+	return m, err
 }
 
 func (o *Comment) CommentList(start, num int) ([]*NewComments, error) {
 	var m = make([]*NewComments, 0)
 	start = (start - 1) * num
 	err := o.db.Select(&m, "select p.type,p.title,c.* from comments c left join posts p on c.post_id = p.id order by c.id desc limit ?,?", start, num)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
+	return m, err
 }
 
 func (o *Comment) PostCommentNum(postId []int) (map[int]int, error) {

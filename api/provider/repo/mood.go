@@ -29,9 +29,5 @@ func (m *Mood) MoodGetList(start int, num int) ([]*UserMoods, error) {
 		"default": m.db,
 	}, &moods)).Limit(num).Offset(start).OrderBy("id desc").All()
 
-	if err != nil {
-		return nil, err
-	}
-
-	return moods, nil
+	return moods, err
 }
