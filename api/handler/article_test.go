@@ -53,7 +53,7 @@ func TestArticle_Archive(t *testing.T) {
 
 func TestArticle_List(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates")...)
 		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db))
 		tests := []struct {
 			name        string
@@ -68,14 +68,14 @@ func TestArticle_List(t *testing.T) {
 				},
 			},
 			{
-				"success",
+				"success domain",
 				gee.H{"page": 1, "domain": "default"},
 				func(t *testing.T, resp *test.Response) {
 					assert.True(t, len(resp.GetJsonBody("data.list").Array()) > 0)
 				},
 			},
 			{
-				"success",
+				"success year",
 				gee.H{"page": 1, "year": "2012", "month": "09"},
 				func(t *testing.T, resp *test.Response) {
 					assert.True(t, len(resp.GetJsonBody("data.list").Array()) > 0)
