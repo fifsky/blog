@@ -296,6 +296,6 @@ func TestArticle_Upload(t *testing.T) {
 		resp, err := req.Post(writer.FormDataContentType(), bb)
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.Equal(t, `{"data":["https://static.fifsky.com/upload/20210629/0030cebb1a617c0841726b1ec3121fe0.png!blog"],"errno":0}`, resp.GetBodyString())
+		require.Contains(t, resp.GetBodyString(), `0030cebb1a617c0841726b1ec3121fe0.png`)
 	})
 }
