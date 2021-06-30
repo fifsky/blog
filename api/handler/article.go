@@ -233,12 +233,10 @@ func (a *Article) Post(c *gee.Context) gee.Response {
 
 	if post.Id > 0 {
 		if _, err := a.db.Model(post).Update(); err != nil {
-			logger.Error(err)
 			return response.Fail(c, 201, "更新文章失败")
 		}
 	} else {
 		if _, err := a.db.Model(post).Create(); err != nil {
-			logger.Error(err)
 			return response.Fail(c, 201, "发表文章失败")
 		}
 	}
@@ -257,7 +255,6 @@ func (a *Article) Delete(c *gee.Context) gee.Response {
 
 	post := &model.Posts{Id: p.Id, Status: 2}
 	if _, err := a.db.Model(post).Update(); err != nil {
-		logger.Error(err)
 		return response.Fail(c, 201, "删除失败")
 	}
 	return response.Success(c, nil)

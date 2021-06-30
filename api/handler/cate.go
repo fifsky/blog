@@ -8,7 +8,6 @@ import (
 	"app/response"
 	"github.com/gin-gonic/gin"
 	"github.com/goapt/gee"
-	"github.com/goapt/logger"
 	"github.com/ilibs/gosql/v2"
 )
 
@@ -58,12 +57,10 @@ func (a *Cate) Post(c *gee.Context) gee.Response {
 
 	if cate.Id > 0 {
 		if _, err := a.db.Model(cate).Update(); err != nil {
-			logger.Error(err)
 			return response.Fail(c, 201, "更新失败")
 		}
 	} else {
 		if _, err := a.db.Model(cate).Create(); err != nil {
-			logger.Error(err)
 			return response.Fail(c, 201, "创建失败")
 		}
 	}
@@ -85,7 +82,6 @@ func (a *Cate) Delete(c *gee.Context) gee.Response {
 	}
 
 	if _, err := a.db.Model(&model.Cates{Id: p.Id}).Delete(); err != nil {
-		logger.Error(err)
 		return response.Fail(c, 201, "删除失败")
 	}
 	return response.Success(c, nil)

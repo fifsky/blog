@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/goapt/gee"
 	"github.com/goapt/golib/pagination"
-	"github.com/goapt/logger"
 	"github.com/ilibs/gosql/v2"
 )
 
@@ -54,12 +53,10 @@ func (m *Mood) Post(c *gee.Context) gee.Response {
 
 	if mood.Id > 0 {
 		if _, err := m.db.Model(mood).Update(); err != nil {
-			logger.Error(err)
 			return response.Fail(c, 201, "更新心情失败")
 		}
 	} else {
 		if _, err := m.db.Model(mood).Create(); err != nil {
-			logger.Error(err)
 			return response.Fail(c, 201, "发表心情失败")
 		}
 	}
@@ -76,7 +73,6 @@ func (m *Mood) Delete(c *gee.Context) gee.Response {
 	}
 
 	if _, err := m.db.Model(&model.Moods{Id: p.Id}).Delete(); err != nil {
-		logger.Error(err)
 		return response.Fail(c, 201, "删除失败")
 	}
 	return response.Success(c, nil)

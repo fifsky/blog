@@ -12,7 +12,6 @@ import (
 	"github.com/goapt/gee"
 	"github.com/goapt/golib/hashing"
 	"github.com/goapt/golib/pagination"
-	"github.com/goapt/logger"
 	"github.com/ilibs/gosql/v2"
 )
 
@@ -117,12 +116,10 @@ func (u *User) Post(c *gee.Context) gee.Response {
 
 	if users.Id > 0 {
 		if _, err := u.db.Model(users).Update(); err != nil {
-			logger.Error(err)
 			return response.Fail(c, 201, "更新失败")
 		}
 	} else {
 		if _, err := u.db.Model(users).Create(); err != nil {
-			logger.Error(err)
 			return response.Fail(c, 201, "创建失败")
 		}
 	}
@@ -152,7 +149,6 @@ func (u *User) Status(c *gee.Context) gee.Response {
 	}
 
 	if _, err := u.db.Model(&model.Users{Status: status}).Where("id = ?", p.Id).Update(); err != nil {
-		logger.Error(err)
 		return response.Fail(c, 201, "停启用失败")
 	}
 	return response.Success(c, nil)

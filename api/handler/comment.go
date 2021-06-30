@@ -54,7 +54,6 @@ func (m *Comment) Post(c *gee.Context) gee.Response {
 	comment.IP = c.ClientIP()
 
 	if _, err := m.db.Model(comment).Create(); err != nil {
-		logger.Error(err)
 		return response.Fail(c, 201, "评论失败"+err.Error())
 	}
 
@@ -126,7 +125,6 @@ func (m *Comment) Delete(c *gee.Context) gee.Response {
 	}
 
 	if _, err := m.db.Model(&model.Comments{Id: p.Id}).Delete(); err != nil {
-		logger.Error(err)
 		return response.Fail(c, 201, "删除失败")
 	}
 	return response.Success(c, nil)

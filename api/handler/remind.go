@@ -10,7 +10,6 @@ import (
 	"github.com/goapt/gee"
 	"github.com/goapt/golib/pagination"
 	"github.com/goapt/golib/robot"
-	"github.com/goapt/logger"
 	"github.com/ilibs/gosql/v2"
 )
 
@@ -94,12 +93,10 @@ func (r *Remind) Post(c *gee.Context) gee.Response {
 	if remind.Id > 0 {
 		remind.Status = 1
 		if _, err := r.db.Model(remind).Update(); err != nil {
-			logger.Error(err)
 			return response.Fail(c, 201, "更新失败:"+err.Error())
 		}
 	} else {
 		if _, err := r.db.Model(remind).Create(); err != nil {
-			logger.Error(err)
 			return response.Fail(c, 201, "创建失败"+err.Error())
 		}
 	}
@@ -115,7 +112,6 @@ func (r *Remind) Delete(c *gee.Context) gee.Response {
 	}
 
 	if _, err := r.db.Model(&model.Reminds{Id: p.Id}).Delete(); err != nil {
-		logger.Error(err)
 		return response.Fail(c, 201, "删除失败")
 	}
 	return response.Success(c, nil)
