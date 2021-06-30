@@ -135,11 +135,11 @@
         overflow: visible;
     }
 
-    .w-e-toolbar .w-e-menu {
-      height: 38px;
-      width: 38px;
+    #editor .w-e-toolbar .w-e-menu {
+      height: 38px !important;
+      width: 38px !important;
     }
-    .w-e-toolbar p, .w-e-text-container p, .w-e-menu-panel p {
+    #editor .w-e-text p {
       font-size: 14px !important;
     }
 </style>
