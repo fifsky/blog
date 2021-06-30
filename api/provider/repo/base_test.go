@@ -7,6 +7,7 @@ import (
 	"app/provider/model"
 	"app/testutil"
 	"github.com/goapt/dbunit"
+	"github.com/ilibs/gosql/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -79,7 +80,9 @@ func TestBase_FindAll(t *testing.T) {
 
 		user := make([]model.Users, 0)
 
-		err := repo.FindAll(&user)
+		err := repo.FindAll(&user, func(b *gosql.Builder) {
+			b.Where("status = 1")
+		})
 		assert.NoError(t, err)
 		assert.True(t, len(user) > 0)
 	})

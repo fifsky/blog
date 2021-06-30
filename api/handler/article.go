@@ -14,6 +14,7 @@ import (
 	"github.com/goapt/gee"
 	"github.com/goapt/golib/convert"
 	"github.com/goapt/golib/hashing"
+	"github.com/goapt/golib/mathutil"
 	"github.com/goapt/golib/pagination"
 	"github.com/goapt/logger"
 	"github.com/gorilla/feeds"
@@ -54,10 +55,7 @@ func (a *Article) List(c *gee.Context) gee.Response {
 		return response.Fail(c, 202, err)
 	}
 
-	num, err := convert.StrTo(options["post_num"]).Int()
-	if err != nil || num < 1 {
-		num = 10
-	}
+	num := mathutil.MaxInt(convert.StrTo(options["post_num"]).MustInt(), 1)
 
 	req := &struct {
 		Year    string `json:"year"`
@@ -87,14 +85,10 @@ func (a *Article) List(c *gee.Context) gee.Response {
 		artdate = req.Year + "-" + req.Month
 	}
 
-	page := req.Page
-	if page <= 0 {
-		page = 1
-	}
+	page := mathutil.MaxInt(req.Page, 1)
 
-	post := &model.Posts{}
-	if cate.Id > 0 {
-		post.CateId = cate.Id
+	post := &model.Posts{
+		CateId: cate.Id,
 	}
 
 	posts, err := a.artRepo.PostGetList(post, page, num, artdate, req.Keyword)

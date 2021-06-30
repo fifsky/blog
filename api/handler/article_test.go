@@ -68,6 +68,20 @@ func TestArticle_List(t *testing.T) {
 				},
 			},
 			{
+				"success",
+				gee.H{"page": 1, "domain": "default"},
+				func(t *testing.T, resp *test.Response) {
+					assert.True(t, len(resp.GetJsonBody("data.list").Array()) > 0)
+				},
+			},
+			{
+				"success",
+				gee.H{"page": 1, "year": "2012", "month": "09"},
+				func(t *testing.T, resp *test.Response) {
+					assert.True(t, len(resp.GetJsonBody("data.list").Array()) > 0)
+				},
+			},
+			{
 				"params error",
 				gee.H{},
 				func(t *testing.T, resp *test.Response) {
@@ -289,7 +303,7 @@ func TestArticle_Upload(t *testing.T) {
 
 		_, err = io.Copy(part, rr)
 		require.NoError(t, err)
-		writer.Close()
+		writer.Close() // must, otherwise FormFile returns EOF error
 
 		require.NoError(t, err)
 		req := test.NewRequest("/api/admin/article/upload", handler.Upload)
