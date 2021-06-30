@@ -35,7 +35,7 @@ func Fail(c *gee.Context, code int, msg interface{}) gee.Response {
 	case error:
 		m = e.Error()
 	default:
-		m = fmt.Sprintf("[%d]%v", code, e)
+		m = fmt.Sprintf("%v", e)
 	}
 
 	return &ApiResponse{

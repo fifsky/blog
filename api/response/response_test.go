@@ -40,4 +40,16 @@ func TestFail(t *testing.T) {
 		assert.Equal(t, `{"code":500,"msg":"system error"}`, w.Body.String())
 		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
 	})
+
+	t.Run("other", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		ctx, _ := gee.CreateTestContext(w)
+		resp := Fail(ctx, 500, gee.H{
+			"error": "noterror",
+		})
+		resp.Render()
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, `{"code":500,"msg":"map[error:noterror]"}`, w.Body.String())
+		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
+	})
 }
