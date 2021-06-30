@@ -28,7 +28,7 @@ func TestMiddleware_Cors(t *testing.T) {
 	}
 
 	{
-		config.App.Env = "dev"
+		config.App.Env = "local"
 		req := test.NewRequest("/dummy/impl", gee.HandlerFunc(NewCors()), testHandler)
 		req.Host = "test.com"
 		req.Header.Set("Origin", "http://test.com")

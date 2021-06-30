@@ -134,4 +134,12 @@
         color: #516d7b;
         overflow: visible;
     }
+
+    .w-e-toolbar .w-e-menu {
+      height: 38px;
+      width: 38px;
+    }
+    .w-e-toolbar p, .w-e-text-container p, .w-e-menu-panel p {
+      font-size: 14px !important;
+    }
 </style>

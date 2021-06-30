@@ -14,7 +14,7 @@ func NewCors() Cors {
 	return func(c *gee.Context) gee.Response {
 		origins := []string{"http://fifsky.com", "http://www.fifsky.com", "https://fifsky.com", "https://www.fifsky.com"}
 
-		if config.App.Env == "dev" {
+		if config.App.Env == "local" {
 			origins = []string{"*"}
 		}
 
