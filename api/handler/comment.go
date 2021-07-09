@@ -6,7 +6,6 @@ import (
 	"app/provider/model"
 	"app/provider/repo"
 	"app/response"
-	"github.com/gin-gonic/gin"
 	"github.com/goapt/gee"
 	"github.com/goapt/golib/pagination"
 	"github.com/goapt/golib/robot"
@@ -100,7 +99,7 @@ func (m *Comment) AdminList(c *gee.Context) gee.Response {
 		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
-	h := gin.H{}
+	h := gee.H{}
 	num := 10
 	comments, err := m.commentRepo.CommentList(p.Page, num)
 	h["list"] = comments

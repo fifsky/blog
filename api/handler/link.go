@@ -4,7 +4,6 @@ import (
 	"app/provider/model"
 	"app/provider/repo"
 	"app/response"
-	"github.com/gin-gonic/gin"
 	"github.com/goapt/gee"
 	"github.com/ilibs/gosql/v2"
 )
@@ -43,7 +42,7 @@ func (l *Link) List(c *gee.Context) gee.Response {
 		return response.Fail(c, 203, err)
 	}
 
-	return response.Success(c, gin.H{
+	return response.Success(c, gee.H{
 		"list":      links,
 		"pageTotal": len(links),
 	})

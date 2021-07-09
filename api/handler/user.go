@@ -8,7 +8,6 @@ import (
 	"app/provider/model"
 	"app/provider/repo"
 	"app/response"
-	"github.com/gin-gonic/gin"
 	"github.com/goapt/gee"
 	"github.com/goapt/golib/hashing"
 	"github.com/goapt/golib/pagination"
@@ -50,7 +49,7 @@ func (u *User) Login(c *gee.Context) gee.Response {
 		return response.Fail(c, 201, "Access Token加密错误"+err.Error())
 	}
 
-	return response.Success(c, gin.H{
+	return response.Success(c, gee.H{
 		"access_token": cipherText,
 		"user":         user,
 	})
@@ -86,7 +85,7 @@ func (u *User) List(c *gee.Context) gee.Response {
 		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
-	h := gin.H{}
+	h := gee.H{}
 	num := 10
 	users, err := u.userRepo.GetList(p.Page, num)
 	h["list"] = users

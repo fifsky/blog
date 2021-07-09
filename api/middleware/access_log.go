@@ -13,10 +13,9 @@ func NewAccessLog(log connect.AccessLogger) AccessLog {
 		entry := logger.NewAccessLog(c.Request)
 		entry.StartTime = c.StartTime
 		entry.Response = c.ResponseWriter()
-		entry.LogInfo = c.LogInfo
 		c.Next()
 		if data := entry.Get(); data != nil {
-			log.WithFields(entry.Get()).Info("access_log")
+			log.WithFields(data).Info("access_log")
 		}
 		return nil
 	}

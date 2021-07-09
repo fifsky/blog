@@ -10,7 +10,6 @@ import (
 	"app/provider/repo"
 	"app/response"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
-	"github.com/gin-gonic/gin"
 	"github.com/goapt/gee"
 	"github.com/goapt/golib/convert"
 	"github.com/goapt/golib/hashing"
@@ -96,7 +95,7 @@ func (a *Article) List(c *gee.Context) gee.Response {
 		return response.Fail(c, 500, err)
 	}
 
-	h := gin.H{}
+	h := gee.H{}
 	h["list"] = posts
 
 	builder := a.db.Model(post)
@@ -127,20 +126,20 @@ func (a *Article) PrevNext(c *gee.Context) gee.Response {
 		return response.Fail(c, 201, "参数错误:"+err.Error())
 	}
 
-	h := gin.H{}
+	h := gee.H{}
 	h["prev"] = map[string]interface{}{}
 	h["next"] = map[string]interface{}{}
 
 	prev, err := a.artRepo.PostPrev(req.Id)
 	if err == nil {
-		h["prev"] = gin.H{
+		h["prev"] = gee.H{
 			"id":    prev.Id,
 			"title": prev.Title,
 		}
 	}
 	next, err := a.artRepo.PostNext(req.Id)
 	if err == nil {
-		h["next"] = gin.H{
+		h["next"] = gee.H{
 			"id":    next.Id,
 			"title": next.Title,
 		}
@@ -271,7 +270,7 @@ func (a *Article) Upload(c *gee.Context) gee.Response {
 	})
 
 	if err != nil {
-		return c.JSON(gin.H{
+		return c.JSON(gee.H{
 			"errno": 201,
 		})
 	}
@@ -280,7 +279,7 @@ func (a *Article) Upload(c *gee.Context) gee.Response {
 
 	if err != nil {
 		logger.Error(err)
-		return c.JSON(gin.H{
+		return c.JSON(gee.H{
 			"errno": 201,
 		})
 	}
@@ -290,19 +289,19 @@ func (a *Article) Upload(c *gee.Context) gee.Response {
 	filename := "upload/" + day + "/" + hashing.Md5File(file) + ".png"
 	_, err = file.Seek(0, 0)
 	if err != nil {
-		return c.JSON(gin.H{
+		return c.JSON(gee.H{
 			"errno": 203,
 		})
 	}
 
 	err = bucket.PutObject(filename, file)
 	if err != nil {
-		return c.JSON(gin.H{
+		return c.JSON(gee.H{
 			"errno": 202,
 		})
 	}
 
-	return c.JSON(gin.H{
+	return c.JSON(gee.H{
 		"errno": 0,
 		"data": [...]string{
 			"https://static.fifsky.com/" + filename + "!blog",
