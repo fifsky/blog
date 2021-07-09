@@ -62,7 +62,7 @@ func (r *Router) route(handler *handler.Handler, middleware *middleware.Middlewa
 		return response.Fail(c, 404, "接口不存在")
 	})
 
-	router.POST("/api/dingmsg", handler.Common.DingMsg)
+	router.POST("/api/dingmsg", handler.DingTalk.DingMsg)
 	router.POST("/api/login", handler.User.Login)
 	router.POST("/api/mood/list", handler.Mood.List)
 	router.POST("/api/cate/all", handler.Cate.All)

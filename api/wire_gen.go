@@ -42,16 +42,18 @@ func Initialize() cli.Commands {
 	remind := repo.NewRemind(db)
 	handlerRemind := handler.NewRemind(db, remind)
 	handlerSetting := handler.NewSetting(db, setting)
+	dingTalk := handler.NewDingTalk(db)
 	handlerHandler := &handler.Handler{
-		Article: handlerArticle,
-		Cate:    handlerCate,
-		Comment: handlerComment,
-		Common:  common,
-		Link:    handlerLink,
-		User:    handlerUser,
-		Mood:    handlerMood,
-		Remind:  handlerRemind,
-		Setting: handlerSetting,
+		Article:  handlerArticle,
+		Cate:     handlerCate,
+		Comment:  handlerComment,
+		Common:   common,
+		Link:     handlerLink,
+		User:     handlerUser,
+		Mood:     handlerMood,
+		Remind:   handlerRemind,
+		Setting:  handlerSetting,
+		DingTalk: dingTalk,
 	}
 	accessLogger := connect.NewAccessLogger()
 	accessLog := middleware.NewAccessLog(accessLogger)
