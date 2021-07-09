@@ -32,7 +32,7 @@ func TestArticle_Archive(t *testing.T) {
 				"success",
 				gee.H{},
 				func(t *testing.T, resp *test.Response) {
-					assert.True(t, len(resp.GetJsonBody("data").Array()) > 0)
+					assert.True(t, len(resp.GetJsonPath("data").Array()) > 0)
 				},
 			},
 		}
@@ -64,21 +64,21 @@ func TestArticle_List(t *testing.T) {
 				"success",
 				gee.H{"page": 1},
 				func(t *testing.T, resp *test.Response) {
-					assert.True(t, len(resp.GetJsonBody("data.list").Array()) > 0)
+					assert.True(t, len(resp.GetJsonPath("data.list").Array()) > 0)
 				},
 			},
 			{
 				"success domain",
 				gee.H{"page": 1, "domain": "default"},
 				func(t *testing.T, resp *test.Response) {
-					assert.True(t, len(resp.GetJsonBody("data.list").Array()) > 0)
+					assert.True(t, len(resp.GetJsonPath("data.list").Array()) > 0)
 				},
 			},
 			{
 				"success year",
 				gee.H{"page": 1, "year": "2012", "month": "09"},
 				func(t *testing.T, resp *test.Response) {
-					assert.True(t, len(resp.GetJsonBody("data.list").Array()) > 0)
+					assert.True(t, len(resp.GetJsonPath("data.list").Array()) > 0)
 				},
 			},
 			{
@@ -150,7 +150,7 @@ func TestArticle_Detail(t *testing.T) {
 				"success",
 				gee.H{"id": 7},
 				func(t *testing.T, resp *test.Response) {
-					assert.Equal(t, `关于`, resp.GetJsonBody("data.title").String())
+					assert.Equal(t, `关于`, resp.GetJsonPath("data.title").String())
 				},
 			},
 			{

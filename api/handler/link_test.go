@@ -26,7 +26,7 @@ func TestLink_All(t *testing.T) {
 				"success",
 				gee.H{},
 				func(t *testing.T, resp *test.Response) {
-					assert.True(t, len(resp.GetJsonBody("data").Array()) > 0)
+					assert.True(t, len(resp.GetJsonPath("data").Array()) > 0)
 				},
 			},
 		}
@@ -58,7 +58,7 @@ func TestLink_List(t *testing.T) {
 				"success",
 				gee.H{},
 				func(t *testing.T, resp *test.Response) {
-					assert.True(t, len(resp.GetJsonBody("data.list").Array()) > 0)
+					assert.True(t, len(resp.GetJsonPath("data.list").Array()) > 0)
 				},
 			},
 		}
