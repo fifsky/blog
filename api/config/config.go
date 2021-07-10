@@ -41,17 +41,23 @@ type acmConf struct {
 	DataId       string `yml:"data_id"`
 }
 
+type tencentCloud struct {
+	SecretId  string `yml:"secret_id"`
+	SecretKey string `yml:"secret_key"`
+}
+
 type Config struct {
-	Env       string
-	Path      string
-	AppName   string                   `yml:"app_name"`
-	Common    common                   `yml:"common"`
-	Log       logger.Config            `yml:"log"`
-	DB        map[string]*gosql.Config `yml:"database"`
-	OSS       ossConf                  `yml:"oss"`
-	Acm       acmConf                  `yml:"acm"`
-	StartTime time.Time
-	IsTesting bool
+	Env          string
+	Path         string
+	AppName      string                   `yml:"app_name"`
+	Common       common                   `yml:"common"`
+	Log          logger.Config            `yml:"log"`
+	DB           map[string]*gosql.Config `yml:"database"`
+	OSS          ossConf                  `yml:"oss"`
+	Acm          acmConf                  `yml:"acm"`
+	TencentCloud tencentCloud             `yml:"tencent_cloud"`
+	StartTime    time.Time
+	IsTesting    bool
 }
 
 var App = &Config{

@@ -6,10 +6,6 @@ import (
 	"github.com/ilibs/identicon"
 )
 
-const (
-	mooodTag = "#心情#"
-)
-
 func getLoginUser(c *gee.Context) *model.Users {
 	if u, ok := c.Get("userInfo"); ok {
 		return u.(*model.Users)

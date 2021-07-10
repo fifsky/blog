@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"os"
 	"testing"
 
 	"app/config"
@@ -18,11 +19,11 @@ func TestDingTalk_DingMsg(t *testing.T) {
 		handler := NewDingTalk(db)
 		config.App.Common.DingAppSecret = "abc"
 
-		t.Run("success", func(t *testing.T) {
+		t.Run("empty", func(t *testing.T) {
 			req := test.NewRequest("/api/dingmsg", handler.DingMsg)
 			req.Header.Set("timestamp", "2020-06-09 12:12:11")
 			req.Header.Set("sign", "vLMGBUARoPek0ks3vv0eAi39mWkzS7afb+5njTlc7BY=")
-			resp, err := req.JSON(`test`)
+			resp, err := req.JSON(``)
 			require.NoError(t, err)
 			require.Equal(t, http.StatusOK, resp.Code)
 			require.Equal(t, `{"msgtype":"text","text":{"content":"我还在开发哦……"}}`, resp.GetBodyString())
@@ -46,6 +47,23 @@ func TestDingTalk_DingMsg(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, http.StatusOK, resp.Code)
 			require.Equal(t, `{"msgtype":"text","text":{"content":"心情发表成功"}}`, resp.GetBodyString())
+		})
+
+		t.Run("chatbot", func(t *testing.T) {
+			if testing.Short() {
+				t.Skip("skip")
+			}
+
+			config.App.TencentCloud.SecretId = os.Getenv("TencentCloudSecretId")
+			config.App.TencentCloud.SecretKey = os.Getenv("TencentCloudSecretKey")
+
+			req := test.NewRequest("/api/dingmsg", handler.DingMsg)
+			req.Header.Set("timestamp", "2020-06-09 12:12:11")
+			req.Header.Set("sign", "vLMGBUARoPek0ks3vv0eAi39mWkzS7afb+5njTlc7BY=")
+			resp, err := req.JSON(gee.H{"text": gee.H{"content": "今天不开心"}})
+			require.NoError(t, err)
+			require.Equal(t, http.StatusOK, resp.Code)
+			require.NotContains(t, `Ohoooo……`, resp.GetBodyString())
 		})
 	})
 }

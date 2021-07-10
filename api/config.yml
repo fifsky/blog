@@ -37,3 +37,6 @@ acm:
   namespace: '26f1d5e2-b698-49cd-9cd9-f534661c388a'
   endpoint: 'acm.aliyun.com'
   role_name: 'BlogACMRole'
+tencent_cloud:
+  secret_id: ''
+  secret_key: ''

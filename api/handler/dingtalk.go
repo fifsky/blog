@@ -12,7 +12,15 @@ import (
 	"github.com/goapt/gee"
 	"github.com/goapt/logger"
 	"github.com/ilibs/gosql/v2"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
+	nlp "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/nlp/v20190408"
 	"github.com/tidwall/gjson"
+)
+
+const (
+	mooodTag  = "#心情#"
+	remindTag = "#提醒#"
 )
 
 type DingTalk struct {
@@ -52,6 +60,24 @@ func (d *DingTalk) DingMsg(c *gee.Context) gee.Response {
 			}
 
 			return d.dingReturn(c, "心情发表成功")
+		} else {
+			credential := common.NewCredential(
+				config.App.TencentCloud.SecretId,
+				config.App.TencentCloud.SecretKey,
+			)
+			cpf := profile.NewClientProfile()
+			cpf.HttpProfile.Endpoint = "nlp.tencentcloudapi.com"
+			client, _ := nlp.NewClient(credential, "ap-guangzhou", cpf)
+
+			request := nlp.NewChatBotRequest()
+
+			request.Query = common.StringPtr(content)
+
+			response, err := client.ChatBot(request)
+			if err != nil {
+				return d.dingReturn(c, "Ohoooo……"+err.Error())
+			}
+			return d.dingReturn(c, *response.Response.Reply)
 		}
 	}
 

@@ -6,7 +6,7 @@ import (
 
 type Reminds struct {
 	Id        int       `json:"id" db:"id"`
-	Type      int       `json:"type" db:"type" binding:"required"`
+	Type      int       `json:"type" db:"type" binding:"required"` // 0固定，1每分钟，2每个小时，3每周，4，每天，5，每月，6，每年
 	Content   string    `json:"content" db:"content" binding:"required"`
 	Month     int       `json:"month" db:"month"`
 	Week      int       `json:"week" db:"week"`
