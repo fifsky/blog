@@ -88,6 +88,9 @@ func (u *User) List(c *gee.Context) gee.Response {
 	h := gee.H{}
 	num := 10
 	users, err := u.userRepo.GetList(p.Page, num)
+	if err != nil {
+		return response.Fail(c, 202, err)
+	}
 	h["list"] = users
 
 	total, err := u.db.Model(&model.Users{}).Count()

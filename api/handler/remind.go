@@ -70,6 +70,9 @@ func (r *Remind) List(c *gee.Context) gee.Response {
 	h := gee.H{}
 	num := 10
 	reminds, err := r.remindRepo.RemindGetList(p.Page, num)
+	if err != nil {
+		return response.Fail(c, 202, err)
+	}
 	h["list"] = reminds
 
 	total, err := r.db.Model(&model.Reminds{}).Count()

@@ -29,6 +29,9 @@ func (m *Mood) List(c *gee.Context) gee.Response {
 	h := gee.H{}
 	num := 10
 	moods, err := m.moodRepo.MoodGetList(p.Page, num)
+	if err != nil {
+		return response.Fail(c, 202, err)
+	}
 	h["list"] = moods
 
 	total, err := m.db.Model(&model.Moods{}).Count()

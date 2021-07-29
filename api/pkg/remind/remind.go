@@ -18,11 +18,8 @@ import (
 func StartCron() {
 	t := time.NewTicker(60 * time.Second)
 
-	for {
-		select {
-		case t1 := <-t.C:
-			dingRemind(t1)
-		}
+	for t1 := range t.C {
+		dingRemind(t1)
 	}
 }
 

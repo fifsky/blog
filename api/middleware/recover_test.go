@@ -11,11 +11,6 @@ import (
 func TestRecover(t *testing.T) {
 	var testHandler gee.HandlerFunc = func(c *gee.Context) gee.Response {
 		panic("dummy")
-
-		return c.JSON(gee.H{
-			"code": 10000,
-			"msg":  "success",
-		})
 	}
 
 	assert.NotPanics(t, func() {

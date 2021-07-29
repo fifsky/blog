@@ -18,6 +18,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+// nolint
 const (
 	mooodTag  = "#心情#"
 	remindTag = "#提醒#"

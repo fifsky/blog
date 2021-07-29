@@ -102,6 +102,10 @@ func (m *Comment) AdminList(c *gee.Context) gee.Response {
 	h := gee.H{}
 	num := 10
 	comments, err := m.commentRepo.CommentList(p.Page, num)
+	if err != nil {
+		return response.Fail(c, 202, err)
+	}
+
 	h["list"] = comments
 
 	total, err := m.db.Model(&model.Comments{}).Count()
