@@ -13,7 +13,7 @@
     "dayjs": "^1.8.5",
     "highlight.js": "9.14.2",
     "nprogress": "^0.2.0",
-    "object-path": "^0.11.5",
+    "object-path": "^0.11.8",
     "vue": "^2.6.6",
     "vue-m-message": "^1.0.0",
     "vue-meta": "^1.5.8",
