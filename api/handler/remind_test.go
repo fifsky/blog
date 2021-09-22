@@ -162,8 +162,8 @@ func TestRemind_Post(t *testing.T) {
 			},
 			{
 				"params error",
-				gee.H{"content": "demo"},
-				`{"code":201,"msg":"参数错误:缺少type"}`,
+				gee.H{"type": 1},
+				`{"code":201,"msg":"参数错误:缺少content"}`,
 			},
 		}
 
