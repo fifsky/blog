@@ -23,7 +23,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.205
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/nlp v1.0.205
-	github.com/tidwall/gjson v1.8.1
+	github.com/tidwall/gjson v1.9.3
 	github.com/urfave/cli/v2 v2.3.0
 	golang.org/x/time v0.0.0-20210611083556-38a9dc6acbc6
 )
