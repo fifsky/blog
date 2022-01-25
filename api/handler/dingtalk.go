@@ -25,19 +25,20 @@ const (
 )
 
 type DingTalk struct {
-	db *gosql.DB
+	db   *gosql.DB
+	conf *config.Config
 }
 
-func NewDingTalk(db *gosql.DB) *DingTalk {
-	return &DingTalk{db: db}
+func NewDingTalk(db *gosql.DB, conf *config.Config) *DingTalk {
+	return &DingTalk{db: db, conf: conf}
 }
 
 func (d *DingTalk) DingMsg(c *gee.Context) gee.Response {
 
 	tt := c.GetHeader("timestamp")
 	sign := c.GetHeader("sign")
-	algorithm := hmac.New(sha256.New, []byte(config.App.Common.DingAppSecret))
-	algorithm.Write([]byte(tt + "\n" + config.App.Common.DingAppSecret))
+	algorithm := hmac.New(sha256.New, []byte(d.conf.Common.DingAppSecret))
+	algorithm.Write([]byte(tt + "\n" + d.conf.Common.DingAppSecret))
 	sign2 := base64.StdEncoding.EncodeToString(algorithm.Sum(nil))
 
 	body, _ := ioutil.ReadAll(c.Request.Body)
@@ -63,8 +64,8 @@ func (d *DingTalk) DingMsg(c *gee.Context) gee.Response {
 			return d.dingReturn(c, "心情发表成功")
 		} else {
 			credential := common.NewCredential(
-				config.App.TencentCloud.SecretId,
-				config.App.TencentCloud.SecretKey,
+				d.conf.TencentCloud.SecretId,
+				d.conf.TencentCloud.SecretKey,
 			)
 			cpf := profile.NewClientProfile()
 			cpf.HttpProfile.Endpoint = "nlp.tencentcloudapi.com"

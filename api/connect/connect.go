@@ -26,13 +26,13 @@ func NewRateLimiter() *rate.Limiter {
 
 type AccessLogger logger.ILogger
 
-func NewAccessLogger() AccessLogger {
+func NewAccessLogger(conf *config.Config) AccessLogger {
 	newLog := logger.NewLogger(func(c *logger.Config) {
 		c.LogName = "access"
-		c.LogMode = config.App.Log.LogMode
-		c.LogPath = config.App.Log.LogPath
-		c.LogLevel = config.App.Log.LogLevel
-		c.LogMaxFiles = config.App.Log.LogMaxFiles
+		c.LogMode = conf.Log.LogMode
+		c.LogPath = conf.Log.LogPath
+		c.LogLevel = conf.Log.LogLevel
+		c.LogMaxFiles = conf.Log.LogMaxFiles
 		c.LogSentryDSN = ""
 		c.LogDetail = false
 	})

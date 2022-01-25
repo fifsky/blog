@@ -15,11 +15,11 @@ import (
 	"app/pkg/aesutil"
 )
 
-func StartCron() {
+func StartCron(conf *config.Config) {
 	t := time.NewTicker(60 * time.Second)
 
 	for t1 := range t.C {
-		dingRemind(t1)
+		dingRemind(t1, conf)
 	}
 }
 
@@ -30,8 +30,8 @@ func numFormat(n int) string {
 	return strconv.Itoa(n)
 }
 
-func message(content string, v *model2.Reminds) {
-	token, _ := aesutil.AesEncode(config.App.Common.TokenSecret, convert.ToStr(v.Id))
+func message(content string, v *model2.Reminds, conf *config.Config) {
+	token, _ := aesutil.AesEncode(conf.Common.TokenSecret, convert.ToStr(v.Id))
 
 	err := robot.CardMessage("⏰重要提醒⏰", content, []map[string]string{
 		{
@@ -59,7 +59,7 @@ func changeNextTime(id int) {
 	}
 }
 
-func dingRemind(t time.Time) {
+func dingRemind(t time.Time, conf *config.Config) {
 	reminds := make([]*model2.Reminds, 0)
 	err := gosql.Model(&reminds).All()
 	if err != nil {
@@ -73,7 +73,7 @@ func dingRemind(t time.Time) {
 		if v.Status == 2 {
 			// 未确认的消息每天都需要在相同的时间点提醒
 			if t.Format("15:04") == v.NextTime.Format("15:04") {
-				message("## ⏰再次提醒 \n "+content, v)
+				message("## ⏰再次提醒 \n "+content, v, conf)
 				changeNextTime(v.Id)
 			}
 
@@ -111,7 +111,7 @@ func dingRemind(t time.Time) {
 		}
 
 		if isRemind {
-			message("## ⏰提醒 \n "+content, v)
+			message("## ⏰提醒 \n "+content, v, conf)
 			changeNextTime(v.Id)
 		}
 	}

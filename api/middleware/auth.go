@@ -17,7 +17,7 @@ import (
 
 type AuthLogin gee.HandlerFunc
 
-func NewAuthLogin(db *gosql.DB) AuthLogin {
+func NewAuthLogin(db *gosql.DB, conf *config.Config) AuthLogin {
 	return func(c *gee.Context) gee.Response {
 		accessToken := c.Request.Header.Get("Access-Token")
 
@@ -26,7 +26,7 @@ func NewAuthLogin(db *gosql.DB) AuthLogin {
 			return response.Fail(c, 201, "Access Token不能为空")
 		}
 
-		cipherText, err := aesutil.AesDecode(config.App.Common.TokenSecret, accessToken)
+		cipherText, err := aesutil.AesDecode(conf.Common.TokenSecret, accessToken)
 		if err != nil {
 			logger.Data(map[string]interface{}{
 				"token": accessToken,
@@ -37,7 +37,7 @@ func NewAuthLogin(db *gosql.DB) AuthLogin {
 		}
 
 		v := strings.Split(cipherText, ":")
-		if len(v) != 2 || hashing.Md5(v[0]+config.App.Common.TokenSecret) != v[1] {
+		if len(v) != 2 || hashing.Md5(v[0]+conf.Common.TokenSecret) != v[1] {
 			logger.Data(map[string]interface{}{
 				"token":      accessToken,
 				"cipherText": cipherText,

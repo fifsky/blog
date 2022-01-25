@@ -16,8 +16,9 @@ import (
 func TestDingTalk_DingMsg(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments")...)
-		handler := NewDingTalk(db)
-		config.App.Common.DingAppSecret = "abc"
+		conf := &config.Config{}
+		conf.Common.DingAppSecret = "abc"
+		handler := NewDingTalk(db, conf)
 
 		t.Run("empty", func(t *testing.T) {
 			req := test.NewRequest("/api/dingmsg", handler.DingMsg)
@@ -54,8 +55,8 @@ func TestDingTalk_DingMsg(t *testing.T) {
 				t.Skip("skip")
 			}
 
-			config.App.TencentCloud.SecretId = os.Getenv("TencentCloudSecretId")
-			config.App.TencentCloud.SecretKey = os.Getenv("TencentCloudSecretKey")
+			conf.TencentCloud.SecretId = os.Getenv("TencentCloudSecretId")
+			conf.TencentCloud.SecretKey = os.Getenv("TencentCloudSecretKey")
 
 			req := test.NewRequest("/api/dingmsg", handler.DingMsg)
 			req.Header.Set("timestamp", "2020-06-09 12:12:11")

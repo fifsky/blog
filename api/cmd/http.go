@@ -11,7 +11,7 @@ import (
 
 type HttpCmd *cli.Command
 
-func NewHttp(router router.Router) HttpCmd {
+func NewHttp(router router.Router, conf *config.Config) HttpCmd {
 	return &cli.Command{
 		Name:  "http",
 		Usage: "http command eg: ./app http --addr=:8080",
@@ -25,7 +25,7 @@ func NewHttp(router router.Router) HttpCmd {
 			if !ctx.IsSet("addr") {
 				_ = ctx.Set("addr", ":8080")
 			}
-			log.Println("[Env] Run profile:" + config.App.Env)
+			log.Println("[Env] Run profile:" + conf.Env)
 			router.Run(ctx.String("addr"))
 			return nil
 		},

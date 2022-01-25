@@ -8,7 +8,6 @@ require (
 	github.com/getsentry/sentry-go v0.11.0 // indirect
 	github.com/gin-contrib/cors v1.3.1
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/goapt/acm v1.0.0
 	github.com/goapt/dbunit v0.0.3
 	github.com/goapt/envconf v0.0.4
 	github.com/goapt/gee v1.5.1

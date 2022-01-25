@@ -17,8 +17,10 @@ func TestMiddleware_Cors(t *testing.T) {
 		})
 	}
 
+	conf := &config.Config{}
+	conf.Env = "local"
 	{
-		req := test.NewRequest("/dummy/impl", gee.HandlerFunc(NewCors()), testHandler)
+		req := test.NewRequest("/dummy/impl", gee.HandlerFunc(NewCors(conf)), testHandler)
 		req.Host = "fifsky.com"
 		req.Header.Set("Origin", "http://fifsky.com")
 
@@ -28,8 +30,9 @@ func TestMiddleware_Cors(t *testing.T) {
 	}
 
 	{
-		config.App.Env = "local"
-		req := test.NewRequest("/dummy/impl", gee.HandlerFunc(NewCors()), testHandler)
+		conf := &config.Config{}
+		conf.Env = "local"
+		req := test.NewRequest("/dummy/impl", gee.HandlerFunc(NewCors(conf)), testHandler)
 		req.Host = "test.com"
 		req.Header.Set("Origin", "http://test.com")
 

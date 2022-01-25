@@ -25,10 +25,11 @@ type Article struct {
 	artRepo     *repo.Article
 	settingRepo *repo.Setting
 	httpClient  *http.Client
+	conf        *config.Config
 }
 
-func NewArticle(db *gosql.DB, artRepo *repo.Article, settingRepo *repo.Setting) *Article {
-	return &Article{db: db, artRepo: artRepo, settingRepo: settingRepo, httpClient: http.DefaultClient}
+func NewArticle(db *gosql.DB, artRepo *repo.Article, settingRepo *repo.Setting, conf *config.Config) *Article {
+	return &Article{db: db, artRepo: artRepo, settingRepo: settingRepo, httpClient: http.DefaultClient, conf: conf}
 }
 
 func (a *Article) Archive(c *gee.Context) gee.Response {
@@ -265,7 +266,7 @@ func (a *Article) Upload(c *gee.Context) gee.Response {
 		c.Status(http.StatusBadRequest)
 		return c.String("Bad request\n" + err.Error())
 	}
-	client, err := oss.New(config.App.OSS.Endpoint, config.App.OSS.AccessKey, config.App.OSS.AccessSecret, func(client *oss.Client) {
+	client, err := oss.New(a.conf.OSS.Endpoint, a.conf.OSS.AccessKey, a.conf.OSS.AccessSecret, func(client *oss.Client) {
 		client.HTTPClient = a.httpClient
 	})
 
@@ -275,7 +276,7 @@ func (a *Article) Upload(c *gee.Context) gee.Response {
 		})
 	}
 
-	bucket, err := client.Bucket(config.App.OSS.Bucket)
+	bucket, err := client.Bucket(a.conf.OSS.Bucket)
 
 	if err != nil {
 		logger.Error(err)

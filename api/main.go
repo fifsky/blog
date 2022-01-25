@@ -12,27 +12,28 @@ import (
 )
 
 func main() {
-	connect.Connect(config.App)
+	conf := config.New()
+	connect.Connect(conf)
 
 	// logger init
 	logger.Setting(func(c *logger.Config) {
 		c.LogName = "app"
-		c.LogMode = config.App.Log.LogMode
-		c.LogPath = config.App.Log.LogPath
-		c.LogLevel = config.App.Log.LogLevel
-		c.LogMaxFiles = config.App.Log.LogMaxFiles
-		c.LogSentryDSN = config.App.Log.LogSentryDSN
-		c.LogSentryType = "go." + config.App.AppName
-		c.LogDetail = config.App.Log.LogDetail
+		c.LogMode = conf.Log.LogMode
+		c.LogPath = conf.Log.LogPath
+		c.LogLevel = conf.Log.LogLevel
+		c.LogMaxFiles = conf.Log.LogMaxFiles
+		c.LogSentryDSN = conf.Log.LogSentryDSN
+		c.LogSentryType = "go." + conf.AppName
+		c.LogDetail = conf.Log.LogDetail
 	})
 
 	robot.Init(ding.NewRobot())
-	robot.SetToken(config.App.Common.RobotToken)
+	robot.SetToken(conf.Common.RobotToken)
 
 	// crontab setup
-	go remind.StartCron()
+	go remind.StartCron(conf)
 
 	// server setup
-	cmds := Initialize()
+	cmds := Initialize(conf)
 	gee.NewCliServer().Run(cmds)
 }

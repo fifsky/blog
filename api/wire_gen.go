@@ -8,6 +8,7 @@ package main
 
 import (
 	"app/cmd"
+	"app/config"
 	"app/connect"
 	"app/handler"
 	"app/middleware"
@@ -24,12 +25,12 @@ import (
 
 // Injectors from wire.go:
 
-func Initialize() cli.Commands {
+func Initialize(conf *config.Config) cli.Commands {
 	db := connect.NewDB()
 	comment := repo.NewComment(db)
 	article := repo.NewArticle(db, comment)
 	setting := repo.NewSetting(db)
-	handlerArticle := handler.NewArticle(db, article, setting)
+	handlerArticle := handler.NewArticle(db, article, setting, conf)
 	cate := repo.NewCate(db)
 	handlerCate := handler.NewCate(db, cate)
 	handlerComment := handler.NewComment(db, comment)
@@ -37,13 +38,13 @@ func Initialize() cli.Commands {
 	link := repo.NewLink(db)
 	handlerLink := handler.NewLink(db, link)
 	user := repo.NewUser(db)
-	handlerUser := handler.NewUser(db, user)
+	handlerUser := handler.NewUser(db, user, conf)
 	mood := repo.NewMood(db)
 	handlerMood := handler.NewMood(db, mood)
 	remind := repo.NewRemind(db)
 	handlerRemind := handler.NewRemind(db, remind)
 	handlerSetting := handler.NewSetting(db, setting)
-	dingTalk := handler.NewDingTalk(db)
+	dingTalk := handler.NewDingTalk(db, conf)
 	handlerHandler := &handler.Handler{
 		Article:  handlerArticle,
 		Cate:     handlerCate,
@@ -56,14 +57,14 @@ func Initialize() cli.Commands {
 		Setting:  handlerSetting,
 		DingTalk: dingTalk,
 	}
-	accessLogger := connect.NewAccessLogger()
+	accessLogger := connect.NewAccessLogger(conf)
 	accessLog := middleware.NewAccessLog(accessLogger)
 	middlewareRecover := middleware.NewRecover()
-	cors := middleware.NewCors()
+	cors := middleware.NewCors(conf)
 	limiter := connect.NewRateLimiter()
 	middlewareLimiter := middleware.NewLimiter(limiter)
-	remindAuth := middleware.NewRemindAuth(db)
-	authLogin := middleware.NewAuthLogin(db)
+	remindAuth := middleware.NewRemindAuth(db, conf)
+	authLogin := middleware.NewAuthLogin(db, conf)
 	middlewareMiddleware := &middleware.Middleware{
 		AccessLog:  accessLog,
 		Recover:    middlewareRecover,
@@ -73,7 +74,7 @@ func Initialize() cli.Commands {
 		AuthLogin:  authLogin,
 	}
 	routerRouter := router.NewRouter(handlerHandler, middlewareMiddleware)
-	httpCmd := cmd.NewHttp(routerRouter)
+	httpCmd := cmd.NewHttp(routerRouter, conf)
 	commands := &cmd.Commands{
 		HttpCmd: httpCmd,
 	}

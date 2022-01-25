@@ -14,14 +14,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func getUserTestToken(id int) string {
-	src := fmt.Sprintf("%d:%s", id, hashing.Md5(fmt.Sprintf("%d%s", id, config.App.Common.TokenSecret)))
+func getUserTestToken(id int, conf *config.Config) string {
+	src := fmt.Sprintf("%d:%s", id, hashing.Md5(fmt.Sprintf("%d%s", id, conf.Common.TokenSecret)))
 
 	if id == 888 {
 		src = src + "err"
 	}
 
-	token, _ := aesutil.AesEncode(config.App.Common.TokenSecret, src)
+	token, _ := aesutil.AesEncode(conf.Common.TokenSecret, src)
 	return token
 }
 
@@ -33,6 +33,9 @@ func TestNewAuthLogin(t *testing.T) {
 		})
 	}
 
+	conf := &config.Config{}
+	conf.Common.TokenSecret = "abcdabcdabcdabcd"
+
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixture("users"))
 
@@ -41,7 +44,7 @@ func TestNewAuthLogin(t *testing.T) {
 			ResponseBody string
 		}{
 			{
-				getUserTestToken(1),
+				getUserTestToken(1, conf),
 				`{"code":10000,"msg":"success"}`,
 			},
 			{
@@ -53,17 +56,17 @@ func TestNewAuthLogin(t *testing.T) {
 				`{"code":201,"msg":"Access Token错误"}`,
 			},
 			{
-				getUserTestToken(888),
+				getUserTestToken(888, conf),
 				`{"code":201,"msg":"Access Token不合法"}`,
 			},
 			{
-				getUserTestToken(999),
+				getUserTestToken(999, conf),
 				`{"code":201,"msg":"Access Token错误，用户不存在"}`,
 			},
 		}
 
 		for _, tt := range tests {
-			req := test.NewRequest("/dummy/impl", gee.HandlerFunc(NewAuthLogin(db)), testHandler)
+			req := test.NewRequest("/dummy/impl", gee.HandlerFunc(NewAuthLogin(db, conf)), testHandler)
 			req.Header.Add("Access-Token", tt.Token)
 			resp, err := req.Get()
 			assert.NoError(t, err)

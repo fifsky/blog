@@ -13,7 +13,7 @@ import (
 
 type RemindAuth gee.HandlerFunc
 
-func NewRemindAuth(db *gosql.DB) RemindAuth {
+func NewRemindAuth(db *gosql.DB, conf *config.Config) RemindAuth {
 	return func(c *gee.Context) gee.Response {
 		token := c.Query("token")
 
@@ -22,7 +22,7 @@ func NewRemindAuth(db *gosql.DB) RemindAuth {
 			return response.Fail(c, 201, "非法访问")
 		}
 
-		id, err := aesutil.AesDecode(config.App.Common.TokenSecret, token)
+		id, err := aesutil.AesDecode(conf.Common.TokenSecret, token)
 		if err != nil {
 			c.Abort()
 			return response.Fail(c, 202, "Token错误")

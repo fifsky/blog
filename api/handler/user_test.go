@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"app/config"
 	"app/provider/model"
 	"app/provider/repo"
 	"app/testutil"
@@ -19,7 +20,9 @@ import (
 func TestUser_Login(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users")...)
-		handler := NewUser(db, repo.NewUser(db))
+		conf := &config.Config{}
+		conf.Common.TokenSecret = "abcdabcdabcdabcd"
+		handler := NewUser(db, repo.NewUser(db), conf)
 		tests := []struct {
 			name         string
 			requestBody  gee.H
@@ -85,7 +88,8 @@ func TestUser_LoginUser(t *testing.T) {
 func TestUser_Get(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users")...)
-		handler := NewUser(db, repo.NewUser(db))
+
+		handler := NewUser(db, repo.NewUser(db), nil)
 		tests := []struct {
 			name         string
 			requestBody  gee.H
@@ -123,7 +127,7 @@ func TestUser_Get(t *testing.T) {
 func TestUser_List(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users")...)
-		handler := NewUser(db, repo.NewUser(db))
+		handler := NewUser(db, repo.NewUser(db), nil)
 		tests := []struct {
 			name        string
 			requestBody gee.H
@@ -162,7 +166,7 @@ func TestUser_List(t *testing.T) {
 func TestUser_Status(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users")...)
-		handler := NewUser(db, repo.NewUser(db))
+		handler := NewUser(db, repo.NewUser(db), nil)
 		tests := []struct {
 			name         string
 			requestBody  gee.H
@@ -200,7 +204,7 @@ func TestUser_Status(t *testing.T) {
 func TestUser_Post(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users")...)
-		handler := NewUser(db, repo.NewUser(db))
+		handler := NewUser(db, repo.NewUser(db), nil)
 		tests := []struct {
 			name         string
 			requestBody  gee.H

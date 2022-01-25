@@ -22,7 +22,7 @@ import (
 func TestArticle_Archive(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db))
+		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), nil)
 		tests := []struct {
 			name        string
 			requestBody gee.H
@@ -54,7 +54,7 @@ func TestArticle_Archive(t *testing.T) {
 func TestArticle_List(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates")...)
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db))
+		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), nil)
 		tests := []struct {
 			name        string
 			requestBody gee.H
@@ -107,7 +107,7 @@ func TestArticle_List(t *testing.T) {
 func TestArticle_PrevNext(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db))
+		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), nil)
 		tests := []struct {
 			name         string
 			requestBody  gee.H
@@ -140,7 +140,7 @@ func TestArticle_PrevNext(t *testing.T) {
 func TestArticle_Detail(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users")...)
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db))
+		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), nil)
 		tests := []struct {
 			name        string
 			requestBody gee.H
@@ -179,7 +179,7 @@ func TestArticle_Detail(t *testing.T) {
 func TestArticle_Feed(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users")...)
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db))
+		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), nil)
 		tests := []struct {
 			name        string
 			requestBody gee.H
@@ -211,7 +211,7 @@ func TestArticle_Feed(t *testing.T) {
 func TestArticle_Post(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db))
+		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), nil)
 		tests := []struct {
 			name         string
 			requestBody  gee.H
@@ -244,7 +244,7 @@ func TestArticle_Post(t *testing.T) {
 func TestArticle_Delete(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db))
+		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), nil)
 		tests := []struct {
 			name         string
 			requestBody  gee.H
@@ -282,14 +282,17 @@ var httpSuites = []test.HttpClientSuite{
 }
 
 func TestArticle_Upload(t *testing.T) {
-	config.App.OSS.Bucket = "test"
-
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
 
 		httpClient := test.NewHttpClientSuite(httpSuites)
+		conf := &config.Config{}
+		conf.OSS.Endpoint = "oss-cn-shanghai-internal.aliyuncs.com"
+		conf.OSS.AccessKey = "test"
+		conf.OSS.AccessSecret = "test"
+		conf.OSS.Bucket = "test"
 
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db))
+		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), conf)
 		handler.httpClient = httpClient
 
 		rr, err := os.Open(testutil.TestDataPath("go.png"))

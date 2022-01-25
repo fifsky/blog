@@ -13,12 +13,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func getRemindTestToken(id int) string {
-	token, _ := aesutil.AesEncode(config.App.Common.TokenSecret, strconv.Itoa(id))
+func getRemindTestToken(id int, conf *config.Config) string {
+	token, _ := aesutil.AesEncode(conf.Common.TokenSecret, strconv.Itoa(id))
 	return token
 }
 
 func TestNewRemindAuth(t *testing.T) {
+	conf := &config.Config{}
+	conf.Common.TokenSecret = "abcdabcdabcdabcd"
 	var testHandler gee.HandlerFunc = func(c *gee.Context) gee.Response {
 		return c.JSON(gee.H{
 			"code": 10000,
@@ -34,7 +36,7 @@ func TestNewRemindAuth(t *testing.T) {
 			ResponseBody string
 		}{
 			{
-				getRemindTestToken(8),
+				getRemindTestToken(8, conf),
 				`{"code":10000,"msg":"success"}`,
 			},
 			{
@@ -46,13 +48,13 @@ func TestNewRemindAuth(t *testing.T) {
 				`{"code":202,"msg":"Token错误"}`,
 			},
 			{
-				getRemindTestToken(888),
+				getRemindTestToken(888, conf),
 				`{"code":203,"msg":"数据不存在"}`,
 			},
 		}
 
 		for _, tt := range tests {
-			req := test.NewRequest("/dummy/impl?token="+tt.Token, gee.HandlerFunc(NewRemindAuth(db)), testHandler)
+			req := test.NewRequest("/dummy/impl?token="+tt.Token, gee.HandlerFunc(NewRemindAuth(db, conf)), testHandler)
 			resp, err := req.Get()
 			assert.NoError(t, err)
 			assert.Equal(t, tt.ResponseBody, resp.GetBodyString())

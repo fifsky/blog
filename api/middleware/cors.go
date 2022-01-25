@@ -10,11 +10,11 @@ import (
 
 type Cors gee.HandlerFunc
 
-func NewCors() Cors {
+func NewCors(conf *config.Config) Cors {
 	return func(c *gee.Context) gee.Response {
 		origins := []string{"http://fifsky.com", "http://www.fifsky.com", "https://fifsky.com", "https://www.fifsky.com"}
 
-		if config.App.Env == "local" {
+		if conf.Env == "local" {
 			origins = []string{"*"}
 		}
 

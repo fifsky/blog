@@ -5,6 +5,7 @@ package main
 
 import (
 	"app/cmd"
+	"app/config"
 	"app/connect"
 	"app/handler"
 	"app/middleware"
@@ -23,6 +24,6 @@ var providerSet = wire.NewSet(
 	provider.RepoSet,
 )
 
-func Initialize() cli.Commands {
+func Initialize(conf *config.Config) cli.Commands {
 	panic(wire.Build(providerSet))
 }

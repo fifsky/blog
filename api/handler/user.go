@@ -17,10 +17,11 @@ import (
 type User struct {
 	db       *gosql.DB
 	userRepo *repo.User
+	conf     *config.Config
 }
 
-func NewUser(db *gosql.DB, userRepo *repo.User) *User {
-	return &User{db: db, userRepo: userRepo}
+func NewUser(db *gosql.DB, userRepo *repo.User, conf *config.Config) *User {
+	return &User{db: db, userRepo: userRepo, conf: conf}
 }
 
 func (u *User) Login(c *gee.Context) gee.Response {
@@ -43,8 +44,8 @@ func (u *User) Login(c *gee.Context) gee.Response {
 		return response.Fail(c, 202, "用户已停用")
 	}
 
-	src := fmt.Sprintf("%d:%s", user.Id, hashing.Md5(fmt.Sprintf("%d%s", user.Id, config.App.Common.TokenSecret)))
-	cipherText, err := aesutil.AesEncode(config.App.Common.TokenSecret, src)
+	src := fmt.Sprintf("%d:%s", user.Id, hashing.Md5(fmt.Sprintf("%d%s", user.Id, u.conf.Common.TokenSecret)))
+	cipherText, err := aesutil.AesEncode(u.conf.Common.TokenSecret, src)
 	if err != nil {
 		return response.Fail(c, 201, "Access Token加密错误"+err.Error())
 	}
