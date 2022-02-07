@@ -16,7 +16,6 @@ type common struct {
 	RobotToken    string `yml:"robot_token"`
 	TokenSecret   string `yml:"token_secret"`
 	DingAppSecret string `yml:"ding_app_secret"`
-	EnvType       string `yml:"env_type"`
 }
 
 type ossConf struct {
@@ -67,13 +66,13 @@ func (c *Config) load(args map[string]string) {
 		log.Fatalf("config error %s", err.Error())
 	}
 
-	if err := conf.Unmarshal(c); err != nil {
-		log.Fatal("config unmarshal error:", err)
-	}
-
 	// load config
 	if err := conf.Env(filepath.Join(appPath, ".env")); err != nil {
 		log.Fatal("config env error:", err)
+	}
+
+	if err := conf.Unmarshal(c); err != nil {
+		log.Fatal("config unmarshal error:", err)
 	}
 
 	if !filepath.IsAbs(c.Common.StoragePath) {

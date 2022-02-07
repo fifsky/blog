@@ -1,6 +1,6 @@
 module app
 
-go 1.14
+go 1.15
 
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.1.8+incompatible

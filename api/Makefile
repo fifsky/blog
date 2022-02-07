@@ -10,7 +10,7 @@ build: fmt-check generate
 .PHONY: generate
 generate:
 	@if [ ! -x "$(command -v wire)" ]; then \
-	$(GO) get github.com/google/wire/cmd/wire; \
+	$(GO) install github.com/google/wire/cmd/wire; \
 	fi;
 	$(GO) generate
 
