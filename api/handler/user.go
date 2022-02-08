@@ -2,15 +2,16 @@ package handler
 
 import (
 	"fmt"
+	"time"
 
 	"app/config"
-	"app/pkg/aesutil"
 	"app/provider/model"
 	"app/provider/repo"
 	"app/response"
 	"github.com/goapt/gee"
 	"github.com/goapt/golib/hashing"
 	"github.com/goapt/golib/pagination"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/ilibs/gosql/v2"
 )
 
@@ -44,14 +45,19 @@ func (u *User) Login(c *gee.Context) gee.Response {
 		return response.Fail(c, 202, "用户已停用")
 	}
 
-	src := fmt.Sprintf("%d:%s", user.Id, hashing.Md5(fmt.Sprintf("%d%s", user.Id, u.conf.Common.TokenSecret)))
-	cipherText, err := aesutil.AesEncode(u.conf.Common.TokenSecret, src)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+		Issuer:    fmt.Sprint(user.Id),
+	})
+
+	tokenString, err := token.SignedString([]byte(u.conf.Common.TokenSecret))
+
 	if err != nil {
 		return response.Fail(c, 201, "Access Token加密错误"+err.Error())
 	}
 
 	return response.Success(c, gee.H{
-		"access_token": cipherText,
+		"access_token": tokenString,
 		"user":         user,
 	})
 }

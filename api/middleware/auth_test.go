@@ -3,26 +3,26 @@ package middleware
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"app/config"
-	"app/pkg/aesutil"
 	"app/testutil"
 	"github.com/goapt/dbunit"
 	"github.com/goapt/gee"
-	"github.com/goapt/golib/hashing"
 	"github.com/goapt/test"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/stretchr/testify/assert"
 )
 
 func getUserTestToken(id int, conf *config.Config) string {
-	src := fmt.Sprintf("%d:%s", id, hashing.Md5(fmt.Sprintf("%d%s", id, conf.Common.TokenSecret)))
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+		Issuer:    fmt.Sprint(id),
+	})
 
-	if id == 888 {
-		src = src + "err"
-	}
-
-	token, _ := aesutil.AesEncode(conf.Common.TokenSecret, src)
-	return token
+	tokenString, _ := token.SignedString([]byte(conf.Common.TokenSecret))
+	// fmt.Println("===>", tokenString, err)
+	return tokenString
 }
 
 func TestNewAuthLogin(t *testing.T) {
@@ -53,10 +53,6 @@ func TestNewAuthLogin(t *testing.T) {
 			},
 			{
 				"789789",
-				`{"code":201,"msg":"Access Token错误"}`,
-			},
-			{
-				getUserTestToken(888, conf),
 				`{"code":201,"msg":"Access Token不合法"}`,
 			},
 			{

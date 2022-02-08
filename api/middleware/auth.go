@@ -1,17 +1,13 @@
 package middleware
 
 import (
-	"strings"
-
 	"app/provider/model"
 	"app/response"
 	"github.com/goapt/gee"
 	"github.com/goapt/logger"
 
 	"app/config"
-	"app/pkg/aesutil"
-
-	"github.com/goapt/golib/hashing"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/ilibs/gosql/v2"
 )
 
@@ -26,34 +22,30 @@ func NewAuthLogin(db *gosql.DB, conf *config.Config) AuthLogin {
 			return response.Fail(c, 201, "Access Token不能为空")
 		}
 
-		cipherText, err := aesutil.AesDecode(conf.Common.TokenSecret, accessToken)
-		if err != nil {
-			logger.Data(map[string]interface{}{
-				"token": accessToken,
-				"err":   err,
-			}).Error("Access Token错误")
-			c.Abort()
-			return response.Fail(c, 201, "Access Token错误")
-		}
+		token, err := jwt.ParseWithClaims(accessToken, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+			return []byte(conf.Common.TokenSecret), nil
+		})
 
-		v := strings.Split(cipherText, ":")
-		if len(v) != 2 || hashing.Md5(v[0]+conf.Common.TokenSecret) != v[1] {
-			logger.Data(map[string]interface{}{
-				"token":      accessToken,
-				"cipherText": cipherText,
-			}).Error("Access Token不合法")
+		if err != nil {
 			c.Abort()
 			return response.Fail(c, 201, "Access Token不合法")
 		}
 
-		user := &model.Users{}
-		err = db.Model(user).Where("id = ?", v[0]).Get()
-		if err != nil {
+		if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok && token.Valid {
+			user := &model.Users{}
+			err = db.Model(user).Where("id = ?", claims.Issuer).Get()
+			if err != nil {
+				c.Abort()
+				return response.Fail(c, 201, "Access Token错误，用户不存在")
+			}
+
+			c.Set("userInfo", user)
+		} else {
+			logger.Errorf("Access Token不合法 %s", err)
 			c.Abort()
-			return response.Fail(c, 201, "Access Token错误，用户不存在")
+			return response.Fail(c, 201, "Access Token不合法")
 		}
 
-		c.Set("userInfo", user)
 		c.Next()
 		return nil
 	}

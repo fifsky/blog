@@ -14,6 +14,7 @@ require (
 	github.com/goapt/golib v1.0.5
 	github.com/goapt/logger v1.4.2
 	github.com/goapt/test v1.0.1
+	github.com/golang-jwt/jwt/v4 v4.2.0
 	github.com/google/wire v0.5.0
 	github.com/gorilla/feeds v1.1.1
 	github.com/ilibs/gosql/v2 v2.1.1

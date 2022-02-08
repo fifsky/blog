@@ -23,41 +23,32 @@ func TestUser_Login(t *testing.T) {
 		conf := &config.Config{}
 		conf.Common.TokenSecret = "abcdabcdabcdabcd"
 		handler := NewUser(db, repo.NewUser(db), conf)
-		tests := []struct {
-			name         string
-			requestBody  gee.H
-			responseBody string
-		}{
+		tests := []testutil.TestCase{
 			{
-				"success",
-				gee.H{"user_name": "test", "password": "test"},
-				`{"code":200,"data":{"access_token":"i+LAmF8PLBrVbZcIe88JMpK0coo9wH7yyUNn0z2oxWSmSDA6MqTSksQAZmAQWxok","user":{"id":1,"name":"test","password":"098f6bcd4621d373cade4e832627b4f6","nick_name":"test","email":"test@aaaa.com","status":1,"type":1,"created_at":"2017-08-18 15:21:56","updated_at":"2017-08-23 17:59:58"}},"msg":"success"}`,
+				Name:         "success",
+				RequestBody:  gee.H{"user_name": "test", "password": "test"},
+				AssertType:   testutil.AssertContains,
+				ResponseBody: `"code":200`,
 			},
 			{
-				"params error",
-				gee.H{},
-				`{"code":201,"msg":"参数错误:缺少user_name"}`,
+				Name:         "params error",
+				RequestBody:  gee.H{},
+				ResponseBody: `{"code":201,"msg":"参数错误:缺少user_name"}`,
 			},
 			{
-				"password error",
-				gee.H{"user_name": "test", "password": "test234"},
-				`{"code":202,"msg":"用户名或密码错误"}`,
+				Name:         "password error",
+				RequestBody:  gee.H{"user_name": "test", "password": "test234"},
+				ResponseBody: `{"code":202,"msg":"用户名或密码错误"}`,
 			},
 			{
-				"delete error",
-				gee.H{"user_name": "stop", "password": "test"},
-				`{"code":202,"msg":"用户已停用"}`,
+				Name:         "delete error",
+				RequestBody:  gee.H{"user_name": "stop", "password": "test"},
+				ResponseBody: `{"code":202,"msg":"用户已停用"}`,
 			},
 		}
 
 		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				req := test.NewRequest("/api/login", handler.Login)
-				resp, err := req.JSON(tt.requestBody)
-				require.NoError(t, err)
-				require.Equal(t, http.StatusOK, resp.Code)
-				require.Equal(t, tt.responseBody, resp.GetBodyString())
-			})
+			tt.Run(t, "/api/login", handler.Login)
 		}
 	})
 }
