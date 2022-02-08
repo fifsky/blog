@@ -1,12 +1,11 @@
 package middleware
 
 import (
+	"app/config"
 	"app/provider/model"
 	"app/response"
 	"github.com/goapt/gee"
 	"github.com/goapt/logger"
-
-	"app/config"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/ilibs/gosql/v2"
 )
