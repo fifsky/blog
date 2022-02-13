@@ -51,7 +51,11 @@
     mounted() {
       if(getAccessToken()){
         sync(async () => {
-          await this.currentUserAction()
+          try {
+            await this.currentUserAction()
+          } catch (e) {
+            localStorage.removeItem("access_token")
+          }
         })
       }
     }
