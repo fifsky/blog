@@ -57,7 +57,7 @@ func TestNewAuthLogin(t *testing.T) {
 			},
 			{
 				getUserTestToken(999, conf),
-				`{"code":201,"msg":"Access Token错误，用户不存在"}`,
+				`{"code":202,"msg":"Access Token错误，用户不存在"}`,
 			},
 		}
 
