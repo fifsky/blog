@@ -16,8 +16,12 @@ export default {
   },
   currentUserAction({commit}){
     return sync(async () => {
-      let ret = await loginUserApi()
-      commit("setUserInfo",ret)
+      try {
+        let ret = await loginUserApi()
+        commit("setUserInfo",ret)
+      } catch (e) {
+        localStorage.removeItem("access_token")
+      }
     })
   },
 }
