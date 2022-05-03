@@ -11,7 +11,7 @@
                         v-if="!data.next.id">嘿，这已经是最后的文章啦</span></div>
             </div>
         </div>
-<!--        <Comment :postId="article.id"></Comment>-->
+        <Comment :postId="article.id"></Comment>
     </div>
 </template>
 
