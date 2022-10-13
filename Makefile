@@ -5,7 +5,7 @@ build:
 
 .PHONY: upload
 upload:
-	ossutil --recursive  cp ./dist/assets oss://fifsky/assets -f -e oss-cn-shanghai.aliyuncs.com -i ${ALIYUN_KEY} -k ${ALIYUN_SECRET}
+	source .env && ossutil --recursive  cp ./dist/assets oss://fifsky/assets -f -e oss-cn-shanghai.aliyuncs.com -i ${ALIYUN_KEY} -k ${ALIYUN_SECRET}
 
 .PHONY: docker
 docker: build upload
