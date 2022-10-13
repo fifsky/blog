@@ -4,7 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
-	"io/ioutil"
+	"io"
 	"strings"
 
 	"app/config"
@@ -41,7 +41,7 @@ func (d *DingTalk) DingMsg(c *gee.Context) gee.Response {
 	algorithm.Write([]byte(tt + "\n" + d.conf.Common.DingAppSecret))
 	sign2 := base64.StdEncoding.EncodeToString(algorithm.Sum(nil))
 
-	body, _ := ioutil.ReadAll(c.Request.Body)
+	body, _ := io.ReadAll(c.Request.Body)
 	logger.Info("body:", string(body))
 
 	if sign != sign2 {
