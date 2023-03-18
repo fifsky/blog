@@ -17,10 +17,10 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
-      - name: Set up Go 1.17
+      - name: Set up Go 1.19
         uses: actions/setup-go@v3
         with:
-          go-version: 1.17
+          go-version: 1.19
         id: go
 
       - name: Set up Node
@@ -35,7 +35,7 @@ jobs:
         uses: golangci/golangci-lint-action@v2
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
-          version: v1.46
+          version: v1.51
           working-directory: api
 
       - name: Build Golang and Test
