@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"app/config"
 	"app/connect"
 	"app/pkg/remind"
@@ -31,8 +29,6 @@ func main() {
 
 	robot.Init(wechat.NewRobot())
 	robot.SetToken(conf.Common.RobotToken)
-
-	fmt.Println("robot token:", conf.Common.RobotToken)
 
 	// crontab setup
 	go remind.StartCron(conf)

@@ -73,7 +73,7 @@ func dingRemind(t time.Time, conf *config.Config) {
 		if v.Status == 2 {
 			// 未确认的消息每天都需要在相同的时间点提醒
 			if t.Format("15:04") == v.NextTime.Format("15:04") {
-				message("## ⏰再次提醒 \n "+content, v, conf)
+				message("🙋🏻‍再次提醒 \n "+content, v, conf)
 				changeNextTime(v.Id)
 			}
 
@@ -111,7 +111,7 @@ func dingRemind(t time.Time, conf *config.Config) {
 		}
 
 		if isRemind {
-			message("## ⏰提醒 \n "+content, v, conf)
+			message(content, v, conf)
 			changeNextTime(v.Id)
 		}
 	}
