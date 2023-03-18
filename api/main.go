@@ -7,7 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/goapt/gee"
 	"github.com/goapt/golib/robot"
-	"github.com/goapt/golib/robot/ding"
+	"github.com/goapt/golib/robot/wechat"
 	"github.com/goapt/logger"
 )
 
@@ -27,7 +27,7 @@ func main() {
 		c.LogDetail = conf.Log.LogDetail
 	})
 
-	robot.Init(ding.NewRobot())
+	robot.Init(wechat.NewRobot())
 	robot.SetToken(conf.Common.RobotToken)
 
 	// crontab setup
