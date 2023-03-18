@@ -9,7 +9,7 @@ require (
 	github.com/goapt/dbunit v0.0.3
 	github.com/goapt/envconf v0.0.4
 	github.com/goapt/gee v1.5.1
-	github.com/goapt/golib v1.1.0
+	github.com/goapt/golib v1.1.1
 	github.com/goapt/logger v1.4.2
 	github.com/goapt/test v1.0.1
 	github.com/golang-jwt/jwt/v4 v4.2.0
@@ -17,7 +17,7 @@ require (
 	github.com/gorilla/feeds v1.1.1
 	github.com/ilibs/gosql/v2 v2.1.1
 	github.com/ilibs/identicon v1.0.0
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.2
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.205
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/nlp v1.0.205
 	github.com/tidwall/gjson v1.9.3
