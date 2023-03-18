@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	model2 "app/provider/model"
+	"app/provider/model"
 	"github.com/goapt/golib/convert"
 	"github.com/goapt/golib/robot"
 	"github.com/goapt/logger"
@@ -30,7 +30,7 @@ func numFormat(n int) string {
 	return strconv.Itoa(n)
 }
 
-func message(content string, v *model2.Reminds, conf *config.Config) {
+func message(content string, v *model.Reminds, conf *config.Config) {
 	token, _ := aesutil.AesEncode(conf.Common.TokenSecret, convert.ToStr(v.Id))
 
 	err := robot.CardMessage("⏰重要提醒⏰", content, []map[string]string{
@@ -52,7 +52,7 @@ func changeNextTime(id int) {
 	location, _ := time.LoadLocation("Asia/Shanghai")
 	nextTime, _ := time.ParseInLocation("2006-01-02 15:04:00", time.Now().AddDate(0, 0, 1).Format("2006-01-02 15:04:00"), location)
 
-	_, err := gosql.Model(&model2.Reminds{Status: 2, NextTime: nextTime}).Where("id = ?", id).Update()
+	_, err := gosql.Model(&model.Reminds{Status: 2, NextTime: nextTime}).Where("id = ?", id).Update()
 
 	if err != nil {
 		logger.Error(err)
@@ -60,7 +60,7 @@ func changeNextTime(id int) {
 }
 
 func dingRemind(t time.Time, conf *config.Config) {
-	reminds := make([]*model2.Reminds, 0)
+	reminds := make([]*model.Reminds, 0)
 	err := gosql.Model(&reminds).All()
 	if err != nil {
 		logger.Error(err)
