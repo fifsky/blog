@@ -67,7 +67,7 @@ func dingRemind(t time.Time, conf *config.Config) {
 	}
 
 	for _, v := range reminds {
-		content := "提醒时间:" + time.Now().Format("2006-01-02 15:04:00") + " \n\n 提醒内容:" + v.Content
+		content := "提醒时间:" + time.Now().Format("2006-01-02 15:04:00") + " \n\n提醒内容:" + v.Content
 
 		// 如果是等待确认的消息，则每天都需要提醒
 		if v.Status == 2 {
