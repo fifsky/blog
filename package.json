@@ -24,13 +24,13 @@
     "wangeditor": "^4.7.3"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.4.0",
-    "@vue/cli-plugin-eslint": "^3.4.0",
-    "@vue/cli-service": "^3.4.0",
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
     "less": "^3.9.0",
-    "less-loader": "^4.1.0",
+    "less-loader": "^11.1.0",
     "node-sass": "^4.13.1",
-    "sass-loader": "^7.1.0",
+    "sass-loader": "^13.2.0",
     "vue-template-compiler": "^2.6.6"
   },
   "eslintConfig": {
