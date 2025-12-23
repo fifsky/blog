@@ -6,6 +6,8 @@ common:
   robot_token: ''
   ding_app_secret: ''
   token_secret: ''
+  notify_url: ''
+  notify_token: ''
 database:
   default:
     enable: true

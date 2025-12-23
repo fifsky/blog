@@ -16,6 +16,8 @@ type common struct {
 	RobotToken    string `yml:"robot_token"`
 	TokenSecret   string `yml:"token_secret"`
 	DingAppSecret string `yml:"ding_app_secret"`
+	NotifyUrl     string `yml:"notify_url"`
+	NotifyToken   string `yml:"notify_token"`
 }
 
 type ossConf struct {

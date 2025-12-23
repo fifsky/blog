@@ -61,7 +61,4 @@ typings/
 .next
 
 /dist
-
-rsync.exclude
-rsync.password
-rsync.sh
+.envrc

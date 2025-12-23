@@ -1,6 +1,10 @@
 package remind
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 	"time"
@@ -30,6 +34,47 @@ func numFormat(n int) string {
 	return strconv.Itoa(n)
 }
 
+type barkRequest struct {
+	Body     string `json:"body,omitempty"`
+	Title    string `json:"title"`
+	Badge    int    `json:"badge"`
+	Url      string `json:"url,omitempty"`
+	Markdown string `json:"markdown"`
+}
+
+func messageForBark(content string, v *model.Reminds, conf *config.Config) {
+	token, _ := aesutil.AesEncode(conf.Common.TokenSecret, convert.ToStr(v.Id))
+
+	markdown := `
+%s
+
+[收到提醒](%s)  [稍后提醒](%s)
+`
+
+	body := barkRequest{
+		Title:    "⏰重要提醒⏰",
+		Badge:    1,
+		Markdown: fmt.Sprintf(markdown, content, "https://api.fifsky.com/api/remind/change?token="+url.QueryEscape(token), "https://api.fifsky.com/api/remind/delay?token="+url.QueryEscape(token)),
+	}
+
+	reqBody, _ := json.Marshal(body)
+
+	req, err := http.NewRequest("POST", conf.Common.NotifyUrl, bytes.NewReader(reqBody))
+
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	req.Header.Set("Authorization", "Basic "+conf.Common.NotifyToken)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		logger.Error(err)
+	}
+	defer resp.Body.Close()
+}
+
 func message(content string, v *model.Reminds, conf *config.Config) {
 	token, _ := aesutil.AesEncode(conf.Common.TokenSecret, convert.ToStr(v.Id))
 
@@ -46,6 +91,7 @@ func message(content string, v *model.Reminds, conf *config.Config) {
 	if err != nil {
 		logger.Error(err)
 	}
+	messageForBark(content, v, conf)
 }
 
 func changeNextTime(id int) {
