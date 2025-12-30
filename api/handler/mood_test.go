@@ -2,7 +2,6 @@ package handler
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -26,17 +25,17 @@ func TestMood_List(t *testing.T) {
 	})
 }
 
-func TestMood_Post(t *testing.T) {
+func TestMood_Create(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixture("moods"))
 		handler := NewMood(store.New(db))
 		// success with user context
 		b, _ := json.Marshal(map[string]any{"content": "demo"})
-		req := httptest.NewRequest(http.MethodPost, "/api/admin/mood/post", bytes.NewReader(b))
+		req := httptest.NewRequest(http.MethodPost, "/api/admin/mood/create", bytes.NewReader(b))
 		req.Header.Set("Content-Type", "application/json")
-		req = req.WithContext(context.WithValue(req.Context(), "userInfo", &model.User{Id: 1}))
+		req = req.WithContext(SetLoginUser(req.Context(), &model.User{Id: 1}))
 		rr := httptest.NewRecorder()
-		handler.Post(rr, req)
+		handler.Create(rr, req)
 		if rr.Code != http.StatusOK || !bytes.Contains(rr.Body.Bytes(), []byte(`"code":200`)) {
 			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}

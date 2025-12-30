@@ -2,7 +2,6 @@ package handler
 
 import (
 	"bytes"
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -55,7 +54,7 @@ func TestUser_LoginUser(t *testing.T) {
 	}
 	userHandler := &User{}
 	req := httptest.NewRequest(http.MethodGet, "/api/admin/loginuser", nil)
-	req = req.WithContext(context.WithValue(req.Context(), "userInfo", user))
+	req = req.WithContext(SetLoginUser(req.Context(), user))
 	rr := httptest.NewRecorder()
 	userHandler.LoginUser(rr, req)
 	if rr.Code != http.StatusOK || !bytes.Contains(rr.Body.Bytes(), []byte(`"code":200`)) {
@@ -113,15 +112,15 @@ func TestUser_Status(t *testing.T) {
 	})
 }
 
-func TestUser_Post(t *testing.T) {
+func TestUser_Create(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users")...)
 		handler := NewUser(store.New(db), nil)
-		rr := doJSON(handler.Post, "/api/admin/user/post", map[string]any{"name": "demo", "password": "123", "nick_name": "demo", "email": "demo@123.com", "type": 1})
+		rr := doJSON(handler.Create, "/api/admin/user/create", map[string]any{"name": "demo", "password": "123", "nick_name": "demo", "email": "demo@123.com", "type": 1})
 		if rr.Code != http.StatusOK || !bytes.Contains(rr.Body.Bytes(), []byte(`"code":200`)) {
 			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
-		rr3 := doJSON(handler.Post, "/api/admin/user/post", map[string]any{"name": "demo", "nick_name": "demo", "type": 1})
+		rr3 := doJSON(handler.Create, "/api/admin/user/create", map[string]any{"name": "demo", "nick_name": "demo", "type": 1})
 		if rr3.Code == http.StatusOK || !bytes.Contains(rr3.Body.Bytes(), []byte(`"密码不能为空"`)) {
 			t.Fatalf("unexpected: code=%d body=%s", rr3.Code, rr3.Body.String())
 		}

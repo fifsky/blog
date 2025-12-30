@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"context"
 	"net/http"
 	"strconv"
 
 	"app/config"
+	"app/handler"
 	"app/response"
 	"app/store"
 
@@ -41,7 +41,7 @@ func NewAuthLogin(s *store.Store, conf *config.Config) AuthLogin {
 					return
 				}
 
-				r = r.WithContext(context.WithValue(r.Context(), "userInfo", user))
+				r = r.WithContext(handler.SetLoginUser(r.Context(), user))
 			} else {
 				response.Fail(w, 203, "Access Token不合法")
 				return

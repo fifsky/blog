@@ -24,10 +24,6 @@ func NewRemind(s *store.Store, robot *wechat.Robot) *Remind {
 
 func (r *Remind) Change(w http.ResponseWriter, req *http.Request) {
 	remind := getRemind(req.Context())
-	if remind == nil {
-		response.Fail(w, 202, "记录未找到")
-		return
-	}
 	err := r.store.UpdateRemindStatus(req.Context(), remind.Id, 1)
 	if err != nil {
 		response.Fail(w, 203, err)
@@ -45,7 +41,6 @@ func (r *Remind) Delay(w http.ResponseWriter, req *http.Request) {
 		response.Fail(w, 202, "记录未找到")
 		return
 	}
-
 	err := r.store.UpdateRemindNextTime(req.Context(), remind.Id, remind.NextTime)
 
 	if err != nil {
@@ -101,57 +96,65 @@ func (r *Remind) List(w http.ResponseWriter, req *http.Request) {
 	response.Success(w, resp)
 }
 
-func (r *Remind) Post(w http.ResponseWriter, req *http.Request) {
-	bodyRemind, err := decode[RemindRequest](req)
+func (r *Remind) Create(w http.ResponseWriter, req *http.Request) {
+	in, err := decode[RemindCreateRequest](req)
 	if err != nil {
 		response.Fail(w, 201, "参数错误:"+err.Error())
 		return
 	}
-	in := bodyRemind
+	c := &model.Remind{
+		Type:      in.Type,
+		Content:   in.Content,
+		Month:     in.Month,
+		Week:      in.Week,
+		Day:       in.Day,
+		Hour:      in.Hour,
+		Minute:    in.Minute,
+		Status:    1,
+		CreatedAt: time.Now(),
+	}
+	if _, err := r.store.CreateRemind(req.Context(), c); err != nil {
+		response.Fail(w, 201, "创建失败"+err.Error())
+		return
+	}
+	response.Success(w, in)
+}
 
-	if in.Id > 0 {
-		u := &model.UpdateRemind{Id: in.Id}
-		if in.Type > 0 {
-			u.Type = &in.Type
-		}
-		if in.Content != "" {
-			u.Content = &in.Content
-		}
-		if in.Month > 0 {
-			u.Month = &in.Month
-		}
-		if in.Week > 0 {
-			u.Week = &in.Week
-		}
-		if in.Day > 0 {
-			u.Day = &in.Day
-		}
-		if in.Hour > 0 {
-			u.Hour = &in.Hour
-		}
-		if in.Minute > 0 {
-			u.Minute = &in.Minute
-		}
-		if err := r.store.UpdateRemind(req.Context(), u); err != nil {
-			response.Fail(w, 201, "更新失败:"+err.Error())
-			return
-		}
-	} else {
-		c := &model.Remind{
-			Type:      in.Type,
-			Content:   in.Content,
-			Month:     in.Month,
-			Week:      in.Week,
-			Day:       in.Day,
-			Hour:      in.Hour,
-			Minute:    in.Minute,
-			Status:    1,
-			CreatedAt: time.Now(),
-		}
-		if _, err := r.store.CreateRemind(req.Context(), c); err != nil {
-			response.Fail(w, 201, "创建失败"+err.Error())
-			return
-		}
+func (r *Remind) Update(w http.ResponseWriter, req *http.Request) {
+	in, err := decode[RemindUpdateRequest](req)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
+	}
+	if in.Id <= 0 {
+		response.Fail(w, 201, "参数错误: ID不能为空")
+		return
+	}
+	u := &model.UpdateRemind{Id: in.Id}
+	if in.Type > 0 {
+		u.Type = &in.Type
+	}
+	if in.Content != "" {
+		u.Content = &in.Content
+	}
+	if in.Month > 0 {
+		u.Month = &in.Month
+	}
+	if in.Week > 0 {
+		u.Week = &in.Week
+	}
+	if in.Day > 0 {
+		u.Day = &in.Day
+	}
+	if in.Hour > 0 {
+		u.Hour = &in.Hour
+	}
+	if in.Minute > 0 {
+		u.Minute = &in.Minute
+	}
+	if err := r.store.UpdateRemind(req.Context(), u); err != nil {
+		response.Fail(w, 201, "更新失败:"+err.Error())
+		return
 	}
 	response.Success(w, in)
 }

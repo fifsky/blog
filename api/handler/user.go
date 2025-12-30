@@ -78,10 +78,6 @@ func (u *User) Login(w http.ResponseWriter, r *http.Request) {
 func (u *User) LoginUser(w http.ResponseWriter, r *http.Request) {
 	// 从请求上下文中获取登录用户
 	user := getLoginUser(r.Context())
-	if user == nil {
-		response.Fail(w, 201, "请登录")
-		return
-	}
 	ui := UserItem{
 		Id:        user.Id,
 		Name:      user.Name,
@@ -164,58 +160,78 @@ func (u *User) List(w http.ResponseWriter, r *http.Request) {
 	response.Success(w, resp)
 }
 
-func (u *User) Post(w http.ResponseWriter, r *http.Request) {
-	// 解析用户数据
-	bodyUser, err := decode[UserRequest](r)
+func (u *User) Create(w http.ResponseWriter, r *http.Request) {
+	in, err := decode[UserCreateRequest](r)
 	if err != nil {
 		response.Fail(w, 201, "参数错误:"+err.Error())
 		return
 	}
-	in := bodyUser
-
+	if in.Password == "" {
+		response.Fail(w, 201, "密码不能为空")
+		return
+	}
 	hashed := fmt.Sprintf("%x", md5.Sum([]byte(in.Password)))
 	now := time.Now()
-	if in.Id > 0 {
-		uReq := &model.UpdateUser{
-			Id:        in.Id,
-			UpdatedAt: &now,
-		}
-		if in.Name != "" {
-			uReq.Name = &in.Name
-		}
-		if in.Password != "" {
-			uReq.Password = &hashed
-		}
-		if in.NickName != "" {
-			uReq.NickName = &in.NickName
-		}
-		if in.Email != "" {
-			uReq.Email = &in.Email
-		}
-		if in.Type > 0 {
-			uReq.Type = &in.Type
-		}
-		if err := u.store.UpdateUser(r.Context(), uReq); err != nil {
-			response.Fail(w, 201, "更新失败")
-			return
-		}
-	} else {
-		cReq := &model.User{
-			Name:      in.Name,
-			Password:  hashed,
-			NickName:  in.NickName,
-			Email:     in.Email,
-			Status:    1,
-			Type:      in.Type,
-			CreatedAt: now,
-			UpdatedAt: now,
-		}
-		if _, err := u.store.CreateUser(r.Context(), cReq); err != nil {
-			response.Fail(w, 201, "创建失败")
-			return
-		}
+	cReq := &model.User{
+		Name:      in.Name,
+		Password:  hashed,
+		NickName:  in.NickName,
+		Email:     in.Email,
+		Status:    1,
+		Type:      in.Type,
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
+	if _, err := u.store.CreateUser(r.Context(), cReq); err != nil {
+		response.Fail(w, 201, "创建失败")
+		return
+	}
+	resp := UserPostResponse{
+		Id:       0,
+		Name:     in.Name,
+		NickName: in.NickName,
+		Email:    in.Email,
+		Status:   1,
+		Type:     in.Type,
+	}
+	response.Success(w, resp)
+}
 
+func (u *User) Update(w http.ResponseWriter, r *http.Request) {
+	in, err := decode[UserUpdateRequest](r)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
+	}
+	if in.Id <= 0 {
+		response.Fail(w, 201, "参数错误: ID不能为空")
+		return
+	}
+	hashed := fmt.Sprintf("%x", md5.Sum([]byte(in.Password)))
+	now := time.Now()
+	uReq := &model.UpdateUser{
+		Id:        in.Id,
+		UpdatedAt: &now,
+	}
+	if in.Name != "" {
+		uReq.Name = &in.Name
+	}
+	if in.Password != "" {
+		uReq.Password = &hashed
+	}
+	if in.NickName != "" {
+		uReq.NickName = &in.NickName
+	}
+	if in.Email != "" {
+		uReq.Email = &in.Email
+	}
+	if in.Type > 0 {
+		uReq.Type = &in.Type
+	}
+	if err := u.store.UpdateUser(r.Context(), uReq); err != nil {
+		response.Fail(w, 201, "更新失败")
+		return
+	}
 	resp := UserPostResponse{
 		Id:       in.Id,
 		Name:     in.Name,

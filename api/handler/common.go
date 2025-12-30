@@ -3,10 +3,11 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"reflect"
 	"strings"
-	"time"
 
 	"app/model"
 	"app/pkg/validate"
@@ -18,26 +19,41 @@ func decode[T any](r *http.Request) (T, error) {
 		return v, fmt.Errorf("decode json: %w", err)
 	}
 
-	if err := validate.Validate(&v); err != nil {
-		return v, err
+	// 仅校验结构体类型，避免 map/slice 等类型触发无意义校验
+	if reflect.TypeOf(v).Kind() == reflect.Struct {
+		if err := validate.Validate(&v); err != nil {
+			return v, err
+		}
 	}
 	return v, nil
 }
 
+type loginUserKey struct{}
+
+func SetLoginUser(ctx context.Context, user *model.User) context.Context {
+	return context.WithValue(ctx, loginUserKey{}, user)
+}
+
 func getLoginUser(ctx context.Context) *model.User {
-	// 从请求上下文取出登录用户信息
-	if u := ctx.Value("userInfo"); u != nil {
-		return u.(*model.User)
+	u := ctx.Value(loginUserKey{})
+	if u == nil {
+		panic(errors.New("login user not found"))
 	}
-	return nil
+	return u.(*model.User)
+}
+
+type remindKey struct{}
+
+func SetRemind(ctx context.Context, remind *model.Remind) context.Context {
+	return context.WithValue(ctx, remindKey{}, remind)
 }
 
 func getRemind(ctx context.Context) *model.Remind {
-	// 从请求上下文取出登录用户信息
-	if u := ctx.Value("remind"); u != nil {
-		return u.(*model.Remind)
+	r := ctx.Value(remindKey{})
+	if r == nil {
+		panic(errors.New("remind not found"))
 	}
-	return nil
+	return r.(*model.Remind)
 }
 
 // 获取客户端IP
@@ -61,20 +77,3 @@ func totalPages(total, pagingNum int) int {
 	}
 	return total/pagingNum + 1
 }
-
-func parseTime(s string) (time.Time, error) {
-	if s == "" {
-		return time.Time{}, nil
-	}
-	// 尝试标准格式
-	if t, err := time.Parse("2006-01-02 15:04:05", s); err == nil {
-		return t, nil
-	}
-	// 尝试RFC3339
-	if t, err := time.Parse(time.RFC3339, s); err == nil {
-		return t, nil
-	}
-	return time.Time{}, fmt.Errorf("invalid time format: %s", s)
-}
-
-// 统一在 request_types 中使用结构体接收参数，移除此类 map 辅助方法

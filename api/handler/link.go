@@ -62,41 +62,48 @@ func (l *Link) List(w http.ResponseWriter, r *http.Request) {
 	response.Success(w, resp)
 }
 
-func (l *Link) Post(w http.ResponseWriter, r *http.Request) {
-	bodyLink, err := decode[LinkRequest](r)
+func (l *Link) Create(w http.ResponseWriter, r *http.Request) {
+	in, err := decode[LinkCreateRequest](r)
 	if err != nil {
 		response.Fail(w, 201, "参数错误:"+err.Error())
 		return
 	}
-	in := bodyLink
+	c := &model.Link{
+		Name:      in.Name,
+		Url:       in.Url,
+		Desc:      in.Desc,
+		CreatedAt: time.Now(),
+	}
+	if _, err := l.store.CreateLink(r.Context(), c); err != nil {
+		response.Fail(w, 201, fmt.Sprintf("创建失败: %v", err))
+		return
+	}
+	response.Success(w, in)
+}
 
-	id := in.Id
-	if id > 0 {
-		u := &model.UpdateLink{Id: id, Name: nil, Url: nil, Desc: nil}
-		if in.Name != "" {
-			u.Name = &in.Name
-		}
-		if in.Url != "" {
-			u.Url = &in.Url
-		}
-		if in.Desc != "" {
-			u.Desc = &in.Desc
-		}
-		if err := l.store.UpdateLink(r.Context(), u); err != nil {
-			response.Fail(w, 201, "更新失败")
-			return
-		}
-	} else {
-		c := &model.Link{
-			Name:      in.Name,
-			Url:       in.Url,
-			Desc:      in.Desc,
-			CreatedAt: time.Now(),
-		}
-		if _, err := l.store.CreateLink(r.Context(), c); err != nil {
-			response.Fail(w, 201, fmt.Sprintf("创建失败: %v", err))
-			return
-		}
+func (l *Link) Update(w http.ResponseWriter, r *http.Request) {
+	in, err := decode[LinkUpdateRequest](r)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
+	}
+	if in.Id <= 0 {
+		response.Fail(w, 201, "参数错误: ID不能为空")
+		return
+	}
+	u := &model.UpdateLink{Id: in.Id, Name: nil, Url: nil, Desc: nil}
+	if in.Name != "" {
+		u.Name = &in.Name
+	}
+	if in.Url != "" {
+		u.Url = &in.Url
+	}
+	if in.Desc != "" {
+		u.Desc = &in.Desc
+	}
+	if err := l.store.UpdateLink(r.Context(), u); err != nil {
+		response.Fail(w, 201, "更新失败")
+		return
 	}
 	response.Success(w, in)
 }

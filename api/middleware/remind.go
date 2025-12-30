@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"context"
 	"net/http"
 	"strconv"
 
+	"app/handler"
 	"app/response"
 	"app/store"
 
@@ -38,7 +38,7 @@ func NewRemindAuth(s *store.Store, conf *config.Config) RemindAuth {
 				return
 			}
 
-			r = r.WithContext(context.WithValue(r.Context(), "remind", remind))
+			r = r.WithContext(handler.SetRemind(r.Context(), remind))
 			next.ServeHTTP(w, r)
 		})
 	}

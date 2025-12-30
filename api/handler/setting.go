@@ -26,7 +26,7 @@ func (s *Setting) Get(w http.ResponseWriter, r *http.Request) {
 	response.Success(w, resp)
 }
 
-func (s *Setting) Post(w http.ResponseWriter, r *http.Request) {
+func (s *Setting) Update(w http.ResponseWriter, r *http.Request) {
 	kv, err := decode[map[string]string](r)
 	if err != nil {
 		response.Fail(w, 202, err)

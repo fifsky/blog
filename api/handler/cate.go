@@ -62,38 +62,17 @@ func (a *Cate) List(w http.ResponseWriter, r *http.Request) {
 	response.Success(w, resp)
 }
 
-func (a *Cate) Post(w http.ResponseWriter, r *http.Request) {
-	bodyCate, err := decode[CateRequest](r)
+func (a *Cate) Create(w http.ResponseWriter, r *http.Request) {
+	cate, err := decode[CateCreateRequest](r)
 	if err != nil {
 		response.Fail(w, 201, "参数错误:"+err.Error())
 		return
 	}
-	cate := bodyCate
-
-	now := time.Now()
-	if cate.Id > 0 {
-		u := &model.UpdateCate{Id: cate.Id}
-		if cate.Name != "" {
-			u.Name = &cate.Name
-		}
-		if cate.Desc != "" {
-			u.Desc = &cate.Desc
-		}
-		if cate.Domain != "" {
-			u.Domain = &cate.Domain
-		}
-		u.UpdatedAt = &now
-		if err := a.store.UpdateCate(r.Context(), u); err != nil {
-			response.Fail(w, 201, "更新失败")
-			return
-		}
-		response.Success(w, cate)
-	}
-
 	if cate.Name == "" || cate.Domain == "" {
 		response.Fail(w, 201, "参数错误: 分类名或域名不能为空")
 		return
 	}
+	now := time.Now()
 	c := &model.Cate{
 		Name:      cate.Name,
 		Desc:      cate.Desc,
@@ -103,6 +82,35 @@ func (a *Cate) Post(w http.ResponseWriter, r *http.Request) {
 	}
 	if _, err := a.store.CreateCate(r.Context(), c); err != nil {
 		response.Fail(w, 201, "创建失败")
+		return
+	}
+	response.Success(w, cate)
+}
+
+func (a *Cate) Update(w http.ResponseWriter, r *http.Request) {
+	cate, err := decode[CateUpdateRequest](r)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
+	}
+	if cate.Id <= 0 {
+		response.Fail(w, 201, "参数错误: ID不能为空")
+		return
+	}
+	now := time.Now()
+	u := &model.UpdateCate{Id: cate.Id}
+	if cate.Name != "" {
+		u.Name = &cate.Name
+	}
+	if cate.Desc != "" {
+		u.Desc = &cate.Desc
+	}
+	if cate.Domain != "" {
+		u.Domain = &cate.Domain
+	}
+	u.UpdatedAt = &now
+	if err := a.store.UpdateCate(r.Context(), u); err != nil {
+		response.Fail(w, 201, "更新失败")
 		return
 	}
 	response.Success(w, cate)

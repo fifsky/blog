@@ -2,7 +2,6 @@ package handler
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -65,7 +64,17 @@ func doJSON(handler func(http.ResponseWriter, *http.Request), url string, body a
 func doJSONWithUser(handler func(http.ResponseWriter, *http.Request), url string, body any) *httptest.ResponseRecorder {
 	b, _ := json.Marshal(body)
 	req := httptest.NewRequest(http.MethodPost, url, bytes.NewReader(b))
-	req = req.WithContext(context.WithValue(req.Context(), "userInfo", &model.User{Id: 1}))
+	req = req.WithContext(SetLoginUser(req.Context(), &model.User{Id: 1}))
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+	handler(rr, req)
+	return rr
+}
+
+func doJSONWithRemind(handler func(http.ResponseWriter, *http.Request), url string, body any) *httptest.ResponseRecorder {
+	b, _ := json.Marshal(body)
+	req := httptest.NewRequest(http.MethodPost, url, bytes.NewReader(b))
+	req = req.WithContext(SetRemind(req.Context(), &model.Remind{Id: 1}))
 	req.Header.Set("Content-Type", "application/json")
 	rr := httptest.NewRecorder()
 	handler(rr, req)

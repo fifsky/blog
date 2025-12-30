@@ -77,18 +77,18 @@ func TestArticle_Feed(t *testing.T) {
 	})
 }
 
-func TestArticle_Post(t *testing.T) {
+func TestArticle_Create(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
 		handler := NewArticle(store.New(db), nil)
 		// success with user context
-		rr := doJSONWithUser(handler.Post, "/api/admin/article/post", map[string]any{"cate_id": 1, "type": 1, "title": "test", "url": "", "content": "test"})
+		rr := doJSONWithUser(handler.Create, "/api/admin/article/create", map[string]any{"cate_id": 1, "type": 1, "title": "test", "url": "", "content": "test"})
 		if rr.Code != http.StatusOK || !strings.Contains(rr.Body.String(), `"code":200`) {
 			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
 		// empty title error
-		rr2 := doJSONWithUser(handler.Post, "/api/admin/article/post", map[string]any{"cate_id": 1, "type": 1, "title": "", "url": "", "content": "test"})
-		if !strings.Contains(rr2.Body.String(), "文章标题不能为空") {
+		rr2 := doJSONWithUser(handler.Create, "/api/admin/article/create", map[string]any{"cate_id": 1, "type": 1, "title": "", "url": "", "content": "test"})
+		if !strings.Contains(rr2.Body.String(), "title为必填字段") {
 			t.Fatalf("unexpected body: %s", rr2.Body.String())
 		}
 	})

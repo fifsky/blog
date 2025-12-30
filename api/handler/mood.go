@@ -65,41 +65,43 @@ func (m *Mood) List(w http.ResponseWriter, r *http.Request) {
 	response.Success(w, resp)
 }
 
-func (m *Mood) Post(w http.ResponseWriter, r *http.Request) {
-	bodyMood, err := decode[MoodRequest](r)
+func (m *Mood) Create(w http.ResponseWriter, r *http.Request) {
+	in, err := decode[MoodCreateRequest](r)
 	if err != nil {
 		response.Fail(w, 201, "参数错误:"+err.Error())
 		return
 	}
-	in := bodyMood
-
-	userId := 0
-	if u := getLoginUser(r.Context()); u != nil {
-		userId = u.Id
+	loginUser := getLoginUser(r.Context())
+	c := &model.Mood{
+		Content:   in.Content,
+		UserId:    loginUser.Id,
+		CreatedAt: time.Now(),
 	}
-
-	id := in.Id
-	if id > 0 {
-		u := &model.UpdateMood{Id: id}
-		if in.Content != "" {
-			u.Content = &in.Content
-		}
-		if err := m.store.UpdateMood(r.Context(), u); err != nil {
-			response.Fail(w, 201, "更新心情失败")
-			return
-		}
-	} else {
-		c := &model.Mood{
-			Content:   in.Content,
-			UserId:    userId,
-			CreatedAt: time.Now(),
-		}
-		if _, err := m.store.CreateMood(r.Context(), c); err != nil {
-			response.Fail(w, 201, "发表心情失败")
-			return
-		}
+	if _, err := m.store.CreateMood(r.Context(), c); err != nil {
+		response.Fail(w, 201, "发表心情失败")
+		return
 	}
+	response.Success(w, nil)
+}
 
+func (m *Mood) Update(w http.ResponseWriter, r *http.Request) {
+	in, err := decode[MoodUpdateRequest](r)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
+	}
+	if in.Id <= 0 {
+		response.Fail(w, 201, "参数错误: ID不能为空")
+		return
+	}
+	u := &model.UpdateMood{Id: in.Id}
+	if in.Content != "" {
+		u.Content = &in.Content
+	}
+	if err := m.store.UpdateMood(r.Context(), u); err != nil {
+		response.Fail(w, 201, "更新心情失败")
+		return
+	}
 	response.Success(w, nil)
 }
 

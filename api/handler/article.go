@@ -283,63 +283,77 @@ func (a *Article) Feed(w http.ResponseWriter, r *http.Request) {
 	// 无需返回JSON，直接输出Atom XML
 }
 
-func (a *Article) Post(w http.ResponseWriter, r *http.Request) {
-	in, err := decode[ArticlePostRequest](r)
+func (a *Article) Create(w http.ResponseWriter, r *http.Request) {
+	in, err := decode[ArticleCreateRequest](r)
 	if err != nil {
 		response.Fail(w, 201, "参数错误:"+err.Error())
 		return
 	}
-
 	loginUser := getLoginUser(r.Context())
-	if loginUser == nil {
-		response.Fail(w, 201, "请先登录")
+	now := time.Now()
+	c := &model.Post{
+		CateId:    in.CateId,
+		Type:      in.Type,
+		UserId:    loginUser.Id,
+		Title:     in.Title,
+		Url:       in.Url,
+		Content:   in.Content,
+		Status:    1,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+	if _, err := a.store.CreatePost(r.Context(), c); err != nil {
+		response.Fail(w, 201, "发表文章失败")
 		return
 	}
-
-	now := time.Now()
-
-	if in.Id > 0 {
-		u := &model.UpdatePost{
-			Id: in.Id,
-		}
-		if in.CateId > 0 {
-			u.CateId = &in.CateId
-		}
-		if in.Type > 0 {
-			u.Type = &in.Type
-		}
-		if in.Title != "" {
-			u.Title = &in.Title
-		}
-		if in.Url != "" {
-			u.Url = &in.Url
-		}
-		if in.Content != "" {
-			u.Content = &in.Content
-		}
-		u.UpdatedAt = &now
-		if err := a.store.UpdatePost(r.Context(), u); err != nil {
-			response.Fail(w, 201, "更新文章失败")
-			return
-		}
-	} else {
-		c := &model.Post{
-			CateId:    in.CateId,
-			Type:      in.Type,
-			UserId:    loginUser.Id,
-			Title:     in.Title,
-			Url:       in.Url,
-			Content:   in.Content,
-			Status:    1,
-			CreatedAt: now,
-			UpdatedAt: now,
-		}
-		if _, err := a.store.CreatePost(r.Context(), c); err != nil {
-			response.Fail(w, 201, "发表文章失败")
-			return
-		}
+	resp := ArticlePostResponse{
+		Id:        0,
+		CateId:    in.CateId,
+		Type:      in.Type,
+		Title:     in.Title,
+		Url:       in.Url,
+		Content:   in.Content,
+		Status:    1,
+		CreatedAt: now.Format(time.DateTime),
+		UpdatedAt: now.Format(time.DateTime),
 	}
+	response.Success(w, resp)
+}
 
+func (a *Article) Update(w http.ResponseWriter, r *http.Request) {
+	in, err := decode[ArticleUpdateRequest](r)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
+	}
+	if in.Id <= 0 {
+		response.Fail(w, 201, "参数错误: ID不能为空")
+		return
+	}
+	now := time.Now()
+	u := &model.UpdatePost{
+		Id: in.Id,
+	}
+	if in.CateId > 0 {
+		u.CateId = &in.CateId
+	}
+	if in.Type > 0 {
+		u.Type = &in.Type
+	}
+	if in.Title != "" {
+		u.Title = &in.Title
+	}
+	if in.Url != "" {
+		u.Url = &in.Url
+	}
+	if in.Content != "" {
+		u.Content = &in.Content
+	}
+	u.UpdatedAt = &now
+	if err := a.store.UpdatePost(r.Context(), u); err != nil {
+		response.Fail(w, 201, "更新文章失败")
+		return
+	}
 	resp := ArticlePostResponse{
 		Id:        in.Id,
 		CateId:    in.CateId,

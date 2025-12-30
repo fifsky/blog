@@ -11,7 +11,6 @@ import (
 	"app/remind"
 	"app/store"
 
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/urfave/cli/v3"
 )
 

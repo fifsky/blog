@@ -33,11 +33,11 @@ func TestLink_List(t *testing.T) {
 	})
 }
 
-func TestLink_Post(t *testing.T) {
+func TestLink_Create(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("links")...)
 		handler := NewLink(store.New(db))
-		rr := doJSON(handler.Post, "/api/admin/link/post", map[string]any{"name": "demo", "url": "https://example.com", "desc": "demo"})
+		rr := doJSON(handler.Create, "/api/admin/link/create", map[string]any{"name": "demo", "url": "https://example.com", "desc": "demo"})
 		if rr.Code != http.StatusOK || !bytes.Contains(rr.Body.Bytes(), []byte(`"code":200`)) {
 			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
