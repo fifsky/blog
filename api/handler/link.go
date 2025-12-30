@@ -74,11 +74,12 @@ func (l *Link) Create(w http.ResponseWriter, r *http.Request) {
 		Desc:      in.Desc,
 		CreatedAt: time.Now(),
 	}
-	if _, err := l.store.CreateLink(r.Context(), c); err != nil {
+	var lastId int64
+	if lastId, err = l.store.CreateLink(r.Context(), c); err != nil {
 		response.Fail(w, 201, fmt.Sprintf("创建失败: %v", err))
 		return
 	}
-	response.Success(w, in)
+	response.Success(w, IDResponse{Id: int(lastId)})
 }
 
 func (l *Link) Update(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +92,7 @@ func (l *Link) Update(w http.ResponseWriter, r *http.Request) {
 		response.Fail(w, 201, "参数错误: ID不能为空")
 		return
 	}
-	u := &model.UpdateLink{Id: in.Id, Name: nil, Url: nil, Desc: nil}
+	u := &model.UpdateLink{Id: in.Id}
 	if in.Name != "" {
 		u.Name = &in.Name
 	}
@@ -105,7 +106,7 @@ func (l *Link) Update(w http.ResponseWriter, r *http.Request) {
 		response.Fail(w, 201, "更新失败")
 		return
 	}
-	response.Success(w, in)
+	response.Success(w, IDResponse{Id: in.Id})
 }
 
 func (l *Link) Delete(w http.ResponseWriter, r *http.Request) {

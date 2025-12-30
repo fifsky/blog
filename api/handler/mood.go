@@ -77,11 +77,12 @@ func (m *Mood) Create(w http.ResponseWriter, r *http.Request) {
 		UserId:    loginUser.Id,
 		CreatedAt: time.Now(),
 	}
-	if _, err := m.store.CreateMood(r.Context(), c); err != nil {
+	var lastId int64
+	if lastId, err = m.store.CreateMood(r.Context(), c); err != nil {
 		response.Fail(w, 201, "发表心情失败")
 		return
 	}
-	response.Success(w, nil)
+	response.Success(w, IDResponse{Id: int(lastId)})
 }
 
 func (m *Mood) Update(w http.ResponseWriter, r *http.Request) {
@@ -102,7 +103,7 @@ func (m *Mood) Update(w http.ResponseWriter, r *http.Request) {
 		response.Fail(w, 201, "更新心情失败")
 		return
 	}
-	response.Success(w, nil)
+	response.Success(w, IDResponse{Id: in.Id})
 }
 
 func (m *Mood) Delete(w http.ResponseWriter, r *http.Request) {

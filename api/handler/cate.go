@@ -80,40 +80,41 @@ func (a *Cate) Create(w http.ResponseWriter, r *http.Request) {
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
-	if _, err := a.store.CreateCate(r.Context(), c); err != nil {
+	var lastId int64
+	if lastId, err = a.store.CreateCate(r.Context(), c); err != nil {
 		response.Fail(w, 201, "创建失败")
 		return
 	}
-	response.Success(w, cate)
+	response.Success(w, IDResponse{Id: int(lastId)})
 }
 
 func (a *Cate) Update(w http.ResponseWriter, r *http.Request) {
-	cate, err := decode[CateUpdateRequest](r)
+	in, err := decode[CateUpdateRequest](r)
 	if err != nil {
 		response.Fail(w, 201, "参数错误:"+err.Error())
 		return
 	}
-	if cate.Id <= 0 {
+	if in.Id <= 0 {
 		response.Fail(w, 201, "参数错误: ID不能为空")
 		return
 	}
 	now := time.Now()
-	u := &model.UpdateCate{Id: cate.Id}
-	if cate.Name != "" {
-		u.Name = &cate.Name
+	u := &model.UpdateCate{Id: in.Id}
+	if in.Name != "" {
+		u.Name = &in.Name
 	}
-	if cate.Desc != "" {
-		u.Desc = &cate.Desc
+	if in.Desc != "" {
+		u.Desc = &in.Desc
 	}
-	if cate.Domain != "" {
-		u.Domain = &cate.Domain
+	if in.Domain != "" {
+		u.Domain = &in.Domain
 	}
 	u.UpdatedAt = &now
 	if err := a.store.UpdateCate(r.Context(), u); err != nil {
 		response.Fail(w, 201, "更新失败")
 		return
 	}
-	response.Success(w, cate)
+	response.Success(w, IDResponse{Id: in.Id})
 }
 
 func (a *Cate) Delete(w http.ResponseWriter, r *http.Request) {

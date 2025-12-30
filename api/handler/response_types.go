@@ -13,6 +13,10 @@ type UserItem struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type IDResponse struct {
+	Id int `json:"id"`
+}
+
 type UserSummary struct {
 	Id       int    `json:"id"`
 	Name     string `json:"name"`
@@ -42,7 +46,7 @@ type CateListItem struct {
 
 type CateListResponse struct {
 	List      []CateListItem `json:"list"`
-	PageTotal int            `json:"pageTotal"`
+	PageTotal int            `json:"page_total"`
 }
 
 type DateArchiveItem struct {
@@ -67,7 +71,7 @@ type ArticleItem struct {
 
 type ArticleListResponse struct {
 	List      []ArticleItem `json:"list"`
-	PageTotal int           `json:"pageTotal"`
+	PageTotal int           `json:"page_total"`
 }
 
 type PrevNextItem struct {
@@ -78,39 +82,6 @@ type PrevNextItem struct {
 type PrevNextResponse struct {
 	Prev PrevNextItem `json:"prev"`
 	Next PrevNextItem `json:"next"`
-}
-
-type CommentItem struct {
-	Id        int       `json:"id"`
-	PostId    int       `json:"post_id"`
-	Pid       int       `json:"pid"`
-	Name      string    `json:"name"`
-	Content   string    `json:"content"`
-	IP        string    `json:"ip"`
-	CreatedAt time.Time `json:"created_at"`
-}
-
-type CommentTopItem struct {
-	Url     string `json:"url"`
-	Content string `json:"content"`
-}
-
-type CommentAdminItem struct {
-	Type         int       `json:"type"`
-	ArticleTitle string    `json:"article_title"`
-	Url          string    `json:"url"`
-	Id           int       `json:"id"`
-	PostId       int       `json:"post_id"`
-	Pid          int       `json:"pid"`
-	Name         string    `json:"name"`
-	Content      string    `json:"content"`
-	IP           string    `json:"ip"`
-	CreatedAt    time.Time `json:"created_at"`
-}
-
-type CommentAdminListResponse struct {
-	List      []CommentAdminItem `json:"list"`
-	PageTotal int                `json:"pageTotal"`
 }
 
 type LinkItem struct {
@@ -128,7 +99,7 @@ type LinkMenuItem struct {
 
 type LinkListResponse struct {
 	List      []LinkItem `json:"list"`
-	PageTotal int        `json:"pageTotal"`
+	PageTotal int        `json:"page_total"`
 }
 
 type MoodItem struct {
@@ -140,7 +111,7 @@ type MoodItem struct {
 
 type MoodListResponse struct {
 	List      []MoodItem `json:"list"`
-	PageTotal int        `json:"pageTotal"`
+	PageTotal int        `json:"page_total"`
 }
 
 type RemindItem struct {
@@ -159,61 +130,12 @@ type RemindItem struct {
 
 type RemindListResponse struct {
 	List      []RemindItem `json:"list"`
-	PageTotal int          `json:"pageTotal"`
+	PageTotal int          `json:"page_total"`
 }
 
 type OptionsResponse map[string]string
 
-type ArticlePostResponse struct {
-	Id        int    `json:"id"`
-	CateId    int    `json:"cate_id"`
-	Type      int    `json:"type"`
-	Title     string `json:"title"`
-	Url       string `json:"url"`
-	Content   string `json:"content"`
-	Status    int    `json:"status"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-}
-
-type CatePostResponse struct {
-	Id        int    `json:"id"`
-	Name      string `json:"name"`
-	Desc      string `json:"desc"`
-	Domain    string `json:"domain"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-}
-
-type LinkPostResponse struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
-	Url  string `json:"url"`
-	Desc string `json:"desc"`
-}
-
-type RemindPostResponse struct {
-	Id       int    `json:"id"`
-	Type     int    `json:"type"`
-	Content  string `json:"content"`
-	Month    int    `json:"month"`
-	Week     int    `json:"week"`
-	Day      int    `json:"day"`
-	Hour     int    `json:"hour"`
-	Minute   int    `json:"minute"`
-	NextTime string `json:"next_time"`
-}
-
-type UserPostResponse struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	NickName string `json:"nick_name"`
-	Email    string `json:"email"`
-	Status   int    `json:"status"`
-	Type     int    `json:"type"`
-}
-
 type UserListReponse struct {
 	List      []UserItem `json:"list"`
-	PageTotal int        `json:"pageTotal"`
+	PageTotal int        `json:"page_total"`
 }

@@ -302,20 +302,13 @@ func (a *Article) Create(w http.ResponseWriter, r *http.Request) {
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
-	if _, err := a.store.CreatePost(r.Context(), c); err != nil {
+	var lastId int64
+	if lastId, err = a.store.CreatePost(r.Context(), c); err != nil {
 		response.Fail(w, 201, "发表文章失败")
 		return
 	}
-	resp := ArticlePostResponse{
-		Id:        0,
-		CateId:    in.CateId,
-		Type:      in.Type,
-		Title:     in.Title,
-		Url:       in.Url,
-		Content:   in.Content,
-		Status:    1,
-		CreatedAt: now.Format(time.DateTime),
-		UpdatedAt: now.Format(time.DateTime),
+	resp := IDResponse{
+		Id: int(lastId),
 	}
 	response.Success(w, resp)
 }
@@ -354,16 +347,8 @@ func (a *Article) Update(w http.ResponseWriter, r *http.Request) {
 		response.Fail(w, 201, "更新文章失败")
 		return
 	}
-	resp := ArticlePostResponse{
-		Id:        in.Id,
-		CateId:    in.CateId,
-		Type:      in.Type,
-		Title:     in.Title,
-		Url:       in.Url,
-		Content:   in.Content,
-		Status:    1,
-		CreatedAt: now.Format(time.DateTime),
-		UpdatedAt: now.Format(time.DateTime),
+	resp := IDResponse{
+		Id: in.Id,
 	}
 	response.Success(w, resp)
 }

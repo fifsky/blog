@@ -113,11 +113,12 @@ func (r *Remind) Create(w http.ResponseWriter, req *http.Request) {
 		Status:    1,
 		CreatedAt: time.Now(),
 	}
-	if _, err := r.store.CreateRemind(req.Context(), c); err != nil {
+	var lastId int64
+	if lastId, err = r.store.CreateRemind(req.Context(), c); err != nil {
 		response.Fail(w, 201, "创建失败"+err.Error())
 		return
 	}
-	response.Success(w, in)
+	response.Success(w, IDResponse{Id: int(lastId)})
 }
 
 func (r *Remind) Update(w http.ResponseWriter, req *http.Request) {
@@ -156,7 +157,7 @@ func (r *Remind) Update(w http.ResponseWriter, req *http.Request) {
 		response.Fail(w, 201, "更新失败:"+err.Error())
 		return
 	}
-	response.Success(w, in)
+	response.Success(w, IDResponse{Id: in.Id})
 }
 
 func (r *Remind) Delete(w http.ResponseWriter, req *http.Request) {

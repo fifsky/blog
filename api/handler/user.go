@@ -182,19 +182,12 @@ func (u *User) Create(w http.ResponseWriter, r *http.Request) {
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
-	if _, err := u.store.CreateUser(r.Context(), cReq); err != nil {
+	var lastId int64
+	if lastId, err = u.store.CreateUser(r.Context(), cReq); err != nil {
 		response.Fail(w, 201, "创建失败")
 		return
 	}
-	resp := UserPostResponse{
-		Id:       0,
-		Name:     in.Name,
-		NickName: in.NickName,
-		Email:    in.Email,
-		Status:   1,
-		Type:     in.Type,
-	}
-	response.Success(w, resp)
+	response.Success(w, IDResponse{Id: int(lastId)})
 }
 
 func (u *User) Update(w http.ResponseWriter, r *http.Request) {
@@ -232,15 +225,7 @@ func (u *User) Update(w http.ResponseWriter, r *http.Request) {
 		response.Fail(w, 201, "更新失败")
 		return
 	}
-	resp := UserPostResponse{
-		Id:       in.Id,
-		Name:     in.Name,
-		NickName: in.NickName,
-		Email:    in.Email,
-		Status:   1,
-		Type:     in.Type,
-	}
-	response.Success(w, resp)
+	response.Success(w, IDResponse{Id: in.Id})
 }
 
 func (u *User) Status(w http.ResponseWriter, r *http.Request) {
