@@ -1,81 +1,123 @@
 package handler
 
 import (
-	"app/provider/model"
-	"app/provider/repo"
+	"net/http"
+	"time"
+
+	"app/model"
 	"app/response"
-	"github.com/goapt/gee"
-	"github.com/goapt/golib/pagination"
-	"github.com/ilibs/gosql/v2"
+	"app/store"
+
+	"github.com/samber/lo"
 )
 
 type Mood struct {
-	db       *gosql.DB
-	moodRepo *repo.Mood
+	store *store.Store
 }
 
-func NewMood(db *gosql.DB, moodRepo *repo.Mood) *Mood {
-	return &Mood{db: db, moodRepo: moodRepo}
+func NewMood(s *store.Store) *Mood {
+	return &Mood{store: s}
 }
 
-func (m *Mood) List(c *gee.Context) gee.Response {
-	p := &struct {
-		Page int `json:"page" binding:"required"`
-	}{}
-	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误:"+err.Error())
+func (m *Mood) List(w http.ResponseWriter, r *http.Request) {
+	p, err := decode[PageRequest](r)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
 	}
 
-	h := gee.H{}
 	num := 10
-	moods, err := m.moodRepo.MoodGetList(p.Page, num)
+	moods, err := m.store.ListMood(r.Context(), p.Page, num)
 	if err != nil {
-		return response.Fail(c, 202, err)
+		response.Fail(w, 202, err)
+		return
 	}
-	h["list"] = moods
+	uids := lo.Map(moods, func(item model.Mood, index int) int {
+		return item.UserId
+	})
 
-	total, err := m.db.Model(&model.Moods{}).Count()
-	pager := pagination.New(int(total), num, p.Page, 2)
-	h["pageTotal"] = pager.TotalPages()
+	um, err := m.store.GetUserByIds(r.Context(), uids)
+
+	items := make([]MoodItem, 0, len(moods))
+	for _, md := range moods {
+		item := MoodItem{
+			Id:        md.Id,
+			Content:   md.Content,
+			CreatedAt: md.CreatedAt,
+		}
+		if u, ok := um[md.UserId]; ok {
+			item.User = &UserSummary{Id: u.Id, Name: u.Name, NickName: u.NickName}
+		}
+		items = append(items, item)
+	}
+
+	total, err := m.store.CountMoodTotal(r.Context())
+	resp := MoodListResponse{
+		List:      items,
+		PageTotal: totalPages(total, num),
+	}
 
 	if err != nil {
-		return response.Fail(c, 500, err)
+		response.Fail(w, 500, err)
+		return
 	}
 
-	return response.Success(c, h)
+	response.Success(w, resp)
 }
 
-func (m *Mood) Post(c *gee.Context) gee.Response {
-	mood := &model.Moods{}
-	if err := c.ShouldBindJSON(mood); err != nil {
-		return response.Fail(c, 201, "参数错误:"+err.Error())
+func (m *Mood) Post(w http.ResponseWriter, r *http.Request) {
+	bodyMood, err := decode[MoodRequest](r)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
+	}
+	in := bodyMood
+
+	userId := 0
+	if u := getLoginUser(r.Context()); u != nil {
+		userId = u.Id
 	}
 
-	mood.UserId = getLoginUser(c).Id
-
-	if mood.Id > 0 {
-		if _, err := m.db.Model(mood).Update(); err != nil {
-			return response.Fail(c, 201, "更新心情失败")
+	id := in.Id
+	if id > 0 {
+		u := &model.UpdateMood{Id: id}
+		if in.Content != "" {
+			u.Content = &in.Content
+		}
+		if err := m.store.UpdateMood(r.Context(), u); err != nil {
+			response.Fail(w, 201, "更新心情失败")
+			return
 		}
 	} else {
-		if _, err := m.db.Model(mood).Create(); err != nil {
-			return response.Fail(c, 201, "发表心情失败")
+		c := &model.Mood{
+			Content:   in.Content,
+			UserId:    userId,
+			CreatedAt: time.Now(),
+		}
+		if _, err := m.store.CreateMood(r.Context(), c); err != nil {
+			response.Fail(w, 201, "发表心情失败")
+			return
 		}
 	}
 
-	return response.Success(c, nil)
+	response.Success(w, nil)
 }
 
-func (m *Mood) Delete(c *gee.Context) gee.Response {
-	p := &struct {
-		Id int `json:"id" binding:"required"`
-	}{}
-	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误:"+err.Error())
+func (m *Mood) Delete(w http.ResponseWriter, r *http.Request) {
+	p, err := decode[IDRequest](r)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
 	}
 
-	if _, err := m.db.Model(&model.Moods{Id: p.Id}).Delete(); err != nil {
-		return response.Fail(c, 201, "删除失败")
+	if p.Id <= 0 {
+		response.Fail(w, 201, "参数错误")
+		return
 	}
-	return response.Success(c, nil)
+
+	if err := m.store.DeleteMood(r.Context(), p.Id); err != nil {
+		response.Fail(w, 201, "删除失败")
+		return
+	}
+	response.Success(w, nil)
 }

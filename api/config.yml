@@ -9,7 +9,7 @@ common:
   notify_url: ''
   notify_token: ''
 database:
-  default:
+  blog:
     enable: true
     driver: mysql
     dsn: ''

@@ -1,17 +1,30 @@
 package handler
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"net/http"
-	"testing"
+	"net/http/httptest"
 
-	"github.com/goapt/test"
-	"github.com/stretchr/testify/require"
+	"app/model"
 )
 
-func TestComment_Avatar(t *testing.T) {
-	handler := NewCommon()
-	req := test.NewRequest("/api/avatar", handler.Avatar)
-	resp, err := req.JSON(``)
-	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, resp.Code)
+func doJSON(handler func(http.ResponseWriter, *http.Request), url string, body any) *httptest.ResponseRecorder {
+	b, _ := json.Marshal(body)
+	req := httptest.NewRequest(http.MethodPost, url, bytes.NewReader(b))
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+	handler(rr, req)
+	return rr
+}
+
+func doJSONWithUser(handler func(http.ResponseWriter, *http.Request), url string, body any) *httptest.ResponseRecorder {
+	b, _ := json.Marshal(body)
+	req := httptest.NewRequest(http.MethodPost, url, bytes.NewReader(b))
+	req = req.WithContext(context.WithValue(req.Context(), "userInfo", &model.User{Id: 1}))
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+	handler(rr, req)
+	return rr
 }

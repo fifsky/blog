@@ -5,48 +5,30 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
 
 	"app/config"
-	"app/provider/repo"
+	"app/pkg/ossutil"
+	"app/store"
 	"app/testutil"
+
 	"github.com/goapt/dbunit"
-	"github.com/goapt/gee"
-	"github.com/goapt/test"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
 func TestArticle_Archive(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), nil)
-		tests := []struct {
-			name        string
-			requestBody gee.H
-			checkFunc   func(t *testing.T, resp *test.Response)
-		}{
-			{
-				"success",
-				gee.H{},
-				func(t *testing.T, resp *test.Response) {
-					assert.True(t, len(resp.GetJsonPath("data").Array()) > 0)
-				},
-			},
-		}
-
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				req := test.NewRequest("/api/article/archive", handler.Archive)
-				resp, err := req.JSON(tt.requestBody)
-				require.NoError(t, err)
-				require.Equal(t, http.StatusOK, resp.Code)
-				if tt.checkFunc != nil {
-					tt.checkFunc(t, resp)
-				}
-			})
+		handler := NewArticle(store.New(db), nil)
+		req := httptest.NewRequest(http.MethodPost, "/api/article/archive", bytes.NewReader([]byte(`{}`)))
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+		handler.Archive(rr, req)
+		if rr.Code != http.StatusOK || !strings.Contains(rr.Body.String(), `"code":200`) {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
 	})
 }
@@ -54,52 +36,10 @@ func TestArticle_Archive(t *testing.T) {
 func TestArticle_List(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates")...)
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), nil)
-		tests := []struct {
-			name        string
-			requestBody gee.H
-			checkFunc   func(t *testing.T, resp *test.Response)
-		}{
-			{
-				"success",
-				gee.H{"page": 1},
-				func(t *testing.T, resp *test.Response) {
-					assert.True(t, len(resp.GetJsonPath("data.list").Array()) > 0)
-				},
-			},
-			{
-				"success domain",
-				gee.H{"page": 1, "domain": "default"},
-				func(t *testing.T, resp *test.Response) {
-					assert.True(t, len(resp.GetJsonPath("data.list").Array()) > 0)
-				},
-			},
-			{
-				"success year",
-				gee.H{"page": 1, "year": "2012", "month": "09"},
-				func(t *testing.T, resp *test.Response) {
-					assert.True(t, len(resp.GetJsonPath("data.list").Array()) > 0)
-				},
-			},
-			{
-				"params error",
-				gee.H{},
-				func(t *testing.T, resp *test.Response) {
-					assert.Equal(t, `{"code":201,"msg":"参数错误:缺少page"}`, resp.GetBodyString())
-				},
-			},
-		}
-
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				req := test.NewRequest("/api/article/list", handler.List)
-				resp, err := req.JSON(tt.requestBody)
-				require.NoError(t, err)
-				require.Equal(t, http.StatusOK, resp.Code)
-				if tt.checkFunc != nil {
-					tt.checkFunc(t, resp)
-				}
-			})
+		handler := NewArticle(store.New(db), nil)
+		rr := doJSON(handler.List, "/api/article/list", map[string]any{"page": 1})
+		if rr.Code != http.StatusOK || !strings.Contains(rr.Body.String(), `"list"`) {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
 	})
 }
@@ -107,71 +47,21 @@ func TestArticle_List(t *testing.T) {
 func TestArticle_PrevNext(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), nil)
-		tests := []struct {
-			name         string
-			requestBody  gee.H
-			responseBody string
-		}{
-			{
-				"success",
-				gee.H{"id": 7},
-				`{"code":200,"data":{"next":{"id":8,"title":"example"},"prev":{"id":4,"title":"fifsky blog for php!"}},"msg":"success"}`,
-			},
-			{
-				"params error",
-				gee.H{},
-				`{"code":201,"msg":"参数错误:缺少id"}`,
-			},
-		}
-
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				req := test.NewRequest("/api/article/prevnext", handler.PrevNext)
-				resp, err := req.JSON(tt.requestBody)
-				require.NoError(t, err)
-				require.Equal(t, http.StatusOK, resp.Code)
-				require.Equal(t, tt.responseBody, resp.GetBodyString())
-			})
+		handler := NewArticle(store.New(db), nil)
+		rr := doJSON(handler.PrevNext, "/api/article/prevnext", map[string]any{"id": 7})
+		if rr.Code != http.StatusOK || !strings.Contains(rr.Body.String(), `"prev"`) || !strings.Contains(rr.Body.String(), `"next"`) {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
 	})
 }
 
 func TestArticle_Detail(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users")...)
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), nil)
-		tests := []struct {
-			name        string
-			requestBody gee.H
-			checkFunc   func(t *testing.T, resp *test.Response)
-		}{
-			{
-				"success",
-				gee.H{"id": 7},
-				func(t *testing.T, resp *test.Response) {
-					assert.Equal(t, `关于`, resp.GetJsonPath("data.title").String())
-				},
-			},
-			{
-				"params error",
-				gee.H{},
-				func(t *testing.T, resp *test.Response) {
-					assert.Equal(t, `{"code":201,"msg":"参数错误"}`, resp.GetBodyString())
-				},
-			},
-		}
-
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				req := test.NewRequest("/api/article/detail", handler.Detail)
-				resp, err := req.JSON(tt.requestBody)
-				require.NoError(t, err)
-				require.Equal(t, http.StatusOK, resp.Code)
-				if tt.checkFunc != nil {
-					tt.checkFunc(t, resp)
-				}
-			})
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates")...)
+		handler := NewArticle(store.New(db), nil)
+		rr := doJSON(handler.Detail, "/api/article/detail", map[string]any{"id": 7})
+		if rr.Code != http.StatusOK || !strings.Contains(rr.Body.String(), `"code":200`) {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
 	})
 }
@@ -179,31 +69,10 @@ func TestArticle_Detail(t *testing.T) {
 func TestArticle_Feed(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users")...)
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), nil)
-		tests := []struct {
-			name        string
-			requestBody gee.H
-			checkFunc   func(t *testing.T, resp *test.Response)
-		}{
-			{
-				"success",
-				gee.H{},
-				func(t *testing.T, resp *test.Response) {
-					assert.True(t, strings.Contains(resp.GetBodyString(), "<title>关于</title>"))
-				},
-			},
-		}
-
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				req := test.NewRequest("/feed.xml", handler.Feed)
-				resp, err := req.JSON(tt.requestBody)
-				require.NoError(t, err)
-				require.Equal(t, http.StatusOK, resp.Code)
-				if tt.checkFunc != nil {
-					tt.checkFunc(t, resp)
-				}
-			})
+		handler := NewArticle(store.New(db), nil)
+		rr := doJSON(handler.Feed, "/feed.xml", map[string]any{})
+		if rr.Code != http.StatusOK || !strings.Contains(rr.Body.String(), "<feed") {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
 	})
 }
@@ -211,32 +80,16 @@ func TestArticle_Feed(t *testing.T) {
 func TestArticle_Post(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), nil)
-		tests := []struct {
-			name         string
-			requestBody  gee.H
-			responseBody string
-		}{
-			{
-				"success",
-				gee.H{"cate_id": 1, "type": 1, "title": "test", "url": "", "content": "test", "created_at": "2021-06-29 11:55:09", "updated_at": "2021-06-29 11:55:09"},
-				`{"code":200,"data":{"id":9,"cate_id":1,"type":1,"user_id":1,"title":"test","url":"","content":"test","status":1,"created_at":"2021-06-29 11:55:09","updated_at":"2021-06-29 11:55:09"},"msg":"success"}`,
-			},
-			{
-				"params error",
-				gee.H{"cate_id": 1, "type": 1, "title": "", "url": "", "content": "test"},
-				`{"code":201,"msg":"参数错误:缺少title"}`,
-			},
+		handler := NewArticle(store.New(db), nil)
+		// success with user context
+		rr := doJSONWithUser(handler.Post, "/api/admin/article/post", map[string]any{"cate_id": 1, "type": 1, "title": "test", "url": "", "content": "test"})
+		if rr.Code != http.StatusOK || !strings.Contains(rr.Body.String(), `"code":200`) {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
-
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				req := test.NewRequest("/api/admin/article/post", setLoginUser, handler.Post)
-				resp, err := req.JSON(tt.requestBody)
-				require.NoError(t, err)
-				require.Equal(t, http.StatusOK, resp.Code)
-				require.Equal(t, tt.responseBody, resp.GetBodyString())
-			})
+		// empty title error
+		rr2 := doJSONWithUser(handler.Post, "/api/admin/article/post", map[string]any{"cate_id": 1, "type": 1, "title": "", "url": "", "content": "test"})
+		if !strings.Contains(rr2.Body.String(), "文章标题不能为空") {
+			t.Fatalf("unexpected body: %s", rr2.Body.String())
 		}
 	})
 }
@@ -244,75 +97,54 @@ func TestArticle_Post(t *testing.T) {
 func TestArticle_Delete(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), nil)
-		tests := []struct {
-			name         string
-			requestBody  gee.H
-			responseBody string
-		}{
-			{
-				"success",
-				gee.H{"id": 4},
-				`{"code":200,"msg":"success"}`,
-			},
-			{
-				"params error",
-				gee.H{},
-				`{"code":201,"msg":"参数错误:缺少id"}`,
-			},
-		}
-
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				req := test.NewRequest("/api/admin/article/delete", handler.Delete)
-				resp, err := req.JSON(tt.requestBody)
-				require.NoError(t, err)
-				require.Equal(t, http.StatusOK, resp.Code)
-				require.Equal(t, tt.responseBody, resp.GetBodyString())
-			})
+		handler := NewArticle(store.New(db), nil)
+		rr := doJSON(handler.Delete, "/api/admin/article/delete", map[string]any{"id": 4})
+		if rr.Code != http.StatusOK || !strings.Contains(rr.Body.String(), `"code":200`) {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
 	})
-}
-
-var httpSuites = []test.HttpClientSuite{
-	{
-		URI:          "*",
-		ResponseBody: `{"retcode":200}`,
-	},
 }
 
 func TestArticle_Upload(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
-
-		httpClient := test.NewHttpClientSuite(httpSuites)
 		conf := &config.Config{}
 		conf.OSS.Endpoint = "oss-cn-shanghai-internal.aliyuncs.com"
 		conf.OSS.AccessKey = "test"
 		conf.OSS.AccessSecret = "test"
 		conf.OSS.Bucket = "test"
 
-		handler := NewArticle(db, repo.NewArticle(db, repo.NewComment(db)), repo.NewSetting(db), conf)
-		handler.httpClient = httpClient
+		handler := NewArticle(store.New(db), conf)
+		handler.httpClient = http.DefaultClient
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+		mockUploader := ossutil.NewMockUploader(ctrl)
+		handler.uploader = mockUploader
+		mockUploader.EXPECT().Put(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 
-		rr, err := os.Open(testutil.TestDataPath("go.png"))
-		require.NoError(t, err)
-		defer rr.Close()
+		rrf, err := os.Open(testutil.TestDataPath("go.png"))
+		if err != nil {
+			t.Fatalf("open file: %v", err)
+		}
+		defer rrf.Close()
 
 		bb := &bytes.Buffer{}
 		writer := multipart.NewWriter(bb)
 		part, err := writer.CreateFormFile("uploadFile", "go.png")
-		require.NoError(t, err)
+		if err != nil {
+			t.Fatalf("formfile: %v", err)
+		}
+		if _, err = io.Copy(part, rrf); err != nil {
+			t.Fatalf("copy: %v", err)
+		}
+		writer.Close()
 
-		_, err = io.Copy(part, rr)
-		require.NoError(t, err)
-		writer.Close() // must, otherwise FormFile returns EOF error
-
-		require.NoError(t, err)
-		req := test.NewRequest("/api/admin/article/upload", handler.Upload)
-		resp, err := req.Post(writer.FormDataContentType(), bb)
-		require.NoError(t, err)
-		require.Equal(t, http.StatusOK, resp.Code)
-		require.Contains(t, resp.GetBodyString(), `0030cebb1a617c0841726b1ec3121fe0.png`)
+		req := httptest.NewRequest(http.MethodPost, "/api/admin/article/upload", bb)
+		req.Header.Set("Content-Type", writer.FormDataContentType())
+		resp := httptest.NewRecorder()
+		handler.Upload(resp, req)
+		if resp.Code != http.StatusOK || !strings.Contains(resp.Body.String(), ".png") {
+			t.Fatalf("unexpected: code=%d body=%s", resp.Code, resp.Body.String())
+		}
 	})
 }

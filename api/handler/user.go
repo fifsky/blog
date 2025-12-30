@@ -1,48 +1,56 @@
 package handler
 
 import (
+	"crypto/md5"
 	"fmt"
+	"net/http"
 	"time"
 
 	"app/config"
-	"app/provider/model"
-	"app/provider/repo"
+	"app/model"
 	"app/response"
-	"github.com/goapt/gee"
-	"github.com/goapt/golib/hashing"
-	"github.com/goapt/golib/pagination"
-	"github.com/golang-jwt/jwt/v4"
-	"github.com/ilibs/gosql/v2"
+	"app/store"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type User struct {
-	db       *gosql.DB
-	userRepo *repo.User
-	conf     *config.Config
+	store *store.Store
+	conf  *config.Config
 }
 
-func NewUser(db *gosql.DB, userRepo *repo.User, conf *config.Config) *User {
-	return &User{db: db, userRepo: userRepo, conf: conf}
+func NewUser(s *store.Store, conf *config.Config) *User {
+	return &User{store: s, conf: conf}
 }
 
-func (u *User) Login(c *gee.Context) gee.Response {
-	p := &struct {
-		UserName string `json:"user_name" binding:"required"`
-		Password string `json:"password" binding:"required"`
-	}{}
+func (u *User) Login(w http.ResponseWriter, r *http.Request) {
+	// 解析登录请求参数
+	p, err := decode[LoginRequest](r)
 
-	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误:"+err.Error())
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
 	}
 
-	user := &model.Users{Name: p.UserName, Password: hashing.Md5(p.Password)}
-	err := u.db.Model(user).Get()
+	if p.UserName == "" || p.Password == "" {
+		response.Fail(w, 201, "用户名或密码不能为空")
+		return
+	}
+
+	user, err := u.store.GetUserByName(r.Context(), p.UserName)
 	if err != nil {
-		return response.Fail(c, 202, "用户名或密码错误")
+		response.Fail(w, 202, "用户名或密码错误")
+		return
+	}
+
+	if user.Password != fmt.Sprintf("%x", md5.Sum([]byte(p.Password))) {
+		response.Fail(w, 202, "用户名或密码错误")
+		return
 	}
 
 	if user.Status != 1 {
-		return response.Fail(c, 202, "用户已停用")
+		response.Fail(w, 202, "用户已停用")
+		return
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
@@ -53,101 +61,202 @@ func (u *User) Login(c *gee.Context) gee.Response {
 	tokenString, err := token.SignedString([]byte(u.conf.Common.TokenSecret))
 
 	if err != nil {
-		return response.Fail(c, 201, "Access Token加密错误"+err.Error())
+		response.Fail(w, 201, "Access Token加密错误"+err.Error())
+		return
 	}
-
-	return response.Success(c, gee.H{
+	ui := UserItem{
+		Id:        user.Id,
+		Name:      user.Name,
+		NickName:  user.NickName,
+		Email:     user.Email,
+		Status:    user.Status,
+		Type:      user.Type,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}
+	response.Success(w, map[string]any{
 		"access_token": tokenString,
-		"user":         user,
+		"user":         ui,
 	})
+	return
 }
 
-func (u *User) LoginUser(c *gee.Context) gee.Response {
-	user := getLoginUser(c)
-	return response.Success(c, user)
-}
-
-func (u *User) Get(c *gee.Context) gee.Response {
-	p := &struct {
-		Id int `json:"id" binding:"required"`
-	}{}
-	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误:"+err.Error())
+func (u *User) LoginUser(w http.ResponseWriter, r *http.Request) {
+	// 从请求上下文中获取登录用户
+	user := getLoginUser(r.Context())
+	if user == nil {
+		response.Fail(w, 201, "请登录")
+		return
 	}
+	ui := UserItem{
+		Id:        user.Id,
+		Name:      user.Name,
+		NickName:  user.NickName,
+		Email:     user.Email,
+		Status:    user.Status,
+		Type:      user.Type,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}
+	response.Success(w, ui)
+}
 
-	user := &model.Users{Id: p.Id}
-	err := u.db.Model(user).Get()
+func (u *User) Get(w http.ResponseWriter, r *http.Request) {
+	// 解析ID参数
+	p, err := decode[IDRequest](r)
 	if err != nil {
-		return response.Fail(c, 201, "用户不存在")
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
 	}
 
-	return response.Success(c, user)
+	user, err := u.store.GetUser(r.Context(), p.Id)
+	if err != nil {
+		response.Fail(w, 201, "用户不存在")
+		return
+	}
+
+	ui := UserItem{
+		Id:        user.Id,
+		Name:      user.Name,
+		NickName:  user.NickName,
+		Email:     user.Email,
+		Status:    user.Status,
+		Type:      user.Type,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}
+	response.Success(w, ui)
 }
 
-func (u *User) List(c *gee.Context) gee.Response {
-	p := &struct {
-		Page int `json:"page" binding:"required"`
-	}{}
-	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误:"+err.Error())
+func (u *User) List(w http.ResponseWriter, r *http.Request) {
+	// 解析分页参数
+	p, err := decode[PageRequest](r)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
 	}
 
-	h := gee.H{}
 	num := 10
-	users, err := u.userRepo.GetList(p.Page, num)
+	users, err := u.store.ListUser(r.Context(), p.Page, num)
 	if err != nil {
-		return response.Fail(c, 202, err)
+		response.Fail(w, 202, err)
+		return
 	}
-	h["list"] = users
+	items := make([]UserItem, 0, len(users))
+	for _, user := range users {
+		items = append(items, UserItem{
+			Id:        user.Id,
+			Name:      user.Name,
+			NickName:  user.NickName,
+			Email:     user.Email,
+			Status:    user.Status,
+			Type:      user.Type,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+		})
+	}
 
-	total, err := u.db.Model(&model.Users{}).Count()
-	pager := pagination.New(int(total), num, p.Page, 2)
-	h["pageTotal"] = pager.TotalPages()
-
+	total, err := u.store.CountUserTotal(r.Context())
 	if err != nil {
-		return response.Fail(c, 500, err)
+		response.Fail(w, 500, err)
+		return
 	}
 
-	return response.Success(c, h)
+	resp := UserListReponse{
+		List:      items,
+		PageTotal: totalPages(total, num),
+	}
+
+	response.Success(w, resp)
 }
 
-func (u *User) Post(c *gee.Context) gee.Response {
-	users := &model.Users{}
-	if err := c.ShouldBindJSON(users); err != nil {
-		return response.Fail(c, 201, "参数错误:"+err.Error())
+func (u *User) Post(w http.ResponseWriter, r *http.Request) {
+	// 解析用户数据
+	bodyUser, err := decode[UserRequest](r)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
 	}
+	in := bodyUser
 
-	if users.Id == 0 && users.Password == "" {
-		return response.Fail(c, 201, "密码不能为空")
-	} else {
-		users.Password = hashing.Md5(users.Password)
+	if in.Id == 0 && in.Password == "" {
+		response.Fail(w, 201, "密码不能为空")
+		return
 	}
-
-	if users.Id > 0 {
-		if _, err := u.db.Model(users).Update(); err != nil {
-			return response.Fail(c, 201, "更新失败")
+	hashed := fmt.Sprintf("%x", md5.Sum([]byte(in.Password)))
+	now := time.Now()
+	if in.Id > 0 {
+		uReq := &model.UpdateUser{
+			Id:        in.Id,
+			UpdatedAt: &now,
+		}
+		if in.Name != "" {
+			uReq.Name = &in.Name
+		}
+		if in.Password != "" {
+			uReq.Password = &hashed
+		}
+		if in.NickName != "" {
+			uReq.NickName = &in.NickName
+		}
+		if in.Email != "" {
+			uReq.Email = &in.Email
+		}
+		if in.Status > 0 {
+			uReq.Status = &in.Status
+		}
+		if in.Type > 0 {
+			uReq.Type = &in.Type
+		}
+		if err := u.store.UpdateUser(r.Context(), uReq); err != nil {
+			response.Fail(w, 201, "更新失败")
+			return
 		}
 	} else {
-		if _, err := u.db.Model(users).Create(); err != nil {
-			return response.Fail(c, 201, "创建失败")
+		cReq := &model.CreateUser{
+			Name:      in.Name,
+			Password:  hashed,
+			NickName:  in.NickName,
+			Email:     in.Email,
+			Status:    in.Status,
+			Type:      in.Type,
+			CreatedAt: now,
+			UpdatedAt: now,
+		}
+		if _, err := u.store.CreateUser(r.Context(), cReq); err != nil {
+			response.Fail(w, 201, "创建失败")
+			return
 		}
 	}
 
-	return response.Success(c, users)
+	resp := UserPostResponse{
+		Id:       in.Id,
+		Name:     in.Name,
+		NickName: in.NickName,
+		Email:    in.Email,
+		Status:   in.Status,
+		Type:     in.Type,
+	}
+	response.Success(w, resp)
 }
 
-func (u *User) Status(c *gee.Context) gee.Response {
-	p := &struct {
-		Id int `json:"id" binding:"required"`
-	}{}
-
-	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误:"+err.Error())
-	}
-	user := &model.Users{Id: p.Id}
-	err := u.db.Model(user).Get()
+func (u *User) Status(w http.ResponseWriter, r *http.Request) {
+	// 解析ID参数
+	p, err := decode[IDRequest](r)
 	if err != nil {
-		return response.Fail(c, 202, "用户不存在")
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
+	}
+
+	if p.Id == 0 {
+		response.Fail(w, 201, "参数错误")
+		return
+	}
+
+	user, err := u.store.GetUser(r.Context(), p.Id)
+	if err != nil {
+		response.Fail(w, 202, "用户不存在")
+		return
 	}
 
 	status := user.Status
@@ -157,8 +266,9 @@ func (u *User) Status(c *gee.Context) gee.Response {
 		status = 1
 	}
 
-	if _, err := u.db.Model(&model.Users{Status: status}).Where("id = ?", p.Id).Update(); err != nil {
-		return response.Fail(c, 201, "停启用失败")
+	if err := u.store.UpdateUser(r.Context(), &model.UpdateUser{Id: p.Id, Status: &status}); err != nil {
+		response.Fail(w, 201, "停启用失败")
+		return
 	}
-	return response.Success(c, nil)
+	response.Success(w, nil)
 }

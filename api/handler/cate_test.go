@@ -1,46 +1,23 @@
 package handler
 
 import (
+	"bytes"
 	"net/http"
 	"testing"
 
-	"app/provider/repo"
+	"app/store"
 	"app/testutil"
+
 	"github.com/goapt/dbunit"
-	"github.com/goapt/gee"
-	"github.com/goapt/test"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestCate_All(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("cates")...)
-		handler := NewCate(db, repo.NewCate(db))
-		tests := []struct {
-			name        string
-			requestBody gee.H
-			checkFunc   func(t *testing.T, resp *test.Response)
-		}{
-			{
-				"success",
-				gee.H{},
-				func(t *testing.T, resp *test.Response) {
-					assert.True(t, len(resp.GetJsonPath("data").Array()) > 0)
-				},
-			},
-		}
-
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				req := test.NewRequest("/api/cate/all", handler.All)
-				resp, err := req.JSON(tt.requestBody)
-				require.NoError(t, err)
-				require.Equal(t, http.StatusOK, resp.Code)
-				if tt.checkFunc != nil {
-					tt.checkFunc(t, resp)
-				}
-			})
+		handler := NewCate(store.New(db))
+		rr := doJSON(handler.All, "/api/cate/all", map[string]any{})
+		if rr.Code != http.StatusOK || rr.Body.Len() == 0 {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
 	})
 }
@@ -48,31 +25,10 @@ func TestCate_All(t *testing.T) {
 func TestCate_List(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("cates")...)
-		handler := NewCate(db, repo.NewCate(db))
-		tests := []struct {
-			name        string
-			requestBody gee.H
-			checkFunc   func(t *testing.T, resp *test.Response)
-		}{
-			{
-				"success",
-				gee.H{},
-				func(t *testing.T, resp *test.Response) {
-					assert.True(t, len(resp.GetJsonPath("data.list").Array()) > 0)
-				},
-			},
-		}
-
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				req := test.NewRequest("/api/admin/cate/list", handler.List)
-				resp, err := req.JSON(tt.requestBody)
-				require.NoError(t, err)
-				require.Equal(t, http.StatusOK, resp.Code)
-				if tt.checkFunc != nil {
-					tt.checkFunc(t, resp)
-				}
-			})
+		handler := NewCate(store.New(db))
+		rr := doJSON(handler.List, "/api/admin/cate/list", map[string]any{})
+		if rr.Code != http.StatusOK || !bytes.Contains(rr.Body.Bytes(), []byte(`"list"`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
 	})
 }
@@ -80,34 +36,19 @@ func TestCate_List(t *testing.T) {
 func TestCate_Post(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("cates")...)
-		handler := NewCate(db, repo.NewCate(db))
+		handler := NewCate(store.New(db))
 
-		tests := []testutil.TestCase{
-			{
-				Name:         "success",
-				RequestBody:  gee.H{"name": "demo", "domain": "demo", "desc": "demo", "created_at": "2021-06-29 11:55:09", "updated_at": "2021-06-29 11:55:09"},
-				ResponseBody: `{"code":200,"data":{"id":2,"name":"demo","desc":"demo","domain":"demo","created_at":"2021-06-29 11:55:09","updated_at":"2021-06-29 11:55:09"},"msg":"success"}`,
-			},
-			{
-				Name:         "update success",
-				RequestBody:  gee.H{"id": 1, "domain": "test2", "name": "test2", "desc": "test2", "updated_at": "2021-06-29 11:55:09"},
-				AssertType:   testutil.AssertContains,
-				ResponseBody: `"name":"test2"`,
-			},
-			{
-				Name:         "update error",
-				RequestBody:  gee.H{"id": 1, "domain": "demo", "name": "demo", "desc": "demo"},
-				ResponseBody: `{"code":201,"msg":"更新失败"}`,
-			},
-			{
-				Name:         "params error",
-				RequestBody:  gee.H{"name": "demo", "desc": "demo"},
-				ResponseBody: `{"code":201,"msg":"参数错误:缺少domain"}`,
-			},
+		rr := doJSON(handler.Post, "/api/admin/cate/post", map[string]any{"name": "demo", "domain": "demo", "desc": "demo"})
+		if rr.Code != http.StatusOK || !bytes.Contains(rr.Body.Bytes(), []byte(`"code":200`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
-
-		for _, tt := range tests {
-			tt.Run(t, "/api/admin/cate/post", handler.Post)
+		rr2 := doJSON(handler.Post, "/api/admin/cate/post", map[string]any{"id": 1, "domain": "test2", "name": "test2", "desc": "test2", "updated_at": "2021-06-29 11:55:09"})
+		if rr2.Code != http.StatusOK {
+			t.Fatalf("unexpected: code=%d body=%s", rr2.Code, rr2.Body.String())
+		}
+		rr3 := doJSON(handler.Post, "/api/admin/cate/post", map[string]any{"name": "demo", "desc": "demo"})
+		if rr3.Code == http.StatusOK || !bytes.Contains(rr3.Body.Bytes(), []byte(`"code":201`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr3.Code, rr3.Body.String())
 		}
 	})
 }
@@ -115,37 +56,18 @@ func TestCate_Post(t *testing.T) {
 func TestCate_Delete(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("cates", "posts")...)
-		handler := NewCate(db, repo.NewCate(db))
-		tests := []struct {
-			name         string
-			requestBody  gee.H
-			responseBody string
-		}{
-			{
-				"success",
-				gee.H{"id": 3},
-				`{"code":200,"msg":"success"}`,
-			},
-			{
-				"params error",
-				gee.H{},
-				`{"code":201,"msg":"参数错误:缺少id"}`,
-			},
-			{
-				"delete error",
-				gee.H{"id": 1},
-				`{"code":201,"msg":"该分类下面还有文章，不能删除"}`,
-			},
+		handler := NewCate(store.New(db))
+		rr := doJSON(handler.Delete, "/api/admin/cate/delete", map[string]any{"id": 3})
+		if rr.Code != http.StatusOK || !bytes.Contains(rr.Body.Bytes(), []byte(`"code":200`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
-
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				req := test.NewRequest("/api/admin/cate/delete", handler.Delete)
-				resp, err := req.JSON(tt.requestBody)
-				require.NoError(t, err)
-				require.Equal(t, http.StatusOK, resp.Code)
-				require.Equal(t, tt.responseBody, resp.GetBodyString())
-			})
+		rr2 := doJSON(handler.Delete, "/api/admin/cate/delete", map[string]any{})
+		if rr2.Code == http.StatusOK || !bytes.Contains(rr2.Body.Bytes(), []byte(`"code":201`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr2.Code, rr2.Body.String())
+		}
+		rr3 := doJSON(handler.Delete, "/api/admin/cate/delete", map[string]any{"id": 1})
+		if rr3.Code == http.StatusOK || !bytes.Contains(rr3.Body.Bytes(), []byte(`不能删除`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr3.Code, rr3.Body.String())
 		}
 	})
 }

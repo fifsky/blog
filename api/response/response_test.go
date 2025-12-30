@@ -5,51 +5,66 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/goapt/gee"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestSuccess(t *testing.T) {
 	w := httptest.NewRecorder()
-	ctx, _ := gee.CreateTestContext(w)
-	resp := Success(ctx, gee.H{"id": 1})
-	resp.Render()
-	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, `{"code":200,"data":{"id":1},"msg":"success"}`, w.Body.String())
-	assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
+	Success(w, map[string]any{"id": 1})
+	if w.Code != http.StatusOK {
+		t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusOK)
+	}
+	want := `{"code":200,"data":{"id":1},"msg":"success"}` + "\n"
+	if w.Body.String() != want {
+		t.Fatalf("unexpected body: got=%s want=%s", w.Body.String(), want)
+	}
+	if ct := w.Header().Get("Content-Type"); ct != "application/json" {
+		t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json")
+	}
 }
 
 func TestFail(t *testing.T) {
 	t.Run("msg", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		ctx, _ := gee.CreateTestContext(w)
-		resp := Fail(ctx, 201, "参数错误")
-		resp.Render()
-		assert.Equal(t, http.StatusOK, w.Code)
-		assert.Equal(t, `{"code":201,"msg":"参数错误"}`, w.Body.String())
-		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
+		Fail(w, 201, "参数错误")
+		if w.Code != http.StatusBadRequest {
+			t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusBadRequest)
+		}
+		want := `{"code":201,"msg":"参数错误"}` + "\n"
+		if w.Body.String() != want {
+			t.Fatalf("unexpected body: got=%s want=%s", w.Body.String(), want)
+		}
+		if ct := w.Header().Get("Content-Type"); ct != "application/json" {
+			t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json")
+		}
 	})
 
 	t.Run("error", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		ctx, _ := gee.CreateTestContext(w)
-		resp := Fail(ctx, 500, errors.New("system error"))
-		resp.Render()
-		assert.Equal(t, http.StatusOK, w.Code)
-		assert.Equal(t, `{"code":500,"msg":"system error"}`, w.Body.String())
-		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
+		Fail(w, 500, errors.New("system error"))
+		if w.Code != http.StatusBadRequest {
+			t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusBadRequest)
+		}
+		want := `{"code":500,"msg":"system error"}` + "\n"
+		if w.Body.String() != want {
+			t.Fatalf("unexpected body: got=%s want=%s", w.Body.String(), want)
+		}
+		if ct := w.Header().Get("Content-Type"); ct != "application/json" {
+			t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json")
+		}
 	})
 
 	t.Run("other", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		ctx, _ := gee.CreateTestContext(w)
-		resp := Fail(ctx, 500, gee.H{
-			"error": "noterror",
-		})
-		resp.Render()
-		assert.Equal(t, http.StatusOK, w.Code)
-		assert.Equal(t, `{"code":500,"msg":"map[error:noterror]"}`, w.Body.String())
-		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
+		Fail(w, 500, map[string]string{"error": "noterror"})
+		if w.Code != http.StatusBadRequest {
+			t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusBadRequest)
+		}
+		want := `{"code":500,"msg":"map[error:noterror]"}` + "\n"
+		if w.Body.String() != want {
+			t.Fatalf("unexpected body: got=%s want=%s", w.Body.String(), want)
+		}
+		if ct := w.Header().Get("Content-Type"); ct != "application/json" {
+			t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json")
+		}
 	})
 }

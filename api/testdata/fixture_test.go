@@ -1,17 +1,17 @@
 package testdata
 
 import (
+	"database/sql"
 	"fmt"
 	"testing"
 
 	"app/testutil"
 	"github.com/goapt/dbunit"
-	"github.com/ilibs/gosql/v2"
 )
 
 // the connect development environment database
-func db(dbname string) *gosql.DB {
-	d, err := gosql.Open("mysql", fmt.Sprintf("root:123456@tcp(127.0.0.1:3306)/%s?charset=utf8&parseTime=True&loc=%s", dbname, "Asia%2FShanghai"))
+func db(dbname string) *sql.DB {
+	d, err := sql.Open("mysql", fmt.Sprintf("root:123456@tcp(127.0.0.1:3306)/%s?charset=utf8&parseTime=True&loc=%s", dbname, "Asia%2FShanghai"))
 	if err != nil {
 		panic(err)
 	}

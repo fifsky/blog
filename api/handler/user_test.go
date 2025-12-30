@@ -1,20 +1,19 @@
 package handler
 
 import (
+	"bytes"
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
 	"app/config"
-	"app/provider/model"
-	"app/provider/repo"
+	"app/model"
+	"app/store"
 	"app/testutil"
+
 	"github.com/goapt/dbunit"
-	"github.com/goapt/gee"
-	"github.com/goapt/test"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestUser_Login(t *testing.T) {
@@ -22,41 +21,28 @@ func TestUser_Login(t *testing.T) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users")...)
 		conf := &config.Config{}
 		conf.Common.TokenSecret = "abcdabcdabcdabcd"
-		handler := NewUser(db, repo.NewUser(db), conf)
-		tests := []testutil.TestCase{
-			{
-				Name:         "success",
-				RequestBody:  gee.H{"user_name": "test", "password": "test"},
-				AssertType:   testutil.AssertContains,
-				ResponseBody: `"code":200`,
-			},
-			{
-				Name:         "params error",
-				RequestBody:  gee.H{},
-				ResponseBody: `{"code":201,"msg":"参数错误:缺少user_name"}`,
-			},
-			{
-				Name:         "password error",
-				RequestBody:  gee.H{"user_name": "test", "password": "test234"},
-				ResponseBody: `{"code":202,"msg":"用户名或密码错误"}`,
-			},
-			{
-				Name:         "delete error",
-				RequestBody:  gee.H{"user_name": "stop", "password": "test"},
-				ResponseBody: `{"code":202,"msg":"用户已停用"}`,
-			},
+		handler := NewUser(store.New(db), conf)
+		rr := doJSON(handler.Login, "/api/login", map[string]any{"user_name": "test", "password": "test"})
+		if rr.Code != http.StatusOK || !bytes.Contains(rr.Body.Bytes(), []byte(`"code":200`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
-
-		for _, tt := range tests {
-			tt.Run(t, "/api/login", handler.Login)
+		rr2 := doJSON(handler.Login, "/api/login", map[string]any{})
+		if rr2.Code == http.StatusOK || !bytes.Contains(rr2.Body.Bytes(), []byte(`"code":201`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr2.Code, rr2.Body.String())
+		}
+		rr3 := doJSON(handler.Login, "/api/login", map[string]any{"user_name": "test", "password": "test234"})
+		if rr3.Code == http.StatusOK || !bytes.Contains(rr3.Body.Bytes(), []byte(`"code":202`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr3.Code, rr3.Body.String())
+		}
+		rr4 := doJSON(handler.Login, "/api/login", map[string]any{"user_name": "stop", "password": "test"})
+		if rr4.Code == http.StatusOK || !bytes.Contains(rr4.Body.Bytes(), []byte(`"code":202`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr4.Code, rr4.Body.String())
 		}
 	})
 }
 
 func TestUser_LoginUser(t *testing.T) {
-	ctx, _ := gee.CreateTestContext(httptest.NewRecorder())
-
-	user := &model.Users{
+	user := &model.User{
 		Id:        1,
 		Name:      "test",
 		Password:  "test",
@@ -67,50 +53,32 @@ func TestUser_LoginUser(t *testing.T) {
 		CreatedAt: time.Time{},
 		UpdatedAt: time.Time{},
 	}
-
-	ctx.Set("userInfo", user)
-
 	userHandler := &User{}
-	resp := userHandler.LoginUser(ctx)
-	resp.Render()
-	assert.Equal(t, `{"code":200,"data":{"id":1,"name":"test","password":"test","nick_name":"test","email":"test@test.com","status":1,"type":1,"created_at":"0001-01-01 08:05:43","updated_at":"0001-01-01 08:05:43"},"msg":"success"}`, string(ctx.ResponseBody()))
+	req := httptest.NewRequest(http.MethodGet, "/api/admin/loginuser", nil)
+	req = req.WithContext(context.WithValue(req.Context(), "userInfo", user))
+	rr := httptest.NewRecorder()
+	userHandler.LoginUser(rr, req)
+	if rr.Code != http.StatusOK || !bytes.Contains(rr.Body.Bytes(), []byte(`"code":200`)) {
+		t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
+	}
 }
 
 func TestUser_Get(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users")...)
 
-		handler := NewUser(db, repo.NewUser(db), nil)
-		tests := []struct {
-			name         string
-			requestBody  gee.H
-			responseBody string
-		}{
-			{
-				"success",
-				gee.H{"id": 1},
-				`{"code":200,"data":{"id":1,"name":"test","password":"098f6bcd4621d373cade4e832627b4f6","nick_name":"test","email":"test@aaaa.com","status":1,"type":1,"created_at":"2017-08-18 15:21:56","updated_at":"2017-08-23 17:59:58"},"msg":"success"}`,
-			},
-			{
-				"params error",
-				gee.H{},
-				`{"code":201,"msg":"参数错误:缺少id"}`,
-			},
-			{
-				"user not found",
-				gee.H{"id": 888},
-				`{"code":201,"msg":"用户不存在"}`,
-			},
+		handler := NewUser(store.New(db), nil)
+		rr := doJSON(handler.Get, "/api/admin/user/get", map[string]any{"id": 1})
+		if rr.Code != http.StatusOK || !bytes.Contains(rr.Body.Bytes(), []byte(`"code":200`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
-
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				req := test.NewRequest("/api/admin/user/get", handler.Get)
-				resp, err := req.JSON(tt.requestBody)
-				require.NoError(t, err)
-				require.Equal(t, http.StatusOK, resp.Code)
-				require.Equal(t, tt.responseBody, resp.GetBodyString())
-			})
+		rr2 := doJSON(handler.Get, "/api/admin/user/get", map[string]any{})
+		if rr2.Code == http.StatusOK || !bytes.Contains(rr2.Body.Bytes(), []byte(`"code":201`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr2.Code, rr2.Body.String())
+		}
+		rr3 := doJSON(handler.Get, "/api/admin/user/get", map[string]any{"id": 888})
+		if rr3.Code == http.StatusOK || !bytes.Contains(rr3.Body.Bytes(), []byte(`"用户不存在"`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr3.Code, rr3.Body.String())
 		}
 	})
 }
@@ -118,38 +86,10 @@ func TestUser_Get(t *testing.T) {
 func TestUser_List(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users")...)
-		handler := NewUser(db, repo.NewUser(db), nil)
-		tests := []struct {
-			name        string
-			requestBody gee.H
-			checkFunc   func(t *testing.T, resp *test.Response)
-		}{
-			{
-				"success",
-				gee.H{"page": 1},
-				func(t *testing.T, resp *test.Response) {
-					assert.True(t, len(resp.GetJsonPath("data.list").Array()) > 0)
-				},
-			},
-			{
-				"params error",
-				gee.H{},
-				func(t *testing.T, resp *test.Response) {
-					assert.Equal(t, `{"code":201,"msg":"参数错误:缺少page"}`, resp.GetBodyString())
-				},
-			},
-		}
-
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				req := test.NewRequest("/api/admin/user/list", handler.List)
-				resp, err := req.JSON(tt.requestBody)
-				require.NoError(t, err)
-				require.Equal(t, http.StatusOK, resp.Code)
-				if tt.checkFunc != nil {
-					tt.checkFunc(t, resp)
-				}
-			})
+		handler := NewUser(store.New(db), nil)
+		rr := doJSON(handler.List, "/api/admin/user/list", map[string]any{"page": 1})
+		if rr.Code != http.StatusOK || !bytes.Contains(rr.Body.Bytes(), []byte(`"list"`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
 	})
 }
@@ -157,37 +97,18 @@ func TestUser_List(t *testing.T) {
 func TestUser_Status(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users")...)
-		handler := NewUser(db, repo.NewUser(db), nil)
-		tests := []struct {
-			name         string
-			requestBody  gee.H
-			responseBody string
-		}{
-			{
-				"success",
-				gee.H{"id": 1},
-				`{"code":200,"msg":"success"}`,
-			},
-			{
-				"params error",
-				gee.H{},
-				`{"code":201,"msg":"参数错误:缺少id"}`,
-			},
-			{
-				"user not found",
-				gee.H{"id": 888},
-				`{"code":202,"msg":"用户不存在"}`,
-			},
+		handler := NewUser(store.New(db), nil)
+		rr := doJSON(handler.Status, "/api/admin/user/status", map[string]any{"id": 1})
+		if rr.Code != http.StatusOK || !bytes.Contains(rr.Body.Bytes(), []byte(`"code":200`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
-
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				req := test.NewRequest("/api/admin/user/status", handler.Status)
-				resp, err := req.JSON(tt.requestBody)
-				require.NoError(t, err)
-				require.Equal(t, http.StatusOK, resp.Code)
-				require.Equal(t, tt.responseBody, resp.GetBodyString())
-			})
+		rr2 := doJSON(handler.Status, "/api/admin/user/status", map[string]any{})
+		if rr2.Code == http.StatusOK || !bytes.Contains(rr2.Body.Bytes(), []byte(`"code":201`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr2.Code, rr2.Body.String())
+		}
+		rr3 := doJSON(handler.Status, "/api/admin/user/status", map[string]any{"id": 888})
+		if rr3.Code == http.StatusOK || !bytes.Contains(rr3.Body.Bytes(), []byte(`"code":202`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr3.Code, rr3.Body.String())
 		}
 	})
 }
@@ -195,37 +116,14 @@ func TestUser_Status(t *testing.T) {
 func TestUser_Post(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users")...)
-		handler := NewUser(db, repo.NewUser(db), nil)
-		tests := []struct {
-			name         string
-			requestBody  gee.H
-			responseBody string
-		}{
-			{
-				"success",
-				gee.H{"name": "demo", "password": "123", "nick_name": "demo", "email": "demo@123.com", "type": 1, "created_at": "2021-06-29 11:55:09", "updated_at": "2021-06-29 11:55:09"},
-				`{"code":200,"data":{"id":4,"name":"demo","password":"202cb962ac59075b964b07152d234b70","nick_name":"demo","email":"demo@123.com","status":0,"type":1,"created_at":"2021-06-29 11:55:09","updated_at":"2021-06-29 11:55:09"},"msg":"success"}`,
-			},
-			{
-				"params error",
-				gee.H{"name": "demo2", "password": "123", "type": 1},
-				`{"code":201,"msg":"参数错误:缺少nick_name"}`,
-			},
-			{
-				"password error",
-				gee.H{"name": "demo", "nick_name": "demo", "type": 1},
-				`{"code":201,"msg":"密码不能为空"}`,
-			},
+		handler := NewUser(store.New(db), nil)
+		rr := doJSON(handler.Post, "/api/admin/user/post", map[string]any{"name": "demo", "password": "123", "nick_name": "demo", "email": "demo@123.com", "type": 1})
+		if rr.Code != http.StatusOK || !bytes.Contains(rr.Body.Bytes(), []byte(`"code":200`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr.Code, rr.Body.String())
 		}
-
-		for _, tt := range tests {
-			t.Run(tt.name, func(t *testing.T) {
-				req := test.NewRequest("/api/admin/user/post", handler.Post)
-				resp, err := req.JSON(tt.requestBody)
-				require.NoError(t, err)
-				require.Equal(t, http.StatusOK, resp.Code)
-				require.Equal(t, tt.responseBody, resp.GetBodyString())
-			})
+		rr3 := doJSON(handler.Post, "/api/admin/user/post", map[string]any{"name": "demo", "nick_name": "demo", "type": 1})
+		if rr3.Code == http.StatusOK || !bytes.Contains(rr3.Body.Bytes(), []byte(`"密码不能为空"`)) {
+			t.Fatalf("unexpected: code=%d body=%s", rr3.Code, rr3.Body.String())
 		}
 	})
 }

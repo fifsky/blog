@@ -1,42 +1,45 @@
 package middleware
 
 import (
-	"app/provider/model"
+	"context"
+	"net/http"
+	"strconv"
+
 	"app/response"
-	"github.com/goapt/gee"
-	"github.com/goapt/golib/convert"
-	"github.com/ilibs/gosql/v2"
+	"app/store"
 
 	"app/config"
 	"app/pkg/aesutil"
+
+	"github.com/samber/lo"
 )
 
-type RemindAuth gee.HandlerFunc
+type RemindAuth = func(next http.Handler) http.Handler
 
-func NewRemindAuth(db *gosql.DB, conf *config.Config) RemindAuth {
-	return func(c *gee.Context) gee.Response {
-		token := c.Query("token")
+func NewRemindAuth(s *store.Store, conf *config.Config) RemindAuth {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			token := r.URL.Query().Get("token")
 
-		if token == "" {
-			c.Abort()
-			return response.Fail(c, 201, "非法访问")
-		}
+			if token == "" {
+				response.Fail(w, 201, "非法访问")
+				return
+			}
 
-		id, err := aesutil.AesDecode(conf.Common.TokenSecret, token)
-		if err != nil {
-			c.Abort()
-			return response.Fail(c, 202, "Token错误")
-		}
+			id, err := aesutil.AesDecode(conf.Common.TokenSecret, token)
+			if err != nil {
+				response.Fail(w, 202, "Token错误")
+				return
+			}
 
-		remind := &model.Reminds{Id: convert.StrTo(id).MustInt()}
-		err = db.Model(remind).Get()
-		if err != nil {
-			c.Abort()
-			return response.Fail(c, 203, "数据不存在")
-		}
+			remind, err := s.GetRemind(r.Context(), lo.Must(strconv.Atoi(id)))
+			if err != nil {
+				response.Fail(w, 203, "数据不存在")
+				return
+			}
 
-		c.Set("remind", remind)
-		c.Next()
-		return nil
+			r = r.WithContext(context.WithValue(r.Context(), "remind", remind))
+			next.ServeHTTP(w, r)
+		})
 	}
 }

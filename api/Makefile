@@ -4,14 +4,11 @@ GOFILES := $(shell find . -name "*.go" -type f -not -path "./vendor/*")
 VETPACKAGES ?= $(shell $(GO) list ./... | grep -v /vendor/ | grep -v /examples/)
 
 .PHONY: build
-build: fmt-check generate
+build: fmt-check
 	$(GO) build -o app
 
 .PHONY: generate
 generate:
-	@if [ ! -x "$(command -v wire)" ]; then \
-	$(GO) install github.com/google/wire/cmd/wire; \
-	fi;
 	$(GO) generate
 
 .PHONY: test

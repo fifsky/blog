@@ -1,120 +1,186 @@
 package handler
 
 import (
+	"net/http"
 	"time"
 
-	"app/provider/model"
-	"app/provider/repo"
+	"app/model"
+	"app/pkg/wechat"
 	"app/response"
-	"github.com/goapt/gee"
-	"github.com/goapt/golib/pagination"
-	"github.com/goapt/golib/robot"
-	"github.com/ilibs/gosql/v2"
+	"app/store"
 )
 
 type Remind struct {
-	db         *gosql.DB
-	remindRepo *repo.Remind
+	store *store.Store
+	robot *wechat.Robot
 }
 
-func NewRemind(db *gosql.DB, remindRepo *repo.Remind) *Remind {
-	return &Remind{db: db, remindRepo: remindRepo}
+func NewRemind(s *store.Store, robot *wechat.Robot) *Remind {
+	return &Remind{
+		store: s,
+		robot: robot,
+	}
 }
 
-func (r *Remind) Change(c *gee.Context) gee.Response {
-	remind, ok := c.Get("remind")
-
-	if !ok {
-		return response.Fail(c, 202, "记录未找到")
+func (r *Remind) Change(w http.ResponseWriter, req *http.Request) {
+	remind := getRemind(req.Context())
+	if remind == nil {
+		response.Fail(w, 202, "记录未找到")
+		return
+	}
+	err := r.store.UpdateRemindStatus(req.Context(), remind.Id, 1)
+	if err != nil {
+		response.Fail(w, 203, err)
+		return
 	}
 
-	v := remind.(*model.Reminds)
+	_ = r.robot.Message("已确认收到提醒")
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	_, _ = w.Write([]byte("已确认收到提醒"))
+}
 
-	_, err := r.db.Model(&model.Reminds{Status: 1}).Where("id = ?", v.Id).Update()
+func (r *Remind) Delay(w http.ResponseWriter, req *http.Request) {
+	remind := getRemind(req.Context())
+	if remind == nil {
+		response.Fail(w, 202, "记录未找到")
+		return
+	}
+
+	err := r.store.UpdateRemindNextTime(req.Context(), remind.Id, remind.NextTime)
 
 	if err != nil {
-		return response.Fail(c, 203, err)
+		response.Fail(w, 203, err)
+		return
 	}
-
-	_ = robot.Message("已确认收到提醒")
-	return c.String("已确认收到提醒")
+	_ = r.robot.Message("将在10分钟后再次提醒")
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	_, _ = w.Write([]byte("将在10分钟后再次提醒"))
 }
 
-func (r *Remind) Delay(c *gee.Context) gee.Response {
-	remind, ok := c.Get("remind")
-
-	if !ok {
-		return response.Fail(c, 202, "记录未找到")
-	}
-
-	v := remind.(*model.Reminds)
-
-	nextTime := time.Now().Add(10 * time.Minute)
-	_, err := r.db.Model(&model.Reminds{NextTime: nextTime}).Where("id = ?", v.Id).Update()
-
+func (r *Remind) List(w http.ResponseWriter, req *http.Request) {
+	p, err := decode[PageRequest](req)
 	if err != nil {
-		return response.Fail(c, 203, err)
-	}
-	_ = robot.Message("将在10分钟后再次提醒")
-	return c.String("将在10分钟后再次提醒")
-}
-
-func (r *Remind) List(c *gee.Context) gee.Response {
-	p := &struct {
-		Page int `json:"page" binding:"required"`
-	}{}
-	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误:"+err.Error())
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
 	}
 
-	h := gee.H{}
 	num := 10
-	reminds, err := r.remindRepo.RemindGetList(p.Page, num)
+	reminds, err := r.store.ListRemind(req.Context(), p.Page, num)
 	if err != nil {
-		return response.Fail(c, 202, err)
+		response.Fail(w, 202, err)
+		return
 	}
-	h["list"] = reminds
+	items := make([]RemindItem, 0, len(reminds))
+	for _, v := range reminds {
+		items = append(items, RemindItem{
+			Id:        v.Id,
+			Type:      v.Type,
+			Content:   v.Content,
+			Month:     v.Month,
+			Week:      v.Week,
+			Day:       v.Day,
+			Hour:      v.Hour,
+			Minute:    v.Minute,
+			Status:    v.Status,
+			NextTime:  v.NextTime,
+			CreatedAt: v.CreatedAt,
+		})
+	}
 
-	total, err := r.db.Model(&model.Reminds{}).Count()
-	pager := pagination.New(int(total), num, p.Page, 2)
-	h["pageTotal"] = pager.TotalPages()
+	total, err := r.store.CountRemindTotal(req.Context())
+	resp := RemindListResponse{
+		List:      items,
+		PageTotal: totalPages(total, num),
+	}
 
 	if err != nil {
-		return response.Fail(c, 500, err)
+		response.Fail(w, 500, err)
+		return
 	}
 
-	return response.Success(c, h)
+	response.Success(w, resp)
 }
 
-func (r *Remind) Post(c *gee.Context) gee.Response {
-	remind := &model.Reminds{}
-	if err := c.ShouldBindJSON(remind); err != nil {
-		return response.Fail(c, 201, "参数错误:"+err.Error())
+func (r *Remind) Post(w http.ResponseWriter, req *http.Request) {
+	bodyRemind, err := decode[RemindRequest](req)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
 	}
+	in := bodyRemind
 
-	if remind.Id > 0 {
-		remind.Status = 1
-		if _, err := r.db.Model(remind).Update(); err != nil {
-			return response.Fail(c, 201, "更新失败:"+err.Error())
+	if in.Id > 0 {
+		u := &model.UpdateRemind{Id: in.Id}
+		// 更新时默认置为已确认
+		status := 1
+		u.Status = &status
+		if in.Type > 0 {
+			u.Type = &in.Type
+		}
+		if in.Content != "" {
+			u.Content = &in.Content
+		}
+		if in.Month > 0 {
+			u.Month = &in.Month
+		}
+		if in.Week > 0 {
+			u.Week = &in.Week
+		}
+		if in.Day > 0 {
+			u.Day = &in.Day
+		}
+		if in.Hour > 0 {
+			u.Hour = &in.Hour
+		}
+		if in.Minute > 0 {
+			u.Minute = &in.Minute
+		}
+		if in.NextTime != "" {
+			if tm, err := parseTime(in.NextTime); err == nil {
+				u.NextTime = &tm
+			}
+		}
+		if err := r.store.UpdateRemind(req.Context(), u); err != nil {
+			response.Fail(w, 201, "更新失败:"+err.Error())
+			return
 		}
 	} else {
-		if _, err := r.db.Model(remind).Create(); err != nil {
-			return response.Fail(c, 201, "创建失败"+err.Error())
+		next := time.Now()
+		c := &model.CreateRemind{
+			Type:      in.Type,
+			Content:   in.Content,
+			Month:     in.Month,
+			Week:      in.Week,
+			Day:       in.Day,
+			Hour:      in.Hour,
+			Minute:    in.Minute,
+			Status:    0,
+			NextTime:  next,
+			CreatedAt: time.Now(),
+		}
+		if _, err := r.store.CreateRemind(req.Context(), c); err != nil {
+			response.Fail(w, 201, "创建失败"+err.Error())
+			return
 		}
 	}
-	return response.Success(c, remind)
+	response.Success(w, in)
 }
 
-func (r *Remind) Delete(c *gee.Context) gee.Response {
-	p := &struct {
-		Id int `json:"id" binding:"required"`
-	}{}
-	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误:"+err.Error())
+func (r *Remind) Delete(w http.ResponseWriter, req *http.Request) {
+	p, err := decode[IDRequest](req)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
 	}
 
-	if _, err := r.db.Model(&model.Reminds{Id: p.Id}).Delete(); err != nil {
-		return response.Fail(c, 201, "删除失败")
+	if p.Id == 0 {
+		response.Fail(w, 201, "参数错误")
+		return
 	}
-	return response.Success(c, nil)
+
+	if err := r.store.DeleteRemind(req.Context(), p.Id); err != nil {
+		response.Fail(w, 201, "删除失败")
+		return
+	}
+	response.Success(w, nil)
 }

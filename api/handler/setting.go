@@ -1,53 +1,43 @@
 package handler
 
 import (
-	"app/provider/model"
-	"app/provider/repo"
+	"net/http"
+
 	"app/response"
-	"github.com/goapt/gee"
-	"github.com/ilibs/gosql/v2"
-	"github.com/tidwall/gjson"
+	"app/store"
 )
 
 type Setting struct {
-	db          *gosql.DB
-	settingRepo *repo.Setting
+	store *store.Store
 }
 
-func NewSetting(db *gosql.DB, settingRepo *repo.Setting) *Setting {
-	return &Setting{db: db, settingRepo: settingRepo}
+func NewSetting(s *store.Store) *Setting {
+	return &Setting{store: s}
 }
 
-func (s *Setting) Get(c *gee.Context) gee.Response {
-	m, err := s.settingRepo.GetOptions()
+func (s *Setting) Get(w http.ResponseWriter, r *http.Request) {
+	m, err := s.store.GetOptions(r.Context())
 	if err != nil {
-		return response.Fail(c, 202, err)
+		response.Fail(w, 202, err)
+		return
 	}
 
-	return response.Success(c, m)
+	var resp OptionsResponse = m
+	response.Success(w, resp)
 }
 
-func (s *Setting) Post(c *gee.Context) gee.Response {
-
-	body, err := c.GetRawData()
+func (s *Setting) Post(w http.ResponseWriter, r *http.Request) {
+	kv, err := decode[map[string]string](r)
 	if err != nil {
-		return response.Fail(c, 202, err)
+		response.Fail(w, 202, err)
+		return
 	}
 
-	options := gjson.ParseBytes(body)
-
-	m := make(map[string]string)
-
-	for k, v := range options.Map() {
-		_, err := s.db.Model(&model.Options{
-			OptionValue: v.String(),
-		}).Where("option_key = ?", k).Update()
-
-		if err != nil {
-			return response.Fail(c, 203, err)
-		}
-		m[k] = v.String()
+	m, err := s.store.UpdateOptions(r.Context(), kv)
+	if err != nil {
+		response.Fail(w, 203, err)
+		return
 	}
-
-	return response.Success(c, m)
+	var resp OptionsResponse = m
+	response.Success(w, resp)
 }

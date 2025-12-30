@@ -1,29 +1,24 @@
 package middleware
 
 import (
+	"fmt"
+	"log/slog"
 	"net/http"
+	"runtime"
 
-	"github.com/goapt/gee"
-	"github.com/goapt/golib/debug"
-	"github.com/goapt/logger"
+	"app/response"
 )
 
-type Recover gee.HandlerFunc
-
-func NewRecover() Recover {
-	return func(c *gee.Context) gee.Response {
-		defer func(c *gee.Context) {
-			if rec := recover(); rec != nil {
-				logger.Data(map[string]interface{}{
-					"error": rec,
-					"path":  c.Request.URL.Path,
-					"stack": string(debug.Stack(-1)),
-				}).Error("[golang painc]", c.Request.URL.Path)
-
-				c.AbortWithStatus(http.StatusInternalServerError)
+func NewRecover(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if err := recover(); err != nil {
+				buf := make([]byte, 1024)
+				buf = buf[:runtime.Stack(buf, false)]
+				slog.Error(fmt.Sprintf("%v", err), "stack", string(buf))
+				response.Fail(w, http.StatusInternalServerError, "服务器内部错误")
 			}
-		}(c)
-		c.Next()
-		return nil
-	}
+		}()
+		next.ServeHTTP(w, r)
+	})
 }

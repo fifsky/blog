@@ -1,39 +1,40 @@
 package main
 
 import (
+	"context"
+	"log"
+	"os"
+
+	"app/cmd"
 	"app/config"
-	"app/connect"
-	"app/pkg/remind"
+	"app/pkg/wechat"
+	"app/remind"
+	"app/store"
+
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/goapt/gee"
-	"github.com/goapt/golib/robot"
-	"github.com/goapt/golib/robot/wechat"
-	"github.com/goapt/logger"
+	"github.com/urfave/cli/v3"
 )
 
 func main() {
 	conf := config.New()
-	connect.Connect(conf)
+	db, clean := config.NewBlogDB(conf)
+	defer clean()
 
-	// logger init
-	logger.Setting(func(c *logger.Config) {
-		c.LogName = "app"
-		c.LogMode = conf.Log.LogMode
-		c.LogPath = conf.Log.LogPath
-		c.LogLevel = conf.Log.LogLevel
-		c.LogMaxFiles = conf.Log.LogMaxFiles
-		c.LogSentryDSN = conf.Log.LogSentryDSN
-		c.LogSentryType = "go." + conf.AppName
-		c.LogDetail = conf.Log.LogDetail
-	})
-
-	robot.Init(wechat.NewRobot())
-	robot.SetToken(conf.Common.RobotToken)
-
+	robot := wechat.NewRobot(conf.Common.RobotToken)
 	// crontab setup
-	go remind.StartCron(conf)
+	s := store.New(db)
+	r := remind.New(s, conf, robot)
+	go r.Start()
 
-	// server setup
-	cmds := Initialize(conf)
-	gee.NewCliServer().Run(cmds)
+	app := &cli.Command{
+		Name:  "blog",
+		Usage: "fifsky blog",
+		Commands: []*cli.Command{
+			cmd.NewHttp(db, conf, robot),
+		},
+	}
+
+	if err := app.Run(context.Background(), os.Args); err != nil {
+		log.Fatal(err)
+	}
 }

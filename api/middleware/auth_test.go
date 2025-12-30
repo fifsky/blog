@@ -2,16 +2,18 @@ package middleware
 
 import (
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
 	"app/config"
+	"app/store"
 	"app/testutil"
-	"github.com/goapt/dbunit"
-	"github.com/goapt/gee"
-	"github.com/goapt/test"
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/goapt/dbunit"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func getUserTestToken(id int, conf *config.Config) string {
@@ -26,13 +28,6 @@ func getUserTestToken(id int, conf *config.Config) string {
 }
 
 func TestNewAuthLogin(t *testing.T) {
-	var testHandler gee.HandlerFunc = func(c *gee.Context) gee.Response {
-		return c.JSON(gee.H{
-			"code": 10000,
-			"msg":  "success",
-		})
-	}
-
 	conf := &config.Config{}
 	conf.Common.TokenSecret = "abcdabcdabcdabcd"
 
@@ -61,12 +56,24 @@ func TestNewAuthLogin(t *testing.T) {
 			},
 		}
 
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"code":10000,"msg":"success"}`))
+		})
+
 		for _, tt := range tests {
-			req := test.NewRequest("/dummy/impl", gee.HandlerFunc(NewAuthLogin(db, conf)), testHandler)
-			req.Header.Add("Access-Token", tt.Token)
-			resp, err := req.Get()
-			assert.NoError(t, err)
-			assert.Equal(t, tt.ResponseBody, resp.GetBodyString())
+			m := NewAuthLogin(store.New(db), conf)
+
+			handler := m(next)
+
+			req := httptest.NewRequest(http.MethodGet, "/dummy/impl", nil)
+			req.Header.Set("Access-Token", tt.Token)
+			rr := httptest.NewRecorder()
+
+			handler.ServeHTTP(rr, req)
+
+			assert.JSONEq(t, tt.ResponseBody, rr.Body.String())
 		}
 	})
 

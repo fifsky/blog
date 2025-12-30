@@ -1,16 +1,18 @@
 package middleware
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"strconv"
 	"testing"
 
 	"app/config"
 	"app/pkg/aesutil"
+	"app/store"
 	"app/testutil"
-	"github.com/goapt/dbunit"
-	"github.com/goapt/gee"
-	"github.com/goapt/test"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/goapt/dbunit"
 )
 
 func getRemindTestToken(id int, conf *config.Config) string {
@@ -21,12 +23,6 @@ func getRemindTestToken(id int, conf *config.Config) string {
 func TestNewRemindAuth(t *testing.T) {
 	conf := &config.Config{}
 	conf.Common.TokenSecret = "abcdabcdabcdabcd"
-	var testHandler gee.HandlerFunc = func(c *gee.Context) gee.Response {
-		return c.JSON(gee.H{
-			"code": 10000,
-			"msg":  "success",
-		})
-	}
 
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixture("reminds"))
@@ -53,11 +49,29 @@ func TestNewRemindAuth(t *testing.T) {
 			},
 		}
 
+		// 构造下游处理器：仅在通过鉴权时返回成功JSON
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"code":10000,"msg":"success"}`))
+		})
+
 		for _, tt := range tests {
-			req := test.NewRequest("/dummy/impl?token="+tt.Token, gee.HandlerFunc(NewRemindAuth(db, conf)), testHandler)
-			resp, err := req.Get()
-			assert.NoError(t, err)
-			assert.Equal(t, tt.ResponseBody, resp.GetBodyString())
+			// 创建被测的中间件
+			m := NewRemindAuth(store.New(db), conf)
+
+			// 包装中间件
+			handler := m(next)
+
+			// 构造请求，设置查询参数token
+			req := httptest.NewRequest(http.MethodGet, "/remind?token="+tt.Token, nil)
+			// 记录响应
+			rr := httptest.NewRecorder()
+
+			// 触发请求
+			handler.ServeHTTP(rr, req)
+
+			assert.JSONEq(t, tt.ResponseBody, rr.Body.String())
 		}
 	})
 }

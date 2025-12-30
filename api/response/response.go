@@ -1,33 +1,39 @@
 package response
 
 import (
+	"encoding/json"
 	"fmt"
-
-	"github.com/goapt/gee"
+	"log/slog"
+	"net/http"
 )
 
+func encode[T any](w http.ResponseWriter, status int, v T) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	if err := json.NewEncoder(w).Encode(v); err != nil {
+		return fmt.Errorf("encode json: %w", err)
+	}
+	return nil
+}
+
 type ApiResponse struct {
-	Context *gee.Context `json:"-"`
-	Code    int          `json:"code"`
-	Data    interface{}  `json:"data,omitempty"`
-	Msg     string       `json:"msg"`
+	Code int    `json:"code"`
+	Data any    `json:"data,omitempty"`
+	Msg  string `json:"msg"`
 }
 
-func (c *ApiResponse) Render() {
-	c.Context.JSON(c).Render()
-}
-
-func Success(c *gee.Context, data interface{}) gee.Response {
-
-	return &ApiResponse{
-		Context: c,
-		Code:    200,
-		Data:    data,
-		Msg:     "success",
+func Success(w http.ResponseWriter, data any) {
+	err := encode(w, http.StatusOK, &ApiResponse{
+		Code: 200,
+		Data: data,
+		Msg:  "success",
+	})
+	if err != nil {
+		slog.Error("response error", slog.String("err", err.Error()))
 	}
 }
 
-func Fail(c *gee.Context, code int, msg interface{}) gee.Response {
+func Fail(w http.ResponseWriter, code int, msg any) {
 	var m string
 	switch e := msg.(type) {
 	case string:
@@ -38,10 +44,20 @@ func Fail(c *gee.Context, code int, msg interface{}) gee.Response {
 		m = fmt.Sprintf("%v", e)
 	}
 
-	return &ApiResponse{
-		Context: c,
-		Code:    code,
-		Data:    nil,
-		Msg:     m,
+	err := encode(w, 400, &ApiResponse{
+		Code: code,
+		Msg:  m,
+	})
+
+	if err != nil {
+		slog.Error("response error", slog.String("err", err.Error()))
+	}
+}
+
+func Upload(w http.ResponseWriter, v any) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(v); err != nil {
+		slog.Error("response error", slog.String("err", err.Error()))
 	}
 }

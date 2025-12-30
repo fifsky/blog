@@ -2,86 +2,134 @@ package handler
 
 import (
 	"fmt"
+	"net/http"
+	"time"
 
-	"app/provider/model"
-	"app/provider/repo"
+	"app/model"
 	"app/response"
-	"github.com/goapt/gee"
-	"github.com/ilibs/gosql/v2"
+	"app/store"
 )
 
 type Cate struct {
-	db       *gosql.DB
-	cateRepo *repo.Cate
+	store *store.Store
 }
 
-func NewCate(db *gosql.DB, cateRepo *repo.Cate) *Cate {
-	return &Cate{db: db, cateRepo: cateRepo}
+func NewCate(s *store.Store) *Cate {
+	return &Cate{store: s}
 }
 
-func (a *Cate) All(c *gee.Context) gee.Response {
-	cates, err := a.cateRepo.GetAllCates()
+func (a *Cate) All(w http.ResponseWriter, r *http.Request) {
+	cates, err := a.store.GetAllCates(r.Context())
 	if err != nil {
-		return response.Fail(c, 203, err)
+		response.Fail(w, 203, err)
+		return
 	}
 
-	data := make([]map[string]string, 0)
+	data := make([]CateMenuItem, 0)
 
 	for _, v := range cates {
-		data = append(data, map[string]string{
-			"url":     "/categroy/" + v.Domain,
-			"content": fmt.Sprintf("%s(%d)", v.Name, v.Num),
+		data = append(data, CateMenuItem{
+			Url:     "/categroy/" + v.Domain,
+			Content: fmt.Sprintf("%s(%d)", v.Name, v.Num),
 		})
 	}
 
-	return response.Success(c, data)
+	response.Success(w, data)
 }
 
-func (a *Cate) List(c *gee.Context) gee.Response {
-	cates, err := a.cateRepo.GetAllCates()
+func (a *Cate) List(w http.ResponseWriter, r *http.Request) {
+	cates, err := a.store.GetAllCates(r.Context())
 	if err != nil {
-		return response.Fail(c, 203, err)
+		response.Fail(w, 203, err)
+		return
 	}
-	return response.Success(c, gee.H{
-		"list":      cates,
-		"pageTotal": len(cates),
-	})
+	items := make([]CateListItem, 0, len(cates))
+	for _, c := range cates {
+		items = append(items, CateListItem{
+			Id:        c.Id,
+			Name:      c.Name,
+			Desc:      c.Desc,
+			Domain:    c.Domain,
+			CreatedAt: c.CreatedAt,
+			UpdatedAt: c.UpdatedAt,
+			Num:       c.Num,
+		})
+	}
+	resp := CateListResponse{
+		List:      items,
+		PageTotal: len(items),
+	}
+	response.Success(w, resp)
 }
 
-func (a *Cate) Post(c *gee.Context) gee.Response {
-	cate := &model.Cates{}
-	if err := c.ShouldBindJSON(cate); err != nil {
-		return response.Fail(c, 201, "参数错误:"+err.Error())
+func (a *Cate) Post(w http.ResponseWriter, r *http.Request) {
+	bodyCate, err := decode[CateRequest](r)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
 	}
+	cate := bodyCate
 
+	now := time.Now()
 	if cate.Id > 0 {
-		if _, err := a.db.Model(cate).Update(); err != nil {
-			return response.Fail(c, 201, "更新失败")
+		u := &model.UpdateCate{Id: cate.Id}
+		if cate.Name != "" {
+			u.Name = &cate.Name
 		}
-	} else {
-		if _, err := a.db.Model(cate).Create(); err != nil {
-			return response.Fail(c, 201, "创建失败")
+		if cate.Desc != "" {
+			u.Desc = &cate.Desc
 		}
+		if cate.Domain != "" {
+			u.Domain = &cate.Domain
+		}
+		u.UpdatedAt = &now
+		if err := a.store.UpdateCate(r.Context(), u); err != nil {
+			response.Fail(w, 201, "更新失败")
+			return
+		}
+		response.Success(w, cate)
 	}
-	return response.Success(c, cate)
+
+	if cate.Name == "" || cate.Domain == "" {
+		response.Fail(w, 201, "参数错误: 分类名或域名不能为空")
+		return
+	}
+	c := &model.Cate{
+		Name:      cate.Name,
+		Desc:      cate.Desc,
+		Domain:    cate.Domain,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+	if _, err := a.store.CreateCate(r.Context(), c); err != nil {
+		response.Fail(w, 201, "创建失败")
+		return
+	}
+	response.Success(w, cate)
 }
 
-func (a *Cate) Delete(c *gee.Context) gee.Response {
-	p := &struct {
-		Id int `json:"id" binding:"required"`
-	}{}
-	if err := c.ShouldBindJSON(p); err != nil {
-		return response.Fail(c, 201, "参数错误:"+err.Error())
+func (a *Cate) Delete(w http.ResponseWriter, r *http.Request) {
+	p, err := decode[IDRequest](r)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
 	}
 
-	total, _ := a.db.Model(&model.Posts{}).Where("cate_id = ?", p.Id).Count()
+	if p.Id <= 0 {
+		response.Fail(w, 201, "参数错误: 分类ID不能为空")
+		return
+	}
+
+	total, _ := a.store.PostsCount(r.Context(), p.Id)
 
 	if total > 0 {
-		return response.Fail(c, 201, "该分类下面还有文章，不能删除")
+		response.Fail(w, 201, "该分类下面还有文章，不能删除")
+		return
 	}
 
-	if _, err := a.db.Model(&model.Cates{Id: p.Id}).Delete(); err != nil {
-		return response.Fail(c, 201, "删除失败")
+	if err := a.store.DeleteCate(r.Context(), p.Id); err != nil {
+		response.Fail(w, 201, "删除失败")
+		return
 	}
-	return response.Success(c, nil)
+	response.Success(w, nil)
 }
