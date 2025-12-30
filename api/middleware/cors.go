@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"net/http"
-	"strings"
 
 	"app/config"
 )
@@ -17,15 +16,43 @@ func NewCors(conf *config.Config) Cors {
 			if conf.Env == "local" {
 				origins = []string{"*"}
 			}
+			origin := r.Header.Get("Origin")
+			if len(origin) == 0 {
+				next.ServeHTTP(w, r)
+				return
+			}
+			host := r.Host
 
-			// 设置CORS头部
-			w.Header().Set("Access-Control-Allow-Origin", getOrigin(r.Header.Get("Origin"), origins))
-			w.Header().Set("Access-Control-Allow-Methods", "*")
-			w.Header().Set("Access-Control-Allow-Headers", "Origin,Content-Length,Content-Type,Access-Token,Access-Control-Allow-Origin,x-requested-with")
+			if origin == "http://"+host || origin == "https://"+host {
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			allowedOrigin := getOrigin(origin, origins)
+			if allowedOrigin == "" {
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			w.Header().Add("Vary", "Origin")
+			w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
-			w.Header().Set("Access-Control-Max-Age", "43200") // 12小时
+			w.Header().Set("Access-Control-Max-Age", "43200")
 
-			// 处理预检请求
+			reqMethod := r.Header.Get("Access-Control-Request-Method")
+			if reqMethod != "" {
+				w.Header().Set("Access-Control-Allow-Methods", reqMethod)
+			} else {
+				w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
+			}
+
+			reqHeaders := r.Header.Get("Access-Control-Request-Headers")
+			if reqHeaders != "" {
+				w.Header().Set("Access-Control-Allow-Headers", reqHeaders)
+			} else {
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization,Content-Length,Content-Type,Access-Token,X-Requested-With")
+			}
+
 			if r.Method == "OPTIONS" {
 				w.WriteHeader(http.StatusOK)
 				return
@@ -36,15 +63,14 @@ func NewCors(conf *config.Config) Cors {
 	}
 }
 
-// getOrigin 检查并返回匹配的源地址
 func getOrigin(requestedOrigin string, allowedOrigins []string) string {
 	for _, origin := range allowedOrigins {
 		if origin == "*" {
 			return requestedOrigin
 		}
-		if strings.ToLower(origin) == strings.ToLower(requestedOrigin) {
+		if requestedOrigin == origin {
 			return requestedOrigin
 		}
 	}
-	return "" // 如果没有匹配的源，则返回空字符串
+	return ""
 }

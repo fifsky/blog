@@ -41,6 +41,11 @@ func (r *Router) Handler() http.Handler {
 	mux := http.NewServeMux()
 	mid := Use(middleware.NewRecover, middleware.NewCors(r.conf))
 
+	// 统一处理所有 /api/ 路径的预检请求，确保中间件设置CORS响应头
+	mux.Handle("OPTIONS /api/", mid.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+
 	mux.Handle("POST /api/login", mid.HandlerFunc(r.handler.User.Login))
 	mux.Handle("POST /api/mood/list", mid.HandlerFunc(r.handler.Mood.List))
 	mux.Handle("POST /api/cate/all", mid.HandlerFunc(r.handler.Cate.All))
