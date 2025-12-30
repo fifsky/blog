@@ -87,9 +87,9 @@ func (s *Store) UpdateRemindNextTime(ctx context.Context, id int, nextTime time.
 	return err
 }
 
-func (s *Store) CreateRemind(ctx context.Context, md *model.CreateRemind) (int64, error) {
-	res, err := s.db.ExecContext(ctx, "insert into reminds (type,content,month,week,day,hour,minute,status,next_time,created_at) values (?,?,?,?,?,?,?,?,?,?)",
-		md.Type, md.Content, md.Month, md.Week, md.Day, md.Hour, md.Minute, md.Status, md.NextTime, md.CreatedAt)
+func (s *Store) CreateRemind(ctx context.Context, md *model.Remind) (int64, error) {
+	res, err := s.db.ExecContext(ctx, "insert into reminds (type,content,month,week,day,hour,minute,status,created_at) values (?,?,?,?,?,?,?,?,?)",
+		md.Type, md.Content, md.Month, md.Week, md.Day, md.Hour, md.Minute, md.Status, md.CreatedAt)
 	if err != nil {
 		return 0, err
 	}

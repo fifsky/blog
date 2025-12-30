@@ -110,11 +110,6 @@ func (m *Mood) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if p.Id <= 0 {
-		response.Fail(w, 201, "参数错误")
-		return
-	}
-
 	if err := m.store.DeleteMood(r.Context(), p.Id); err != nil {
 		response.Fail(w, 201, "删除失败")
 		return

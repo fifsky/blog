@@ -111,9 +111,6 @@ func (r *Remind) Post(w http.ResponseWriter, req *http.Request) {
 
 	if in.Id > 0 {
 		u := &model.UpdateRemind{Id: in.Id}
-		// 更新时默认置为已确认
-		status := 1
-		u.Status = &status
 		if in.Type > 0 {
 			u.Type = &in.Type
 		}
@@ -135,18 +132,12 @@ func (r *Remind) Post(w http.ResponseWriter, req *http.Request) {
 		if in.Minute > 0 {
 			u.Minute = &in.Minute
 		}
-		if in.NextTime != "" {
-			if tm, err := parseTime(in.NextTime); err == nil {
-				u.NextTime = &tm
-			}
-		}
 		if err := r.store.UpdateRemind(req.Context(), u); err != nil {
 			response.Fail(w, 201, "更新失败:"+err.Error())
 			return
 		}
 	} else {
-		next := time.Now()
-		c := &model.CreateRemind{
+		c := &model.Remind{
 			Type:      in.Type,
 			Content:   in.Content,
 			Month:     in.Month,
@@ -154,8 +145,7 @@ func (r *Remind) Post(w http.ResponseWriter, req *http.Request) {
 			Day:       in.Day,
 			Hour:      in.Hour,
 			Minute:    in.Minute,
-			Status:    0,
-			NextTime:  next,
+			Status:    1,
 			CreatedAt: time.Now(),
 		}
 		if _, err := r.store.CreateRemind(req.Context(), c); err != nil {
@@ -170,11 +160,6 @@ func (r *Remind) Delete(w http.ResponseWriter, req *http.Request) {
 	p, err := decode[IDRequest](req)
 	if err != nil {
 		response.Fail(w, 201, "参数错误:"+err.Error())
-		return
-	}
-
-	if p.Id == 0 {
-		response.Fail(w, 201, "参数错误")
 		return
 	}
 

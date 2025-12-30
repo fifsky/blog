@@ -115,11 +115,6 @@ func (a *Cate) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if p.Id <= 0 {
-		response.Fail(w, 201, "参数错误: 分类ID不能为空")
-		return
-	}
-
 	total, _ := a.store.PostsCount(r.Context(), p.Id)
 
 	if total > 0 {

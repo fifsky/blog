@@ -55,6 +55,12 @@ func (a *Article) Archive(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Article) List(w http.ResponseWriter, r *http.Request) {
+	req, err := decode[ArticleListRequest](r)
+	if err != nil {
+		response.Fail(w, 201, "参数错误:"+err.Error())
+		return
+	}
+
 	options, err := a.store.GetOptions(r.Context())
 	if err != nil {
 		response.Fail(w, 202, err)
@@ -67,12 +73,6 @@ func (a *Article) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	num := max(int(n), 1)
-
-	req, err := decode[ArticleListRequest](r)
-	if err != nil {
-		response.Fail(w, 201, "参数错误:"+err.Error())
-		return
-	}
 
 	cateId := 0
 	if req.Domain != "" {
@@ -185,11 +185,6 @@ func (a *Article) Detail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.Id < 1 && req.Url == "" {
-		response.Fail(w, 201, "参数错误")
-		return
-	}
-
 	post, err := a.store.GetPost(r.Context(), req.Id, req.Url)
 	if err != nil {
 		response.Fail(w, 202, "您访问的文章不存在或已经删除！")
@@ -289,31 +284,15 @@ func (a *Article) Feed(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Article) Post(w http.ResponseWriter, r *http.Request) {
-	bodyPost, err := decode[ArticlePostRequest](r)
+	in, err := decode[ArticlePostRequest](r)
 	if err != nil {
 		response.Fail(w, 201, "参数错误:"+err.Error())
 		return
-	}
-	in := bodyPost
-
-	status := in.Status
-	if status == 0 {
-		status = 1
 	}
 
 	loginUser := getLoginUser(r.Context())
 	if loginUser == nil {
 		response.Fail(w, 201, "请先登录")
-		return
-	}
-
-	if in.Title == "" {
-		response.Fail(w, 201, "文章标题不能为空")
-		return
-	}
-
-	if in.CateId < 1 {
-		response.Fail(w, 201, "请选择文章分类")
 		return
 	}
 
@@ -338,9 +317,6 @@ func (a *Article) Post(w http.ResponseWriter, r *http.Request) {
 		if in.Content != "" {
 			u.Content = &in.Content
 		}
-		if status > 0 {
-			u.Status = &status
-		}
 		u.UpdatedAt = &now
 		if err := a.store.UpdatePost(r.Context(), u); err != nil {
 			response.Fail(w, 201, "更新文章失败")
@@ -354,7 +330,7 @@ func (a *Article) Post(w http.ResponseWriter, r *http.Request) {
 			Title:     in.Title,
 			Url:       in.Url,
 			Content:   in.Content,
-			Status:    status,
+			Status:    1,
 			CreatedAt: now,
 			UpdatedAt: now,
 		}
@@ -371,7 +347,7 @@ func (a *Article) Post(w http.ResponseWriter, r *http.Request) {
 		Title:     in.Title,
 		Url:       in.Url,
 		Content:   in.Content,
-		Status:    status,
+		Status:    1,
 		CreatedAt: now.Format(time.DateTime),
 		UpdatedAt: now.Format(time.DateTime),
 	}

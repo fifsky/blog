@@ -26,14 +26,8 @@ func NewUser(s *store.Store, conf *config.Config) *User {
 func (u *User) Login(w http.ResponseWriter, r *http.Request) {
 	// 解析登录请求参数
 	p, err := decode[LoginRequest](r)
-
 	if err != nil {
 		response.Fail(w, 201, "参数错误:"+err.Error())
-		return
-	}
-
-	if p.UserName == "" || p.Password == "" {
-		response.Fail(w, 201, "用户名或密码不能为空")
 		return
 	}
 
@@ -179,10 +173,6 @@ func (u *User) Post(w http.ResponseWriter, r *http.Request) {
 	}
 	in := bodyUser
 
-	if in.Id == 0 && in.Password == "" {
-		response.Fail(w, 201, "密码不能为空")
-		return
-	}
 	hashed := fmt.Sprintf("%x", md5.Sum([]byte(in.Password)))
 	now := time.Now()
 	if in.Id > 0 {
@@ -202,9 +192,6 @@ func (u *User) Post(w http.ResponseWriter, r *http.Request) {
 		if in.Email != "" {
 			uReq.Email = &in.Email
 		}
-		if in.Status > 0 {
-			uReq.Status = &in.Status
-		}
 		if in.Type > 0 {
 			uReq.Type = &in.Type
 		}
@@ -213,12 +200,12 @@ func (u *User) Post(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		cReq := &model.CreateUser{
+		cReq := &model.User{
 			Name:      in.Name,
 			Password:  hashed,
 			NickName:  in.NickName,
 			Email:     in.Email,
-			Status:    in.Status,
+			Status:    1,
 			Type:      in.Type,
 			CreatedAt: now,
 			UpdatedAt: now,
@@ -234,7 +221,7 @@ func (u *User) Post(w http.ResponseWriter, r *http.Request) {
 		Name:     in.Name,
 		NickName: in.NickName,
 		Email:    in.Email,
-		Status:   in.Status,
+		Status:   1,
 		Type:     in.Type,
 	}
 	response.Success(w, resp)
@@ -245,11 +232,6 @@ func (u *User) Status(w http.ResponseWriter, r *http.Request) {
 	p, err := decode[IDRequest](r)
 	if err != nil {
 		response.Fail(w, 201, "参数错误:"+err.Error())
-		return
-	}
-
-	if p.Id == 0 {
-		response.Fail(w, 201, "参数错误")
 		return
 	}
 

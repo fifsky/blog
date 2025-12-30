@@ -70,7 +70,7 @@ func (s *Store) GetUserByName(ctx context.Context, name string) (*model.User, er
 	return nil, sql.ErrNoRows
 }
 
-func (s *Store) CreateUser(ctx context.Context, users *model.CreateUser) (int64, error) {
+func (s *Store) CreateUser(ctx context.Context, users *model.User) (int64, error) {
 	res, err := s.db.ExecContext(ctx, "insert into users (name,password,nick_name,email,status,type,created_at,updated_at) values (?,?,?,?,?,?,?,?)",
 		users.Name, users.Password, users.NickName, users.Email, users.Status, users.Type, users.CreatedAt, users.UpdatedAt)
 	if err != nil {

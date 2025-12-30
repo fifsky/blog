@@ -14,17 +14,6 @@ type User struct {
 	UpdatedAt time.Time
 }
 
-type CreateUser struct {
-	Name      string
-	Password  string
-	NickName  string
-	Email     string
-	Status    int
-	Type      int
-	CreatedAt time.Time
-	UpdatedAt time.Time
-}
-
 type UpdateUser struct {
 	Id        int
 	Name      *string
