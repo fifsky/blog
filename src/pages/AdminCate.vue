@@ -57,7 +57,7 @@
 </template>
 
 <script>
-  import {cateDeleteApi, cateListApi, catePostApi} from "../service";
+  import {cateDeleteApi, cateListApi, cateCreateApi, cateUpdateApi} from "../service";
   import {BatchHandle} from "../components";
   import list from "../mixins/list"
 
@@ -66,8 +66,9 @@
     data() {
       return {
         listApi: cateListApi,
-        postApi: catePostApi,
-        deleteApi:cateDeleteApi
+        createApi: cateCreateApi,
+        updateApi: cateUpdateApi,
+        deleteApi: cateDeleteApi
       }
     },
     mixins: [list],

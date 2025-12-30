@@ -60,7 +60,7 @@
 </template>
 
 <script>
-  import {moodDeleteApi, moodListApi, moodPostApi} from "../service";
+  import {moodDeleteApi, moodListApi, moodCreateApi, moodUpdateApi} from "../service";
   import Paginate from 'vuejs-paginate'
   import {BatchHandle} from "../components";
   import list from "../mixins/list"
@@ -69,7 +69,8 @@
     name: "AdminMood",
     data() {
       return {
-        postApi: moodPostApi,
+        createApi: moodCreateApi,
+        updateApi: moodUpdateApi,
         deleteApi: moodDeleteApi,
         listApi: moodListApi
       }

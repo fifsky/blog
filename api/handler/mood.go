@@ -91,10 +91,6 @@ func (m *Mood) Update(w http.ResponseWriter, r *http.Request) {
 		response.Fail(w, 201, "参数错误:"+err.Error())
 		return
 	}
-	if in.Id <= 0 {
-		response.Fail(w, 201, "参数错误: ID不能为空")
-		return
-	}
 	u := &model.UpdateMood{Id: in.Id}
 	if in.Content != "" {
 		u.Content = &in.Content

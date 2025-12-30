@@ -31,7 +31,7 @@
 
 <script>
   import {sync} from "../utils";
-  import {settingApi, settingPostApi} from "../service";
+  import {settingApi, settingUpdateApi} from "../service";
 
   export default {
     name: "AdminIndex",
@@ -43,7 +43,7 @@
     methods: {
       submit() {
         sync(async () => {
-          await settingPostApi(this.formdata)
+          await settingUpdateApi(this.formdata)
           this.$message.success("保存成功")
         })
       }

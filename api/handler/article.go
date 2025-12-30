@@ -181,7 +181,7 @@ func (a *Article) PrevNext(w http.ResponseWriter, r *http.Request) {
 func (a *Article) Detail(w http.ResponseWriter, r *http.Request) {
 	req, err := decode[ArticleDetailRequest](r)
 	if err != nil {
-		response.Fail(w, 201, "参数错误")
+		response.Fail(w, 201, fmt.Sprintf("参数错误:%s", err))
 		return
 	}
 
@@ -317,10 +317,6 @@ func (a *Article) Update(w http.ResponseWriter, r *http.Request) {
 	in, err := decode[ArticleUpdateRequest](r)
 	if err != nil {
 		response.Fail(w, 201, "参数错误:"+err.Error())
-		return
-	}
-	if in.Id <= 0 {
-		response.Fail(w, 201, "参数错误: ID不能为空")
 		return
 	}
 	now := time.Now()

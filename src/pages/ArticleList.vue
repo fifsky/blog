@@ -55,7 +55,7 @@
         sync(async () => {
           let ret = await articleListApi(data)
           this.list = ret.list
-          this.pageTotal = ret.pageTotal
+          this.pageTotal = ret.page_total
         })
       },
       changePage(pageNum) {

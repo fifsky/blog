@@ -55,7 +55,7 @@
 </template>
 
 <script>
-  import {linkDeleteApi, linkListApi, linkPostApi} from "../service";
+  import {linkDeleteApi, linkListApi, linkCreateApi, linkUpdateApi} from "../service";
   import {BatchHandle} from "../components";
   import list from "../mixins/list"
 
@@ -64,8 +64,9 @@
     data() {
       return {
         listApi: linkListApi,
-        postApi: linkPostApi,
-        deleteApi:linkDeleteApi
+        createApi: linkCreateApi,
+        updateApi: linkUpdateApi,
+        deleteApi: linkDeleteApi
       }
     },
     mixins: [list],

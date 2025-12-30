@@ -88,10 +88,6 @@ func (l *Link) Update(w http.ResponseWriter, r *http.Request) {
 		response.Fail(w, 201, "参数错误:"+err.Error())
 		return
 	}
-	if in.Id <= 0 {
-		response.Fail(w, 201, "参数错误: ID不能为空")
-		return
-	}
 	u := &model.UpdateLink{Id: in.Id}
 	if in.Name != "" {
 		u.Name = &in.Name

@@ -68,10 +68,6 @@ func (a *Cate) Create(w http.ResponseWriter, r *http.Request) {
 		response.Fail(w, 201, "参数错误:"+err.Error())
 		return
 	}
-	if cate.Name == "" || cate.Domain == "" {
-		response.Fail(w, 201, "参数错误: 分类名或域名不能为空")
-		return
-	}
 	now := time.Now()
 	c := &model.Cate{
 		Name:      cate.Name,
@@ -92,10 +88,6 @@ func (a *Cate) Update(w http.ResponseWriter, r *http.Request) {
 	in, err := decode[CateUpdateRequest](r)
 	if err != nil {
 		response.Fail(w, 201, "参数错误:"+err.Error())
-		return
-	}
-	if in.Id <= 0 {
-		response.Fail(w, 201, "参数错误: ID不能为空")
 		return
 	}
 	now := time.Now()

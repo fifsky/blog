@@ -196,10 +196,6 @@ func (u *User) Update(w http.ResponseWriter, r *http.Request) {
 		response.Fail(w, 201, "参数错误:"+err.Error())
 		return
 	}
-	if in.Id <= 0 {
-		response.Fail(w, 201, "参数错误: ID不能为空")
-		return
-	}
 	hashed := fmt.Sprintf("%x", md5.Sum([]byte(in.Password)))
 	now := time.Now()
 	uReq := &model.UpdateUser{

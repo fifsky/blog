@@ -46,7 +46,7 @@
 
 <script>
   import {sync} from "../utils";
-  import {userGetApi,userPostApi} from "../service";
+  import {userGetApi, userCreateApi, userUpdateApi} from "../service";
 
   export default {
     name: "PostUser",
@@ -67,7 +67,7 @@
         let {id, name, nick_name, password1, email, type} = this.user
         let data = {id, name, nick_name, password:password1, email, type:parseInt(type)}
         sync(async () => {
-          let ret = await userPostApi(data)
+          let ret = await (id ? userUpdateApi : userCreateApi)(data)
           this.$router.push("/admin/users")
         })
       }

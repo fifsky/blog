@@ -84,7 +84,7 @@
 </template>
 
 <script>
-  import {remindDeleteApi, remindListApi, remindPostApi} from "../service";
+  import {remindDeleteApi, remindListApi, remindCreateApi, remindUpdateApi} from "../service";
   import Paginate from 'vuejs-paginate'
   import {BatchHandle} from "../components";
   import dayjs from "dayjs"
@@ -95,7 +95,8 @@
     data() {
       return {
         listApi: remindListApi,
-        postApi: remindPostApi,
+        createApi: remindCreateApi,
+        updateApi: remindUpdateApi,
         deleteApi: remindDeleteApi,
         item: {},
         defaultRemind() {

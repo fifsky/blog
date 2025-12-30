@@ -127,10 +127,6 @@ func (r *Remind) Update(w http.ResponseWriter, req *http.Request) {
 		response.Fail(w, 201, "参数错误:"+err.Error())
 		return
 	}
-	if in.Id <= 0 {
-		response.Fail(w, 201, "参数错误: ID不能为空")
-		return
-	}
 	u := &model.UpdateRemind{Id: in.Id}
 	if in.Type > 0 {
 		u.Type = &in.Type

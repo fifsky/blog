@@ -13,7 +13,11 @@ const list = {
     triggerSubmit(data, defaultItem) {
       defaultItem = defaultItem || {};
       sync(async () => {
-        let ret = await this.postApi(data);
+        let api = this.postApi;
+        if (!api && this.createApi && this.updateApi) {
+          api = data.id ? this.updateApi : this.createApi;
+        }
+        let ret = await api(data);
         this.item = defaultItem;
         this.$message.success("发表成功");
         this.loadList();
