@@ -1,21 +1,18 @@
 env: local
 app_name: "blog"
 common:
-  debug: 'on'
   storage_path: storage/
-  robot_token: ''
-  ding_app_secret: ''
-  token_secret: ''
-  notify_url: ''
-  notify_token: ''
+  robot_token: "16755e18-448c-4ee7-9fbb-e36bdf30f3c3"
+  token_secret: "Cif$kyL!1024@iLU"
+  notify_url: "https://ntfy.fifsky.com/Rgg8K3pzmzBiGLn2Z9Z3re"
+  notify_token: "Zmlmc2t5OnB1QGF4NHN1Qm91Nw=="
 database:
   blog:
-    enable: true
     driver: mysql
-    dsn: ''
+    dsn: "root:123456@tcp(127.0.0.1:3306)/blog?charset=utf8&parseTime=True&loc=Asia%2FShanghai"
     max_open_conns: 10
     max_idle_conns: 20
-    show_sql: false
+    max_lifetime: 60
 log:
   log_mode: "file"
   log_path: "./storage/logs/"
@@ -26,10 +23,7 @@ log:
   log_sentry_type: "go"
   log_detail: true
 oss:
-  access_key: ''
-  access_secret: ''
-  endpoint: 'oss-cn-shanghai-internal.aliyuncs.com'
-  bucket: ''
-tencent_cloud:
-  secret_id: ''
-  secret_key: ''
+  access_key: "LTAI4FhdntzSsWeHq8xynxWY"
+  access_secret: "oI2QFjpF5F3Oz7qB9YZh1rUY4ZTRtc"
+  endpoint: "oss-cn-shanghai-internal.aliyuncs.com"
+  bucket: "fifsky"
