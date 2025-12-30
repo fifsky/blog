@@ -1,4 +1,4 @@
-FROM golang:1.19 as builder
+FROM golang:1.25 AS builder
 WORKDIR /app
 ENV GOPROXY=https://goproxy.cn,direct GOPRIVATE="" GOSUMDB="sum.golang.google.cn"
 WORKDIR /build
@@ -15,9 +15,8 @@ WORKDIR /app
 
 COPY --from=builder /build/app ./
 COPY --from=builder /build/storage/ ./storage/
-COPY --from=builder /build/config.yml ./
 
 ENV TZ=Asia/Shanghai
 EXPOSE 80
 
-ENTRYPOINT ["./app","http","--addr=:80","--env=prod"]
+ENTRYPOINT ["./app","http","--addr=:80"]
