@@ -24,7 +24,6 @@ type ossConf struct {
 
 type Config struct {
 	Env     string
-	Path    string
 	AppName string  `yaml:"app_name"`
 	Common  common  `yaml:"common"`
 	DB      DBConf  `yaml:"database"`
