@@ -7,18 +7,21 @@ import (
 	"app/handler"
 	"app/middleware"
 	"app/response"
+	"app/service"
 	"app/store"
 )
 
 type Router struct {
 	handler *handler.Handler
+	service *service.Service
 	conf    *config.Config
 	store   *store.Store
 }
 
-func New(handler *handler.Handler, conf *config.Config, s *store.Store) Router {
+func New(handler *handler.Handler, service *service.Service, conf *config.Config, s *store.Store) Router {
 	return Router{
 		handler: handler,
+		service: service,
 		conf:    conf,
 		store:   s,
 	}
@@ -38,56 +41,56 @@ func (n *NotFoundHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (r *Router) Handler() http.Handler {
-	mux := http.NewServeMux()
-	mid := Use(middleware.NewRecover, middleware.NewCors)
+	mux := NewServeMux()
+	api := mux.Use(middleware.NewRecover, middleware.NewCors)
 
 	// 统一处理所有 /api/ 路径的预检请求，确保中间件设置CORS响应头
-	mux.Handle("OPTIONS /api/", mid.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	api.HandleFunc("OPTIONS /api/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-	}))
+	})
 
-	mux.Handle("POST /api/login", mid.HandlerFunc(r.handler.User.Login))
-	mux.Handle("POST /api/mood/list", mid.HandlerFunc(r.handler.Mood.List))
-	mux.Handle("POST /api/cate/all", mid.HandlerFunc(r.handler.Cate.All))
-	mux.Handle("POST /api/article/archive", mid.HandlerFunc(r.handler.Article.Archive))
-	mux.Handle("POST /api/article/prevnext", mid.HandlerFunc(r.handler.Article.PrevNext))
-	mux.Handle("POST /api/article/list", mid.HandlerFunc(r.handler.Article.List))
-	mux.Handle("POST /api/article/detail", mid.HandlerFunc(r.handler.Article.Detail))
-	mux.Handle("POST /api/link/all", mid.HandlerFunc(r.handler.Link.All))
+	api.HandleFunc("POST /api/login", r.handler.User.Login)
+	api.HandleFunc("POST /api/mood/list", r.handler.Mood.List)
+	api.HandleFunc("POST /api/cate/all", r.handler.Cate.All)
+	api.HandleFunc("POST /api/article/archive", r.handler.Article.Archive)
+	api.HandleFunc("POST /api/article/prevnext", r.handler.Article.PrevNext)
+	api.HandleFunc("POST /api/article/list", r.handler.Article.List)
+	api.HandleFunc("POST /api/article/detail", r.handler.Article.Detail)
+	api.HandleFunc("POST /api/link/all", r.handler.Link.All)
+	api.HandleFunc("POST /api/setting", r.handler.Setting.Get)
+	api.HandleFunc("GET /feed.xml", r.handler.Article.Feed)
 
-	remindAuth := mid.Append(middleware.NewRemindAuth(r.store, r.conf))
-	mux.Handle("GET /api/remind/change", remindAuth.HandlerFunc(r.handler.Remind.Change))
-	mux.Handle("GET /api/remind/delay", remindAuth.HandlerFunc(r.handler.Remind.Delay))
-	mux.Handle("POST /api/setting", mid.HandlerFunc(r.handler.Setting.Get))
-	mux.Handle("GET /feed.xml", mid.HandlerFunc(r.handler.Article.Feed))
+	remindAuth := api.Use(middleware.NewRemindAuth(r.store, r.conf))
+	remindAuth.HandleFunc("GET /api/remind/change", r.handler.Remind.Change)
+	remindAuth.HandleFunc("GET /api/remind/delay", r.handler.Remind.Delay)
 
-	adminAuth := mid.Append(middleware.NewAuthLogin(r.store, r.conf))
-	mux.Handle("POST /api/admin/loginuser", adminAuth.HandlerFunc(r.handler.User.LoginUser))
-	mux.Handle("POST /api/admin/article/create", adminAuth.HandlerFunc(r.handler.Article.Create))
-	mux.Handle("POST /api/admin/article/update", adminAuth.HandlerFunc(r.handler.Article.Update))
-	mux.Handle("POST /api/admin/article/delete", adminAuth.HandlerFunc(r.handler.Article.Delete))
-	mux.Handle("POST /api/admin/upload", adminAuth.HandlerFunc(r.handler.Article.Upload))
-	mux.Handle("POST /api/admin/setting/update", adminAuth.HandlerFunc(r.handler.Setting.Update))
-	mux.Handle("POST /api/admin/mood/create", adminAuth.HandlerFunc(r.handler.Mood.Create))
-	mux.Handle("POST /api/admin/mood/update", adminAuth.HandlerFunc(r.handler.Mood.Update))
-	mux.Handle("POST /api/admin/mood/delete", adminAuth.HandlerFunc(r.handler.Mood.Delete))
-	mux.Handle("POST /api/admin/cate/create", adminAuth.HandlerFunc(r.handler.Cate.Create))
-	mux.Handle("POST /api/admin/cate/update", adminAuth.HandlerFunc(r.handler.Cate.Update))
-	mux.Handle("POST /api/admin/cate/list", adminAuth.HandlerFunc(r.handler.Cate.List))
-	mux.Handle("POST /api/admin/cate/delete", adminAuth.HandlerFunc(r.handler.Cate.Delete))
-	mux.Handle("POST /api/admin/link/create", adminAuth.HandlerFunc(r.handler.Link.Create))
-	mux.Handle("POST /api/admin/link/update", adminAuth.HandlerFunc(r.handler.Link.Update))
-	mux.Handle("POST /api/admin/link/list", adminAuth.HandlerFunc(r.handler.Link.List))
-	mux.Handle("POST /api/admin/link/delete", adminAuth.HandlerFunc(r.handler.Link.Delete))
-	mux.Handle("POST /api/admin/remind/create", adminAuth.HandlerFunc(r.handler.Remind.Create))
-	mux.Handle("POST /api/admin/remind/update", adminAuth.HandlerFunc(r.handler.Remind.Update))
-	mux.Handle("POST /api/admin/remind/list", adminAuth.HandlerFunc(r.handler.Remind.List))
-	mux.Handle("POST /api/admin/remind/delete", adminAuth.HandlerFunc(r.handler.Remind.Delete))
-	mux.Handle("POST /api/admin/user/get", adminAuth.HandlerFunc(r.handler.User.Get))
-	mux.Handle("POST /api/admin/user/create", adminAuth.HandlerFunc(r.handler.User.Create))
-	mux.Handle("POST /api/admin/user/update", adminAuth.HandlerFunc(r.handler.User.Update))
-	mux.Handle("POST /api/admin/user/list", adminAuth.HandlerFunc(r.handler.User.List))
-	mux.Handle("POST /api/admin/user/status", adminAuth.HandlerFunc(r.handler.User.Status))
+	adminAuth := api.Use(middleware.NewAuthLogin(r.store, r.conf))
+	adminAuth.HandleFunc("POST /api/admin/loginuser", r.handler.User.LoginUser)
+	adminAuth.HandleFunc("POST /api/admin/article/create", r.handler.Article.Create)
+	adminAuth.HandleFunc("POST /api/admin/article/update", r.handler.Article.Update)
+	adminAuth.HandleFunc("POST /api/admin/article/delete", r.handler.Article.Delete)
+	adminAuth.HandleFunc("POST /api/admin/upload", r.handler.Article.Upload)
+	adminAuth.HandleFunc("POST /api/admin/setting/update", r.handler.Setting.Update)
+	adminAuth.HandleFunc("POST /api/admin/mood/create", r.handler.Mood.Create)
+	adminAuth.HandleFunc("POST /api/admin/mood/update", r.handler.Mood.Update)
+	adminAuth.HandleFunc("POST /api/admin/mood/delete", r.handler.Mood.Delete)
+	adminAuth.HandleFunc("POST /api/admin/cate/create", r.handler.Cate.Create)
+	adminAuth.HandleFunc("POST /api/admin/cate/update", r.handler.Cate.Update)
+	adminAuth.HandleFunc("POST /api/admin/cate/list", r.handler.Cate.List)
+	adminAuth.HandleFunc("POST /api/admin/cate/delete", r.handler.Cate.Delete)
+	adminAuth.HandleFunc("POST /api/admin/link/create", r.handler.Link.Create)
+	adminAuth.HandleFunc("POST /api/admin/link/update", r.handler.Link.Update)
+	adminAuth.HandleFunc("POST /api/admin/link/list", r.handler.Link.List)
+	adminAuth.HandleFunc("POST /api/admin/link/delete", r.handler.Link.Delete)
+	adminAuth.HandleFunc("POST /api/admin/remind/create", r.handler.Remind.Create)
+	adminAuth.HandleFunc("POST /api/admin/remind/update", r.handler.Remind.Update)
+	adminAuth.HandleFunc("POST /api/admin/remind/list", r.handler.Remind.List)
+	adminAuth.HandleFunc("POST /api/admin/remind/delete", r.handler.Remind.Delete)
+	adminAuth.HandleFunc("POST /api/admin/user/get", service.Wrap(r.service.User.Get))
+	adminAuth.HandleFunc("POST /api/admin/user/create", r.handler.User.Create)
+	adminAuth.HandleFunc("POST /api/admin/user/update", r.handler.User.Update)
+	adminAuth.HandleFunc("POST /api/admin/user/list", r.handler.User.List)
+	adminAuth.HandleFunc("POST /api/admin/user/status", r.handler.User.Status)
 
-	return &NotFoundHandler{mux: mux}
+	return &NotFoundHandler{mux: mux.ServeMux}
 }

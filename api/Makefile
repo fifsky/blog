@@ -41,6 +41,10 @@ vet:
 deploy:
 	skaffold run -n pay --tail
 
+.PHONY: proto
+proto:
+	cd proto && buf generate
+
 .PHONY: docker
 docker:
 	docker login --username=${ALIYUN_DOCKER_USERNAME} --password=${ALIYUN_DOCKER_PASSWORD} registry.cn-shanghai.aliyuncs.com

@@ -1,4 +1,4 @@
-package handler
+package service
 
 import (
 	"context"
@@ -6,17 +6,17 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"reflect"
 	"strings"
 
 	"app/model"
-	"app/pkg/validate"
 	"app/response"
+	"buf.build/go/protovalidate"
+	"google.golang.org/protobuf/proto"
 )
 
-type HandleFunc[T any, R any] func(ctx context.Context, r T) (R, error)
+type ServiceFunc[T any, R any] func(ctx context.Context, r T) (R, error)
 
-func Handle[T any, R any](f HandleFunc[T, R]) http.HandlerFunc {
+func Wrap[T any, R any](f ServiceFunc[T, R]) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var (
 			ctx  = r.Context()
@@ -45,9 +45,8 @@ func decode[T any](r *http.Request) (T, error) {
 		return v, fmt.Errorf("decode json: %w", err)
 	}
 
-	// 仅校验结构体类型，避免 map/slice 等类型触发无意义校验
-	if reflect.TypeOf(v).Kind() == reflect.Struct {
-		if err := validate.Validate(&v); err != nil {
+	if msg, ok := any(v).(proto.Message); ok {
+		if err := protovalidate.Validate(msg); err != nil {
 			return v, err
 		}
 	}

@@ -4,25 +4,11 @@ import "net/http"
 
 type Middleware = func(next http.Handler) http.Handler
 
-type Chain struct {
-	mws []Middleware
-}
-
-func (m Chain) Handle(next http.Handler) http.Handler {
-	for i := len(m.mws) - 1; i >= 0; i-- {
-		next = m.mws[i](next)
+// chain builds a http.Handler composed of an inline middleware stack and endpoint
+// handler in the order they are passed.
+func chain(endpoint http.Handler, middlewares []Middleware) http.Handler {
+	for i := len(middlewares) - 1; i >= 0; i-- {
+		endpoint = middlewares[i](endpoint)
 	}
-	return next
-}
-
-func (m Chain) HandlerFunc(next http.HandlerFunc) http.Handler {
-	return m.Handle(next)
-}
-
-func (m Chain) Append(mws ...Middleware) Chain {
-	return Chain{append(m.mws, mws...)}
-}
-
-func Use(mws ...Middleware) Chain {
-	return Chain{mws}
+	return endpoint
 }
