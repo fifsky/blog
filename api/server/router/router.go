@@ -39,7 +39,7 @@ func (n *NotFoundHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (r *Router) Handler() http.Handler {
 	mux := http.NewServeMux()
-	mid := Use(middleware.NewRecover, middleware.NewCors(r.conf))
+	mid := Use(middleware.NewRecover, middleware.NewCors)
 
 	// 统一处理所有 /api/ 路径的预检请求，确保中间件设置CORS响应头
 	mux.Handle("OPTIONS /api/", mid.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -54,9 +54,6 @@ func (r *Router) Handler() http.Handler {
 	mux.Handle("POST /api/article/list", mid.HandlerFunc(r.handler.Article.List))
 	mux.Handle("POST /api/article/detail", mid.HandlerFunc(r.handler.Article.Detail))
 	mux.Handle("POST /api/link/all", mid.HandlerFunc(r.handler.Link.All))
-	// mux.Handle("POST /api/comment/new", mid.HandlerFunc(r.handler.Comment.Add)
-	// mux.Handle("POST /api/comment/list", mid.HandlerFunc(r.handler.Comment.List)
-	// mux.Handle("POST /api/comment/post", mid.HandlerFunc(r.handler.Comment.Post)
 
 	remindAuth := mid.Append(middleware.NewRemindAuth(r.store, r.conf))
 	mux.Handle("GET /api/remind/change", remindAuth.HandlerFunc(r.handler.Remind.Change))
@@ -71,8 +68,6 @@ func (r *Router) Handler() http.Handler {
 	mux.Handle("POST /api/admin/article/delete", adminAuth.HandlerFunc(r.handler.Article.Delete))
 	mux.Handle("POST /api/admin/upload", adminAuth.HandlerFunc(r.handler.Article.Upload))
 	mux.Handle("POST /api/admin/setting/update", adminAuth.HandlerFunc(r.handler.Setting.Update))
-	// mux.Handle("POST /api/admin/comment/list", adminAuth.HandlerFunc(r.handler.Comment.AdminList))
-	// mux.Handle("POST /api/admin/comment/delete", adminAuth.HandlerFunc(r.handler.Comment.Delete))
 	mux.Handle("POST /api/admin/mood/create", adminAuth.HandlerFunc(r.handler.Mood.Create))
 	mux.Handle("POST /api/admin/mood/update", adminAuth.HandlerFunc(r.handler.Mood.Update))
 	mux.Handle("POST /api/admin/mood/delete", adminAuth.HandlerFunc(r.handler.Mood.Delete))

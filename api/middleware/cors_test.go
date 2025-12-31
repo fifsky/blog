@@ -3,19 +3,16 @@ package middleware
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
-
-	"app/config"
 )
 
 func TestCorsPreflight(t *testing.T) {
-	conf := &config.Config{Env: "prod"}
-	cors := NewCors(conf)
-
+	_ = os.Setenv("APP_ENV", "prod")
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
-	handler := cors(next)
+	handler := NewCors(next)
 
 	req := httptest.NewRequest(http.MethodOptions, "https://api.fifsky.com/api/mood/list", nil)
 	req.Header.Set("Origin", "https://fifsky.com")

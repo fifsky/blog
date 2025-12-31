@@ -1,8 +1,6 @@
 package config
 
 import (
-	"app/pkg/jsonutil"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -44,7 +42,8 @@ func New() *Config {
 	if err := yaml.Unmarshal(content, conf); err != nil {
 		log.Fatal("config unmarshal error:", err)
 	}
-	fmt.Println(jsonutil.Encode(conf))
+
+	_ = os.Setenv("APP_ENV", conf.Env)
 
 	return conf
 }
