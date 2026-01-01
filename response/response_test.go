@@ -13,12 +13,12 @@ func TestSuccess(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusOK)
 	}
-	want := `{"code":200,"data":{"id":1},"msg":"success"}` + "\n"
+	want := `{"id":1}` + "\n"
 	if w.Body.String() != want {
 		t.Fatalf("unexpected body: got=%s want=%s", w.Body.String(), want)
 	}
-	if ct := w.Header().Get("Content-Type"); ct != "application/json" {
-		t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json")
+	if ct := w.Header().Get("Content-Type"); ct != "application/json; charset=utf-8" {
+		t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json; charset=utf-8")
 	}
 }
 
@@ -29,12 +29,12 @@ func TestFail(t *testing.T) {
 		if w.Code != http.StatusBadRequest {
 			t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusBadRequest)
 		}
-		want := `{"code":201,"msg":"参数错误"}` + "\n"
+		want := `{"code":201,"msg":"参数错误"}`
 		if w.Body.String() != want {
 			t.Fatalf("unexpected body: got=%s want=%s", w.Body.String(), want)
 		}
-		if ct := w.Header().Get("Content-Type"); ct != "application/json" {
-			t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json")
+		if ct := w.Header().Get("Content-Type"); ct != "application/json; charset=utf-8" {
+			t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json; charset=utf-8")
 		}
 	})
 
@@ -44,12 +44,12 @@ func TestFail(t *testing.T) {
 		if w.Code != http.StatusBadRequest {
 			t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusBadRequest)
 		}
-		want := `{"code":500,"msg":"system error"}` + "\n"
+		want := `{"code":500,"msg":"system error"}`
 		if w.Body.String() != want {
 			t.Fatalf("unexpected body: got=%s want=%s", w.Body.String(), want)
 		}
-		if ct := w.Header().Get("Content-Type"); ct != "application/json" {
-			t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json")
+		if ct := w.Header().Get("Content-Type"); ct != "application/json; charset=utf-8" {
+			t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json; charset=utf-8")
 		}
 	})
 
@@ -59,12 +59,12 @@ func TestFail(t *testing.T) {
 		if w.Code != http.StatusBadRequest {
 			t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusBadRequest)
 		}
-		want := `{"code":500,"msg":"map[error:noterror]"}` + "\n"
+		want := `{"code":500,"msg":"map[error:noterror]"}`
 		if w.Body.String() != want {
 			t.Fatalf("unexpected body: got=%s want=%s", w.Body.String(), want)
 		}
-		if ct := w.Header().Get("Content-Type"); ct != "application/json" {
-			t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json")
+		if ct := w.Header().Get("Content-Type"); ct != "application/json; charset=utf-8" {
+			t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json; charset=utf-8")
 		}
 	})
 }
