@@ -1,0 +1,45 @@
+name: blog
+on:
+  push:
+    branches:
+      - master
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+
+      - name: Set up Go 1.25
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.25
+        id: go
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.6
+
+      - name: Build Golang and Test
+        env:
+          TZ: Asia/Shanghai
+        run: |
+          make && make test && bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN}}
+
+      - name: Build frontend
+        run: |
+          npm install && npm run build

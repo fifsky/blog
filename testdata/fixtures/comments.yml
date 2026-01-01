@@ -1,0 +1,23 @@
+
+#Created At:2021-06-24 65:30:29
+- id: 4
+  post_id: 7
+  pid: 0
+  name: 匿名
+  content: 不知不觉10年过去了
+  ip: 116.238.130.197
+  created_at: 2018-08-11T15:50:40+08:00
+- id: 9
+  post_id: 7
+  pid: 0
+  name: Snowin1994@foxmail.com
+  content: "你好，关于gosql 有两个问题想问下。\r\n1 gosql怎么支持读写分离呢，我注意到db链接是可以配置多个的，如何切换呢？\r\n"
+  ip: 124.127.34.162
+  created_at: 2018-09-18T20:05:02+08:00
+- id: 10
+  post_id: 7
+  pid: 0
+  name: Snowin1994@foxmail.com
+  content: "2 注意到你新增加的构造函数，为什么没有BeforeFind呀\r\n如果方便，劳烦邮件交流下，打扰了"
+  ip: 124.127.34.162
+  created_at: 2018-09-18T20:05:11+08:00

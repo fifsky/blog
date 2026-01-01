@@ -1,0 +1,50 @@
+syntax = "proto3";
+package fifsky.blog.api.v1;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/empty.proto";
+import "api/v1/common.proto";
+
+option go_package = "gen/api/v1";
+
+service RemindService {
+  rpc Change(RemindActionRequest) returns (TextResponse) {
+    option (google.api.http) = {
+      get: "/api/remind/change"
+    };
+  }
+  rpc Delay(RemindActionRequest) returns (TextResponse) {
+    option (google.api.http) = {
+      get: "/api/remind/delay"
+    };
+  }
+}
+
+message RemindActionRequest {
+  string token = 1[(buf.validate.field).required = true, (google.api.field_behavior) = REQUIRED];
+}
+
+message TextResponse {
+  string text = 1;
+}
+
+message RemindItem {
+  int32 id = 1;
+  int32 type = 2;
+  string content = 3;
+  int32 month = 4;
+  int32 week = 5;
+  int32 day = 6;
+  int32 hour = 7;
+  int32 minute = 8;
+  int32 status = 9;
+  string next_time = 10;
+  string created_at = 11;
+}
+
+message RemindListResponse {
+  repeated RemindItem list = 1;
+  int32 page_total = 2;
+}

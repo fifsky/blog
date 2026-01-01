@@ -1,0 +1,40 @@
+syntax = "proto3";
+package fifsky.blog.admin.v1;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+import "buf/validate/validate.proto";
+import "admin/v1/common.proto";
+
+option go_package = "gen/admin/v1";
+
+service MoodService {
+  rpc Create(MoodCreateRequest) returns (IDResponse) {
+    option (google.api.http) = {
+      post: "/api/admin/mood/create"
+      body: "*"
+    };
+  }
+  rpc Update(MoodUpdateRequest) returns (IDResponse) {
+    option (google.api.http) = {
+      post: "/api/admin/mood/update"
+      body: "*"
+    };
+  }
+  rpc Delete(IDRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/admin/mood/delete"
+      body: "*"
+    };
+  }
+}
+
+message MoodCreateRequest {
+  string content = 1[(buf.validate.field).required = true, (google.api.field_behavior) = REQUIRED];
+}
+
+message MoodUpdateRequest {
+  int32 id = 1[(buf.validate.field).int32.gt = 0, (google.api.field_behavior) = REQUIRED];
+  string content = 2;
+}

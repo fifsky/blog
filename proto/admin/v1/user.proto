@@ -1,0 +1,98 @@
+syntax = "proto3";
+package fifsky.blog.admin.v1;
+
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "buf/validate/validate.proto";
+import "admin/v1/common.proto";
+
+option go_package = "gen/admin/v1";
+
+service UserService {
+  rpc Get(GetUserRequest) returns (User) {
+    option (google.api.http) = {
+      post: "/api/admin/user/get"
+      body: "*"
+    };
+  }
+  rpc Create(UserCreateRequest) returns (IDResponse) {
+    option (google.api.http) = {
+      post: "/api/admin/user/create"
+      body: "*"
+    };
+  }
+  rpc Update(UserUpdateRequest) returns (IDResponse) {
+    option (google.api.http) = {
+      post: "/api/admin/user/update"
+      body: "*"
+    };
+  }
+  rpc List(PageRequest) returns (UserListResponse) {
+    option (google.api.http) = {
+      post: "/api/admin/user/list"
+      body: "*"
+    };
+  }
+  rpc Status(IDRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/admin/user/status"
+      body: "*"
+    };
+  }
+  rpc LoginUser(google.protobuf.Empty) returns (User) {
+    option (google.api.http) = {
+      post: "/api/admin/loginuser"
+      body: "*"
+    };
+  }
+}
+
+message GetUserRequest {
+  int32 id = 1[
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message User {
+  int32 id = 1;
+  string name = 2;
+  string nick_name = 3;
+  string email = 4;
+  int32 status = 5;
+  int32 type = 6;
+  string created_at = 7;
+  string updated_at = 8;
+}
+
+message UserCreateRequest {
+  string name = 1[(buf.validate.field).required = true, (google.api.field_behavior) = REQUIRED];
+  string password = 2[(buf.validate.field).required = true, (google.api.field_behavior) = REQUIRED];
+  string nick_name = 3[(buf.validate.field).required = true, (google.api.field_behavior) = REQUIRED];
+  string email = 4;
+  int32 type = 5[(buf.validate.field).int32.gt = 0, (google.api.field_behavior) = REQUIRED];
+}
+message UserUpdateRequest {
+  int32 id = 1[(buf.validate.field).int32.gt = 0, (google.api.field_behavior) = REQUIRED];
+  string name = 2;
+  string password = 3;
+  string nick_name = 4;
+  string email = 5;
+  int32 type = 6;
+}
+
+message UserItem {
+  int32 id = 1;
+  string name = 2;
+  string nick_name = 3;
+  string email = 4;
+  int32 status = 5;
+  int32 type = 6;
+  string created_at = 7;
+  string updated_at = 8;
+}
+message UserListResponse {
+  repeated UserItem list = 1;
+  int32 page_total = 2;
+}

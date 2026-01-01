@@ -1,0 +1,1480 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ""
+    version: 0.0.1
+paths:
+    /api/admin/article/create:
+        post:
+            tags:
+                - ArticleService
+            operationId: ArticleService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ArticleCreateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/IDResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/article/delete:
+        post:
+            tags:
+                - ArticleService
+            operationId: ArticleService_Delete
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/IDRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/article/update:
+        post:
+            tags:
+                - ArticleService
+            operationId: ArticleService_Update
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ArticleUpdateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/IDResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/cate/create:
+        post:
+            tags:
+                - CateService
+            operationId: CateService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CateCreateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/IDResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/cate/delete:
+        post:
+            tags:
+                - CateService
+            operationId: CateService_Delete
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/IDRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/cate/list:
+        post:
+            tags:
+                - CateService
+            operationId: CateService_List
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CateListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/cate/update:
+        post:
+            tags:
+                - CateService
+            operationId: CateService_Update
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CateUpdateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/IDResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/link/create:
+        post:
+            tags:
+                - LinkService
+            operationId: LinkService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LinkCreateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/IDResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/link/delete:
+        post:
+            tags:
+                - LinkService
+            operationId: LinkService_Delete
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/IDRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/link/list:
+        post:
+            tags:
+                - LinkService
+            operationId: LinkService_List
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LinkListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/link/update:
+        post:
+            tags:
+                - LinkService
+            operationId: LinkService_Update
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LinkUpdateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/IDResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/loginuser:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_LoginUser
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/mood/create:
+        post:
+            tags:
+                - MoodService
+            operationId: MoodService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/MoodCreateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/IDResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/mood/delete:
+        post:
+            tags:
+                - MoodService
+            operationId: MoodService_Delete
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/IDRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/mood/update:
+        post:
+            tags:
+                - MoodService
+            operationId: MoodService_Update
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/MoodUpdateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/IDResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/remind/create:
+        post:
+            tags:
+                - RemindService
+            operationId: RemindService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RemindCreateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/IDResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/remind/delete:
+        post:
+            tags:
+                - RemindService
+            operationId: RemindService_Delete
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/IDRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/remind/list:
+        post:
+            tags:
+                - RemindService
+            operationId: RemindService_List
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PageRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RemindListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/remind/update:
+        post:
+            tags:
+                - RemindService
+            operationId: RemindService_Update
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RemindUpdateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/IDResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/setting/update:
+        post:
+            tags:
+                - SettingService
+            operationId: SettingService_Update
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Options'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Options'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/user/create:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UserCreateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/IDResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/user/get:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_Get
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GetUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/user/list:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_List
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PageRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UserListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/user/status:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_Status
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/IDRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/admin/user/update:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_Update
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UserUpdateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/IDResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/article/archive:
+        post:
+            tags:
+                - ArticleService
+            operationId: ArticleService_Archive
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ArchiveResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/article/detail:
+        post:
+            tags:
+                - ArticleService
+            operationId: ArticleService_Detail
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ArticleDetailRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ArticleItem'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/article/list:
+        post:
+            tags:
+                - ArticleService
+            operationId: ArticleService_List
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ArticleListRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ArticleListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/article/prevnext:
+        post:
+            tags:
+                - ArticleService
+            operationId: ArticleService_PrevNext
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PrevNextRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PrevNextResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/cate/all:
+        post:
+            tags:
+                - CateService
+            operationId: CateService_All
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CateMenuResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/link/all:
+        post:
+            tags:
+                - LinkService
+            operationId: LinkService_All
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LinkMenuResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/login:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_Login
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LoginResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/mood/list:
+        post:
+            tags:
+                - MoodService
+            operationId: MoodService_List
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PageRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MoodListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/remind/change:
+        get:
+            tags:
+                - RemindService
+            operationId: RemindService_Change
+            parameters:
+                - name: token
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TextResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/remind/delay:
+        get:
+            tags:
+                - RemindService
+            operationId: RemindService_Delay
+            parameters:
+                - name: token
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TextResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/setting:
+        post:
+            tags:
+                - SettingService
+            operationId: SettingService_Get
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Options'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /feed.xml:
+        get:
+            tags:
+                - ArticleService
+            operationId: ArticleService_Feed
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        '*/*': {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+components:
+    schemas:
+        ArchiveResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/DateArchiveItem'
+        ArticleCreateRequest:
+            required:
+                - cateId
+                - type
+                - title
+                - content
+            type: object
+            properties:
+                cateId:
+                    type: integer
+                    format: int32
+                type:
+                    type: integer
+                    format: int32
+                title:
+                    type: string
+                url:
+                    type: string
+                content:
+                    type: string
+        ArticleDetailRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                url:
+                    type: string
+        ArticleItem:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                cateId:
+                    type: integer
+                    format: int32
+                type:
+                    type: integer
+                    format: int32
+                userId:
+                    type: integer
+                    format: int32
+                title:
+                    type: string
+                url:
+                    type: string
+                content:
+                    type: string
+                status:
+                    type: integer
+                    format: int32
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+                user:
+                    $ref: '#/components/schemas/UserSummary'
+                cate:
+                    $ref: '#/components/schemas/CateSummary'
+        ArticleListRequest:
+            type: object
+            properties:
+                year:
+                    type: string
+                month:
+                    type: string
+                domain:
+                    type: string
+                keyword:
+                    type: string
+                page:
+                    type: integer
+                    format: int32
+                type:
+                    type: integer
+                    format: int32
+        ArticleListResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ArticleItem'
+                pageTotal:
+                    type: integer
+                    format: int32
+        ArticleUpdateRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                cateId:
+                    type: integer
+                    format: int32
+                type:
+                    type: integer
+                    format: int32
+                title:
+                    type: string
+                url:
+                    type: string
+                content:
+                    type: string
+                status:
+                    type: integer
+                    format: int32
+        CateCreateRequest:
+            required:
+                - name
+                - domain
+            type: object
+            properties:
+                name:
+                    type: string
+                desc:
+                    type: string
+                domain:
+                    type: string
+        CateListItem:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+                desc:
+                    type: string
+                domain:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+                num:
+                    type: integer
+                    format: int32
+        CateListResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/CateListItem'
+                pageTotal:
+                    type: integer
+                    format: int32
+        CateMenuItem:
+            type: object
+            properties:
+                url:
+                    type: string
+                content:
+                    type: string
+        CateMenuResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/CateMenuItem'
+        CateSummary:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+                domain:
+                    type: string
+        CateUpdateRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+                desc:
+                    type: string
+                domain:
+                    type: string
+        DateArchiveItem:
+            type: object
+            properties:
+                url:
+                    type: string
+                content:
+                    type: string
+        GetUserRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        IDRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+        IDResponse:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+        LinkCreateRequest:
+            required:
+                - name
+                - url
+            type: object
+            properties:
+                name:
+                    type: string
+                url:
+                    type: string
+                desc:
+                    type: string
+        LinkItem:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+                url:
+                    type: string
+                desc:
+                    type: string
+                createdAt:
+                    type: string
+        LinkListResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/LinkItem'
+                pageTotal:
+                    type: integer
+                    format: int32
+        LinkMenuItem:
+            type: object
+            properties:
+                url:
+                    type: string
+                content:
+                    type: string
+        LinkMenuResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/LinkMenuItem'
+        LinkUpdateRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+                url:
+                    type: string
+                desc:
+                    type: string
+        LoginRequest:
+            required:
+                - userName
+                - password
+            type: object
+            properties:
+                userName:
+                    type: string
+                password:
+                    type: string
+        LoginResponse:
+            type: object
+            properties:
+                accessToken:
+                    type: string
+                user:
+                    $ref: '#/components/schemas/UserItem'
+        MoodCreateRequest:
+            required:
+                - content
+            type: object
+            properties:
+                content:
+                    type: string
+        MoodItem:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                content:
+                    type: string
+                user:
+                    $ref: '#/components/schemas/UserSummary'
+                createdAt:
+                    type: string
+        MoodListResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/MoodItem'
+                pageTotal:
+                    type: integer
+                    format: int32
+        MoodUpdateRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                content:
+                    type: string
+        Options:
+            type: object
+            properties:
+                kv:
+                    type: object
+                    additionalProperties:
+                        type: string
+        PageRequest:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    format: int32
+        PrevNextItem:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                title:
+                    type: string
+        PrevNextRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+        PrevNextResponse:
+            type: object
+            properties:
+                prev:
+                    $ref: '#/components/schemas/PrevNextItem'
+                next:
+                    $ref: '#/components/schemas/PrevNextItem'
+        RemindCreateRequest:
+            required:
+                - content
+            type: object
+            properties:
+                type:
+                    type: integer
+                    format: int32
+                content:
+                    type: string
+                month:
+                    type: integer
+                    format: int32
+                week:
+                    type: integer
+                    format: int32
+                day:
+                    type: integer
+                    format: int32
+                hour:
+                    type: integer
+                    format: int32
+                minute:
+                    type: integer
+                    format: int32
+        RemindItem:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                type:
+                    type: integer
+                    format: int32
+                content:
+                    type: string
+                month:
+                    type: integer
+                    format: int32
+                week:
+                    type: integer
+                    format: int32
+                day:
+                    type: integer
+                    format: int32
+                hour:
+                    type: integer
+                    format: int32
+                minute:
+                    type: integer
+                    format: int32
+                status:
+                    type: integer
+                    format: int32
+                nextTime:
+                    type: string
+                createdAt:
+                    type: string
+        RemindListResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RemindItem'
+                pageTotal:
+                    type: integer
+                    format: int32
+        RemindUpdateRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                type:
+                    type: integer
+                    format: int32
+                content:
+                    type: string
+                month:
+                    type: integer
+                    format: int32
+                week:
+                    type: integer
+                    format: int32
+                day:
+                    type: integer
+                    format: int32
+                hour:
+                    type: integer
+                    format: int32
+                minute:
+                    type: integer
+                    format: int32
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        TextResponse:
+            type: object
+            properties:
+                text:
+                    type: string
+        User:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+                nickName:
+                    type: string
+                email:
+                    type: string
+                status:
+                    type: integer
+                    format: int32
+                type:
+                    type: integer
+                    format: int32
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        UserCreateRequest:
+            required:
+                - name
+                - password
+                - nickName
+                - type
+            type: object
+            properties:
+                name:
+                    type: string
+                password:
+                    type: string
+                nickName:
+                    type: string
+                email:
+                    type: string
+                type:
+                    type: integer
+                    format: int32
+        UserItem:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+                nickName:
+                    type: string
+                email:
+                    type: string
+                status:
+                    type: integer
+                    format: int32
+                type:
+                    type: integer
+                    format: int32
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        UserListResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/UserItem'
+                pageTotal:
+                    type: integer
+                    format: int32
+        UserSummary:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+                nickName:
+                    type: string
+        UserUpdateRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+                password:
+                    type: string
+                nickName:
+                    type: string
+                email:
+                    type: string
+                type:
+                    type: integer
+                    format: int32
+tags:
+    - name: ArticleService
+    - name: ArticleService
+    - name: CateService
+    - name: CateService
+    - name: LinkService
+    - name: LinkService
+    - name: MoodService
+    - name: MoodService
+    - name: RemindService
+    - name: RemindService
+    - name: SettingService
+    - name: SettingService
+    - name: UserService
+    - name: UserService
+      description: 用户服务

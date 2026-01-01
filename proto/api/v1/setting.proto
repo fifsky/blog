@@ -1,0 +1,17 @@
+syntax = "proto3";
+package fifsky.blog.api.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "api/v1/common.proto";
+
+option go_package = "gen/api/v1";
+
+service SettingService {
+  rpc Get(google.protobuf.Empty) returns (Options) {
+    option (google.api.http) = {
+      post: "/api/setting"
+      body: "*"
+    };
+  }
+}
