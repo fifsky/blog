@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSuccess(t *testing.T) {
@@ -13,13 +15,9 @@ func TestSuccess(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusOK)
 	}
-	want := `{"id":1}` + "\n"
-	if w.Body.String() != want {
-		t.Fatalf("unexpected body: got=%s want=%s", w.Body.String(), want)
-	}
-	if ct := w.Header().Get("Content-Type"); ct != "application/json; charset=utf-8" {
-		t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json; charset=utf-8")
-	}
+	want := `{"id":1}`
+	assert.JSONEq(t, want, w.Body.String())
+	assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
 }
 
 func TestFail(t *testing.T) {
@@ -30,12 +28,8 @@ func TestFail(t *testing.T) {
 			t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusBadRequest)
 		}
 		want := `{"code":201,"msg":"参数错误"}`
-		if w.Body.String() != want {
-			t.Fatalf("unexpected body: got=%s want=%s", w.Body.String(), want)
-		}
-		if ct := w.Header().Get("Content-Type"); ct != "application/json; charset=utf-8" {
-			t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json; charset=utf-8")
-		}
+		assert.JSONEq(t, want, w.Body.String())
+		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
 	})
 
 	t.Run("error", func(t *testing.T) {
@@ -45,12 +39,8 @@ func TestFail(t *testing.T) {
 			t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusBadRequest)
 		}
 		want := `{"code":500,"msg":"system error"}`
-		if w.Body.String() != want {
-			t.Fatalf("unexpected body: got=%s want=%s", w.Body.String(), want)
-		}
-		if ct := w.Header().Get("Content-Type"); ct != "application/json; charset=utf-8" {
-			t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json; charset=utf-8")
-		}
+		assert.JSONEq(t, want, w.Body.String())
+		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
 	})
 
 	t.Run("other", func(t *testing.T) {
@@ -60,11 +50,7 @@ func TestFail(t *testing.T) {
 			t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusBadRequest)
 		}
 		want := `{"code":500,"msg":"map[error:noterror]"}`
-		if w.Body.String() != want {
-			t.Fatalf("unexpected body: got=%s want=%s", w.Body.String(), want)
-		}
-		if ct := w.Header().Get("Content-Type"); ct != "application/json; charset=utf-8" {
-			t.Fatalf("unexpected content-type: got=%s want=%s", ct, "application/json; charset=utf-8")
-		}
+		assert.JSONEq(t, want, w.Body.String())
+		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
 	})
 }
