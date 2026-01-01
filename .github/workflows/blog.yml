@@ -3,10 +3,15 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+concurrency: blog-${{ github.ref }}
+permissions:
+  contents: read
 jobs:
-
-  build:
-    name: Build
+  backend:
+    name: Backend
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -15,31 +20,57 @@ jobs:
           MYSQL_ROOT_PASSWORD: root
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Node
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          node-version: '10.x'
-
-      - name: Set up Go 1.25
-        uses: actions/setup-go@v3
+          go-version: "1.25"
+          cache: true
+      - name: Cache Go build
+        uses: actions/cache@v4
         with:
-          go-version: 1.25
-        id: go
-
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
       - name: Lint
         uses: golangci/golangci-lint-action@v9
         with:
           version: v2.6
-
-      - name: Build Golang and Test
+      - name: Build and Test
         env:
           TZ: Asia/Shanghai
         run: |
-          make && make test && bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN}}
-
-      - name: Build frontend
+          make
+          make test
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "pnpm"
+          cache-dependency-path: web/pnpm-lock.yaml
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Install and Build
+        working-directory: web
         run: |
-          npm install && npm run build
+          pnpm install --frozen-lockfile
+          pnpm run build
