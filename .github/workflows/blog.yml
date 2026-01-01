@@ -2,7 +2,7 @@ name: blog
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
 
   build:
