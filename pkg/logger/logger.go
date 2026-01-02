@@ -5,6 +5,7 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"sync/atomic"
 
 	"app/pkg/logger/rolling"
 )
@@ -34,12 +35,16 @@ func New(conf *Config) *slog.Logger {
 	return slog.New(newHandler(conf))
 }
 
-var defaultLogger *slog.Logger
+var defaultLogger atomic.Pointer[slog.Logger]
+
+func init() {
+	defaultLogger.Store(New(&Config{}))
+}
 
 // Default returns the standard logger used by the package-level output functions.
-func Default() *slog.Logger { return defaultLogger }
+func Default() *slog.Logger { return defaultLogger.Load() }
 
-func SetDefault(logger *slog.Logger) { defaultLogger = logger }
+func SetDefault(logger *slog.Logger) { defaultLogger.Store(logger) }
 
 func newRoller(conf *Config) *rolling.Roller {
 	if conf.MaxFiles == 0 {
