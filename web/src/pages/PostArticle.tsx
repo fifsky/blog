@@ -24,7 +24,10 @@ export default function PostArticle() {
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
 
-  const toolbarConfig: Partial<IToolbarConfig> = {};
+  const toolbarConfig: Partial<IToolbarConfig> = {
+    excludeKeys: ["uploadVideo", "fontFamily", "lineHeight", "group-indent"],
+  };
+
   const editorConfig: Partial<IEditorConfig> = {
     placeholder: "请输入内容...",
     MENU_CONF: {
@@ -38,7 +41,7 @@ export default function PostArticle() {
         onFailed(file: File, res: any) {
           alert(`${file.name} 上传失败` + (res.message || ""));
         },
-        onError(file: File, err: any) {
+        onError(file: File, err: any, res: any) {
           alert(`${file.name} 上传失败` + (err || ""));
         },
       },
