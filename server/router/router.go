@@ -1,17 +1,20 @@
 package router
 
 import (
+	"log/slog"
 	"net/http"
 
 	"app/config"
 	"app/contract"
 	"app/middleware"
+	"app/pkg/logger"
 	adminv1 "app/proto/gen/admin/v1"
 	apiv1 "app/proto/gen/api/v1"
 	"app/response"
 	"app/service"
 	adminsvc "app/service/admin"
 	"app/store"
+	sloghttp "github.com/samber/slog-http"
 )
 
 type Router struct {
@@ -44,8 +47,22 @@ func (n *NotFoundHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (r *Router) Handler() http.Handler {
+	conf := sloghttp.Config{
+		DefaultLevel:       slog.LevelInfo,
+		ClientErrorLevel:   slog.LevelWarn,
+		ServerErrorLevel:   slog.LevelError,
+		WithUserAgent:      true,
+		WithRequestHeader:  true,
+		WithRequestBody:    true,
+		WithResponseHeader: true,
+		// WithResponseBody: true,
+		Filters: []sloghttp.Filter{
+			sloghttp.IgnorePath("/api/admin/upload"),
+		},
+	}
+
 	mux := NewServeMux()
-	api := mux.Use(middleware.NewRecover, middleware.NewCors)
+	api := mux.Use(middleware.NewRecover, sloghttp.NewWithConfig(logger.Default(), conf), middleware.NewCors)
 
 	// 统一处理所有 /api/ 路径的预检请求，确保中间件设置CORS响应头
 	api.HandleFunc("OPTIONS /api/", func(w http.ResponseWriter, r *http.Request) {

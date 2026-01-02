@@ -9,6 +9,7 @@ import (
 )
 
 type common struct {
+	StoragePath string `yaml:"storage_path"`
 	RobotToken  string `yaml:"robot_token"`
 	TokenSecret string `yaml:"token_secret"`
 	NotifyUrl   string `yaml:"notify_url"`

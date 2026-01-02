@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"app/pkg/logger"
 	apiv1 "app/proto/gen/api/v1"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
@@ -38,7 +39,7 @@ func encode[T any](w http.ResponseWriter, status int, v T) error {
 func Success(w http.ResponseWriter, data any) {
 	err := encode(w, http.StatusOK, data)
 	if err != nil {
-		slog.Error("response error", slog.String("err", err.Error()))
+		logger.Default().Error("response error", slog.String("err", err.Error()))
 	}
 }
 
@@ -59,7 +60,7 @@ func Fail(w http.ResponseWriter, code int32, msg any) {
 	})
 
 	if err != nil {
-		slog.Error("response error", slog.String("err", err.Error()))
+		logger.Default().Error("response error", slog.String("err", err.Error()))
 	}
 }
 
@@ -70,6 +71,6 @@ func FailPlain(w http.ResponseWriter, code int, err error) {
 
 func Upload(w http.ResponseWriter, v any) {
 	if err := encode(w, http.StatusOK, v); err != nil {
-		slog.Error("response error", slog.String("err", err.Error()))
+		logger.Default().Error("response error", slog.String("err", err.Error()))
 	}
 }

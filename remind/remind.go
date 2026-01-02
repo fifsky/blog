@@ -14,6 +14,7 @@ import (
 	"app/config"
 	"app/model"
 	"app/pkg/aesutil"
+	"app/pkg/logger"
 	"app/pkg/wechat"
 	"app/store"
 )
@@ -75,7 +76,7 @@ func (r *Remind) messageForBark(content string, v *model.Remind) {
 	req, err := http.NewRequest("POST", r.conf.Common.NotifyUrl, bytes.NewReader(reqBody))
 
 	if err != nil {
-		slog.Error("remind request bark error", slog.String("err", err.Error()))
+		logger.Default().Error("remind request bark error", slog.String("err", err.Error()))
 		return
 	}
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
@@ -83,7 +84,7 @@ func (r *Remind) messageForBark(content string, v *model.Remind) {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		slog.Error("remind request bark error", slog.String("err", err.Error()))
+		logger.Default().Error("remind request bark error", slog.String("err", err.Error()))
 	}
 	defer resp.Body.Close()
 }
@@ -102,7 +103,7 @@ func (r *Remind) message(content string, v *model.Remind) {
 		},
 	})
 	if err != nil {
-		slog.Error("remind request robot error", slog.String("err", err.Error()))
+		logger.Default().Error("remind request robot error", slog.String("err", err.Error()))
 	}
 	r.messageForBark(content, v)
 }
