@@ -41,7 +41,7 @@ export default function PostArticle() {
         onFailed(file: File, res: any) {
           alert(`${file.name} 上传失败` + (res.message || ""));
         },
-        onError(file: File, err: any, res: any) {
+        onError(file: File, err: any) {
           alert(`${file.name} 上传失败` + (err || ""));
         },
       },
@@ -63,7 +63,7 @@ export default function PostArticle() {
     if (id)
       await articleUpdateApi({
         id,
-        cate_id: cate_id,
+        cate_id,
         title,
         content,
         type,
@@ -77,7 +77,7 @@ export default function PostArticle() {
     (async () => {
       if (params.get("id")) {
         const a = await articleDetailApi({ id: parseInt(params.get("id")!) });
-        setArticle({ ...a, cate_id: a.cate_id });
+        setArticle(a);
       }
       const ret = await cateListApi({});
       setCates(ret.list || []);
