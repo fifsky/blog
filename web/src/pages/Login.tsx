@@ -1,19 +1,22 @@
-import React, { useState } from 'react'
-import { CHeader } from '@/components/CHeader'
-import { CFooter } from '@/components/CFooter'
-import { useStore } from '@/store/context'
-import { useNavigate } from 'react-router-dom'
-import {LoginRequest} from "@/types/openapi";
+import React, { useState } from "react";
+import { CHeader } from "@/components/CHeader";
+import { CFooter } from "@/components/CFooter";
+import { useStore } from "@/store/context";
+import { useNavigate } from "react-router";
+import { LoginRequest } from "@/types/openapi";
 
 export default function Login() {
-  const [formdata, setFormdata] = useState<LoginRequest>({password: "", user_name: ""})
-  const { loginAction } = useStore()
-  const navigate = useNavigate()
+  const [formdata, setFormdata] = useState<LoginRequest>({
+    password: "",
+    user_name: "",
+  });
+  const { loginAction } = useStore();
+  const navigate = useNavigate();
   const submit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    await loginAction(formdata)
-    navigate('/admin/index')
-  }
+    e.preventDefault();
+    await loginAction(formdata);
+    navigate("/admin/index");
+  };
   return (
     <div id="container">
       <CHeader />
@@ -25,11 +28,31 @@ export default function Login() {
             <form method="post" onSubmit={submit} className="vf lf">
               <p>
                 <label className="label_input">用户名：</label>
-                <input type="text" className="input_text" value={formdata.user_name || ''} onChange={e => setFormdata(prev => ({ ...prev, user_name: e.target.value }))} />
+                <input
+                  type="text"
+                  className="input_text"
+                  value={formdata.user_name || ""}
+                  onChange={(e) =>
+                    setFormdata((prev) => ({
+                      ...prev,
+                      user_name: e.target.value,
+                    }))
+                  }
+                />
               </p>
               <p>
                 <label className="label_input">密码：</label>
-                <input type="password" className="input_text" value={formdata.password || ''} onChange={e => setFormdata(prev => ({ ...prev, password: e.target.value }))} />
+                <input
+                  type="password"
+                  className="input_text"
+                  value={formdata.password || ""}
+                  onChange={(e) =>
+                    setFormdata((prev) => ({
+                      ...prev,
+                      password: e.target.value,
+                    }))
+                  }
+                />
               </p>
               <p className="act">
                 <input type="submit" className="formbutton" value="登录" />
@@ -40,5 +63,5 @@ export default function Login() {
       </div>
       <CFooter />
     </div>
-  )
+  );
 }
