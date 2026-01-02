@@ -168,6 +168,7 @@ export default function PostArticle() {
                 </span>
               </p>
             )}
+            <input type="hidden" name="id" value={article.id || ""} />
           </div>
           <div className="col-right">
             <p>
@@ -176,6 +177,7 @@ export default function PostArticle() {
                 className="input_check"
                 name="type"
                 type="radio"
+                value={1}
                 checked={article.type === 1}
                 onChange={() =>
                   setArticle((prev: any) => ({ ...prev, type: 1 }))
@@ -186,6 +188,7 @@ export default function PostArticle() {
                 className="input_check"
                 name="type"
                 type="radio"
+                value={2}
                 checked={article.type === 2}
                 onChange={() =>
                   setArticle((prev: any) => ({ ...prev, type: 2 }))
@@ -213,6 +216,7 @@ export default function PostArticle() {
               }
               mode="default"
             />
+            <input type="hidden" name="content" value={article.content || ""} />
           </div>
         </div>
         <p className="act">
