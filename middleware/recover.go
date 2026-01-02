@@ -15,6 +15,7 @@ func NewRecover(next http.Handler) http.Handler {
 			if err := recover(); err != nil {
 				buf := make([]byte, 1024)
 				buf = buf[:runtime.Stack(buf, false)]
+				fmt.Println(string(buf))
 				logger.Default().Error(fmt.Sprintf("%v", err), "stack", string(buf))
 				response.Fail(w, http.StatusInternalServerError, "服务器内部错误")
 			}
