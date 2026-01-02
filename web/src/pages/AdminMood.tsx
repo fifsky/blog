@@ -3,7 +3,7 @@ import { moodDeleteApi, moodListApi, moodCreateApi, moodUpdateApi } from '@/serv
 import { BatchHandle } from '@/components/BatchHandle'
 import { Paginate } from "@/components/Paginate";
 
-export function AdminMood() {
+export default function AdminMood() {
   const [list, setList] = useState<any[]>([])
   const [item, setItem] = useState<any>({})
   const [pageTotal, setPageTotal] = useState(0)

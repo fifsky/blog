@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { settingApi, settingUpdateApi } from '@/service'
 
-export function AdminIndex() {
+export default function AdminIndex() {
   const [formdata, setFormdata] = useState<Record<string, string>>({})
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -43,4 +43,3 @@ export function AdminIndex() {
     </div>
   )
 }
-

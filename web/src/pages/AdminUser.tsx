@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { userListApi, userStatusApi } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Paginate } from "@/components/Paginate";
-export function AdminUser() {
+export default function AdminUser() {
   const [list, setList] = useState<any[]>([]);
   const [pageTotal, setPageTotal] = useState(0);
   const [page, setPage] = useState(1);

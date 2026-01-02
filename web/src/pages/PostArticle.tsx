@@ -7,7 +7,7 @@ import {
 } from "@/service";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 
-export function PostArticle() {
+export default function PostArticle() {
   const [article, setArticle] = useState<any>({ type: 1 });
   const [cates, setCates] = useState<any[]>([]);
   const editorRef = useRef<HTMLDivElement>(null);

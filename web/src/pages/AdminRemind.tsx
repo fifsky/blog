@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { BatchHandle } from '@/components/BatchHandle'
 import { Paginate } from "@/components/Paginate";
 
-export function AdminRemind() {
+export default function AdminRemind() {
   const [list, setList] = useState<any[]>([])
   const [pageTotal, setPageTotal] = useState(0)
   const [page, setPage] = useState(1)

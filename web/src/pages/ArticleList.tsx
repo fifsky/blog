@@ -5,7 +5,7 @@ import { Paginate } from "@/components/Paginate";
 import { articleListApi } from "@/service";
 import { useStore } from "@/store/context";
 
-export function ArticleList() {
+export default function ArticleList() {
   const [list, setList] = useState<any[]>([]);
   const [pageTotal, setPageTotal] = useState(0);
   const [page, setPage] = useState(1);

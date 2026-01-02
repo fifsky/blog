@@ -4,7 +4,7 @@ import { CArticle } from "@/components/CArticle";
 import { Comment } from "@/components/Comment";
 import { articleDetailApi, prevnextArticleApi } from "@/service";
 
-export function ArticleDetail() {
+export default function ArticleDetail() {
   const [article, setArticle] = useState<any>({});
   const [data, setData] = useState<{ prev?: any; next?: any }>({});
   const params = useParams();

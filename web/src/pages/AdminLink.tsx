@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { linkDeleteApi, linkListApi, linkCreateApi, linkUpdateApi } from '@/service'
 import { BatchHandle } from '@/components/BatchHandle'
 
-export function AdminLink() {
+export default function AdminLink() {
   const [list, setList] = useState<any[]>([])
   const [item, setItem] = useState<any>({})
   const loadList = async () => {

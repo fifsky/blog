@@ -7,7 +7,7 @@ import {
 } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 
-export function AdminCate() {
+export default function AdminCate() {
   const [list, setList] = useState<any[]>([]);
   const [item, setItem] = useState<any>({});
   const loadList = async () => {

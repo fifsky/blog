@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { CArticle } from "@/components/CArticle";
 import { articleDetailApi } from "@/service";
 
-export function About() {
+export default function About() {
   const [article, setArticle] = useState<any>({});
   useEffect(() => {
     (async () => {

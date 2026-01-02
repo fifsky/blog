@@ -5,7 +5,7 @@ import { useStore } from '@/store/context'
 import { useNavigate } from 'react-router-dom'
 import {LoginRequest} from "@/types/openapi";
 
-export function Login() {
+export default function Login() {
   const [formdata, setFormdata] = useState<LoginRequest>({password: "", user_name: ""})
   const { loginAction } = useStore()
   const navigate = useNavigate()
@@ -42,4 +42,3 @@ export function Login() {
     </div>
   )
 }
-

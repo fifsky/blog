@@ -4,7 +4,7 @@ import { articleDeleteApi, articleListApi } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Paginate } from "@/components/Paginate";
 
-export function AdminArticle() {
+export default function AdminArticle() {
   const [list, setList] = useState<any[]>([]);
   const [pageTotal, setPageTotal] = useState(0);
   const [page, setPage] = useState(1);
