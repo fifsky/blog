@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@wangeditor/editor": "^5.1.23",
+    "@wangeditor/editor-for-react": "^1.0.6",
     "artalk": "^2.9.1",
     "dayjs": "^1.11.19",
     "highlight.js": "^11.9.0",

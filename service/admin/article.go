@@ -101,28 +101,25 @@ func (a *Article) Upload(w http.ResponseWriter, r *http.Request) {
 	file, _, err := r.FormFile("uploadFile")
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte("Bad request\n" + err.Error()))
+		response.Upload(w, map[string]any{"errno": 201, "message": err.Error()})
 		return
-	}
-	if a.upl == nil {
-		a.upl = ossutil.NewAliyunUploader(a.conf, a.http)
 	}
 	day := time.Now().Format("20060102")
 	filename := "upload/" + day + "/" + md5File(file) + ".png"
 	_, err = file.Seek(0, 0)
 	if err != nil {
-		response.Upload(w, map[string]any{"errno": 203})
+		response.Upload(w, map[string]any{"errno": 203, "message": err.Error()})
 		return
 	}
 	err = a.upl.Put(r.Context(), filename, file)
 	if err != nil {
-		response.Upload(w, map[string]any{"errno": 202})
+		response.Upload(w, map[string]any{"errno": 202, "message": err.Error()})
 		return
 	}
 	response.Upload(w, map[string]any{
 		"errno": 0,
-		"data": []string{
-			"https://static.fifsky.com/" + filename + "!blog",
+		"data": map[string]any{
+			"url": "https://static.fifsky.com/" + filename,
 		},
 	})
 }

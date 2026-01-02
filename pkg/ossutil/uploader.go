@@ -27,7 +27,7 @@ func NewAliyunUploader(conf *config.Config, httpClient *http.Client) *AliyunUplo
 func (u *AliyunUploader) Put(ctx context.Context, filename string, body io.Reader) error {
 	client, err := oss.New(u.conf.OSS.Endpoint, u.conf.OSS.AccessKey, u.conf.OSS.AccessSecret, func(client *oss.Client) {
 		client.HTTPClient = u.httpClient
-	}, oss.AuthVersion(oss.AuthV4))
+	}, oss.AuthVersion(oss.AuthV4), oss.Region("cn-shanghai"))
 	if err != nil {
 		return err
 	}

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   articleDetailApi,
   articleCreateApi,
@@ -6,17 +6,44 @@ import {
   cateListApi,
 } from "@/service";
 import { useLocation, useNavigate, Link } from "react-router-dom";
+import "@wangeditor/editor/dist/css/style.css";
+import { Editor, Toolbar } from "@wangeditor/editor-for-react";
+import type {
+  IDomEditor,
+  IEditorConfig,
+  IToolbarConfig,
+} from "@wangeditor/editor";
+import { getApiUrl, getAccessToken } from "@/utils/common";
 
 export default function PostArticle() {
   const [article, setArticle] = useState<any>({ type: 1 });
   const [cates, setCates] = useState<any[]>([]);
-  const editorRef = useRef<HTMLDivElement>(null);
+  const [editor, setEditor] = useState<IDomEditor | null>(null);
 
   const location = useLocation();
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
 
-  // 使用简易 contentEditable 编辑器，无第三方依赖
+  const toolbarConfig: Partial<IToolbarConfig> = {};
+  const editorConfig: Partial<IEditorConfig> = {
+    placeholder: "请输入内容...",
+    MENU_CONF: {
+      uploadImage: {
+        server: getApiUrl("/api/admin/upload"),
+        fieldName: "uploadFile",
+        headers: { "Access-Token": getAccessToken() },
+        withCredentials: false,
+        maxFileSize: 10 * 1024 * 1024,
+        allowedFileTypes: ["image/*"],
+        onFailed(file: File, res: any) {
+          alert(`${file.name} 上传失败` + (res.message || ""));
+        },
+        onError(file: File, err: any) {
+          alert(`${file.name} 上传失败` + (err || ""));
+        },
+      },
+    },
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +85,11 @@ export default function PostArticle() {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    return () => {
+      if (editor) editor.destroy();
+    };
+  }, [editor]);
 
   return (
     <div id="articles">
@@ -148,17 +180,24 @@ export default function PostArticle() {
           </div>
         </div>
         <div id="editor">
-          <div
-            ref={editorRef}
-            contentEditable
-            style={{ minHeight: 300, border: "1px solid #ddd", padding: 10 }}
-            onInput={(e) =>
-              setArticle({
-                ...article,
-                content: (e.target as HTMLDivElement).innerHTML,
-              })
-            }
-          ></div>
+          <div style={{ border: "1px solid #ddd" }}>
+            <Toolbar
+              editor={editor}
+              defaultConfig={toolbarConfig}
+              mode="default"
+              style={{ borderBottom: "1px solid #ddd" }}
+            />
+            <Editor
+              style={{ height: 500, overflowY: "hidden" }}
+              defaultConfig={editorConfig}
+              value={article.content || ""}
+              onCreated={(ed: IDomEditor) => setEditor(ed)}
+              onChange={(ed: IDomEditor) =>
+                setArticle({ ...article, content: ed.getHtml() })
+              }
+              mode="default"
+            />
+          </div>
         </div>
         <p className="act">
           <input className="formbutton" type="submit" value="发布" />
