@@ -28,6 +28,13 @@ export default defineConfig(() => {
     build: {
       outDir: "dist",
       assetsDir: "assets",
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            "utils-vendor": ["dayjs", "highlight.js"],
+          },
+        },
+      },
     },
   };
 });

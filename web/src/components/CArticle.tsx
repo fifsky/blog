@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef } from "react";
-import hljs from "highlight.js";
+import hljs from "highlight.js/lib/core";
 import { Link, useLocation } from "react-router-dom";
 export function CArticle({ article }: { article: any }) {
-  const rootRef = useRef<HTMLDivElement>(null)
+  const rootRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const keyword = useMemo(
     () => new URLSearchParams(location.search).get("keyword") || "",
@@ -13,8 +13,8 @@ export function CArticle({ article }: { article: any }) {
     return content.replace(k, `<mark>${k}</mark>`);
   };
   useEffect(() => {
-    const root = rootRef.current
-    if (!root) return
+    const root = rootRef.current;
+    if (!root) return;
     root.querySelectorAll("pre code").forEach((block) => {
       hljs.highlightElement(block as HTMLElement);
     });
