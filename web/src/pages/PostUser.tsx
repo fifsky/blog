@@ -57,7 +57,9 @@ export default function PostUser() {
             className="input_text"
             size={50}
             value={user.name || ""}
-            onChange={(e) => setUser({ ...user, name: e.target.value })}
+            onChange={(e) =>
+              setUser((prev: any) => ({ ...prev, name: e.target.value }))
+            }
           ></input>
         </p>
         <span className="hint">
@@ -72,7 +74,9 @@ export default function PostUser() {
             className="input_text"
             size={50}
             value={user.email || ""}
-            onChange={(e) => setUser({ ...user, email: e.target.value })}
+            onChange={(e) =>
+              setUser((prev: any) => ({ ...prev, email: e.target.value }))
+            }
           ></input>
         </p>
         <span className="hint">
@@ -85,7 +89,9 @@ export default function PostUser() {
             className="input_text"
             size={50}
             value={user.nick_name || ""}
-            onChange={(e) => setUser({ ...user, nick_name: e.target.value })}
+            onChange={(e) =>
+              setUser((prev: any) => ({ ...prev, nick_name: e.target.value }))
+            }
           ></input>
         </p>
         <span className="hint">
@@ -101,7 +107,9 @@ export default function PostUser() {
             className="input_text"
             size={50}
             value={user.password1 || ""}
-            onChange={(e) => setUser({ ...user, password1: e.target.value })}
+            onChange={(e) =>
+              setUser((prev: any) => ({ ...prev, password1: e.target.value }))
+            }
           />
         </p>
         <span className="hint">为用户分配一个密码。</span>
@@ -114,7 +122,9 @@ export default function PostUser() {
             className="input_text"
             size={50}
             value={user.password2 || ""}
-            onChange={(e) => setUser({ ...user, password2: e.target.value })}
+            onChange={(e) =>
+              setUser((prev: any) => ({ ...prev, password2: e.target.value }))
+            }
           />
           <span className="hint">
             请确认你的密码，与上面输入的密码保持一致。
@@ -127,7 +137,9 @@ export default function PostUser() {
           <select
             name="type"
             value={user.type}
-            onChange={(e) => setUser({ ...user, type: e.target.value })}
+            onChange={(e) =>
+              setUser((prev: any) => ({ ...prev, type: e.target.value }))
+            }
           >
             <option value="1">管理员</option>
             <option value="2">编辑</option>

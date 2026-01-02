@@ -55,14 +55,14 @@ export default function AdminLink() {
       <div className="col-right" style={{ width: 250, paddingTop: 31 }}>
         <form className="vf" method="post" autoComplete="off" onSubmit={submit}>
           <p><label className="label_input">链接名称</label>
-            <input className="input_text" size={30} name="name" value={item.name || ''} onChange={e => setItem({ ...item, name: e.target.value })} /></p>
+            <input className="input_text" size={30} name="name" value={item.name || ''} onChange={e => setItem((prev: any) => ({ ...prev, name: e.target.value }))} /></p>
           <p><label className="label_input">链接地址</label>
-            <input className="input_text" size={30} name="url" value={item.url || ''} onChange={e => setItem({ ...item, url: e.target.value })} />
+            <input className="input_text" size={30} name="url" value={item.url || ''} onChange={e => setItem((prev: any) => ({ ...prev, url: e.target.value }))} />
             <span className="hint">例如：http://fifsky.com/</span>
           </p>
           <p>
             <label className="label_input">链接描述</label>
-            <textarea name="desc" rows={5} cols={30} value={item.desc || ''} onChange={e => setItem({ ...item, desc: e.target.value })}></textarea>
+            <textarea name="desc" rows={5} cols={30} value={item.desc || ''} onChange={e => setItem((prev: any) => ({ ...prev, desc: e.target.value }))}></textarea>
           </p>
           <p className="act">
             <button className="formbutton" type="submit">{item.id ? '修改' : '添加'}</button>

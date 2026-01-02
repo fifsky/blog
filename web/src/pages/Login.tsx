@@ -25,11 +25,11 @@ export default function Login() {
             <form method="post" onSubmit={submit} className="vf lf">
               <p>
                 <label className="label_input">用户名：</label>
-                <input type="text" className="input_text" value={formdata.user_name || ''} onChange={e => setFormdata({ ...formdata, user_name: e.target.value })} />
+                <input type="text" className="input_text" value={formdata.user_name || ''} onChange={e => setFormdata(prev => ({ ...prev, user_name: e.target.value }))} />
               </p>
               <p>
                 <label className="label_input">密码：</label>
-                <input type="password" className="input_text" value={formdata.password || ''} onChange={e => setFormdata({ ...formdata, password: e.target.value })} />
+                <input type="password" className="input_text" value={formdata.password || ''} onChange={e => setFormdata(prev => ({ ...prev, password: e.target.value }))} />
               </p>
               <p className="act">
                 <input type="submit" className="formbutton" value="登录" />

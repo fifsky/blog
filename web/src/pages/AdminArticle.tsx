@@ -69,7 +69,7 @@ export default function AdminArticle() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {v.comment_num}
+                    0
                   </a>
                 </td>
                 <td>

@@ -117,7 +117,10 @@ export default function PostArticle() {
                 name="title"
                 value={article.title || ""}
                 onChange={(e) =>
-                  setArticle({ ...article, title: e.target.value })
+                  setArticle((prev: any) => ({
+                    ...prev,
+                    title: e.target.value,
+                  }))
                 }
               />
             </p>
@@ -128,7 +131,10 @@ export default function PostArticle() {
                   name="cate_id"
                   value={article.cate_id || ""}
                   onChange={(e) =>
-                    setArticle({ ...article, cate_id: Number(e.target.value) })
+                    setArticle((prev: any) => ({
+                      ...prev,
+                      cate_id: Number(e.target.value),
+                    }))
                   }
                 >
                   {cates.map((v) => (
@@ -150,7 +156,10 @@ export default function PostArticle() {
                   name="url"
                   value={article.url || ""}
                   onChange={(e) =>
-                    setArticle({ ...article, url: e.target.value })
+                    setArticle((prev: any) => ({
+                      ...prev,
+                      url: e.target.value,
+                    }))
                   }
                 />
                 <span className="hint">
@@ -168,7 +177,9 @@ export default function PostArticle() {
                 name="type"
                 type="radio"
                 checked={article.type === 1}
-                onChange={() => setArticle({ ...article, type: 1 })}
+                onChange={() =>
+                  setArticle((prev: any) => ({ ...prev, type: 1 }))
+                }
               />
               文章
               <input
@@ -176,7 +187,9 @@ export default function PostArticle() {
                 name="type"
                 type="radio"
                 checked={article.type === 2}
-                onChange={() => setArticle({ ...article, type: 2 })}
+                onChange={() =>
+                  setArticle((prev: any) => ({ ...prev, type: 2 }))
+                }
               />
               页面
             </p>
@@ -196,7 +209,7 @@ export default function PostArticle() {
               value={article.content || ""}
               onCreated={(ed: IDomEditor) => setEditor(ed)}
               onChange={(ed: IDomEditor) =>
-                setArticle({ ...article, content: ed.getHtml() })
+                setArticle((prev: any) => ({ ...prev, content: ed.getHtml() }))
               }
               mode="default"
             />

@@ -104,7 +104,9 @@ export default function AdminCate() {
               size={30}
               name="name"
               value={item.name || ""}
-              onChange={(e) => setItem({ ...item, name: e.target.value })}
+              onChange={(e) =>
+                setItem((prev: any) => ({ ...prev, name: e.target.value }))
+              }
             />
           </p>
           <p>
@@ -115,7 +117,9 @@ export default function AdminCate() {
               size={30}
               name="domain"
               value={item.domain || ""}
-              onChange={(e) => setItem({ ...item, domain: e.target.value })}
+              onChange={(e) =>
+                setItem((prev: any) => ({ ...prev, domain: e.target.value }))
+              }
             />
             <span className="hint">缩略名，使用字母开头([a-z][0-9]-)</span>
           </p>
@@ -126,7 +130,9 @@ export default function AdminCate() {
               rows={5}
               cols={30}
               value={item.desc || ""}
-              onChange={(e) => setItem({ ...item, desc: e.target.value })}
+              onChange={(e) =>
+                setItem((prev: any) => ({ ...prev, desc: e.target.value }))
+              }
             ></textarea>
             <span className="hint">描述将在分类meta中显示</span>
           </p>

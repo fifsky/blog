@@ -72,7 +72,7 @@ export default function AdminMood() {
         <form className="vf" method="post" autoComplete="off" onSubmit={submit}>
           <p>
             <label className="label_input">发表心情</label>
-            <textarea name="content" rows={5} cols={30} value={item.content || ''} onChange={e => setItem({ ...item, content: e.target.value })}></textarea>
+            <textarea name="content" rows={5} cols={30} value={item.content || ''} onChange={e => setItem((prev: any) => ({ ...prev, content: e.target.value }))}></textarea>
           </p>
           <p className="act">
             <button className="formbutton" type="submit">{item.id ? '修改' : '添加'}</button>
