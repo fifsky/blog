@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { userGetApi, userCreateApi, userUpdateApi } from "@/service";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router";
 
 export default function PostUser() {
   const [user, setUser] = useState<any>({ type: 1 });

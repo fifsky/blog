@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import hljs from "highlight.js/lib/core";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router";
 export function CArticle({ article }: { article: any }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const location = useLocation();

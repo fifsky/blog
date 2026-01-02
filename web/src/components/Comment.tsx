@@ -1,5 +1,5 @@
 import { useCallback, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import Artalk from "artalk";
 import "artalk/Artalk.css";
 

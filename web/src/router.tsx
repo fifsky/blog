@@ -4,7 +4,7 @@ import {
   Outlet,
   useLocation,
   type RouteObject,
-} from "react-router-dom";
+} from "react-router";
 import { Layout } from "@/components/Layout";
 import { AdminLayout } from "@/components/AdminLayout";
 import { RouteProgress } from "@/components/RouteProgress";

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet, NavLink } from "react-router";
 import { CHeader } from "./CHeader";
 import { Sidebar } from "./Sidebar";
 import { Mood } from "./Mood";
