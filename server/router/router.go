@@ -3,18 +3,19 @@ package router
 import (
 	"log/slog"
 	"net/http"
+	"path/filepath"
 
 	"app/config"
 	"app/contract"
 	"app/middleware"
 	"app/pkg/logger"
+	"app/pkg/logger/sloghttp"
 	adminv1 "app/proto/gen/admin/v1"
 	apiv1 "app/proto/gen/api/v1"
 	"app/response"
 	"app/service"
 	adminsvc "app/service/admin"
 	"app/store"
-	sloghttp "github.com/samber/slog-http"
 )
 
 type Router struct {
@@ -51,6 +52,7 @@ func (r *Router) Handler() http.Handler {
 		DefaultLevel:       slog.LevelInfo,
 		ClientErrorLevel:   slog.LevelWarn,
 		ServerErrorLevel:   slog.LevelError,
+		WithRequestID:      true,
 		WithUserAgent:      true,
 		WithRequestHeader:  true,
 		WithRequestBody:    true,
@@ -61,8 +63,15 @@ func (r *Router) Handler() http.Handler {
 		},
 	}
 
+	log := logger.New(&logger.Config{
+		Mode:     logger.ModeFile,
+		FileName: filepath.Join(r.conf.Common.StoragePath, "logs", "access.log"),
+		MaxFiles: 3,
+		Detail:   true,
+	})
+
 	mux := NewServeMux()
-	api := mux.Use(middleware.NewRecover, sloghttp.NewWithConfig(logger.Default(), conf), middleware.NewCors)
+	api := mux.Use(middleware.NewRecover, sloghttp.NewMiddleware(log, conf), middleware.NewCors)
 
 	// 统一处理所有 /api/ 路径的预检请求，确保中间件设置CORS响应头
 	api.HandleFunc("OPTIONS /api/", func(w http.ResponseWriter, r *http.Request) {
