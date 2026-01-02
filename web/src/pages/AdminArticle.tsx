@@ -21,7 +21,6 @@ export default function AdminArticle() {
   };
   useEffect(() => {
     loadList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
   return (
     <div id="articles">
