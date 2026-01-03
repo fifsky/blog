@@ -45,9 +45,9 @@ export default function AdminCate() {
             <tr>
               <th style={{ width: 20 }}>&nbsp;</th>
               <th>分类名</th>
-              <th style={{ width: 60 }}>缩略名</th>
-              <th style={{ width: 50 }}>文章数</th>
-              <th style={{ width: 80 }}>操作</th>
+              <th style={{ width: 90 }}>缩略名</th>
+              <th style={{ width: 60 }}>文章数</th>
+              <th style={{ width: 90 }}>操作</th>
             </tr>
             {list.length === 0 && (
               <tr>

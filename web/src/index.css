@@ -67,7 +67,6 @@ select {
   vertical-align: middle;
 }
 .input_text {
-  height: 15px;
   padding: 3px 4px;
   line-height: 15px;
 }
@@ -78,7 +77,6 @@ select {
   color: #999;
 }
 input.formbutton {
-  height: 23px;
   padding: 0 1.5em;
   border: 1px solid;
   border-color: #66acff #094fa1 #094fa1 #66acff;
@@ -349,7 +347,6 @@ form p.inputting .formtip {
 }
 #sidebar {
   float: right;
-  width: 205px;
   padding: 15px 10px 20px 18px;
   border: 1px solid #89d5ef;
   background: #fff;
@@ -411,6 +408,11 @@ form p.inputting .formtip {
 #footer p.info a:hover {
   color: #ccc;
   text-decoration: none;
+}
+#footer p.info img {
+  display: inline;
+  vertical-align: middle;
+  margin-right: 4px;
 }
 #content {
   padding: 20px;
@@ -954,7 +956,6 @@ mark {
   color: #444444;
   font-size: 14px;
   font-weight: bold;
-  height: 18px;
   line-height: 18px;
   width: 280px;
 }

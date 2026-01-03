@@ -53,8 +53,8 @@ export default function AdminMood() {
               <th style={{ width: 20 }}>&nbsp;</th>
               <th style={{ width: 80 }}>作者</th>
               <th>心情</th>
-              <th style={{ width: 90 }}>日期</th>
-              <th style={{ width: 80 }}>操作</th>
+              <th style={{ width: 180 }}>日期</th>
+              <th style={{ width: 90 }}>操作</th>
             </tr>
             {list.length === 0 && (
               <tr>

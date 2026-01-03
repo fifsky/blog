@@ -38,11 +38,11 @@ export default function AdminUser() {
         <tbody>
           <tr>
             <th style={{ width: 20 }}>&nbsp;</th>
-            <th style={{ width: 80 }}>用户名</th>
-            <th style={{ width: 80 }}>昵称</th>
+            <th style={{ width: 120 }}>用户名</th>
+            <th style={{ width: 120 }}>昵称</th>
             <th>邮箱</th>
-            <th style={{ width: 60 }}>角色</th>
-            <th style={{ width: 60 }}>状态</th>
+            <th style={{ width: 100 }}>角色</th>
+            <th style={{ width: 100 }}>状态</th>
             <th style={{ width: 90 }}>操作</th>
           </tr>
           {list.length === 0 && (

@@ -163,10 +163,10 @@ export default function AdminRemind() {
           <tbody>
             <tr>
               <th style={{ width: 20 }}>&nbsp;</th>
-              <th style={{ width: 60 }}>提醒类别</th>
+              <th style={{ width: 80 }}>提醒类别</th>
               <th style={{ width: 180 }}>时间</th>
               <th>内容</th>
-              <th style={{ width: 80 }}>操作</th>
+              <th style={{ width: 90 }}>操作</th>
             </tr>
             {list.length === 0 && (
               <tr>

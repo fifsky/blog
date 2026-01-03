@@ -44,9 +44,9 @@ export default function AdminLink() {
           <tbody>
             <tr>
               <th style={{ width: 20 }}>&nbsp;</th>
-              <th style={{ width: 80 }}>连接名</th>
+              <th style={{ width: 120 }}>连接名</th>
               <th>地址</th>
-              <th style={{ width: 80 }}>操作</th>
+              <th style={{ width: 90 }}>操作</th>
             </tr>
             {list.length === 0 && (
               <tr>

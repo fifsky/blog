@@ -14,7 +14,11 @@ export function CHeader() {
     <div id="header" className="clearfix">
       <h1>
         <Link to="/">
-          <img alt="首页" src="/assets/images/logo.png" />
+          <img
+            className="inline-block"
+            alt="首页"
+            src="/assets/images/logo.png"
+          />
           <span>首页</span>
         </Link>
       </h1>

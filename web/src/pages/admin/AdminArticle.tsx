@@ -44,8 +44,8 @@ export default function AdminArticle() {
             <th style={{ width: 60 }}>作者</th>
             <th style={{ width: 80 }}>分类</th>
             <th style={{ width: 80 }}>类型</th>
-            <th style={{ width: 90 }}>日期</th>
-            <th style={{ width: 80 }}>操作</th>
+            <th style={{ width: 180 }}>日期</th>
+            <th style={{ width: 90 }}>操作</th>
           </tr>
           {list.length === 0 && (
             <tr>
@@ -63,7 +63,9 @@ export default function AdminArticle() {
                 </td>
                 <td className="comment-num">
                   <a
-                    href={`${v.type === 2 ? v.url : "/article" + v.id}#comments`}
+                    href={`${
+                      v.type === 2 ? v.url : "/article" + v.id
+                    }#comments`}
                     target="_blank"
                     rel="noreferrer"
                   >
