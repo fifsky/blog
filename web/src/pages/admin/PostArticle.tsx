@@ -5,7 +5,7 @@ import {
   articleUpdateApi,
   cateListApi,
 } from "@/service";
-import { useLocation, useNavigate, Link } from "react-router";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import "@wangeditor/editor/dist/css/style.css";
 import { Editor, Toolbar } from "@wangeditor/editor-for-react";
 import type {

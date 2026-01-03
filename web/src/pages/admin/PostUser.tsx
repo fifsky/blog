@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { userGetApi, userCreateApi, userUpdateApi } from "@/service";
-import { useLocation, useNavigate, Link } from "react-router";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 
 export default function PostUser() {
   const [user, setUser] = useState<any>({ type: 1 });
@@ -108,7 +108,10 @@ export default function PostUser() {
             size={50}
             value={user.password1 || ""}
             onChange={(e) =>
-              setUser((prev: any) => ({ ...prev, password1: e.target.value }))
+              setUser((prev: any) => ({
+                ...prev,
+                password1: e.target.value,
+              }))
             }
           />
         </p>
@@ -123,7 +126,10 @@ export default function PostUser() {
             size={50}
             value={user.password2 || ""}
             onChange={(e) =>
-              setUser((prev: any) => ({ ...prev, password2: e.target.value }))
+              setUser((prev: any) => ({
+                ...prev,
+                password2: e.target.value,
+              }))
             }
           />
           <span className="hint">

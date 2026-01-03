@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { articleDeleteApi, articleListApi } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Paginate } from "@/components/Paginate";
@@ -63,9 +63,7 @@ export default function AdminArticle() {
                 </td>
                 <td className="comment-num">
                   <a
-                    href={`${
-                      v.type === 2 ? v.url : "/article" + v.id
-                    }#comments`}
+                    href={`${v.type === 2 ? v.url : "/article" + v.id}#comments`}
                     target="_blank"
                     rel="noreferrer"
                   >

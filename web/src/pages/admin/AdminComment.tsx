@@ -54,9 +54,7 @@ export default function AdminComment() {
                 </td>
                 <td>
                   <a
-                    href={`${
-                      v.type === 2 ? v.url : "/article" + v.id
-                    }#comments`}
+                    href={`${v.type === 2 ? v.url : "/article" + v.id}#comments`}
                     target="_blank"
                     rel="noreferrer"
                   >

@@ -13,16 +13,16 @@ const ArticleList = lazy(() => import("@/pages/ArticleList"));
 const ArticleDetail = lazy(() => import("@/pages/ArticleDetail"));
 const About = lazy(() => import("@/pages/About"));
 const Login = lazy(() => import("@/pages/Login"));
-const AdminIndex = lazy(() => import("@/pages/AdminIndex"));
-const AdminArticle = lazy(() => import("@/pages/AdminArticle"));
-const AdminComment = lazy(() => import("@/pages/AdminComment"));
-const AdminMood = lazy(() => import("@/pages/AdminMood"));
-const AdminCate = lazy(() => import("@/pages/AdminCate"));
-const AdminLink = lazy(() => import("@/pages/AdminLink"));
-const AdminRemind = lazy(() => import("@/pages/AdminRemind"));
-const AdminUser = lazy(() => import("@/pages/AdminUser"));
-const PostArticle = lazy(() => import("@/pages/PostArticle"));
-const PostUser = lazy(() => import("@/pages/PostUser"));
+const AdminIndex = lazy(() => import("@/pages/admin/AdminIndex"));
+const AdminArticle = lazy(() => import("@/pages/admin/AdminArticle"));
+const AdminComment = lazy(() => import("@/pages/admin/AdminComment"));
+const AdminMood = lazy(() => import("@/pages/admin/AdminMood"));
+const AdminCate = lazy(() => import("@/pages/admin/AdminCate"));
+const AdminLink = lazy(() => import("@/pages/admin/AdminLink"));
+const AdminRemind = lazy(() => import("@/pages/admin/AdminRemind"));
+const AdminUser = lazy(() => import("@/pages/admin/AdminUser"));
+const PostArticle = lazy(() => import("@/pages/admin/PostArticle"));
+const PostUser = lazy(() => import("@/pages/admin/PostUser"));
 function useTitleTemplate(title?: string) {
   const location = useLocation();
   useEffect(() => {
