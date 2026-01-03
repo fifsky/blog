@@ -17,3 +17,4 @@
 /bin
 config.yml
 .envrc
+.buf-deps

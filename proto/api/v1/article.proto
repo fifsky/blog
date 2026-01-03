@@ -1,44 +1,48 @@
 syntax = "proto3";
 package fifsky.blog.api.v1;
 
+import "api/v1/common.proto";
+import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
-import "google/protobuf/empty.proto";
 import "google/api/httpbody.proto";
-import "buf/validate/validate.proto";
-import "api/v1/common.proto";
+import "google/protobuf/empty.proto";
 
 option go_package = "gen/api/v1";
 
+// ArticleService 提供文章相关的接口
 service ArticleService {
+  // Archive 获取文章归档
   rpc Archive(google.protobuf.Empty) returns (ArchiveResponse) {
     option (google.api.http) = {
       post: "/api/article/archive"
       body: "*"
     };
   }
+  // List 获取文章列表
   rpc List(ArticleListRequest) returns (ArticleListResponse) {
     option (google.api.http) = {
       post: "/api/article/list"
       body: "*"
     };
   }
+  // PrevNext 获取上一篇下一篇文章
   rpc PrevNext(PrevNextRequest) returns (PrevNextResponse) {
     option (google.api.http) = {
       post: "/api/article/prevnext"
       body: "*"
     };
   }
+  // Detail 获取文章详情
   rpc Detail(ArticleDetailRequest) returns (ArticleItem) {
     option (google.api.http) = {
       post: "/api/article/detail"
       body: "*"
     };
   }
+  // Feed 获取文章 RSS 订阅
   rpc Feed(google.protobuf.Empty) returns (google.api.HttpBody) {
-    option (google.api.http) = {
-      get: "/feed.xml"
-    };
+    option (google.api.http) = {get: "/feed.xml"};
   }
 }
 
@@ -80,7 +84,7 @@ message ArticleListResponse {
 }
 
 message PrevNextRequest {
-  int32 id = 1[
+  int32 id = 1 [
     (buf.validate.field).int32.gt = 0,
     (google.api.field_behavior) = REQUIRED
   ];
@@ -95,14 +99,15 @@ message PrevNextResponse {
 }
 
 message ArticleDetailRequest {
-  int32 id = 1[
-    (buf.validate.field).int32.gt = 0
-  ];
+  int32 id = 1 [(buf.validate.field).int32.gt = 0];
   string url = 2;
 
   option (buf.validate.message).oneof = {
     // At most one search method can be used
-    fields: ["id", "url"],
+    fields: [
+      "id",
+      "url"
+    ]
     // One search method must be present
     required: true
   };

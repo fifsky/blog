@@ -1,27 +1,31 @@
 syntax = "proto3";
 package fifsky.blog.admin.v1;
 
+import "admin/v1/common.proto";
+import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
-import "buf/validate/validate.proto";
-import "admin/v1/common.proto";
 
 option go_package = "gen/admin/v1";
 
+// ArticleService 提供文章相关的接口
 service ArticleService {
+  // Create 创建文章
   rpc Create(ArticleCreateRequest) returns (IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/article/create"
       body: "*"
     };
   }
+  // Update 更新文章
   rpc Update(ArticleUpdateRequest) returns (IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/article/update"
       body: "*"
     };
   }
+  // Delete 删除文章
   rpc Delete(IDRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/admin/article/delete"
@@ -31,15 +35,30 @@ service ArticleService {
 }
 
 message ArticleCreateRequest {
-  int32 cate_id = 1[(buf.validate.field).int32.gt = 0, (google.api.field_behavior) = REQUIRED];
-  int32 type = 2[(buf.validate.field).int32.gt = 0, (google.api.field_behavior) = REQUIRED];
-  string title = 3[(buf.validate.field).required = true, (google.api.field_behavior) = REQUIRED];
+  int32 cate_id = 1 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
+  int32 type = 2 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string title = 3 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
   string url = 4;
-  string content = 5[(buf.validate.field).required = true, (google.api.field_behavior) = REQUIRED];
+  string content = 5 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
 }
 
 message ArticleUpdateRequest {
-  int32 id = 1[(buf.validate.field).int32.gt = 0, (google.api.field_behavior) = REQUIRED];
+  int32 id = 1 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
   int32 cate_id = 2;
   int32 type = 3;
   string title = 4;

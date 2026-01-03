@@ -1,33 +1,38 @@
 syntax = "proto3";
 package fifsky.blog.admin.v1;
 
+import "admin/v1/common.proto";
+import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
-import "buf/validate/validate.proto";
-import "admin/v1/common.proto";
 
 option go_package = "gen/admin/v1";
 
+// CateService 提供分类相关的接口
 service CateService {
+  // List 获取分类列表
   rpc List(google.protobuf.Empty) returns (CateListResponse) {
     option (google.api.http) = {
       post: "/api/admin/cate/list"
       body: "*"
     };
   }
+  // Create 创建分类
   rpc Create(CateCreateRequest) returns (IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/cate/create"
       body: "*"
     };
   }
+  // Update 更新分类
   rpc Update(CateUpdateRequest) returns (IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/cate/update"
       body: "*"
     };
   }
+  // Delete 删除分类
   rpc Delete(IDRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/admin/cate/delete"
@@ -51,13 +56,22 @@ message CateListResponse {
 }
 
 message CateCreateRequest {
-  string name = 1[(buf.validate.field).required = true, (google.api.field_behavior) = REQUIRED];
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
   string desc = 2;
-  string domain = 3[(buf.validate.field).required = true, (google.api.field_behavior) = REQUIRED];
+  string domain = 3 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
 }
 
 message CateUpdateRequest {
-  int32 id = 1[(buf.validate.field).int32.gt = 0, (google.api.field_behavior) = REQUIRED];
+  int32 id = 1 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
   string name = 2;
   string desc = 3;
   string domain = 4;

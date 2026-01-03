@@ -1,33 +1,38 @@
 syntax = "proto3";
 package fifsky.blog.admin.v1;
 
+import "admin/v1/common.proto";
+import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
-import "buf/validate/validate.proto";
-import "admin/v1/common.proto";
 
 option go_package = "gen/admin/v1";
 
+// RemindService 提供提醒相关的接口
 service RemindService {
+  // List 获取提醒列表
   rpc List(PageRequest) returns (RemindListResponse) {
     option (google.api.http) = {
       post: "/api/admin/remind/list"
       body: "*"
     };
   }
+  // Create 创建提醒
   rpc Create(RemindCreateRequest) returns (IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/remind/create"
       body: "*"
     };
   }
+  // Update 更新提醒
   rpc Update(RemindUpdateRequest) returns (IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/remind/update"
       body: "*"
     };
   }
+  // Delete 删除提醒
   rpc Delete(IDRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/admin/remind/delete"
@@ -56,7 +61,10 @@ message RemindListResponse {
 
 message RemindCreateRequest {
   int32 type = 1;
-  string content = 2[(buf.validate.field).required = true, (google.api.field_behavior) = REQUIRED];
+  string content = 2 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
   int32 month = 3;
   int32 week = 4;
   int32 day = 5;
@@ -65,7 +73,10 @@ message RemindCreateRequest {
 }
 
 message RemindUpdateRequest {
-  int32 id = 1[(buf.validate.field).int32.gt = 0, (google.api.field_behavior) = REQUIRED];
+  int32 id = 1 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
   int32 type = 2;
   string content = 3;
   int32 month = 4;

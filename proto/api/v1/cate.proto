@@ -1,14 +1,17 @@
 syntax = "proto3";
 package fifsky.blog.api.v1;
 
+import "api/v1/common.proto";
+import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
-import "buf/validate/validate.proto";
 import "google/protobuf/empty.proto";
-import "api/v1/common.proto";
+
 option go_package = "gen/api/v1";
 
+// CateService 提供分类相关的接口
 service CateService {
+  // All 获取所有分类
   rpc All(google.protobuf.Empty) returns (CateMenuResponse) {
     option (google.api.http) = {
       post: "/api/cate/all"

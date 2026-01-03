@@ -1,33 +1,38 @@
 syntax = "proto3";
 package fifsky.blog.admin.v1;
 
+import "admin/v1/common.proto";
+import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
-import "buf/validate/validate.proto";
-import "admin/v1/common.proto";
 
 option go_package = "gen/admin/v1";
 
+// LinkService 提供链接相关的接口
 service LinkService {
+  // List 获取链接列表
   rpc List(google.protobuf.Empty) returns (LinkListResponse) {
     option (google.api.http) = {
       post: "/api/admin/link/list"
       body: "*"
     };
   }
+  // Create 创建链接
   rpc Create(LinkCreateRequest) returns (IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/link/create"
       body: "*"
     };
   }
+  // Update 更新链接
   rpc Update(LinkUpdateRequest) returns (IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/link/update"
       body: "*"
     };
   }
+  // Delete 删除链接
   rpc Delete(IDRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/admin/link/delete"
@@ -49,13 +54,22 @@ message LinkListResponse {
 }
 
 message LinkCreateRequest {
-  string name = 1[(buf.validate.field).required = true, (google.api.field_behavior) = REQUIRED];
-  string url = 2[(buf.validate.field).required = true, (google.api.field_behavior) = REQUIRED];
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string url = 2 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
   string desc = 3;
 }
 
 message LinkUpdateRequest {
-  int32 id = 1[(buf.validate.field).int32.gt = 0, (google.api.field_behavior) = REQUIRED];
+  int32 id = 1 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
   string name = 2;
   string url = 3;
   string desc = 4;
