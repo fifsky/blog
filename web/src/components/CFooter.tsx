@@ -12,7 +12,7 @@ export function CFooter() {
     <div id="footer">
       <p>
         <a href="https://fangyuan.love" target="_blank" rel="noreferrer">最好的我们</a> |
-        <a href="https://caishuyan.com/" target="_blank" rel="noreferrer">最好的她们</a> &copy;2024 <a href="https://github.com/fifsky/blog" target="_blank" rel="noreferrer">fifsky.com</a>
+        <a href="https://caishuyan.com/" target="_blank" rel="noreferrer">最好的她们</a> &copy;2026 <a href="https://github.com/fifsky/blog" target="_blank" rel="noreferrer">fifsky.com</a>
       </p>
       <p className="info">
         <a href="https://beian.miit.gov.cn" target="_blank" rel="noreferrer">沪ICP备14029559号-1</a>
