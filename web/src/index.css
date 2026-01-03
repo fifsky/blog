@@ -140,16 +140,6 @@ form p.inputting .formtip {
 .nf .input_text {
   width: 200px;
 }
-.nf:after,
-.nf p:after,
-.nf .util:after {
-  clear: both;
-  content: ".";
-  display: block;
-  font-size: 0;
-  line-height: 0;
-  visibility: hidden;
-}
 .nf ul {
   list-style: none;
 }
