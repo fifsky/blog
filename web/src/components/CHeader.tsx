@@ -24,7 +24,7 @@ export function CHeader() {
         </Link>
       </h1>
       <div id="navigation" className="inline-flex items-center">
-        <ul className="flex items-center gap-2">
+        <ul className="flex items-center">
           <li>
             <Link to="/">首页</Link>
           </li>
