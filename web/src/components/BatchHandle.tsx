@@ -1,6 +1,6 @@
 export function BatchHandle() {
   return (
-    <div className="float-left">
+    <div className="flex items-center gap-2">
       <a href="#" className="all-selected">全选</a><span className="line">|</span>
       <a href="#" className="inverse-selected">反选</a>&nbsp;&nbsp;
       <select name="batch_operation">

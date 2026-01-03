@@ -105,8 +105,8 @@ export default function PostArticle() {
       </h2>
       <div className="message"></div>
       <form className="vf" method="post" autoComplete="off" onSubmit={submit}>
-        <div className="clearfix">
-          <div className="col-left">
+        <div className="flex">
+          <div className="w-[700px]">
             <p>
               <label className="label_input">标题</label>
               <input
@@ -170,7 +170,7 @@ export default function PostArticle() {
             )}
             <input type="hidden" name="id" value={article.id || ""} />
           </div>
-          <div className="col-right">
+          <div className="w-[250px]">
             <p>
               <label className="label_input">类型</label>
               <input

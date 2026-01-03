@@ -12,7 +12,7 @@ export function CHeader() {
     navigate("/");
   };
   return (
-    <div id="header" className="clearfix">
+    <div id="header" className="flex items-center justify-between">
       <h1>
         <Link to="/">
           <img
@@ -23,8 +23,8 @@ export function CHeader() {
           <span>首页</span>
         </Link>
       </h1>
-      <div id="navigation">
-        <ul>
+      <div id="navigation" className="inline-flex items-center">
+        <ul className="flex items-center gap-2">
           <li>
             <Link to="/">首页</Link>
           </li>
@@ -53,7 +53,15 @@ export function CHeader() {
           )}
           {isLogin && (
             <li>
-              <a onClick={logOut}>退出</a>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  logOut();
+                }}
+              >
+                退出
+              </a>
             </li>
           )}
           {!isLogin && (

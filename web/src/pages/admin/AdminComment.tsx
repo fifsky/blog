@@ -25,7 +25,7 @@ export default function AdminComment() {
   return (
     <div>
       <h2>管理评论</h2>
-      <div className="operate clearfix">
+      <div className="my-[10px] flex items-center">
         <BatchHandle />
       </div>
       <table className="list">
@@ -54,7 +54,9 @@ export default function AdminComment() {
                 </td>
                 <td>
                   <a
-                    href={`${v.type === 2 ? v.url : "/article" + v.id}#comments`}
+                    href={`${
+                      v.type === 2 ? v.url : "/article" + v.id
+                    }#comments`}
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -80,7 +82,7 @@ export default function AdminComment() {
             ))}
         </tbody>
       </table>
-      <div className="operate clearfix">
+      <div className="my-[10px] flex items-center justify-between">
         <BatchHandle />
         <Paginate page={page} pageTotal={pageTotal} onChange={setPage} />
       </div>

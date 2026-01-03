@@ -19,19 +19,21 @@ export default function AdminIndex() {
       <h2>站点设置</h2>
       <div className="message">保存成功</div>
       <form className="nf" method="post" autoComplete="off" onSubmit={submit}>
-        <p>
+        <p className="flex ">
           <label className="label_input">站点名称</label>
-          <input
-            type="text"
-            className="input_text"
-            size={50}
-            name="site_name"
-            value={formdata.site_name || ""}
-            onChange={(e) =>
-              setFormdata((prev) => ({ ...prev, site_name: e.target.value }))
-            }
-          />
-          <span className="hint">站点的名称将显示在网页的标题处。</span>
+          <div>
+            <input
+              type="text"
+              className="input_text"
+              size={50}
+              name="site_name"
+              value={formdata.site_name || ""}
+              onChange={(e) =>
+                setFormdata((prev) => ({ ...prev, site_name: e.target.value }))
+              }
+            />
+            <span className="hint">站点的名称将显示在网页的标题处。</span>
+          </div>
         </p>
         <p>
           <label className="label_input">站点描述</label>

@@ -31,7 +31,7 @@ export default function AdminUser() {
           新增用户
         </Link>
       </h2>
-      <div className="operate clearfix">
+      <div className="my-[10px] flex items-center">
         <BatchHandle />
       </div>
       <table className="list">
@@ -80,7 +80,7 @@ export default function AdminUser() {
             ))}
         </tbody>
       </table>
-      <div className="operate clearfix">
+      <div className="my-[10px] flex items-center justify-between">
         <BatchHandle />
         <Paginate page={page} pageTotal={pageTotal} onChange={setPage} />
       </div>

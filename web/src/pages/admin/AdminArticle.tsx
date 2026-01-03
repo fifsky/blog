@@ -30,7 +30,7 @@ export default function AdminArticle() {
           <i className="iconfont icon-edit" style={{ color: "#444" }}></i>写文章
         </Link>
       </h2>
-      <div className="operate clearfix">
+      <div className="my-[10px] flex items-center">
         <BatchHandle />
       </div>
       <table className="list">
@@ -110,7 +110,7 @@ export default function AdminArticle() {
             ))}
         </tbody>
       </table>
-      <div className="operate clearfix">
+      <div className="my-[10px] flex items-center justify-between">
         <BatchHandle />
         <Paginate page={page} pageTotal={pageTotal} onChange={setPage} />
       </div>

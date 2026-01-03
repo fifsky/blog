@@ -41,99 +41,106 @@ export default function AdminMood() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
   return (
-    <div className="clearfix">
+    <div>
       <h2>管理心情</h2>
-      <div className="col-left">
-        <div className="operate clearfix">
-          <BatchHandle />
-        </div>
-        <table className="list">
-          <tbody>
-            <tr>
-              <th style={{ width: 20 }}>&nbsp;</th>
-              <th style={{ width: 80 }}>作者</th>
-              <th>心情</th>
-              <th style={{ width: 180 }}>日期</th>
-              <th style={{ width: 90 }}>操作</th>
-            </tr>
-            {list.length === 0 && (
+      <div className="flex justify-between">
+        <div className="w-[700px]">
+          <div className="my-[10px] flex items-center">
+            <BatchHandle />
+          </div>
+          <table className="list">
+            <tbody>
               <tr>
-                <td colSpan={7} align="center">
-                  还没有心情！
-                </td>
+                <th style={{ width: 20 }}>&nbsp;</th>
+                <th style={{ width: 80 }}>作者</th>
+                <th>心情</th>
+                <th style={{ width: 180 }}>日期</th>
+                <th style={{ width: 90 }}>操作</th>
               </tr>
-            )}
-            {list.length > 0 &&
-              list.map((v) => (
-                <tr key={v.id}>
-                  <td>
-                    <input type="checkbox" name="ids" value={v.id} />
-                  </td>
-                  <td>{v.user.name}</td>
-                  <td>{v.content}</td>
-                  <td>{v.created_at}</td>
-                  <td>
-                    <a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        editItem(v.id);
-                      }}
-                    >
-                      编辑
-                    </a>
-                    <span className="line">|</span>
-                    <a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        deleteItem(v.id);
-                      }}
-                    >
-                      删除
-                    </a>
+              {list.length === 0 && (
+                <tr>
+                  <td colSpan={7} align="center">
+                    还没有心情！
                   </td>
                 </tr>
-              ))}
-          </tbody>
-        </table>
-        <div className="operate clearfix">
-          <BatchHandle />
-          <Paginate page={page} pageTotal={pageTotal} onChange={setPage} />
+              )}
+              {list.length > 0 &&
+                list.map((v) => (
+                  <tr key={v.id}>
+                    <td>
+                      <input type="checkbox" name="ids" value={v.id} />
+                    </td>
+                    <td>{v.user.name}</td>
+                    <td>{v.content}</td>
+                    <td>{v.created_at}</td>
+                    <td>
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          editItem(v.id);
+                        }}
+                      >
+                        编辑
+                      </a>
+                      <span className="line">|</span>
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          deleteItem(v.id);
+                        }}
+                      >
+                        删除
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+          <div className="my-2.5 flex items-center justify-between">
+            <BatchHandle />
+            <Paginate page={page} pageTotal={pageTotal} onChange={setPage} />
+          </div>
         </div>
-      </div>
-      <div className="col-right" style={{ width: 250, paddingTop: 31 }}>
-        <form className="vf" method="post" autoComplete="off" onSubmit={submit}>
-          <p>
-            <label className="label_input">发表心情</label>
-            <textarea
-              name="content"
-              rows={5}
-              cols={30}
-              value={item.content || ""}
-              onChange={(e) =>
-                setItem((prev: any) => ({ ...prev, content: e.target.value }))
-              }
-            ></textarea>
-          </p>
-          <p className="act">
-            <button className="formbutton" type="submit">
-              {item.id ? "修改" : "添加"}
-            </button>
-            {item.id && (
-              <a
-                className="ml-2.5"
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  cancel();
-                }}
-              >
-                取消
-              </a>
-            )}
-          </p>
-        </form>
+        <div className="w-[250px]" style={{ paddingTop: 31 }}>
+          <form
+            className="vf"
+            method="post"
+            autoComplete="off"
+            onSubmit={submit}
+          >
+            <p>
+              <label className="label_input">发表心情</label>
+              <textarea
+                name="content"
+                rows={5}
+                cols={30}
+                value={item.content || ""}
+                onChange={(e) =>
+                  setItem((prev: any) => ({ ...prev, content: e.target.value }))
+                }
+              ></textarea>
+            </p>
+            <p className="act">
+              <button className="formbutton" type="submit">
+                {item.id ? "修改" : "添加"}
+              </button>
+              {item.id && (
+                <a
+                  className="ml-2.5"
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    cancel();
+                  }}
+                >
+                  取消
+                </a>
+              )}
+            </p>
+          </form>
+        </div>
       </div>
     </div>
   );
