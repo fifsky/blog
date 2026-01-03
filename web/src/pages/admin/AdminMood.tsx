@@ -122,7 +122,7 @@ export default function AdminMood() {
             </button>
             {item.id && (
               <a
-                className="ml10"
+                className="ml-2.5"
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();

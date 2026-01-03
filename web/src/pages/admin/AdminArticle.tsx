@@ -38,7 +38,7 @@ export default function AdminArticle() {
           <tr>
             <th style={{ width: 20 }}>&nbsp;</th>
             <th style={{ width: 20 }}>
-              <i className="iconfont icon-comment fs-12"></i>
+              <i className="iconfont icon-comment text-[12px]"></i>
             </th>
             <th>标题</th>
             <th style={{ width: 60 }}>作者</th>

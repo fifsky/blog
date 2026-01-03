@@ -224,7 +224,7 @@ export default function PostArticle() {
           <a
             id="_save_draft"
             href="#"
-            className="ml10"
+            className="ml-2.5"
             onClick={(e) => e.preventDefault()}
           >
             保存草稿
