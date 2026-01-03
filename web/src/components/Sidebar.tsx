@@ -5,22 +5,23 @@ import { SidebarList } from "./SidebarList";
 import { Calendar } from "./Calendar";
 
 export function Sidebar() {
-  const { state, dispatch } = useStore();
+  const keyword = useStore((s) => s.keyword);
+  const setKeyword = useStore((s) => s.setKeyword);
   const navigate = useNavigate();
   const location = useLocation();
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     navigate({
       pathname: "/search",
-      search: `?keyword=${encodeURIComponent(state.keyword)}`,
+      search: `?keyword=${encodeURIComponent(keyword)}`,
     });
   };
   const changeKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: "setKeyword", payload: e.target.value });
+    setKeyword(e.target.value);
   };
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    dispatch({ type: "setKeyword", payload: params.get("keyword") || "" });
+    setKeyword(params.get("keyword") || "");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search]);
   return (
@@ -33,7 +34,7 @@ export function Sidebar() {
               type="text"
               name="keyword"
               onChange={changeKeyword}
-              value={state.keyword}
+              value={keyword}
             />
             &nbsp;
             <input className="formbutton" type="submit" value="搜索" />

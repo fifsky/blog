@@ -6,8 +6,9 @@ import { useStore } from "@/store/context";
 import { getAccessToken } from "@/utils/common";
 
 export function AdminLayout() {
-  const { state, currentUserAction } = useStore();
-  const isLogin = !!state.userInfo.id;
+  const userInfo = useStore((s) => s.userInfo);
+  const currentUserAction = useStore((s) => s.currentUserAction);
+  const isLogin = !!userInfo.id;
   const location = useLocation();
   const navigate = useNavigate();
 

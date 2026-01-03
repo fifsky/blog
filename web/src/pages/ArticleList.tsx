@@ -12,7 +12,7 @@ export default function ArticleList() {
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams();
-  const { dispatch } = useStore();
+  const setKeyword = useStore((s) => s.setKeyword);
 
   const loadList = async () => {
     const q = new URLSearchParams(location.search);
@@ -38,7 +38,7 @@ export default function ArticleList() {
 
   useEffect(() => {
     if (location.pathname !== "/search") {
-      dispatch({ type: "setKeyword", payload: "" });
+      setKeyword("");
     }
     loadList();
     // eslint-disable-next-line react-hooks/exhaustive-deps

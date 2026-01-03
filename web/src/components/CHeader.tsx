@@ -2,12 +2,13 @@ import { Link, useNavigate } from "react-router";
 import { useStore } from "@/store/context";
 
 export function CHeader() {
-  const { state, dispatch } = useStore();
-  const isLogin = !!state.userInfo.id;
+  const userInfo = useStore((s) => s.userInfo);
+  const setUserInfo = useStore((s) => s.setUserInfo);
+  const isLogin = !!userInfo.id;
   const navigate = useNavigate();
   const logOut = () => {
     localStorage.removeItem("access_token");
-    dispatch({ type: "setUserInfo", payload: {} });
+    setUserInfo({});
     navigate("/");
   };
   return (

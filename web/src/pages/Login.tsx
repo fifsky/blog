@@ -10,7 +10,7 @@ export default function Login() {
     password: "",
     user_name: "",
   });
-  const { loginAction } = useStore();
+  const loginAction = useStore((s) => s.loginAction);
   const navigate = useNavigate();
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();

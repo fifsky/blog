@@ -8,7 +8,7 @@ import { useStore } from "@/store/context";
 import { getAccessToken } from "@/utils/common";
 
 export function Layout() {
-  const { currentUserAction } = useStore();
+  const currentUserAction = useStore((s) => s.currentUserAction);
 
   useEffect(() => {
     if (getAccessToken()) {
