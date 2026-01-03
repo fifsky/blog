@@ -1,12 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 import { resolve } from "path";
 
 export default defineConfig(() => {
   const isProd = process.env.NODE_ENV === "production";
   return {
     base: isProd ? "https://static.fifsky.com/" : "/",
-    plugins: [react()],
+    plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
         "@": resolve(__dirname, "src"),
