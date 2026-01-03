@@ -39,7 +39,7 @@ export function AdminLayout() {
       {isLogin && (
         <div className="admin">
           <div className="tabs">
-            <ul>
+            <ul className="flex justify-start list-none">
               <li>
                 <Link
                   to="/admin/index"

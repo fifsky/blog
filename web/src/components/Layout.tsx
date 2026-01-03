@@ -20,34 +20,36 @@ export function Layout() {
   return (
     <div id="container">
       <CHeader />
-      <div id="main">
-        <Mood />
-        <div className="tabs">
-          <ul>
-            <li>
-              <NavLink
-                to="/about"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                关于我
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/"
-                end
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                所有文章
-              </NavLink>
-            </li>
-          </ul>
+      <div className="flex justify-between items-start">
+        <div id="main">
+          <Mood />
+          <div className="tabs">
+            <ul className="flex justify-end list-none">
+              <li>
+                <NavLink
+                  to="/about"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  关于我
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/"
+                  end
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  所有文章
+                </NavLink>
+              </li>
+            </ul>
+          </div>
+          <div id="content">
+            <Outlet />
+          </div>
         </div>
-        <div id="content">
-          <Outlet />
-        </div>
+        <Sidebar />
       </div>
-      <Sidebar />
       <CFooter />
     </div>
   );

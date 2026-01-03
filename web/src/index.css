@@ -146,21 +146,6 @@ form p.inputting .formtip {
 .nf li {
   margin: 0.5em 0;
 }
-.nf p.act {
-  margin-left: 170px;
-}
-.nf p.note {
-  width: 400px;
-  margin-left: 170px;
-  line-height: 150%;
-}
-.nf p.pending {
-  width: 384px;
-  padding: 7px 5px 7px 9px;
-  margin-left: 170px;
-  border: 1px solid #ccc;
-  background: #eee;
-}
 .nf span.hint {
   display: block;
   margin-left: 170px;
@@ -179,7 +164,6 @@ form p.inputting .formtip {
   min-height: 500px;
 }
 #main {
-  float: left;
   width: 778px;
   overflow: hidden;
 }
@@ -228,7 +212,6 @@ form p.inputting .formtip {
   text-decoration: none;
 }
 #sidebar {
-  float: right;
   padding: 15px 10px 20px 18px;
   border: 1px solid #89d5ef;
   background: #fff;
@@ -315,21 +298,19 @@ form p.inputting .formtip {
   visibility: hidden;
 }
 .tabs ul {
-  float: right;
   list-style: none;
 }
 .tabs li {
-  float: left;
   margin: 0 0 0 5px;
 }
 .tabs li a {
-  float: left;
   margin: 5px 0 0;
   padding: 2px 14px;
   background: #89d5ef;
   border: 1px solid #89d5ef;
   color: #333;
   text-decoration: none;
+  display: inline-flex;
 }
 .tabs li a:hover {
   background: #fff;
@@ -380,7 +361,6 @@ form p.inputting .formtip {
   font-size: 13px;
 }
 #info #avatar {
-  float: left;
   padding: 1px;
   border: 1px solid #89d5ef;
   background: #fff;
@@ -393,7 +373,7 @@ form p.inputting .formtip {
 }
 #latest {
   min-height: 98px;
-  margin-left: 120px;
+  margin-left: 20px;
   border: 1px solid #89d5ef;
   background: linear-gradient(#fff, #eeffde);
   word-spacing: 1px;
@@ -486,18 +466,15 @@ table.canlender td.happy {
   overflow: hidden;
 }
 .article .entry-title .avatar {
-  float: left;
   padding: 2px;
   width: 40px;
   height: 40px;
 }
 .article .entry-title h2 {
   font-size: 14px;
-  margin: 0 0 0 55px;
 }
 .article .entry-title .entry-meta {
   color: #999;
-  margin: 4px 0 0 55px;
   font-size: 12px;
 }
 .articles .post-meta {
@@ -581,13 +558,7 @@ ul {
   white-space: nowrap;
   width: 230px;
 }
-.article-single .post-navi .prev {
-  float: left;
-}
-.article-single .post-navi .next {
-  float: right;
-  text-align: right;
-}
+
 .not_article {
   text-align: center;
 }
@@ -631,7 +602,6 @@ span.highlight {
   padding: 10px 0;
 }
 .comment a.avatar {
-  float: left;
   display: block;
 }
 .comment a.avatar img {
@@ -650,7 +620,6 @@ span.highlight {
 }
 .comment .actions {
   font-weight: normal;
-  float: right;
 }
 .comment .comment-entry {
   margin-top: 5px;
@@ -658,19 +627,10 @@ span.highlight {
 .comment .comment-form {
   width: 100%;
 }
-.comment .comment-form p:after {
-  clear: both;
-  content: ".";
-  display: block;
-  font-size: 0;
-  line-height: 0;
-  visibility: hidden;
-}
 .comment .comment-form .label_input {
   margin-right: 10px;
   text-align: right;
   width: 50px;
-  float: left;
 }
 .comment .comment-form .input_text {
   width: 200px;
@@ -711,15 +671,12 @@ mark {
 .admin #content {
   font-size: 13px;
 }
-.admin .tabs ul {
-  float: left;
-}
+
 .admin .tabs ul li {
   margin: 0 5px 0 0;
 }
 .admin .paginator {
   text-align: right;
-  float: right;
   padding: 0;
 }
 .admin h2 {
@@ -755,7 +712,6 @@ mark {
 }
 .vf .label_input {
   display: block;
-  float: none;
   text-align: left;
 }
 .lf label.label_check {
@@ -852,47 +808,6 @@ table td span.tag {
 }
 #articles .vf {
   width: 100%;
-}
-#articles .col-right {
-  width: 250px;
-}
-#articles .col-left ul {
-  list-style: none;
-}
-#articles .col-left li {
-  float: left;
-  width: 150px;
-}
-.col-left {
-  width: 700px;
-  float: left;
-}
-.col-right {
-  float: right;
-}
-#comments .vf {
-  width: 500px;
-}
-#cates table td.art-num {
-  text-align: left;
-}
-#cates .col-right .vf,
-#links .col-right .vf,
-#moods .col-right .vf {
-  width: 250px;
-  padding-top: 31px;
-}
-#pages .vf {
-  width: 100%;
-}
-#pages .col-right {
-  width: 250px;
-}
-#pages .operate .input_text {
-  width: 100px;
-}
-#users .vf {
-  width: 500px;
 }
 code {
   background: #ebf8ff;

@@ -50,11 +50,11 @@ export function Mood() {
   const next = () => setIndex((i) => (i + 1 < moods.length ? i + 1 : i));
   const m = moods[index];
   return (
-    <div id="info">
+    <div id="info" className="flex items-start">
       <div id="avatar">
         <img title="莫一哲" alt="莫一哲" src="/assets/images/faceicon.jpg" />
       </div>
-      <div id="latest">
+      <div id="latest" className="flex-1 min-w-0">
         {m && (
           <p className="current active">
             {m.content}

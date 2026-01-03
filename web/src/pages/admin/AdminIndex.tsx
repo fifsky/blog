@@ -84,10 +84,13 @@ export default function AdminIndex() {
             />
           </div>
         </p>
-        <p className="act">
-          <button className="formbutton" type="submit">
-            保存
-          </button>
+        <p className="flex items-center">
+          <div className="label_input"></div>
+          <div>
+            <button className="formbutton" type="submit">
+              保存
+            </button>
+          </div>
         </p>
       </form>
     </div>

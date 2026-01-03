@@ -26,7 +26,7 @@ export default function ArticleDetail() {
     <div>
       <div className="article-single">
         <CArticle article={article} />
-        <div className="post-navi">
+        <div className="post-navi flex justify-between">
           <div className="prev">
             <strong>上一篇：</strong>
             {data.prev && data.prev.id ? (
@@ -35,7 +35,7 @@ export default function ArticleDetail() {
               <span>嘿，这已经是最新的文章啦</span>
             )}
           </div>
-          <div className="next">
+          <div className="next text-right">
             <strong>下一篇：</strong>
             {data.next && data.next.id ? (
               <Link to={`/article/${data.next.id}`}>{data.next.title}</Link>
