@@ -568,6 +568,7 @@ form p.inputting .formtip {
   word-break: break-all;
   overflow: hidden;
   -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
   display: none;
 }
 #latest .current.active {
@@ -628,8 +629,7 @@ table.canlender td.today {
 table.canlender td.happy {
   color: #d08c00;
 }
-.articles {
-}
+
 .article .entry-title {
   height: 54px;
   overflow: hidden;
