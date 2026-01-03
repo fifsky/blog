@@ -70,23 +70,10 @@ select {
   padding: 3px 4px;
   line-height: 15px;
 }
-.input_file {
-  height: 23px;
-}
 .empty {
   color: #999;
 }
-input.formbutton {
-  padding: 0 1.5em;
-  border: 1px solid;
-  border-color: #66acff #094fa1 #094fa1 #66acff;
-  background: #2680e9;
-  color: #fff;
-  letter-spacing: 0.3em;
-  cursor: pointer;
-}
 button.formbutton {
-  height: 23px;
   padding: 0 1.5em;
   border: 1px solid;
   border-color: #66acff #094fa1 #094fa1 #66acff;
@@ -94,33 +81,12 @@ button.formbutton {
   color: #fff;
   letter-spacing: 0.3em;
   cursor: pointer;
-  line-height: 23px;
 }
 .formbutton:focus {
   border-color: #fff;
 }
 input.cancel {
   margin-left: 2em;
-}
-.inlinebutton {
-  height: 23px;
-  padding: 0 0.5em;
-  border: 1px solid;
-  border-color: #ccc #999 #999 #ccc;
-  cursor: pointer;
-}
-.inlinebutton:focus {
-  border-color: #666;
-}
-input.formdisabled {
-  border: 1px solid;
-  border-color: #eee #ccc #ccc #eee;
-  color: #808080;
-  background: #eee;
-}
-input.formdisabled:focus {
-  border: 1px solid;
-  border-color: #eee #ccc #ccc #eee;
 }
 select {
   padding: 2px 2px 2px 0;
@@ -402,37 +368,6 @@ form p.inputting .formtip {
   border: 1px solid #89d5ef;
   border-bottom: 0;
   background: #fff;
-}
-.alist {
-  list-style: none;
-}
-.alist li {
-  float: left;
-  margin: 0 3px 3px 0;
-}
-.alist:after {
-  content: ".";
-  display: block;
-  font-size: 0;
-  line-height: 0;
-  clear: both;
-  visibility: hidden;
-}
-.alist li a {
-  float: left;
-  width: 48px;
-  height: 64px;
-  overflow: hidden;
-  text-decoration: none;
-}
-.alist li a img {
-  height: 48px;
-}
-.alist li a span {
-  display: block;
-  text-align: center;
-  line-height: 150%;
-  white-space: nowrap;
 }
 .paginator {
   list-style: none;

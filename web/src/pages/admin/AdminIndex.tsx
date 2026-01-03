@@ -77,7 +77,9 @@ export default function AdminIndex() {
           />
         </p>
         <p className="act">
-          <input className="formbutton" type="submit" value="保存" />
+          <button className="formbutton" type="submit">
+            保存
+          </button>
         </p>
       </form>
     </div>

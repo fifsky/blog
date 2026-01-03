@@ -37,7 +37,9 @@ export function Sidebar() {
               value={keyword}
             />
             &nbsp;
-            <input className="formbutton" type="submit" value="搜索" />
+            <button className="formbutton" type="submit">
+              搜索
+            </button>
           </p>
         </form>
       </div>

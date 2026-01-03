@@ -220,7 +220,9 @@ export default function PostArticle() {
           </div>
         </div>
         <p className="act">
-          <input className="formbutton" type="submit" value="发布" />
+          <button className="formbutton" type="submit">
+            发布
+          </button>
           <a
             id="_save_draft"
             href="#"

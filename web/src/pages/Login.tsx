@@ -55,7 +55,9 @@ export default function Login() {
                 />
               </p>
               <p className="act">
-                <input type="submit" className="formbutton" value="登录" />
+                <button type="submit" className="formbutton">
+                  登录
+                </button>
               </p>
             </form>
           </div>
