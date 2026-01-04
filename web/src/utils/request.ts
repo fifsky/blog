@@ -1,5 +1,6 @@
 import { getApiUrl } from "./common";
 import { dialog } from "./dialog";
+import { AppError } from "./error";
 
 type RequestOptions = {
   url: string;
@@ -10,7 +11,7 @@ type RequestOptions = {
 
 export async function request<T = any>(
   option: RequestOptions,
-  errorHandler?: (e: any) => void
+  errorHandler?: (e: AppError) => void
 ) {
   const { url, method = "GET", headers = {}, data } = option;
   const init: RequestInit = {
@@ -42,40 +43,66 @@ export async function request<T = any>(
       return payload as T;
     }
 
-    if (
-      isJSON &&
-      payload &&
-      typeof payload === "object" &&
-      "code" in payload &&
-      "msg" in payload
-    ) {
-      throw payload;
+    if (isJSON && payload && typeof payload === "object") {
+      const p: any = payload;
+      if (typeof p.code === "number" && typeof p.msg === "string") {
+        throw new AppError(p.code, p.msg);
+      }
     }
-
-    throw {
-      code: resp.status,
-      msg:
-        typeof payload === "string"
-          ? payload
-          : resp.statusText || "Request error",
-    };
+    throw new AppError(
+      resp.status,
+      getErrorMessage(payload)
+    );
   } catch (e: any) {
-    const err = { code: e?.code || 500, msg: e?.msg || "Network error" };
+    const err: AppError =
+      e instanceof AppError
+        ? e
+        : new AppError(
+            getErrorCode(e.code),
+            getErrorMessage(e)
+          );
     if (errorHandler) {
       errorHandler(err);
       // 返回一个 rejected promise 让调用方自行停止后续逻辑或继续链式处理
       throw err;
     } else {
-      dialog.message(err.msg);
+      dialog.message(err.message);
       throw err;
     }
   }
 }
 
+function getErrorCode(code: unknown) {
+  if (typeof code === "number") {
+    return code;
+  }
+  return 500;
+}
+
+function getErrorMessage(error: unknown, fallback = "Unknown error"): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === "string") {
+    return error;
+  }
+
+  if (error && typeof error === "object" && "message" in error) {
+    return String(error.message);
+  }
+
+  if (error && typeof error === "object" && "msg" in error) {
+    return String(error.msg);
+  }
+
+  return fallback;
+}
+
 export const createApi = <TResp = any>(
   url: string,
   data?: any,
-  errorHandler?: (e: any) => void
+  errorHandler?: (e: AppError) => void
 ) => {
   const headers = {
     "Access-Token": localStorage.getItem("access_token") || "",

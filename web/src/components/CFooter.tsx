@@ -52,7 +52,7 @@ export function CFooter() {
       {showScroll && (
         <i
           id="scroll_top"
-          className="fixed bottom-[100px] left-1/2 ml-[520px] inline-flex items-center justify-center w-7 h-7 rounded-full border border-[#89d5ef] text-[#06c] bg-white cursor-pointer iconfont icon-scall-top text-xl"
+          className="fixed bottom-[100px] left-1/2 ml-[520px] inline-flex items-center justify-center w-7 h-7 rounded-full border border-[#89d5ef] text-[#06c] bg-white cursor-pointer iconfont icon-scroll-top text-xl"
           onClick={(e) => {
             e.preventDefault();
             top();
