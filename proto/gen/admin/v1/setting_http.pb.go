@@ -14,7 +14,9 @@ import (
 // is compatible with the kratos package it is being compiled against.
 // context.contract.http.
 
+// SettingService 提供设置相关的接口
 type SettingServiceHTTPServer interface {
+	// Update 更新设置
 	Update(context.Context, *Options) (*Options, error)
 }
 
@@ -52,6 +54,7 @@ func (s *SettingService) Update(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Update(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return

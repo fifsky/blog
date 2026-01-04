@@ -28,9 +28,14 @@ const (
 // MoodServiceClient is the client API for MoodService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// MoodService 提供心情相关的接口
 type MoodServiceClient interface {
+	// Create 创建心情
 	Create(ctx context.Context, in *MoodCreateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	// Update 更新心情
 	Update(ctx context.Context, in *MoodUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	// Delete 删除心情
 	Delete(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -75,9 +80,14 @@ func (c *moodServiceClient) Delete(ctx context.Context, in *IDRequest, opts ...g
 // MoodServiceServer is the server API for MoodService service.
 // All implementations must embed UnimplementedMoodServiceServer
 // for forward compatibility.
+//
+// MoodService 提供心情相关的接口
 type MoodServiceServer interface {
+	// Create 创建心情
 	Create(context.Context, *MoodCreateRequest) (*IDResponse, error)
+	// Update 更新心情
 	Update(context.Context, *MoodUpdateRequest) (*IDResponse, error)
+	// Delete 删除心情
 	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedMoodServiceServer()
 }

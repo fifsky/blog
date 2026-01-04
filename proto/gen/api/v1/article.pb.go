@@ -593,7 +593,7 @@ var File_api_v1_article_proto protoreflect.FileDescriptor
 
 const file_api_v1_article_proto_rawDesc = "" +
 	"\n" +
-	"\x14api/v1/article.proto\x12\x12fifsky.blog.api.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x19google/api/httpbody.proto\x1a\x1bbuf/validate/validate.proto\x1a\x13api/v1/common.proto\"J\n" +
+	"\x14api/v1/article.proto\x12\x12fifsky.blog.api.v1\x1a\x13api/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/httpbody.proto\x1a\x1bgoogle/protobuf/empty.proto\"J\n" +
 	"\x0fArchiveResponse\x127\n" +
 	"\x04list\x18\x01 \x03(\v2#.fifsky.blog.api.v1.DateArchiveItemR\x04list\"=\n" +
 	"\x0fDateArchiveItem\x12\x10\n" +

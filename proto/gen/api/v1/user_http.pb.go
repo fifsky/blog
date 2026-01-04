@@ -14,8 +14,9 @@ import (
 // is compatible with the kratos package it is being compiled against.
 // context.contract.http.
 
-// 用户服务
+// UserService 提供用户相关的接口
 type UserServiceHTTPServer interface {
+	// Login 登录
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 }
 
@@ -53,6 +54,7 @@ func (s *UserService) Login(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Login(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return

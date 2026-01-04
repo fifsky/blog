@@ -47,7 +47,6 @@ export default function PostUser() {
           返回列表
         </Link>
       </h2>
-      <div className="message"></div>
       <form className="vf" method="post" autoComplete="off" onSubmit={submit}>
         <p>
           <label className="label_input">

@@ -26,7 +26,7 @@ var File_api_v1_setting_proto protoreflect.FileDescriptor
 
 const file_api_v1_setting_proto_rawDesc = "" +
 	"\n" +
-	"\x14api/v1/setting.proto\x12\x12fifsky.blog.api.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x13api/v1/common.proto2e\n" +
+	"\x14api/v1/setting.proto\x12\x12fifsky.blog.api.v1\x1a\x13api/v1/common.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto2e\n" +
 	"\x0eSettingService\x12S\n" +
 	"\x03Get\x12\x16.google.protobuf.Empty\x1a\x1b.fifsky.blog.api.v1.Options\"\x17\x82\xd3\xe4\x93\x02\x11:\x01*\"\f/api/settingB\xad\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\fSettingProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"

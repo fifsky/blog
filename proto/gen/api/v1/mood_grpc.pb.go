@@ -25,7 +25,10 @@ const (
 // MoodServiceClient is the client API for MoodService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// MoodService 提供心情相关的接口
 type MoodServiceClient interface {
+	// List 获取心情列表
 	List(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*MoodListResponse, error)
 }
 
@@ -50,7 +53,10 @@ func (c *moodServiceClient) List(ctx context.Context, in *PageRequest, opts ...g
 // MoodServiceServer is the server API for MoodService service.
 // All implementations must embed UnimplementedMoodServiceServer
 // for forward compatibility.
+//
+// MoodService 提供心情相关的接口
 type MoodServiceServer interface {
+	// List 获取心情列表
 	List(context.Context, *PageRequest) (*MoodListResponse, error)
 	mustEmbedUnimplementedMoodServiceServer()
 }

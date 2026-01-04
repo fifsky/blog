@@ -15,10 +15,15 @@ import (
 // is compatible with the kratos package it is being compiled against.
 // context.contract.http.
 
+// CateService 提供分类相关的接口
 type CateServiceHTTPServer interface {
+	// Create 创建分类
 	Create(context.Context, *CateCreateRequest) (*IDResponse, error)
+	// Delete 删除分类
 	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	// List 获取分类列表
 	List(context.Context, *emptypb.Empty) (*CateListResponse, error)
+	// Update 更新分类
 	Update(context.Context, *CateUpdateRequest) (*IDResponse, error)
 }
 
@@ -50,6 +55,7 @@ func (s *CateService) List(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.List(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -70,6 +76,7 @@ func (s *CateService) Create(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Create(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -90,6 +97,7 @@ func (s *CateService) Update(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Update(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return

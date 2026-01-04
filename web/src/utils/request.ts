@@ -56,7 +56,7 @@ export async function request<T = any>(option: RequestOptions) {
           : resp.statusText || "Request error",
     };
   } catch (e: any) {
-    throw { code: 500, msg: e?.message || "Network error" };
+    throw { code: e?.code || 500, msg: e?.msg || "Network error" };
   }
 }
 

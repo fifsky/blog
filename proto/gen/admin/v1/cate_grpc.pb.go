@@ -29,10 +29,16 @@ const (
 // CateServiceClient is the client API for CateService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// CateService 提供分类相关的接口
 type CateServiceClient interface {
+	// List 获取分类列表
 	List(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CateListResponse, error)
+	// Create 创建分类
 	Create(ctx context.Context, in *CateCreateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	// Update 更新分类
 	Update(ctx context.Context, in *CateUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	// Delete 删除分类
 	Delete(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -87,10 +93,16 @@ func (c *cateServiceClient) Delete(ctx context.Context, in *IDRequest, opts ...g
 // CateServiceServer is the server API for CateService service.
 // All implementations must embed UnimplementedCateServiceServer
 // for forward compatibility.
+//
+// CateService 提供分类相关的接口
 type CateServiceServer interface {
+	// List 获取分类列表
 	List(context.Context, *emptypb.Empty) (*CateListResponse, error)
+	// Create 创建分类
 	Create(context.Context, *CateCreateRequest) (*IDResponse, error)
+	// Update 更新分类
 	Update(context.Context, *CateUpdateRequest) (*IDResponse, error)
+	// Delete 删除分类
 	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedCateServiceServer()
 }

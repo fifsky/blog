@@ -14,8 +14,11 @@ import (
 // is compatible with the kratos package it is being compiled against.
 // context.contract.http.
 
+// RemindService 提供提醒相关的接口
 type RemindServiceHTTPServer interface {
+	// Change 切换提醒状态
 	Change(context.Context, *RemindActionRequest) (*TextResponse, error)
+	// Delay 延迟提醒
 	Delay(context.Context, *RemindActionRequest) (*TextResponse, error)
 }
 
@@ -54,6 +57,7 @@ func (s *RemindService) Change(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Change(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -74,6 +78,7 @@ func (s *RemindService) Delay(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Delay(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return

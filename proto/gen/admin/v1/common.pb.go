@@ -203,7 +203,7 @@ var File_admin_v1_common_proto protoreflect.FileDescriptor
 
 const file_admin_v1_common_proto_rawDesc = "" +
 	"\n" +
-	"\x15admin/v1/common.proto\x12\x14fifsky.blog.admin.v1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bbuf/validate/validate.proto\"'\n" +
+	"\x15admin/v1/common.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/api/field_behavior.proto\"'\n" +
 	"\tIDRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"\x1c\n" +

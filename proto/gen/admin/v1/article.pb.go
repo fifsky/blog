@@ -196,7 +196,7 @@ var File_admin_v1_article_proto protoreflect.FileDescriptor
 
 const file_admin_v1_article_proto_rawDesc = "" +
 	"\n" +
-	"\x16admin/v1/article.proto\x12\x14fifsky.blog.admin.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1bbuf/validate/validate.proto\x1a\x15admin/v1/common.proto\"\xb3\x01\n" +
+	"\x16admin/v1/article.proto\x12\x14fifsky.blog.admin.v1\x1a\x15admin/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xb3\x01\n" +
 	"\x14ArticleCreateRequest\x12#\n" +
 	"\acate_id\x18\x01 \x01(\x05B\n" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x06cateId\x12\x1e\n" +

@@ -10,6 +10,7 @@ paths:
         post:
             tags:
                 - ArticleService
+            description: Create 创建文章
             operationId: ArticleService_Create
             requestBody:
                 content:
@@ -34,6 +35,7 @@ paths:
         post:
             tags:
                 - ArticleService
+            description: Delete 删除文章
             operationId: ArticleService_Delete
             requestBody:
                 content:
@@ -55,6 +57,7 @@ paths:
         post:
             tags:
                 - ArticleService
+            description: Update 更新文章
             operationId: ArticleService_Update
             requestBody:
                 content:
@@ -79,6 +82,7 @@ paths:
         post:
             tags:
                 - CateService
+            description: Create 创建分类
             operationId: CateService_Create
             requestBody:
                 content:
@@ -103,6 +107,7 @@ paths:
         post:
             tags:
                 - CateService
+            description: Delete 删除分类
             operationId: CateService_Delete
             requestBody:
                 content:
@@ -124,6 +129,7 @@ paths:
         post:
             tags:
                 - CateService
+            description: List 获取分类列表
             operationId: CateService_List
             requestBody:
                 content:
@@ -146,6 +152,7 @@ paths:
         post:
             tags:
                 - CateService
+            description: Update 更新分类
             operationId: CateService_Update
             requestBody:
                 content:
@@ -170,6 +177,7 @@ paths:
         post:
             tags:
                 - LinkService
+            description: Create 创建链接
             operationId: LinkService_Create
             requestBody:
                 content:
@@ -194,6 +202,7 @@ paths:
         post:
             tags:
                 - LinkService
+            description: Delete 删除链接
             operationId: LinkService_Delete
             requestBody:
                 content:
@@ -215,6 +224,7 @@ paths:
         post:
             tags:
                 - LinkService
+            description: List 获取链接列表
             operationId: LinkService_List
             requestBody:
                 content:
@@ -237,6 +247,7 @@ paths:
         post:
             tags:
                 - LinkService
+            description: Update 更新链接
             operationId: LinkService_Update
             requestBody:
                 content:
@@ -261,6 +272,7 @@ paths:
         post:
             tags:
                 - UserService
+            description: LoginUser 获取登录用户详情
             operationId: UserService_LoginUser
             requestBody:
                 content:
@@ -283,6 +295,7 @@ paths:
         post:
             tags:
                 - MoodService
+            description: Create 创建心情
             operationId: MoodService_Create
             requestBody:
                 content:
@@ -307,6 +320,7 @@ paths:
         post:
             tags:
                 - MoodService
+            description: Delete 删除心情
             operationId: MoodService_Delete
             requestBody:
                 content:
@@ -328,6 +342,7 @@ paths:
         post:
             tags:
                 - MoodService
+            description: Update 更新心情
             operationId: MoodService_Update
             requestBody:
                 content:
@@ -352,6 +367,7 @@ paths:
         post:
             tags:
                 - RemindService
+            description: Create 创建提醒
             operationId: RemindService_Create
             requestBody:
                 content:
@@ -376,6 +392,7 @@ paths:
         post:
             tags:
                 - RemindService
+            description: Delete 删除提醒
             operationId: RemindService_Delete
             requestBody:
                 content:
@@ -397,6 +414,7 @@ paths:
         post:
             tags:
                 - RemindService
+            description: List 获取提醒列表
             operationId: RemindService_List
             requestBody:
                 content:
@@ -421,6 +439,7 @@ paths:
         post:
             tags:
                 - RemindService
+            description: Update 更新提醒
             operationId: RemindService_Update
             requestBody:
                 content:
@@ -445,6 +464,7 @@ paths:
         post:
             tags:
                 - SettingService
+            description: Update 更新设置
             operationId: SettingService_Update
             requestBody:
                 content:
@@ -469,6 +489,7 @@ paths:
         post:
             tags:
                 - UserService
+            description: Create 创建用户
             operationId: UserService_Create
             requestBody:
                 content:
@@ -493,6 +514,7 @@ paths:
         post:
             tags:
                 - UserService
+            description: Get 获取用户详情
             operationId: UserService_Get
             requestBody:
                 content:
@@ -517,6 +539,7 @@ paths:
         post:
             tags:
                 - UserService
+            description: List 获取用户列表
             operationId: UserService_List
             requestBody:
                 content:
@@ -541,6 +564,7 @@ paths:
         post:
             tags:
                 - UserService
+            description: Status 更新用户状态
             operationId: UserService_Status
             requestBody:
                 content:
@@ -562,6 +586,7 @@ paths:
         post:
             tags:
                 - UserService
+            description: Update 更新用户
             operationId: UserService_Update
             requestBody:
                 content:
@@ -586,6 +611,7 @@ paths:
         post:
             tags:
                 - ArticleService
+            description: Archive 获取文章归档
             operationId: ArticleService_Archive
             requestBody:
                 content:
@@ -608,6 +634,7 @@ paths:
         post:
             tags:
                 - ArticleService
+            description: Detail 获取文章详情
             operationId: ArticleService_Detail
             requestBody:
                 content:
@@ -632,6 +659,7 @@ paths:
         post:
             tags:
                 - ArticleService
+            description: List 获取文章列表
             operationId: ArticleService_List
             requestBody:
                 content:
@@ -656,6 +684,7 @@ paths:
         post:
             tags:
                 - ArticleService
+            description: PrevNext 获取上一篇下一篇文章
             operationId: ArticleService_PrevNext
             requestBody:
                 content:
@@ -680,6 +709,7 @@ paths:
         post:
             tags:
                 - CateService
+            description: All 获取所有分类
             operationId: CateService_All
             requestBody:
                 content:
@@ -702,6 +732,7 @@ paths:
         post:
             tags:
                 - LinkService
+            description: All 获取所有链接
             operationId: LinkService_All
             requestBody:
                 content:
@@ -724,6 +755,7 @@ paths:
         post:
             tags:
                 - UserService
+            description: Login 登录
             operationId: UserService_Login
             requestBody:
                 content:
@@ -748,6 +780,7 @@ paths:
         post:
             tags:
                 - MoodService
+            description: List 获取心情列表
             operationId: MoodService_List
             requestBody:
                 content:
@@ -772,6 +805,7 @@ paths:
         get:
             tags:
                 - RemindService
+            description: Change 切换提醒状态
             operationId: RemindService_Change
             parameters:
                 - name: token
@@ -795,6 +829,7 @@ paths:
         get:
             tags:
                 - RemindService
+            description: Delay 延迟提醒
             operationId: RemindService_Delay
             parameters:
                 - name: token
@@ -818,6 +853,7 @@ paths:
         post:
             tags:
                 - SettingService
+            description: Get 获取设置
             operationId: SettingService_Get
             requestBody:
                 content:
@@ -840,6 +876,7 @@ paths:
         get:
             tags:
                 - ArticleService
+            description: Feed 获取文章 RSS 订阅
             operationId: ArticleService_Feed
             responses:
                 "200":
@@ -1464,17 +1501,30 @@ components:
                     format: int32
 tags:
     - name: ArticleService
+      description: ArticleService 提供文章相关的接口
     - name: ArticleService
+      description: ArticleService 提供文章相关的接口
     - name: CateService
+      description: CateService 提供分类相关的接口
     - name: CateService
+      description: CateService 提供分类相关的接口
     - name: LinkService
+      description: LinkService 提供链接相关的接口
     - name: LinkService
+      description: LinkService 提供链接相关的接口
     - name: MoodService
+      description: MoodService 提供心情相关的接口
     - name: MoodService
+      description: MoodService 提供心情相关的接口
     - name: RemindService
+      description: RemindService 提供提醒相关的接口
     - name: RemindService
+      description: RemindService 提供提醒相关的接口
     - name: SettingService
+      description: SettingService 提供设置相关的接口
     - name: SettingService
+      description: SettingService 提供设置相关的接口
     - name: UserService
+      description: UserService 提供用户相关的接口
     - name: UserService
-      description: 用户服务
+      description: UserService 提供用户相关的接口

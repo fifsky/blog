@@ -216,7 +216,7 @@ var File_api_v1_cate_proto protoreflect.FileDescriptor
 
 const file_api_v1_cate_proto_rawDesc = "" +
 	"\n" +
-	"\x11api/v1/cate.proto\x12\x12fifsky.blog.api.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x13api/v1/common.proto\":\n" +
+	"\x11api/v1/cate.proto\x12\x12fifsky.blog.api.v1\x1a\x13api/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\":\n" +
 	"\fCateMenuItem\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x18\n" +
 	"\acontent\x18\x02 \x01(\tR\acontent\"H\n" +

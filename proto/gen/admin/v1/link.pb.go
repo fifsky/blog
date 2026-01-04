@@ -284,7 +284,7 @@ var File_admin_v1_link_proto protoreflect.FileDescriptor
 
 const file_admin_v1_link_proto_rawDesc = "" +
 	"\n" +
-	"\x13admin/v1/link.proto\x12\x14fifsky.blog.admin.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1bbuf/validate/validate.proto\x1a\x15admin/v1/common.proto\"s\n" +
+	"\x13admin/v1/link.proto\x12\x14fifsky.blog.admin.v1\x1a\x15admin/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\"s\n" +
 	"\bLinkItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x10\n" +

@@ -15,10 +15,15 @@ import (
 // is compatible with the kratos package it is being compiled against.
 // context.contract.http.
 
+// LinkService 提供链接相关的接口
 type LinkServiceHTTPServer interface {
+	// Create 创建链接
 	Create(context.Context, *LinkCreateRequest) (*IDResponse, error)
+	// Delete 删除链接
 	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	// List 获取链接列表
 	List(context.Context, *emptypb.Empty) (*LinkListResponse, error)
+	// Update 更新链接
 	Update(context.Context, *LinkUpdateRequest) (*IDResponse, error)
 }
 
@@ -50,6 +55,7 @@ func (s *LinkService) List(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.List(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -70,6 +76,7 @@ func (s *LinkService) Create(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Create(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -90,6 +97,7 @@ func (s *LinkService) Update(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Update(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return

@@ -29,10 +29,16 @@ const (
 // RemindServiceClient is the client API for RemindService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// RemindService 提供提醒相关的接口
 type RemindServiceClient interface {
+	// List 获取提醒列表
 	List(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*RemindListResponse, error)
+	// Create 创建提醒
 	Create(ctx context.Context, in *RemindCreateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	// Update 更新提醒
 	Update(ctx context.Context, in *RemindUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	// Delete 删除提醒
 	Delete(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -87,10 +93,16 @@ func (c *remindServiceClient) Delete(ctx context.Context, in *IDRequest, opts ..
 // RemindServiceServer is the server API for RemindService service.
 // All implementations must embed UnimplementedRemindServiceServer
 // for forward compatibility.
+//
+// RemindService 提供提醒相关的接口
 type RemindServiceServer interface {
+	// List 获取提醒列表
 	List(context.Context, *PageRequest) (*RemindListResponse, error)
+	// Create 创建提醒
 	Create(context.Context, *RemindCreateRequest) (*IDResponse, error)
+	// Update 更新提醒
 	Update(context.Context, *RemindUpdateRequest) (*IDResponse, error)
+	// Delete 删除提醒
 	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedRemindServiceServer()
 }

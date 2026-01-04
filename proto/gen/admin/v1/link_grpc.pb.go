@@ -29,10 +29,16 @@ const (
 // LinkServiceClient is the client API for LinkService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// LinkService 提供链接相关的接口
 type LinkServiceClient interface {
+	// List 获取链接列表
 	List(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*LinkListResponse, error)
+	// Create 创建链接
 	Create(ctx context.Context, in *LinkCreateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	// Update 更新链接
 	Update(ctx context.Context, in *LinkUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	// Delete 删除链接
 	Delete(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -87,10 +93,16 @@ func (c *linkServiceClient) Delete(ctx context.Context, in *IDRequest, opts ...g
 // LinkServiceServer is the server API for LinkService service.
 // All implementations must embed UnimplementedLinkServiceServer
 // for forward compatibility.
+//
+// LinkService 提供链接相关的接口
 type LinkServiceServer interface {
+	// List 获取链接列表
 	List(context.Context, *emptypb.Empty) (*LinkListResponse, error)
+	// Create 创建链接
 	Create(context.Context, *LinkCreateRequest) (*IDResponse, error)
+	// Update 更新链接
 	Update(context.Context, *LinkUpdateRequest) (*IDResponse, error)
+	// Delete 删除链接
 	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedLinkServiceServer()
 }

@@ -292,7 +292,7 @@ var File_api_v1_remind_proto protoreflect.FileDescriptor
 
 const file_api_v1_remind_proto_rawDesc = "" +
 	"\n" +
-	"\x13api/v1/remind.proto\x12\x12fifsky.blog.api.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x13api/v1/common.proto\"6\n" +
+	"\x13api/v1/remind.proto\x12\x12fifsky.blog.api.v1\x1a\x13api/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\"6\n" +
 	"\x13RemindActionRequest\x12\x1f\n" +
 	"\x05token\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x05token\"\"\n" +
 	"\fTextResponse\x12\x12\n" +

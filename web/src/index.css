@@ -17,13 +17,15 @@ blockquote {
   background-color: #f8f8f8;
   word-break: break-all;
 }
-a {
-  color: #06c;
-  text-decoration: none;
-}
-a:hover {
-  color: #ff7031;
-  text-decoration: underline;
+@layer base {
+  a {
+    color: #06c;
+    text-decoration: none;
+  }
+  a:hover {
+    color: #ff7031;
+    text-decoration: underline;
+  }
 }
 img {
   border: 0;
@@ -118,7 +120,6 @@ form p.inputting .formtip {
   color: #666;
 }
 .nf {
-  clear: both;
   font-size: 13px;
 }
 .nf h3 {
@@ -257,28 +258,6 @@ form p.inputting .formtip {
   padding: 0;
   letter-spacing: 0;
 }
-#footer {
-  clear: both;
-  padding: 1em 0;
-  text-align: center;
-  font-size: 13px;
-}
-#footer p {
-  margin: 1em 0;
-}
-#footer p.info {
-  color: #ccc;
-}
-#footer p.info a,
-#footer p.info a:hover {
-  color: #ccc;
-  text-decoration: none;
-}
-#footer p.info img {
-  display: inline;
-  vertical-align: middle;
-  margin-right: 4px;
-}
 #content {
   padding: 20px;
   border: 1px solid #89d5ef;
@@ -288,14 +267,6 @@ form p.inputting .formtip {
   position: relative;
   top: 1px;
   font-size: 14px;
-}
-.tabs:after {
-  content: ".";
-  display: block;
-  font-size: 0;
-  line-height: 0;
-  clear: both;
-  visibility: hidden;
 }
 .tabs ul {
   list-style: none;
@@ -405,14 +376,6 @@ form p.inputting .formtip {
 #latest .current.active {
   display: block;
 }
-#latest .current:after {
-  content: ".";
-  display: block;
-  font-size: 0;
-  line-height: 0;
-  clear: both;
-  visibility: hidden;
-}
 #latest .stamp {
   position: absolute;
   right: 10px;
@@ -445,20 +408,6 @@ form p.inputting .formtip {
 }
 #info:hover .handle {
   display: inline;
-}
-table.canlender {
-  width: 200px;
-  font-size: 13px;
-}
-table.canlender td {
-  text-align: center;
-}
-table.canlender td.today {
-  background-color: #eeeeee;
-  font-weight: bold;
-}
-table.canlender td.happy {
-  color: #d08c00;
 }
 
 .article .entry-title {
@@ -589,14 +538,6 @@ span.highlight {
 .comment li {
   list-style: none;
 }
-.comment ul li:after {
-  clear: both;
-  content: ".";
-  display: block;
-  font-size: 0;
-  line-height: 0;
-  visibility: hidden;
-}
 .comment ul li {
   border-bottom: 1px dashed #dbdbdb;
   padding: 10px 0;
@@ -650,20 +591,6 @@ span.highlight {
 .comment .replay-entry {
   margin: 0 0 0 40px;
 }
-#scroll_top {
-  position: fixed;
-  bottom: 100px;
-  left: 50%;
-  margin-left: 520px;
-  width: 20px;
-  height: 50px;
-  text-decoration: none;
-  font-size: 0;
-  line-height: 0;
-  overflow: hidden;
-  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAyCAMAAABrogsUAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6N0Q5NUUyMTI0MzE1MTFFMDgyN0RDQ0E4OTAyNDNDQkIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6N0Q5NUUyMTM0MzE1MTFFMDgyN0RDQ0E4OTAyNDNDQkIiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo3RDk1RTIxMDQzMTUxMUUwODI3RENDQTg5MDI0M0NCQiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo3RDk1RTIxMTQzMTUxMUUwODI3RENDQTg5MDI0M0NCQiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pg4ieTEAAAAJUExURW6q5fP3+////0UckUwAAAADdFJOU///ANfKDUEAAACCSURBVHjarJPbDoAgDEOL///RigyBtlGyuPDCyUZ3A4cxXIesQhQypCCgsEowbMIr7Onk1QWOGmf4eG3AFsuwn2/owo3Qdp4vnefwR3rtfLgKFKEb4k8Yt7KOGLE2SM59FMv9pDenjGYISamHm1WUN8PPCMF6au06o/TO269t7BRgAOQyA1ZDSsDiAAAAAElFTkSuQmCC)
-    0 0 no-repeat;
-}
 mark {
   background: orange;
   color: black;
@@ -699,8 +626,6 @@ mark {
   margin: 10px 0;
 }
 .label_input .desc {
-  font-family: sans-serif;
-  font-weight: normal;
   color: #666;
 }
 .vf {
@@ -747,7 +672,6 @@ mark {
   padding: 5px 10px;
   margin: 10px 0 0;
   border-radius: 3px 3px 3px 3px;
-  display: none;
 }
 .admin .message {
   background-color: #ffffe0;

@@ -15,12 +15,19 @@ import (
 // is compatible with the kratos package it is being compiled against.
 // context.contract.http.
 
+// UserService 提供用户相关的接口
 type UserServiceHTTPServer interface {
+	// Create 创建用户
 	Create(context.Context, *UserCreateRequest) (*IDResponse, error)
+	// Get 获取用户详情
 	Get(context.Context, *GetUserRequest) (*User, error)
+	// List 获取用户列表
 	List(context.Context, *PageRequest) (*UserListResponse, error)
+	// LoginUser 获取登录用户详情
 	LoginUser(context.Context, *emptypb.Empty) (*User, error)
+	// Status 更新用户状态
 	Status(context.Context, *IDRequest) (*emptypb.Empty, error)
+	// Update 更新用户
 	Update(context.Context, *UserUpdateRequest) (*IDResponse, error)
 }
 
@@ -63,6 +70,7 @@ func (s *UserService) Get(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Get(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -83,6 +91,7 @@ func (s *UserService) Create(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Create(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -103,6 +112,7 @@ func (s *UserService) Update(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Update(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -123,6 +133,7 @@ func (s *UserService) List(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.List(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -154,6 +165,7 @@ func (s *UserService) LoginUser(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.LoginUser(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return

@@ -26,7 +26,10 @@ const (
 // CateServiceClient is the client API for CateService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// CateService 提供分类相关的接口
 type CateServiceClient interface {
+	// All 获取所有分类
 	All(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CateMenuResponse, error)
 }
 
@@ -51,7 +54,10 @@ func (c *cateServiceClient) All(ctx context.Context, in *emptypb.Empty, opts ...
 // CateServiceServer is the server API for CateService service.
 // All implementations must embed UnimplementedCateServiceServer
 // for forward compatibility.
+//
+// CateService 提供分类相关的接口
 type CateServiceServer interface {
+	// All 获取所有分类
 	All(context.Context, *emptypb.Empty) (*CateMenuResponse, error)
 	mustEmbedUnimplementedCateServiceServer()
 }

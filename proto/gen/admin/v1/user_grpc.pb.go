@@ -31,12 +31,20 @@ const (
 // UserServiceClient is the client API for UserService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// UserService 提供用户相关的接口
 type UserServiceClient interface {
+	// Get 获取用户详情
 	Get(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error)
+	// Create 创建用户
 	Create(ctx context.Context, in *UserCreateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	// Update 更新用户
 	Update(ctx context.Context, in *UserUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	// List 获取用户列表
 	List(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*UserListResponse, error)
+	// Status 更新用户状态
 	Status(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// LoginUser 获取登录用户详情
 	LoginUser(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*User, error)
 }
 
@@ -111,12 +119,20 @@ func (c *userServiceClient) LoginUser(ctx context.Context, in *emptypb.Empty, op
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
+//
+// UserService 提供用户相关的接口
 type UserServiceServer interface {
+	// Get 获取用户详情
 	Get(context.Context, *GetUserRequest) (*User, error)
+	// Create 创建用户
 	Create(context.Context, *UserCreateRequest) (*IDResponse, error)
+	// Update 更新用户
 	Update(context.Context, *UserUpdateRequest) (*IDResponse, error)
+	// List 获取用户列表
 	List(context.Context, *PageRequest) (*UserListResponse, error)
+	// Status 更新用户状态
 	Status(context.Context, *IDRequest) (*emptypb.Empty, error)
+	// LoginUser 获取登录用户详情
 	LoginUser(context.Context, *emptypb.Empty) (*User, error)
 	mustEmbedUnimplementedUserServiceServer()
 }

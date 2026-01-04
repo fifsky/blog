@@ -15,7 +15,9 @@ import (
 // is compatible with the kratos package it is being compiled against.
 // context.contract.http.
 
+// CateService 提供分类相关的接口
 type CateServiceHTTPServer interface {
+	// All 获取所有分类
 	All(context.Context, *emptypb.Empty) (*CateMenuResponse, error)
 }
 
@@ -44,6 +46,7 @@ func (s *CateService) All(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.All(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return

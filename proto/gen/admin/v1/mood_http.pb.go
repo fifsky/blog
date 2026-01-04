@@ -15,9 +15,13 @@ import (
 // is compatible with the kratos package it is being compiled against.
 // context.contract.http.
 
+// MoodService 提供心情相关的接口
 type MoodServiceHTTPServer interface {
+	// Create 创建心情
 	Create(context.Context, *MoodCreateRequest) (*IDResponse, error)
+	// Delete 删除心情
 	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	// Update 更新心情
 	Update(context.Context, *MoodUpdateRequest) (*IDResponse, error)
 }
 
@@ -57,6 +61,7 @@ func (s *MoodService) Create(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Create(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -77,6 +82,7 @@ func (s *MoodService) Update(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Update(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return

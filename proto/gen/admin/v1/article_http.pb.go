@@ -15,9 +15,13 @@ import (
 // is compatible with the kratos package it is being compiled against.
 // context.contract.http.
 
+// ArticleService 提供文章相关的接口
 type ArticleServiceHTTPServer interface {
+	// Create 创建文章
 	Create(context.Context, *ArticleCreateRequest) (*IDResponse, error)
+	// Delete 删除文章
 	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	// Update 更新文章
 	Update(context.Context, *ArticleUpdateRequest) (*IDResponse, error)
 }
 
@@ -57,6 +61,7 @@ func (s *ArticleService) Create(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Create(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -77,6 +82,7 @@ func (s *ArticleService) Update(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Update(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return

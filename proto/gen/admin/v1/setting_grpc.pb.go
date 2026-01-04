@@ -25,7 +25,10 @@ const (
 // SettingServiceClient is the client API for SettingService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// SettingService 提供设置相关的接口
 type SettingServiceClient interface {
+	// Update 更新设置
 	Update(ctx context.Context, in *Options, opts ...grpc.CallOption) (*Options, error)
 }
 
@@ -50,7 +53,10 @@ func (c *settingServiceClient) Update(ctx context.Context, in *Options, opts ...
 // SettingServiceServer is the server API for SettingService service.
 // All implementations must embed UnimplementedSettingServiceServer
 // for forward compatibility.
+//
+// SettingService 提供设置相关的接口
 type SettingServiceServer interface {
+	// Update 更新设置
 	Update(context.Context, *Options) (*Options, error)
 	mustEmbedUnimplementedSettingServiceServer()
 }

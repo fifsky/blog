@@ -148,7 +148,7 @@ var File_api_v1_mood_proto protoreflect.FileDescriptor
 
 const file_api_v1_mood_proto_rawDesc = "" +
 	"\n" +
-	"\x11api/v1/mood.proto\x12\x12fifsky.blog.api.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1bbuf/validate/validate.proto\x1a\x13api/v1/common.proto\"\x88\x01\n" +
+	"\x11api/v1/mood.proto\x12\x12fifsky.blog.api.v1\x1a\x13api/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\"\x88\x01\n" +
 	"\bMoodItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x18\n" +
 	"\acontent\x18\x02 \x01(\tR\acontent\x123\n" +

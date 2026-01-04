@@ -15,10 +15,15 @@ import (
 // is compatible with the kratos package it is being compiled against.
 // context.contract.http.
 
+// RemindService 提供提醒相关的接口
 type RemindServiceHTTPServer interface {
+	// Create 创建提醒
 	Create(context.Context, *RemindCreateRequest) (*IDResponse, error)
+	// Delete 删除提醒
 	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	// List 获取提醒列表
 	List(context.Context, *PageRequest) (*RemindListResponse, error)
+	// Update 更新提醒
 	Update(context.Context, *RemindUpdateRequest) (*IDResponse, error)
 }
 
@@ -59,6 +64,7 @@ func (s *RemindService) List(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.List(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -79,6 +85,7 @@ func (s *RemindService) Create(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Create(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -99,6 +106,7 @@ func (s *RemindService) Update(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Update(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return

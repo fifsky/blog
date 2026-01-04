@@ -103,7 +103,6 @@ export default function PostArticle() {
           返回列表
         </Link>
       </h2>
-      <div className="message"></div>
       <form className="vf" method="post" autoComplete="off" onSubmit={submit}>
         <div className="flex">
           <div className="w-[700px]">

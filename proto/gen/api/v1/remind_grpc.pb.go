@@ -26,8 +26,12 @@ const (
 // RemindServiceClient is the client API for RemindService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// RemindService 提供提醒相关的接口
 type RemindServiceClient interface {
+	// Change 切换提醒状态
 	Change(ctx context.Context, in *RemindActionRequest, opts ...grpc.CallOption) (*TextResponse, error)
+	// Delay 延迟提醒
 	Delay(ctx context.Context, in *RemindActionRequest, opts ...grpc.CallOption) (*TextResponse, error)
 }
 
@@ -62,8 +66,12 @@ func (c *remindServiceClient) Delay(ctx context.Context, in *RemindActionRequest
 // RemindServiceServer is the server API for RemindService service.
 // All implementations must embed UnimplementedRemindServiceServer
 // for forward compatibility.
+//
+// RemindService 提供提醒相关的接口
 type RemindServiceServer interface {
+	// Change 切换提醒状态
 	Change(context.Context, *RemindActionRequest) (*TextResponse, error)
+	// Delay 延迟提醒
 	Delay(context.Context, *RemindActionRequest) (*TextResponse, error)
 	mustEmbedUnimplementedRemindServiceServer()
 }

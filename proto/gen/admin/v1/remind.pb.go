@@ -396,7 +396,7 @@ var File_admin_v1_remind_proto protoreflect.FileDescriptor
 
 const file_admin_v1_remind_proto_rawDesc = "" +
 	"\n" +
-	"\x15admin/v1/remind.proto\x12\x14fifsky.blog.admin.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1bbuf/validate/validate.proto\x1a\x15admin/v1/common.proto\"\x86\x02\n" +
+	"\x15admin/v1/remind.proto\x12\x14fifsky.blog.admin.v1\x1a\x15admin/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\"\x86\x02\n" +
 	"\n" +
 	"RemindItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +

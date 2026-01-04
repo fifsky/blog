@@ -14,7 +14,9 @@ import (
 // is compatible with the kratos package it is being compiled against.
 // context.contract.http.
 
+// MoodService 提供心情相关的接口
 type MoodServiceHTTPServer interface {
+	// List 获取心情列表
 	List(context.Context, *PageRequest) (*MoodListResponse, error)
 }
 
@@ -52,6 +54,7 @@ func (s *MoodService) List(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.List(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return

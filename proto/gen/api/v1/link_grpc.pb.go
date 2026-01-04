@@ -26,7 +26,10 @@ const (
 // LinkServiceClient is the client API for LinkService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// LinkService 提供链接相关的接口
 type LinkServiceClient interface {
+	// All 获取所有链接
 	All(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*LinkMenuResponse, error)
 }
 
@@ -51,7 +54,10 @@ func (c *linkServiceClient) All(ctx context.Context, in *emptypb.Empty, opts ...
 // LinkServiceServer is the server API for LinkService service.
 // All implementations must embed UnimplementedLinkServiceServer
 // for forward compatibility.
+//
+// LinkService 提供链接相关的接口
 type LinkServiceServer interface {
+	// All 获取所有链接
 	All(context.Context, *emptypb.Empty) (*LinkMenuResponse, error)
 	mustEmbedUnimplementedLinkServiceServer()
 }

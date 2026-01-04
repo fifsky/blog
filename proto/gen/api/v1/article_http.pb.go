@@ -16,11 +16,17 @@ import (
 // is compatible with the kratos package it is being compiled against.
 // context.contract.http.
 
+// ArticleService 提供文章相关的接口
 type ArticleServiceHTTPServer interface {
+	// Archive 获取文章归档
 	Archive(context.Context, *emptypb.Empty) (*ArchiveResponse, error)
+	// Detail 获取文章详情
 	Detail(context.Context, *ArticleDetailRequest) (*ArticleItem, error)
+	// Feed 获取文章 RSS 订阅
 	Feed(context.Context, *emptypb.Empty) (*httpbody.HttpBody, error)
+	// List 获取文章列表
 	List(context.Context, *ArticleListRequest) (*ArticleListResponse, error)
+	// PrevNext 获取上一篇下一篇文章
 	PrevNext(context.Context, *PrevNextRequest) (*PrevNextResponse, error)
 }
 
@@ -53,6 +59,7 @@ func (s *ArticleService) Archive(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Archive(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -73,6 +80,7 @@ func (s *ArticleService) List(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.List(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -93,6 +101,7 @@ func (s *ArticleService) PrevNext(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.PrevNext(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return
@@ -113,6 +122,7 @@ func (s *ArticleService) Detail(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.Detail(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return

@@ -3,10 +3,12 @@ import { settingApi, settingUpdateApi } from "@/service";
 
 export default function AdminIndex() {
   const [formdata, setFormdata] = useState<Record<string, string>>({});
+  const [showMessage, setShowMessage] = useState(false);
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     await settingUpdateApi({ kv: formdata });
-    alert("保存成功");
+    setShowMessage(true);
+    setTimeout(() => setShowMessage(false), 3000);
   };
   useEffect(() => {
     (async () => {
@@ -17,7 +19,7 @@ export default function AdminIndex() {
   return (
     <div id="settings">
       <h2>站点设置</h2>
-      <div className="message">保存成功</div>
+      {showMessage && <div className="message">保存成功</div>}
       <form className="nf" method="post" autoComplete="off" onSubmit={submit}>
         <p className="flex">
           <label className="label_input">站点名称</label>

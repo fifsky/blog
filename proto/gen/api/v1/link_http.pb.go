@@ -15,7 +15,9 @@ import (
 // is compatible with the kratos package it is being compiled against.
 // context.contract.http.
 
+// LinkService 提供链接相关的接口
 type LinkServiceHTTPServer interface {
+	// All 获取所有链接
 	All(context.Context, *emptypb.Empty) (*LinkMenuResponse, error)
 }
 
@@ -44,6 +46,7 @@ func (s *LinkService) All(w http.ResponseWriter, r *http.Request) {
 	out, err := s.server.All(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
+		return
 	}
 	s.codec.Encode(w, r, out)
 	return

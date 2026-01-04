@@ -31,11 +31,18 @@ const (
 // ArticleServiceClient is the client API for ArticleService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// ArticleService 提供文章相关的接口
 type ArticleServiceClient interface {
+	// Archive 获取文章归档
 	Archive(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ArchiveResponse, error)
+	// List 获取文章列表
 	List(ctx context.Context, in *ArticleListRequest, opts ...grpc.CallOption) (*ArticleListResponse, error)
+	// PrevNext 获取上一篇下一篇文章
 	PrevNext(ctx context.Context, in *PrevNextRequest, opts ...grpc.CallOption) (*PrevNextResponse, error)
+	// Detail 获取文章详情
 	Detail(ctx context.Context, in *ArticleDetailRequest, opts ...grpc.CallOption) (*ArticleItem, error)
+	// Feed 获取文章 RSS 订阅
 	Feed(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*httpbody.HttpBody, error)
 }
 
@@ -100,11 +107,18 @@ func (c *articleServiceClient) Feed(ctx context.Context, in *emptypb.Empty, opts
 // ArticleServiceServer is the server API for ArticleService service.
 // All implementations must embed UnimplementedArticleServiceServer
 // for forward compatibility.
+//
+// ArticleService 提供文章相关的接口
 type ArticleServiceServer interface {
+	// Archive 获取文章归档
 	Archive(context.Context, *emptypb.Empty) (*ArchiveResponse, error)
+	// List 获取文章列表
 	List(context.Context, *ArticleListRequest) (*ArticleListResponse, error)
+	// PrevNext 获取上一篇下一篇文章
 	PrevNext(context.Context, *PrevNextRequest) (*PrevNextResponse, error)
+	// Detail 获取文章详情
 	Detail(context.Context, *ArticleDetailRequest) (*ArticleItem, error)
+	// Feed 获取文章 RSS 订阅
 	Feed(context.Context, *emptypb.Empty) (*httpbody.HttpBody, error)
 	mustEmbedUnimplementedArticleServiceServer()
 }

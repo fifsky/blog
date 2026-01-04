@@ -28,9 +28,14 @@ const (
 // ArticleServiceClient is the client API for ArticleService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// ArticleService 提供文章相关的接口
 type ArticleServiceClient interface {
+	// Create 创建文章
 	Create(ctx context.Context, in *ArticleCreateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	// Update 更新文章
 	Update(ctx context.Context, in *ArticleUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	// Delete 删除文章
 	Delete(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -75,9 +80,14 @@ func (c *articleServiceClient) Delete(ctx context.Context, in *IDRequest, opts .
 // ArticleServiceServer is the server API for ArticleService service.
 // All implementations must embed UnimplementedArticleServiceServer
 // for forward compatibility.
+//
+// ArticleService 提供文章相关的接口
 type ArticleServiceServer interface {
+	// Create 创建文章
 	Create(context.Context, *ArticleCreateRequest) (*IDResponse, error)
+	// Update 更新文章
 	Update(context.Context, *ArticleUpdateRequest) (*IDResponse, error)
+	// Delete 删除文章
 	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedArticleServiceServer()
 }

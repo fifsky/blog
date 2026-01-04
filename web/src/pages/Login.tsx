@@ -24,7 +24,6 @@ export default function Login() {
         <div id="content">
           <div id="sign-in">
             <h2>博客管理登录</h2>
-            <div className="message"></div>
             <form method="post" onSubmit={submit} className="vf lf">
               <p>
                 <label className="label_input">用户名：</label>
