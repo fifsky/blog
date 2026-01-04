@@ -1,10 +1,10 @@
-FROM dockerproxy.net/library/golang:1.25 AS builder
+FROM docker.1ms.run/library/golang:1.25 AS builder
 ENV GOPROXY=https://goproxy.cn,direct GOPRIVATE="" GOSUMDB="sum.golang.google.cn"
 WORKDIR /build
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make
 
-FROM dockerproxy.net/library/alpine:3.11
+FROM docker.1ms.run/library/alpine:3.11
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 RUN apk update && \
   apk add --no-cache ca-certificates \

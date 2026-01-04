@@ -9,9 +9,9 @@ import (
 	"net/url"
 	"regexp"
 	"slices"
-	"strings"
 
 	"app/response"
+
 	"github.com/gorilla/schema"
 	"google.golang.org/protobuf/encoding/protojson"
 
@@ -55,8 +55,8 @@ func (c *Codec) Decode(r *http.Request, v any) error {
 	}
 
 	contentType, _, _ := mime.ParseMediaType(r.Header.Get("Content-Type"))
-	// 如果是POST，并且是"x-www-form-urlencoded"，则解析from
-	if r.Method == http.MethodPost && slices.Contains([]string{"application/x-www-form-urlencoded", "multipart/form-data"}, contentType) {
+	// 如果是POST，并且是"x-www-form-urlencoded"，则解析form
+	if r.Method == http.MethodPost && contentType == "application/x-www-form-urlencoded" {
 		if err := r.ParseForm(); err != nil {
 			return fmt.Errorf("parse form error: %w", err)
 		}
@@ -79,6 +79,15 @@ func (c *Codec) Decode(r *http.Request, v any) error {
 		}
 	}
 
+	if !hasBody(r) {
+		return nil
+	}
+
+	// 如果不是 JSON 请求体，则跳过，暂不支持其他类型
+	if contentType != "application/json" {
+		return nil
+	}
+
 	if msg, ok := v.(proto.Message); ok {
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
@@ -88,15 +97,24 @@ func (c *Codec) Decode(r *http.Request, v any) error {
 			return fmt.Errorf("decode protojson error: %w", err)
 		}
 	} else {
-		// 如果是 JSON 请求体，则进行 JSON 解码
-		ct := strings.ToLower(r.Header.Get("Content-Type"))
-		if r.Body != nil && strings.Contains(ct, "application/json") {
-			if err := json.NewDecoder(r.Body).Decode(v); err != nil {
-				return fmt.Errorf("decode body error: %w", err)
-			}
+		if err := json.NewDecoder(r.Body).Decode(v); err != nil {
+			return fmt.Errorf("decode body error: %w", err)
 		}
 	}
 	return nil
+}
+
+func hasBody(r *http.Request) bool {
+	if r.Body == nil || r.Body == http.NoBody {
+		return false
+	}
+	if r.ContentLength > 0 {
+		return true
+	}
+	if slices.Contains(r.TransferEncoding, "chunked") {
+		return true
+	}
+	return false
 }
 
 var pathVarReg = regexp.MustCompile(`\{([^{}]+)\}`)
