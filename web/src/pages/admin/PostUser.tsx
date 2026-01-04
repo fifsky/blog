@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { userGetApi, userCreateApi, userUpdateApi } from "@/service";
 import { useLocation, useNavigate, Link } from "react-router";
+import { dialog } from "@/utils/dialog";
 
 export default function PostUser() {
   const [user, setUser] = useState<any>({ type: 1 });
@@ -11,7 +12,7 @@ export default function PostUser() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (user.password1 !== user.password2) {
-      alert("两次输入的密码不一致");
+      dialog.message("两次输入的密码不一致");
       return;
     }
     const { id, name, nick_name, password1, email, type } = user;

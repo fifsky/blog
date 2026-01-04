@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Outlet, useLocation, Link, useNavigate } from "react-router";
 import { CHeader } from "./CHeader";
 import { CFooter } from "./CFooter";
+import { AppMessage } from "./AppMessage";
 import { useStore } from "@/store/context";
 import { getAccessToken } from "@/utils/common";
 
@@ -35,6 +36,7 @@ export function AdminLayout() {
 
   return (
     <div id="container">
+      <AppMessage />
       <CHeader />
       {isLogin && (
         <div className="admin">

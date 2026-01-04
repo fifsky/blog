@@ -104,3 +104,24 @@ export type LinkUpdateRequest = {
     url?: string;
     desc?: string;
 }
+
+export type RemindCreateRequest = {
+  type: number;
+  month?: number;
+  week?: number;
+  day?: number;
+  hour?: number;
+  minute?: number;
+  content: string;
+}
+
+export type RemindUpdateRequest = {
+  id: number;
+  type?: number;
+  month?: number;
+  week?: number;
+  day?: number;
+  hour?: number;
+  minute?: number;
+  content?: string;
+}

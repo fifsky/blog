@@ -1,4 +1,4 @@
-import { createApi } from '@/utils/request'
+import { createApi } from "@/utils/request";
 import type {
   LoginRequest,
   LoginResponse,
@@ -17,6 +17,8 @@ import type {
   IDResponse,
   MoodCreateRequest,
   MoodUpdateRequest,
+  RemindCreateRequest,
+  RemindUpdateRequest,
   CateCreateRequest,
   CateUpdateRequest,
   LinkCreateRequest,
@@ -27,48 +29,143 @@ import type {
   UserUpdateRequest,
   GetUserRequest,
   ArticleCreateRequest,
-  ArticleUpdateRequest
-} from '@/types/openapi'
+  ArticleUpdateRequest,
+} from "@/types/openapi";
 
-export const loginApi = (data: LoginRequest) => createApi<LoginResponse>('/api/login', data)
-export const articleListApi = (data: ArticleListRequest) => createApi<ArticleListResponse>('/api/article/list', data)
-export const articleDetailApi = (data: { id?: number; url?: string }) => createApi<ArticleItem>('/api/article/detail', data)
-export const prevnextArticleApi = (data: { id: number }) => createApi<PrevNextResponse>('/api/article/prevnext', data)
-export const moodListApi = (data: PageRequest) => createApi<MoodListResponse>('/api/mood/list', data)
-export const commentListApi = (data: any) => createApi('/api/comment/list', data)
-export const commentPostApi = (data: any) => createApi('/api/comment/post', data)
-export const settingApi = () => createApi<Options>('/api/setting')
-export const cateAllApi = () => createApi<CateMenuResponse>('/api/cate/all')
-export const archiveApi = () => createApi<ArchiveResponse>('/api/article/archive')
-export const newCommentApi = () => createApi<any>('/api/comment/new')
-export const linkAllApi = () => createApi<LinkMenuResponse>('/api/link/all')
+export const loginApi = (data: LoginRequest, errorHandler?: (e: any) => void) =>
+  createApi<LoginResponse>("/api/login", data, errorHandler);
+export const articleListApi = (
+  data: ArticleListRequest,
+  errorHandler?: (e: any) => void
+) => createApi<ArticleListResponse>("/api/article/list", data, errorHandler);
+export const articleDetailApi = (
+  data: { id?: number; url?: string },
+  errorHandler?: (e: any) => void
+) => createApi<ArticleItem>("/api/article/detail", data, errorHandler);
+export const prevnextArticleApi = (
+  data: { id: number },
+  errorHandler?: (e: any) => void
+) => createApi<PrevNextResponse>("/api/article/prevnext", data, errorHandler);
+export const moodListApi = (
+  data: PageRequest,
+  errorHandler?: (e: any) => void
+) => createApi<MoodListResponse>("/api/mood/list", data, errorHandler);
+export const commentListApi = (data: any, errorHandler?: (e: any) => void) =>
+  createApi("/api/comment/list", data, errorHandler);
+export const commentPostApi = (data: any, errorHandler?: (e: any) => void) =>
+  createApi("/api/comment/post", data, errorHandler);
+export const settingApi = (errorHandler?: (e: any) => void) =>
+  createApi<Options>("/api/setting", undefined, errorHandler);
+export const cateAllApi = (errorHandler?: (e: any) => void) =>
+  createApi<CateMenuResponse>("/api/cate/all", undefined, errorHandler);
+export const archiveApi = (errorHandler?: (e: any) => void) =>
+  createApi<ArchiveResponse>("/api/article/archive", undefined, errorHandler);
+export const newCommentApi = (errorHandler?: (e: any) => void) =>
+  createApi<any>("/api/comment/new", undefined, errorHandler);
+export const linkAllApi = (errorHandler?: (e: any) => void) =>
+  createApi<LinkMenuResponse>("/api/link/all", undefined, errorHandler);
 
-export const loginUserApi = () => createApi<User>('/api/admin/loginuser')
-export const settingUpdateApi = (data: Options) => createApi<Options>('/api/admin/setting/update', data)
-export const articleCreateApi = (data: ArticleCreateRequest) => createApi<IDResponse>('/api/admin/article/create', data)
-export const articleUpdateApi = (data: ArticleUpdateRequest) => createApi<IDResponse>('/api/admin/article/update', data)
-export const articleDeleteApi = (data: IDRequest) => createApi('/api/admin/article/delete', data)
-export const uploadApi = (data: any) => createApi('/api/admin/upload', data)
-export const commentAdminListApi = (data: PageRequest) => createApi('/api/admin/comment/list', data)
-export const commentDeleteApi = (data: IDRequest) => createApi('/api/admin/comment/delete', data)
-export const moodCreateApi = (data: MoodCreateRequest) => createApi<IDResponse>('/api/admin/mood/create', data)
-export const moodUpdateApi = (data: MoodUpdateRequest) => createApi<IDResponse>('/api/admin/mood/update', data)
-export const moodDeleteApi = (data: IDRequest) => createApi('/api/admin/mood/delete', data)
-export const cateListApi = (data?: any) => createApi<CateListResponse>('/api/admin/cate/list', data)
-export const cateCreateApi = (data: CateCreateRequest) => createApi<IDResponse>('/api/admin/cate/create', data)
-export const cateUpdateApi = (data: CateUpdateRequest) => createApi<IDResponse>('/api/admin/cate/update', data)
-export const cateDeleteApi = (data: IDRequest) => createApi('/api/admin/cate/delete', data)
-export const linkListApi = (data?: any) => createApi('/api/admin/link/list', data)
-export const linkCreateApi = (data: LinkCreateRequest) => createApi<IDResponse>('/api/admin/link/create', data)
-export const linkUpdateApi = (data: LinkUpdateRequest) => createApi<IDResponse>('/api/admin/link/update', data)
-export const linkDeleteApi = (data: IDRequest) => createApi('/api/admin/link/delete', data)
-export const remindListApi = (data: PageRequest) => createApi('/api/admin/remind/list', data)
-export const remindCreateApi = (data: any) => createApi<IDResponse>('/api/admin/remind/create', data)
-export const remindUpdateApi = (data: any) => createApi<IDResponse>('/api/admin/remind/update', data)
-export const remindDeleteApi = (data: IDRequest) => createApi('/api/admin/remind/delete', data)
-export const userListApi = (data: PageRequest) => createApi<UserListResponse>('/api/admin/user/list', data)
-export const userCreateApi = (data: UserCreateRequest) => createApi<IDResponse>('/api/admin/user/create', data)
-export const userUpdateApi = (data: UserUpdateRequest) => createApi<IDResponse>('/api/admin/user/update', data)
-export const userGetApi = (data: GetUserRequest) => createApi<User>('/api/admin/user/get', data)
-export const userStatusApi = (data: IDRequest) => createApi('/api/admin/user/status', data)
-
+export const loginUserApi = (errorHandler?: (e: any) => void) =>
+  createApi<User>("/api/admin/loginuser", undefined, errorHandler);
+export const settingUpdateApi = (
+  data: Options,
+  errorHandler?: (e: any) => void
+) => createApi<Options>("/api/admin/setting/update", data, errorHandler);
+export const articleCreateApi = (
+  data: ArticleCreateRequest,
+  errorHandler?: (e: any) => void
+) => createApi<IDResponse>("/api/admin/article/create", data, errorHandler);
+export const articleUpdateApi = (
+  data: ArticleUpdateRequest,
+  errorHandler?: (e: any) => void
+) => createApi<IDResponse>("/api/admin/article/update", data, errorHandler);
+export const articleDeleteApi = (
+  data: IDRequest,
+  errorHandler?: (e: any) => void
+) => createApi("/api/admin/article/delete", data, errorHandler);
+export const uploadApi = (data: any, errorHandler?: (e: any) => void) =>
+  createApi("/api/admin/upload", data, errorHandler);
+export const commentAdminListApi = (
+  data: PageRequest,
+  errorHandler?: (e: any) => void
+) => createApi("/api/admin/comment/list", data, errorHandler);
+export const commentDeleteApi = (
+  data: IDRequest,
+  errorHandler?: (e: any) => void
+) => createApi("/api/admin/comment/delete", data, errorHandler);
+export const moodCreateApi = (
+  data: MoodCreateRequest,
+  errorHandler?: (e: any) => void
+) => createApi<IDResponse>("/api/admin/mood/create", data, errorHandler);
+export const moodUpdateApi = (
+  data: MoodUpdateRequest,
+  errorHandler?: (e: any) => void
+) => createApi<IDResponse>("/api/admin/mood/update", data, errorHandler);
+export const moodDeleteApi = (
+  data: IDRequest,
+  errorHandler?: (e: any) => void
+) => createApi("/api/admin/mood/delete", data, errorHandler);
+export const cateListApi = (data?: any, errorHandler?: (e: any) => void) =>
+  createApi<CateListResponse>("/api/admin/cate/list", data, errorHandler);
+export const cateCreateApi = (
+  data: CateCreateRequest,
+  errorHandler?: (e: any) => void
+) => createApi<IDResponse>("/api/admin/cate/create", data, errorHandler);
+export const cateUpdateApi = (
+  data: CateUpdateRequest,
+  errorHandler?: (e: any) => void
+) => createApi<IDResponse>("/api/admin/cate/update", data, errorHandler);
+export const cateDeleteApi = (
+  data: IDRequest,
+  errorHandler?: (e: any) => void
+) => createApi("/api/admin/cate/delete", data, errorHandler);
+export const linkListApi = (data?: any, errorHandler?: (e: any) => void) =>
+  createApi("/api/admin/link/list", data, errorHandler);
+export const linkCreateApi = (
+  data: LinkCreateRequest,
+  errorHandler?: (e: any) => void
+) => createApi<IDResponse>("/api/admin/link/create", data, errorHandler);
+export const linkUpdateApi = (
+  data: LinkUpdateRequest,
+  errorHandler?: (e: any) => void
+) => createApi<IDResponse>("/api/admin/link/update", data, errorHandler);
+export const linkDeleteApi = (
+  data: IDRequest,
+  errorHandler?: (e: any) => void
+) => createApi("/api/admin/link/delete", data, errorHandler);
+export const remindListApi = (
+  data: PageRequest,
+  errorHandler?: (e: any) => void
+) => createApi("/api/admin/remind/list", data, errorHandler);
+export const remindCreateApi = (
+  data: RemindCreateRequest,
+  errorHandler?: (e: any) => void
+) => createApi<IDResponse>("/api/admin/remind/create", data, errorHandler);
+export const remindUpdateApi = (
+  data: RemindUpdateRequest,
+  errorHandler?: (e: any) => void
+) => createApi<IDResponse>("/api/admin/remind/update", data, errorHandler);
+export const remindDeleteApi = (
+  data: IDRequest,
+  errorHandler?: (e: any) => void
+) => createApi("/api/admin/remind/delete", data, errorHandler);
+export const userListApi = (
+  data: PageRequest,
+  errorHandler?: (e: any) => void
+) => createApi<UserListResponse>("/api/admin/user/list", data, errorHandler);
+export const userCreateApi = (
+  data: UserCreateRequest,
+  errorHandler?: (e: any) => void
+) => createApi<IDResponse>("/api/admin/user/create", data, errorHandler);
+export const userUpdateApi = (
+  data: UserUpdateRequest,
+  errorHandler?: (e: any) => void
+) => createApi<IDResponse>("/api/admin/user/update", data, errorHandler);
+export const userGetApi = (
+  data: GetUserRequest,
+  errorHandler?: (e: any) => void
+) => createApi<User>("/api/admin/user/get", data, errorHandler);
+export const userStatusApi = (
+  data: IDRequest,
+  errorHandler?: (e: any) => void
+) => createApi("/api/admin/user/status", data, errorHandler);

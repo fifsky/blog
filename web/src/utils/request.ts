@@ -1,4 +1,5 @@
 import { getApiUrl } from "./common";
+import { dialog } from "./dialog";
 
 type RequestOptions = {
   url: string;
@@ -7,7 +8,10 @@ type RequestOptions = {
   data?: any;
 };
 
-export async function request<T = any>(option: RequestOptions) {
+export async function request<T = any>(
+  option: RequestOptions,
+  errorHandler?: (e: any) => void
+) {
   const { url, method = "GET", headers = {}, data } = option;
   const init: RequestInit = {
     method,
@@ -56,11 +60,23 @@ export async function request<T = any>(option: RequestOptions) {
           : resp.statusText || "Request error",
     };
   } catch (e: any) {
-    throw { code: e?.code || 500, msg: e?.msg || "Network error" };
+    const err = { code: e?.code || 500, msg: e?.msg || "Network error" };
+    if (errorHandler) {
+      errorHandler(err);
+      // 返回一个 rejected promise 让调用方自行停止后续逻辑或继续链式处理
+      throw err;
+    } else {
+      dialog.message(err.msg);
+      throw err;
+    }
   }
 }
 
-export const createApi = <TResp = any>(url: string, data?: any) => {
+export const createApi = <TResp = any>(
+  url: string,
+  data?: any,
+  errorHandler?: (e: any) => void
+) => {
   const headers = {
     "Access-Token": localStorage.getItem("access_token") || "",
   };
@@ -70,5 +86,5 @@ export const createApi = <TResp = any>(url: string, data?: any) => {
     method: "post",
     headers,
   };
-  return request<TResp>(param);
+  return request<TResp>(param, errorHandler);
 };

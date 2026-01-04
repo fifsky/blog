@@ -14,6 +14,7 @@ import type {
   IToolbarConfig,
 } from "@wangeditor/editor";
 import { getApiUrl, getAccessToken } from "@/utils/common";
+import { dialog } from "@/utils/dialog";
 
 export default function PostArticle() {
   const [article, setArticle] = useState<any>({ type: 1 });
@@ -39,10 +40,10 @@ export default function PostArticle() {
         maxFileSize: 10 * 1024 * 1024,
         allowedFileTypes: ["image/*"],
         onFailed(file: File, res: any) {
-          alert(`${file.name} 上传失败` + (res.message || ""));
+          dialog.message(`${file.name} 上传失败` + (res.message || ""));
         },
         onError(file: File, err: any) {
-          alert(`${file.name} 上传失败` + (err || ""));
+          dialog.message(`${file.name} 上传失败` + (err || ""));
         },
       },
     },
@@ -52,11 +53,11 @@ export default function PostArticle() {
     e.preventDefault();
     const { id, cate_id, title, content, type, url } = article;
     if (!title || title.length === 0) {
-      alert("标题不能为空");
+      dialog.message("标题不能为空");
       return;
     }
     if (!cate_id || cate_id < 1) {
-      alert("请选择分类");
+      dialog.message("请选择分类");
       return;
     }
     const data = { id, cate_id, title, content, type, url };

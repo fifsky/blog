@@ -1,11 +1,10 @@
 export const dialog = {
-  alert(msg: string, fn: ((ok?: boolean) => void) | null = null) {
-    window.alert(msg)
-    fn && fn()
+  message(msg: string, fn: ((ok?: boolean) => void) | null = null) {
+    window.dispatchEvent(new CustomEvent("app-alert", { detail: { msg } }));
+    fn && fn();
   },
   confirm(msg: string, fn: ((ok: boolean) => void) | null = null) {
-    const ok = window.confirm(msg)
-    fn && fn(ok)
-  }
-}
-
+    const ok = window.confirm(msg);
+    fn && fn(ok);
+  },
+};
