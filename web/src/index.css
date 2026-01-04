@@ -68,9 +68,6 @@ select {
   padding: 3px 4px;
   line-height: 15px;
 }
-.empty {
-  color: #999;
-}
 button.formbutton {
   padding: 0 1.5em;
   border: 1px solid;
@@ -110,15 +107,6 @@ form p.error input,
 form p.error textarea {
   border-color: red;
 }
-form p.error .formtip {
-  font-weight: bold;
-}
-form p.inputting .formtip {
-  color: #000;
-}
-.formtip {
-  color: #666;
-}
 .nf {
   font-size: 13px;
 }
@@ -133,10 +121,6 @@ form p.inputting .formtip {
   margin-right: 15px;
   text-align: right;
   width: 155px;
-}
-.nf .label_check {
-  margin-left: 170px;
-  cursor: pointer;
 }
 .nf .input_text {
   width: 200px;
@@ -294,38 +278,6 @@ form p.inputting .formtip {
   border-bottom: 0;
   background: #fff;
 }
-.paginator {
-  list-style: none;
-  padding: 10px 0;
-  text-align: center;
-}
-.paginator li {
-  margin: 0 0.2em;
-  display: inline;
-  cursor: pointer;
-}
-.paginator li.active a {
-  background: #ddd;
-  color: #555;
-}
-.paginator li.active a:hover {
-  background: #ddd;
-  color: #555;
-  border-color: #ddd;
-  cursor: default;
-}
-.paginator li a {
-  padding: 2px 8px;
-  border: 1px solid #ddd;
-  text-decoration: none;
-  user-select: none;
-  outline: none;
-}
-.paginator li a:hover {
-  border-color: #06c;
-  background: #06c;
-  color: #fff;
-}
 #info {
   position: relative;
   margin: 0 0 10px;
@@ -383,10 +335,6 @@ form p.inputting .formtip {
   line-height: 120%;
   color: #8c8c8c;
   font-size: 12px;
-}
-#latest .stamp a.post_act {
-  margin-left: 1em;
-  color: #555;
 }
 #info .handle {
   position: absolute;
@@ -453,19 +401,12 @@ form p.inputting .formtip {
   -webkit-box-shadow: 0 0 8px #aaa;
   box-shadow: 0 0 8px #e1e1e1;
 }
-.article .entry .hljs,
-.article .entry .ql-syntax {
+.article .entry .hljs {
   line-height: 16px;
   border-radius: 3px;
   word-spacing: normal;
   letter-spacing: normal;
   padding: 5px 10px;
-}
-.article .entry .ql-syntax {
-  display: block;
-  overflow-x: auto;
-  background: #ebf8ff;
-  color: #516d7b;
 }
 .article .entry p {
   line-height: 30px;
@@ -507,10 +448,6 @@ ul {
   white-space: nowrap;
   width: 230px;
 }
-
-.not_article {
-  text-align: center;
-}
 span.highlight {
   color: #ff0000;
   position: absolute;
@@ -523,13 +460,6 @@ span.highlight {
   font-weight: bold;
   line-height: 30px;
   font-size: 14px;
-}
-.comment .comment-close {
-  text-align: center;
-  margin: 10px;
-}
-.comment .comment-null {
-  text-align: center;
 }
 .comment ul {
   margin: 10px 0 20px;
@@ -553,43 +483,8 @@ span.highlight {
 .comment a.avatar:hover img {
   border: 1px solid #ff7031;
 }
-.comment .comment-doc {
-  margin: -3px 0 0 45px;
-}
 .comment h4 {
   font-size: 12px;
-}
-.comment .actions {
-  font-weight: normal;
-}
-.comment .comment-entry {
-  margin-top: 5px;
-}
-.comment .comment-form {
-  width: 100%;
-}
-.comment .comment-form .label_input {
-  margin-right: 10px;
-  text-align: right;
-  width: 50px;
-}
-.comment .comment-form .input_text {
-  width: 200px;
-}
-.comment .comment-form textarea {
-  width: 350px;
-  height: 80px;
-}
-.comment .reply-list li {
-  padding: 5px;
-  background: none repeat scroll 0 0 #f6f6f6;
-  border: none;
-}
-.comment .reply-info {
-  margin: 0 0 0 40px;
-}
-.comment .replay-entry {
-  margin: 0 0 0 40px;
 }
 mark {
   background: orange;
@@ -639,9 +534,6 @@ mark {
   display: block;
   text-align: left;
 }
-.lf label.label_check {
-  font-weight: normal;
-}
 .lf p {
   line-height: 26px;
 }
@@ -664,11 +556,7 @@ mark {
   margin: 3px 0 3px 0;
   font-size: 12px;
 }
-.nf .util {
-  margin: 10px 0;
-}
-.admin .message,
-.admin .notice {
+.admin .message {
   padding: 5px 10px;
   margin: 10px 0 0;
   border-radius: 3px 3px 3px 3px;
@@ -676,10 +564,6 @@ mark {
 .admin .message {
   background-color: #ffffe0;
   border: 1px solid #e6db55;
-}
-.admin .notice {
-  background-color: #ffebe8;
-  border-color: #cc0000;
 }
 table.list {
   width: 100%;
@@ -715,10 +599,6 @@ table td.comment-num a:hover,
 table td.art-num a:hover {
   background: none repeat scroll 0 0 #89d5ef;
   text-decoration: none;
-}
-table td span.tag {
-  color: #e7a940;
-  padding-right: 5px;
 }
 #sign-in {
   padding: 0 30px;
