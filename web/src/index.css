@@ -2,7 +2,6 @@
 @import "./assets/iconfont/iconfont.css";
 @import "tw-animate-css";
 @import "./themes/default.css";
-@import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
