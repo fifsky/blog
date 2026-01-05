@@ -5,8 +5,8 @@ import { Toaster } from "@/components/ui/sonner";
 export default function App() {
   return (
     <>
-    <Toaster />
-    <RouterProvider router={router}/>
+      <Toaster position="top-center" duration={3000} />
+      <RouterProvider router={router} />
     </>
   );
 }
