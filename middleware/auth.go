@@ -21,7 +21,7 @@ func NewAuthLogin(s *store.Store, conf *config.Config) AuthLogin {
 			accessToken := r.Header.Get("Access-Token")
 
 			if accessToken == "" {
-				response.Fail(w, 201, "Access Token不能为空")
+				response.Fail(w, 201, "登录过期，请重新登录")
 				return
 			}
 
@@ -30,7 +30,7 @@ func NewAuthLogin(s *store.Store, conf *config.Config) AuthLogin {
 			})
 
 			if err != nil {
-				response.Fail(w, 201, "Access Token不合法")
+				response.Fail(w, 201, "登录过期，请重新登录")
 				return
 			}
 
@@ -43,7 +43,7 @@ func NewAuthLogin(s *store.Store, conf *config.Config) AuthLogin {
 
 				r = r.WithContext(admin.SetLoginUser(r.Context(), user))
 			} else {
-				response.Fail(w, 203, "Access Token不合法")
+				response.Fail(w, 203, "登录过期，请重新登录")
 				return
 			}
 

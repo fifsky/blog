@@ -10,6 +10,7 @@ import (
 	"app/config"
 	"app/store"
 	"app/testutil"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/goapt/dbunit"
@@ -44,11 +45,11 @@ func TestNewAuthLogin(t *testing.T) {
 			},
 			{
 				"",
-				`{"code":201,"msg":"Access Token不能为空"}`,
+				`{"code":201,"msg":"登录过期，请重新登录"}`,
 			},
 			{
 				"789789",
-				`{"code":201,"msg":"Access Token不合法"}`,
+				`{"code":201,"msg":"登录过期，请重新登录"}`,
 			},
 			{
 				getUserTestToken(999, conf),
