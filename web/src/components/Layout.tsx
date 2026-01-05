@@ -4,7 +4,6 @@ import { CHeader } from "./CHeader";
 import { Sidebar } from "./Sidebar";
 import { Mood } from "./Mood";
 import { CFooter } from "./CFooter";
-import { AppMessage } from "./AppMessage";
 import { useStore } from "@/store/context";
 import { getAccessToken } from "@/utils/common";
 
@@ -20,7 +19,6 @@ export function Layout() {
 
   return (
     <div id="container">
-      <AppMessage />
       <CHeader />
       <div className="flex justify-between items-start">
         <div id="main">
