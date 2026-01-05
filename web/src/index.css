@@ -1,14 +1,37 @@
 @import "tailwindcss";
 @import "./assets/iconfont/iconfont.css";
-body {
-  line-height: 150%;
-  background: linear-gradient(#97d2e8, #fff 350px) no-repeat;
-  font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC,
-    Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei,
-    sans-serif;
-  font-size: 14px;
-  color: #555555;
+@import "tw-animate-css";
+@import "./themes/default.css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@layer base {
+  a {
+    color: var(--primary);
+    text-decoration: none;
+  }
+  a:hover {
+    color: #ff7031;
+    text-decoration: underline;
+  }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply font-sans bg-background text-foreground text-[14px] leading-[150%];
+    background-image: linear-gradient(#97d2e8, #fff 350px);
+    background-repeat: no-repeat;
+  }
+  html {
+    @apply font-sans;
+  }
+
+  button {
+    cursor: pointer;
+  }
 }
+
 blockquote {
   color: #7e7e7e;
   padding-left: 10px;
@@ -17,16 +40,7 @@ blockquote {
   background-color: #f8f8f8;
   word-break: break-all;
 }
-@layer base {
-  a {
-    color: #06c;
-    text-decoration: none;
-  }
-  a:hover {
-    color: #ff7031;
-    text-decoration: underline;
-  }
-}
+
 img {
   border: 0;
   vertical-align: middle;
