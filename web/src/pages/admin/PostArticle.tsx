@@ -42,6 +42,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { cn } from "@/lib/utils";
 
 const articleSchema = z.object({
   id: z.number().optional(),
@@ -167,145 +168,145 @@ export default function PostArticle() {
       <div className="mt-3">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(submit)} className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
-              {/* 左栏：占三分之二 - 标题和分类 */}
-              <FieldGroup>
+            {/* 两行两列布局：第一行标题和类型，第二行分类和缩略名 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* 第一行：标题 */}
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <Field>
+                    <FormLabel>
+                      标题 <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <FieldContent>
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="请输入标题"
+                            maxLength={200}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+
+              {/* 第一行：类型 */}
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <Field>
+                    <FormLabel>
+                      类型 <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <FieldContent>
+                      <FormItem>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={(value) =>
+                              field.onChange(parseInt(value) as 1 | 2)
+                            }
+                            defaultValue={field.value.toString()}
+                            className="flex space-x-6"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="1" id="type-1" />
+                              <label
+                                htmlFor="type-1"
+                                className="cursor-pointer"
+                              >
+                                文章
+                              </label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="2" id="type-2" />
+                              <label
+                                htmlFor="type-2"
+                                className="cursor-pointer"
+                              >
+                                页面
+                              </label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+
+              {/* 第二行：分类 */}
+              <FormField
+                control={form.control}
+                name="cate_id"
+                render={({ field }) => (
+                  <Field>
+                    <FormLabel>
+                      分类 <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <FieldContent>
+                      <FormItem>
+                        <Select
+                          onValueChange={(value) =>
+                            field.onChange(parseInt(value))
+                          }
+                          value={field.value.toString()}
+                        >
+                          <FormControl>
+                            <SelectTrigger size={"sm"}>
+                              <SelectValue placeholder="请选择分类" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {cates.map((v) => (
+                              <SelectItem key={v.id} value={v.id.toString()}>
+                                {v.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+
+              {/* 第二行：缩略名 */}
+              {articleType === 2 && (
                 <FormField
                   control={form.control}
-                  name="title"
+                  name="url"
                   render={({ field }) => (
                     <Field>
-                      <FormLabel>
-                        标题 <span className="text-destructive">*</span>
-                      </FormLabel>
+                      <FormLabel>缩略名</FormLabel>
                       <FieldContent>
                         <FormItem>
                           <FormControl>
                             <Input
                               {...field}
-                              placeholder="请输入标题"
+                              placeholder="请输入缩略名"
                               maxLength={200}
+                              className={cn("w-52")}
                             />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       </FieldContent>
+                      <FieldDescription>
+                        页面的URL名称，如http://domain.com/
+                        <span style={{ color: "red" }}>about</span>
+                      </FieldDescription>
                     </Field>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="cate_id"
-                  render={({ field }) => (
-                    <Field>
-                      <FormLabel>
-                        分类 <span className="text-destructive">*</span>
-                      </FormLabel>
-                      <FieldContent>
-                        <FormItem>
-                          <Select
-                            onValueChange={(value) =>
-                              field.onChange(parseInt(value))
-                            }
-                            value={field.value.toString()}
-                          >
-                            <FormControl>
-                              <SelectTrigger size={"sm"}>
-                                <SelectValue placeholder="请选择分类" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {cates.map((v) => (
-                                <SelectItem key={v.id} value={v.id.toString()}>
-                                  {v.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      </FieldContent>
-                    </Field>
-                  )}
-                />
-              </FieldGroup>
-
-              {/* 右栏：占三分之一 - 类型和缩略名 */}
-              <FieldGroup>
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <Field>
-                      <FormLabel>
-                        类型 <span className="text-destructive">*</span>
-                      </FormLabel>
-                      <FieldContent>
-                        <FormItem>
-                          <FormControl>
-                            <RadioGroup
-                              onValueChange={(value) =>
-                                field.onChange(parseInt(value) as 1 | 2)
-                              }
-                              defaultValue={field.value.toString()}
-                              className="flex space-x-6"
-                            >
-                              <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="1" id="type-1" />
-                                <label
-                                  htmlFor="type-1"
-                                  className="cursor-pointer"
-                                >
-                                  文章
-                                </label>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="2" id="type-2" />
-                                <label
-                                  htmlFor="type-2"
-                                  className="cursor-pointer"
-                                >
-                                  页面
-                                </label>
-                              </div>
-                            </RadioGroup>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      </FieldContent>
-                    </Field>
-                  )}
-                />
-
-                {articleType === 2 && (
-                  <FormField
-                    control={form.control}
-                    name="url"
-                    render={({ field }) => (
-                      <Field>
-                        <FormLabel>缩略名</FormLabel>
-                        <FieldContent>
-                          <FormItem>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                placeholder="请输入缩略名"
-                                maxLength={200}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        </FieldContent>
-                        <FieldDescription>
-                          页面的URL名称，如http://domain.com/
-                          <span style={{ color: "red" }}>about</span>
-                        </FieldDescription>
-                      </Field>
-                    )}
-                  />
-                )}
-              </FieldGroup>
+              )}
             </div>
 
             <FormField
