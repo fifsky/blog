@@ -152,10 +152,10 @@ export default function PostArticle() {
   }, [editor]);
 
   return (
-    <div id="articles" className="max-w-5xl mx-auto mt-3">
-      <h2>
+    <div className="max-w-5xl mx-auto">
+      <h2 className="border-b border-b-[#cccccc] text-base">
         {isEditing ? "编辑" : "撰写"}文章
-        <Link to="/admin/articles">
+        <Link to="/admin/articles" className="ml-3 text-[14px]">
           <i className="iconfont icon-undo" style={{ color: "#444" }}></i>
           返回列表
         </Link>

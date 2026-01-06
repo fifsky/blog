@@ -36,10 +36,10 @@ export function AdminLayout() {
   }, [location.pathname]);
 
   return (
-    <div id="container">
+    <div className="w-[1024px] mt-4 mx-auto min-h-[500px]">
       <CHeader />
       {isLogin && (
-        <div className="admin">
+        <div>
           <div className="tabs relative top-px">
             <ul className="flex justify-start list-none">
               <li className="ml-1.5">

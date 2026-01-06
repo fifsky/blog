@@ -23,9 +23,9 @@ export default function AdminUser() {
   }, [page]);
   return (
     <div>
-      <h2>
+      <h2 className="border-b border-b-[#cccccc] text-base">
         管理用户
-        <Link to="/admin/post/user" className="add">
+        <Link to="/admin/post/user" className="ml-3 text-[14px]">
           <i className="iconfont icon-add" style={{ color: "#444" }}></i>
           新增用户
         </Link>

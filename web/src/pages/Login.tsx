@@ -40,12 +40,11 @@ export default function Login() {
     navigate("/admin/index");
   };
   return (
-    <div id="container">
+    <div className="w-[1024px] mt-4 mx-auto min-h-[500px]">
       <CHeader />
-      <div className="admin">
         <div className="p-5 border border-[#89d5ef] bg-white">
           <div className="px-[30px]">
-            <h2>博客管理登录</h2>
+            <h2 className="border-b border-b-[#cccccc] text-base">博客管理登录</h2>
             <form
               method="post"
               onSubmit={form.handleSubmit(onSubmit)}
@@ -105,7 +104,6 @@ export default function Login() {
             </form>
           </div>
         </div>
-      </div>
       <CFooter />
     </div>
   );

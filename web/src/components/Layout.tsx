@@ -17,10 +17,10 @@ export function Layout() {
   }, []);
 
   return (
-    <div id="container">
+    <div className="w-[1024px] mt-4 mx-auto min-h-[500px]">
       <CHeader />
       <div className="flex justify-between items-start">
-        <div id="main">
+        <div className="w-[778px] overflow-hidden">
           <Mood />
           <div className="tabs relative top-px">
             <ul className="flex justify-end list-none">

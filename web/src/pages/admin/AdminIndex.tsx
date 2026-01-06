@@ -56,7 +56,7 @@ export default function AdminIndex() {
   }, [form]);
   return (
     <div id="settings">
-      <h2>站点设置</h2>
+       <h2 className="border-b border-b-[#cccccc] text-base">站点设置</h2>
       {showMessage && (
         <Alert variant="success" className="mt-2">
           <CheckCircle2Icon />

@@ -24,9 +24,9 @@ export default function AdminArticle() {
   }, [page]);
   return (
     <div id="articles">
-      <h2>
+      <h2 className="border-b border-b-[#cccccc] text-base">
         管理文章
-        <Link to="/admin/post/article" className="add">
+        <Link to="/admin/post/article" className="ml-3 text-[14px]">
           <i className="iconfont icon-edit" style={{ color: "#444" }}></i>写文章
         </Link>
       </h2>

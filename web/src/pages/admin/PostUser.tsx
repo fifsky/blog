@@ -99,9 +99,9 @@ export default function PostUser() {
 
   return (
     <div>
-      <h2>
+      <h2 className="border-b border-b-[#cccccc] text-base">
         {isEditing ? "编辑" : "新增"}用户
-        <Link to="/admin/users">
+        <Link to="/admin/users" className="ml-3 text-[14px]">
           <i className="iconfont icon-undo" style={{ color: "#444" }}></i>
           返回列表
         </Link>

@@ -62,96 +62,6 @@
     white-space: -o-pre-wrap;
     word-wrap: break-word;
   }
-  #container {
-    width: 1024px;
-    margin: 1em auto 0;
-    min-height: 500px;
-  }
-  #main {
-    width: 778px;
-    overflow: hidden;
-  }
-
-
-  #info {
-    position: relative;
-    margin: 0 0 10px;
-    font-size: 13px;
-  }
-  #info #avatar {
-    padding: 1px;
-    border: 1px solid #89d5ef;
-    background: #fff;
-    overflow: hidden;
-  }
-  #info #avatar img {
-    display: block;
-    width: 96px;
-    height: 96px;
-  }
-  #latest {
-    min-height: 98px;
-    margin-left: 20px;
-    border: 1px solid #89d5ef;
-    background: linear-gradient(#fff, #eeffde);
-    word-spacing: 1px;
-    letter-spacing: 1px;
-  }
-  #latest:before {
-    content: "";
-    position: absolute;
-    top: 0.9rem;
-    left: 110px;
-    width: 0;
-    height: 0;
-    border-top: 0.6rem solid transparent;
-    border-bottom: 0.6rem solid transparent;
-    border-right: 0.7rem solid #fff;
-  }
-  #latest {
-    height: 98px;
-  }
-  #latest .current {
-    padding: 10px;
-    line-height: 120%;
-    word-break: break-all;
-    overflow: hidden;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-    display: none;
-  }
-  #latest .current.active {
-    display: block;
-  }
-  #latest .stamp {
-    position: absolute;
-    right: 10px;
-    bottom: 5px;
-    line-height: 120%;
-    color: #8c8c8c;
-    font-size: 12px;
-  }
-  #info .handle {
-    position: absolute;
-    bottom: 0;
-    left: 125px;
-    cursor: pointer;
-    display: none;
-    user-select: none;
-  }
-  #info .handle i.iconfont {
-    font-size: 20px;
-    color: rgba(48, 175, 255, 0.5);
-  }
-  #info .handle i.iconfont.icon-right {
-    margin-left: -10px;
-  }
-  #info .handle i.iconfont:hover {
-    color: rgba(48, 175, 255, 1);
-  }
-  #info:hover .handle {
-    display: inline;
-  }
 
   .article .entry {
     color: #555555;
@@ -213,33 +123,6 @@
   mark {
     background: orange;
     color: black;
-  }
-  .admin #content {
-    font-size: 13px;
-  }
-
-  .admin .tabs ul li {
-    margin: 0 5px 0 0;
-  }
-  .admin .paginator {
-    text-align: right;
-    padding: 0;
-  }
-  .admin h2 {
-    border-bottom: 1px solid #cccccc;
-    color: #444444;
-    font-size: 16px;
-    line-height: 200%;
-    margin: -10px 0 0 0;
-  }
-  .admin h2 a {
-    margin-left: 10px;
-    font-weight: normal;
-    font-size: 14px;
-    line-height: 16px;
-  }
-  .admin h2 a i {
-    margin-right: 2px;
   }
 
   table.list {

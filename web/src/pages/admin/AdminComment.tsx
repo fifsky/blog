@@ -23,7 +23,7 @@ export default function AdminComment() {
   }, [page]);
   return (
     <div>
-      <h2>管理评论</h2>
+      <h2 className="border-b border-b-[#cccccc] text-base">管理评论</h2>
       <div className="my-[10px] flex items-center">
         <BatchHandle />
       </div>

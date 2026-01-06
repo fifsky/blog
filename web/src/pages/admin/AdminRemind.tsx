@@ -64,7 +64,7 @@ export default function AdminRemind() {
   }, [page]);
   return (
     <div>
-      <h2>
+      <h2 className="border-b border-b-[#cccccc] text-base">
         管理提醒
         <Button variant={"link"} onClick={handleOpenDialog}>
           <i className="iconfont icon-add" style={{ color: "#444" }}></i>
