@@ -21,7 +21,7 @@ export function CArticle({ article }: { article: any }) {
   }, [article]);
   if (!article) return null;
   return (
-    <div className="article" ref={rootRef}>
+    <div ref={rootRef}>
       <div className="flex justify-between items-center h-[54px] overflow-hidden">
         <img
           className="p-[2px] w-[40px] h-[40px]"
@@ -52,7 +52,7 @@ export function CArticle({ article }: { article: any }) {
         </div>
       </div>
       <div
-        className="entry"
+        className="article"
         dangerouslySetInnerHTML={{ __html: article.content }}
       />
     </div>
