@@ -80,26 +80,14 @@
     font-size: 13px;
     color: #444;
   }
-  .nf .label_input {
-    margin-right: 15px;
-    text-align: right;
-    width: 155px;
-  }
-  .nf .input_text {
-    width: 200px;
-  }
+
   .nf ul {
     list-style: none;
   }
   .nf li {
     margin: 0.5em 0;
   }
-  .nf span.hint {
-    display: block;
-    margin-left: 170px;
-    color: #666;
-    font-size: 12px;
-  }
+
   .nf span.hidden {
     display: none;
   }
@@ -190,21 +178,7 @@
   #sidebar p {
     margin: 5px 0;
   }
-  #sidebar .rss {
-    list-style: none;
-    display: inline-flex;
-  }
-  #sidebar .rss a {
-    padding-left: 5px;
-  }
-  #sidebar #searchpanel .input_text {
-    width: 125px;
-  }
-  #sidebar #searchpanel .formbutton {
-    width: 60px;
-    padding: 0;
-    letter-spacing: 0;
-  }
+
   #content {
     padding: 20px;
     border: 1px solid #89d5ef;
@@ -321,30 +295,6 @@
     display: inline;
   }
 
-  .article .entry-title {
-    height: 54px;
-    overflow: hidden;
-  }
-  .article .entry-title .avatar {
-    padding: 2px;
-    width: 40px;
-    height: 40px;
-  }
-  .article .entry-title h2 {
-    font-size: 14px;
-  }
-  .article .entry-title .entry-meta {
-    color: #999;
-    font-size: 12px;
-  }
-  .articles .post-meta {
-    border-top: 1px dashed #dbdbdb;
-    color: #999;
-    margin-top: 20px;
-    padding: 10px 0;
-    text-align: right;
-    font-size: 13px;
-  }
   .article .entry {
     color: #555555;
     line-height: 22px;
@@ -396,59 +346,12 @@
     border-right: 1px solid #ccc;
     padding: 3px 5px;
   }
-  .article-single {
-    margin-bottom: 10px;
-  }
-  .article-single .post-navi {
-    overflow: hidden;
-    font-size: 13px;
-    margin-top: 15px;
-  }
-  .article-single .post-navi div {
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 230px;
-  }
+
   span.highlight {
     color: #ff0000;
     position: absolute;
   }
-  .comment {
-    font-size: 13px;
-  }
-  .comment h3 {
-    border-bottom: 1px solid #cccccc;
-    font-weight: bold;
-    line-height: 30px;
-    font-size: 14px;
-  }
-  .comment ul {
-    margin: 10px 0 20px;
-  }
-  .comment ul,
-  .comment li {
-    list-style: none;
-  }
-  .comment ul li {
-    border-bottom: 1px dashed #dbdbdb;
-    padding: 10px 0;
-  }
-  .comment a.avatar {
-    display: block;
-  }
-  .comment a.avatar img {
-    padding: 1px;
-    border: 1px solid #ccc;
-    background: #fff;
-  }
-  .comment a.avatar:hover img {
-    border: 1px solid #ff7031;
-  }
-  .comment h4 {
-    font-size: 12px;
-  }
+
   mark {
     background: orange;
     color: black;
@@ -479,45 +382,6 @@
   }
   .admin h2 a i {
     margin-right: 2px;
-  }
-  .operate {
-    margin: 10px 0;
-  }
-  .label_input .desc {
-    color: #666;
-  }
-  .vf {
-    margin: 0 auto;
-    width: 300px;
-  }
-  .vf label {
-    font-weight: bold;
-  }
-  .vf .label_input {
-    display: block;
-    text-align: left;
-  }
-  .lf p {
-    line-height: 26px;
-  }
-  .lf label.label_input {
-    font-size: 14px;
-    font-weight: normal;
-  }
-  .lf input.input_text {
-    color: #444444;
-    font-size: 14px;
-    font-weight: bold;
-    line-height: 18px;
-    width: 280px;
-  }
-  .nf span.hint,
-  .vf span.hint {
-    color: #666666;
-    display: block;
-    line-height: 150%;
-    margin: 3px 0 3px 0;
-    font-size: 12px;
   }
 
   table.list {
@@ -555,19 +419,7 @@
     background: none repeat scroll 0 0 #89d5ef;
     text-decoration: none;
   }
-  #sign-in {
-    padding: 0 30px;
-  }
-  #sign-in h2 {
-    border-bottom: 1px solid #cccccc;
-    color: #444444;
-    font-size: 16px;
-    line-height: 200%;
-    margin: 0 0 10px;
-  }
-  #articles .vf {
-    width: 100%;
-  }
+
   code {
     background: #ebf8ff;
     padding: 2px;

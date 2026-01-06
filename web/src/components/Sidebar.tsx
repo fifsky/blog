@@ -50,9 +50,10 @@ export function Sidebar() {
       <SidebarList title="文章分类" api="cateAllApi" />
       <SidebarList title="历史存档" api="archiveApi" />
       <SidebarList title="我关注的" api="linkAllApi" />
-      <div className="rss">
+      <div>
         <i className="iconfont icon-rss" style={{ color: "orange" }}></i>
         <a
+          className="pl-[5px]"
           href="https://api.fifsky.com/feed.xml"
           target="_blank"
           rel="noreferrer"

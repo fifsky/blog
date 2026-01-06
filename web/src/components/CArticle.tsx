@@ -22,10 +22,14 @@ export function CArticle({ article }: { article: any }) {
   if (!article) return null;
   return (
     <div className="article" ref={rootRef}>
-      <div className="entry-title flex justify-between items-center">
-        <img className="avatar" src="/assets/images/avatar.jpg" alt="" />
+      <div className="flex justify-between items-center h-[54px] overflow-hidden">
+        <img
+          className="p-[2px] w-[40px] h-[40px]"
+          src="/assets/images/avatar.jpg"
+          alt=""
+        />
         <div className="flex-1 ml-4">
-          <h2>
+          <h2 className="text-[14px]">
             <Link
               to={`/article/${article.id}`}
               dangerouslySetInnerHTML={{
@@ -33,7 +37,7 @@ export function CArticle({ article }: { article: any }) {
               }}
             />
           </h2>
-          <div className="entry-meta">
+          <div className="text-[12px] text-[#999]">
             by&nbsp;{article.user.nick_name}&nbsp;&nbsp;/&nbsp;&nbsp;
             <Link
               to={`/categroy/${article.cate.domain}`}

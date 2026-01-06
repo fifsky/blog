@@ -23,10 +23,10 @@ export default function ArticleDetail() {
   if (!article.id) return null;
   return (
     <div>
-      <div className="article-single">
+      <div className="mb-[10px]">
         <CArticle article={article} />
-        <div className="post-navi flex justify-between">
-          <div className="prev">
+        <div className="my-5 flex justify-between">
+          <div className="w-[400px] overflow-hidden text-ellipsis whitespace-nowrap">
             <strong>上一篇：</strong>
             {data.prev && data.prev.id ? (
               <Link to={`/article/${data.prev.id}`}>{data.prev.title}</Link>
@@ -34,7 +34,7 @@ export default function ArticleDetail() {
               <span>嘿，这已经是最新的文章啦</span>
             )}
           </div>
-          <div className="next text-right">
+          <div className="w-[400px] overflow-hidden text-ellipsis whitespace-nowrap text-right">
             <strong>下一篇：</strong>
             {data.next && data.next.id ? (
               <Link to={`/article/${data.next.id}`}>{data.next.title}</Link>

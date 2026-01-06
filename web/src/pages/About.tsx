@@ -14,7 +14,7 @@ export default function About() {
   if (!article.id) return null;
   return (
     <div>
-      <div className="article-single">
+      <div className="mb-[10px]">
         <CArticle article={article} />
       </div>
     </div>

@@ -48,7 +48,7 @@ export default function ArticleList() {
       {list.map((v, k) => (
         <div className="articles" key={k}>
           <CArticle article={v} />
-          <div className="post-meta"></div>
+          <div className="border-t border-t-dashed border-t-[#dbdbdb] mt-5 pt-2.5 pb-2.5 text-right"></div>
         </div>
       ))}
       <Paginate page={page} pageTotal={pageTotal} onChange={changePage} />

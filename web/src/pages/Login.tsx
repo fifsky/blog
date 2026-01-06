@@ -44,13 +44,13 @@ export default function Login() {
       <CHeader />
       <div className="admin">
         <div id="content">
-          <div id="sign-in">
-            <h2>博客管理登录</h2>
+          <div className="px-[30px]">
+            <h2 className="mb-[20px]">博客管理登录</h2>
             {/* 使用 react-hook-form + shadcn Field 改造登录表单 */}
             <form
               method="post"
               onSubmit={form.handleSubmit(onSubmit)}
-              className="vf lf"
+              className="w-[300px] mx-auto"
             >
               {/* 使用 FieldGroup 包裹所有字段，统一布局与间距 */}
               <FieldGroup>
