@@ -71,50 +71,7 @@
     width: 778px;
     overflow: hidden;
   }
-  #header {
-    width: 100%;
-    padding: 0.25em 0 1.25em;
-  }
-  #header h1 {
-    width: 225px;
-  }
-  #header h1 a {
-    display: block;
-    text-decoration: none;
-  }
-  #header h1 a span {
-    display: none;
-    margin-left: 0.5em;
-    font-size: 13px;
-    font-weight: normal;
-  }
-  #header h1 a:hover span {
-    display: inline;
-    color: #fff;
-  }
-  #navigation {
-    height: 35px;
-    margin: 0.5em 0 0;
-    padding: 0 10px;
-    background-color: #fff;
-    border-radius: 8px;
-    line-height: 35px;
-    white-space: nowrap;
-  }
-  #navigation ul {
-    list-style: none;
-  }
-  #navigation li {
-    background: #fff;
-  }
-  #navigation li a {
-    padding: 2px 7px;
-  }
-  #navigation li a:hover {
-    background-color: #0066cc;
-    color: #fff;
-    text-decoration: none;
-  }
+
   #sidebar {
     padding: 15px 10px 20px 18px;
     border: 1px solid #89d5ef;

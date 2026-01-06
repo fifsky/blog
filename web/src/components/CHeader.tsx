@@ -13,60 +13,64 @@ export function CHeader() {
   };
   return (
     <div id="header" className="flex items-center justify-between">
-      <h1>
-        <Link to="/">
+      <div className="group pt-1 pb-5 px-0">
+        <Link to="/" className="no-underline">
           <img
             className="inline-block"
             alt="首页"
             src="/assets/images/logo.png"
           />
-          <span>首页</span>
+          <span className="hidden ml-2 group-hover:inline group-hover:text-white">
+            首页
+          </span>
         </Link>
-      </h1>
-      <div id="navigation" className="inline-flex items-center">
-        <ul className="flex items-center">
-          <li>
-            <Link to="/">首页</Link>
+      </div>
+      <div className="inline-flex items-center h-[35px] my-2 px-3 bg-white rounded-lg whitespace-nowrap">
+        <ul className="flex items-center list-none">
+          <li className="bg-white">
+            <Link to="/" className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline">首页</Link>
           </li>
-          <li>
+          <li className="bg-white">
             <a
               href="https://github.com/fifsky"
               target="_blank"
               rel="noreferrer"
+              className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
             >
               Github
             </a>
           </li>
-          <li>
-            <a href="https://gist.github.com/fifsky">技术</a>
+          <li className="bg-white">
+            <a href="https://gist.github.com/fifsky" className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline">技术</a>
           </li>
-          <li>
-            <Link to="/about">关于</Link>
+          <li className="bg-white">
+            <Link to="/about" className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline">关于</Link>
           </li>
-          <li>
-            <a href="https://caixudong.com">简历</a>
+          <li className="bg-white">
+            <a href="https://caixudong.com" className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline">简历</a>
           </li>
           {isLogin && (
-            <li>
-              <Link to="/admin/index">管理中心</Link>
+            <li className="bg-white">
+              <Link to="/admin/index" className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline">管理中心</Link>
             </li>
           )}
           {isLogin && (
-            <li>
+            <li className="bg-white">
               <a
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
                   logOut();
                 }}
+                className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
               >
                 退出
               </a>
             </li>
           )}
           {!isLogin && (
-            <li>
-              <Link to="/login">登录</Link>
+            <li className="bg-white">
+              <Link to="/login" className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline">登录</Link>
             </li>
           )}
         </ul>

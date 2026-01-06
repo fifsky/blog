@@ -45,12 +45,11 @@ export default function Login() {
       <div className="admin">
         <div id="content">
           <div className="px-[30px]">
-            <h2 className="mb-[20px]">博客管理登录</h2>
-            {/* 使用 react-hook-form + shadcn Field 改造登录表单 */}
+            <h2>博客管理登录</h2>
             <form
               method="post"
               onSubmit={form.handleSubmit(onSubmit)}
-              className="w-[300px] mx-auto"
+              className="w-[300px] mx-auto my-[30px]"
             >
               {/* 使用 FieldGroup 包裹所有字段，统一布局与间距 */}
               <FieldGroup>
@@ -97,12 +96,12 @@ export default function Login() {
                     </Field>
                   )}
                 />
+                <Field>
+                  <Button type="submit" size={"sm"}>
+                    登 录
+                  </Button>
+                </Field>
               </FieldGroup>
-              <p>
-                <Button type="submit" size={"sm"}>
-                  登 录
-                </Button>
-              </p>
             </form>
           </div>
         </div>
