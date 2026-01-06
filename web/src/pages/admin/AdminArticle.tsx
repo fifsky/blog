@@ -95,7 +95,7 @@ export default function AdminArticle() {
                 <td>{v.updated_at}</td>
                 <td>
                   <Link to={`/admin/post/article?id=${v.id}`}>编辑</Link>
-                  <span className="line">|</span>
+                  <span className="px-1.5 text-[#ccc]">|</span>
                   <a
                     href="#"
                     onClick={(e) => {

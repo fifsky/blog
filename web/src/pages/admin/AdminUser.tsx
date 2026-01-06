@@ -65,7 +65,7 @@ export default function AdminUser() {
                 <td>{v.status === 1 ? "启用" : "停用"}</td>
                 <td>
                   <Link to={`/admin/post/user?id=${v.id}`}>编辑</Link>
-                  <span className="line">|</span>
+                  <span className="px-1.5 text-[#ccc]">|</span>
                   <a
                     href="#"
                     onClick={(e) => {

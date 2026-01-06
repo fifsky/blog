@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   remindDeleteApi,
   remindListApi,
@@ -8,19 +8,52 @@ import {
 import dayjs from "dayjs";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Paginate } from "@/components/Paginate";
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Field,
+  FieldLabel,
+  FieldError,
+  FieldGroup,
+  FieldContent,
+} from "@/components/ui/field";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
 export default function AdminRemind() {
   const [list, setList] = useState<any[]>([]);
   const [pageTotal, setPageTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [item, setItem] = useState<any>({
-    type: 0,
-    month: 1,
-    week: 1,
-    day: 1,
-    hour: 0,
-    minute: 0,
-    content: "",
+  const [item, setItem] = useState<any>({});
+  const formSchema = z.object({
+    type: z.number(),
+    month: z.number().optional(),
+    week: z.number().optional(),
+    day: z.number().optional(),
+    hour: z.number().optional(),
+    minute: z.number().optional(),
+    content: z.string().min(1, "请输入提醒内容"),
+  });
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      type: 0,
+      month: 1,
+      week: 1,
+      day: 1,
+      hour: 0,
+      minute: 0,
+      content: "",
+    },
+    mode: "onChange",
   });
   const remindType: Record<number, string> = {
     0: "固定",
@@ -54,7 +87,7 @@ export default function AdminRemind() {
     6: "六",
     7: "日",
   };
-  const intRemindType = Number(item.type);
+  const intRemindType = Number(form.watch("type"));
   const numFormat = (n: number) => (n < 10 ? "0" + n : String(n));
   const remindTimeFormat = (v: any) => {
     let str = "";
@@ -113,15 +146,28 @@ export default function AdminRemind() {
     setList(ret.list || []);
     setPageTotal(ret.pageTotal || 0);
   };
-  const editItem = (id: number) => setItem(list.find((i) => i.id === id));
+  const editItem = (id: number) => {
+    const it = list.find((i) => i.id === id);
+    setItem(it || {});
+    form.reset({
+      type: it?.type ?? 0,
+      month: it?.month ?? 1,
+      week: it?.week ?? 1,
+      day: it?.day ?? 1,
+      hour: it?.hour ?? 0,
+      minute: it?.minute ?? 0,
+      content: it?.content ?? "",
+    });
+  };
   const deleteItem = async (id: number) => {
     if (confirm("确认要删除？")) {
       await remindDeleteApi({ id });
       loadList();
     }
   };
-  const cancel = () =>
-    setItem({
+  const cancel = () => {
+    setItem({});
+    form.reset({
       type: 0,
       month: 1,
       week: 1,
@@ -130,18 +176,18 @@ export default function AdminRemind() {
       minute: 0,
       content: "",
     });
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { id, type, content, month, week, day, hour, minute } = item;
+  };
+  const submit = async (values: z.infer<typeof formSchema>) => {
+    const { id } = item || {};
     const data = {
       id,
-      type: Number(type),
-      content,
-      month,
-      week,
-      day,
-      hour,
-      minute,
+      type: Number(values.type),
+      content: values.content,
+      month: values.month,
+      week: values.week,
+      day: values.day,
+      hour: values.hour,
+      minute: values.minute,
     };
     if (id) await remindUpdateApi(data);
     else await remindCreateApi(data);
@@ -195,7 +241,7 @@ export default function AdminRemind() {
                       >
                         编辑
                       </a>
-                      <span className="line">|</span>
+                      <span className="px-1.5 text-[#ccc]">|</span>
                       <a
                         href="#"
                         onClick={(e) => {
@@ -217,147 +263,212 @@ export default function AdminRemind() {
         </div>
         <div className="w-[250px]" style={{ paddingTop: 31 }}>
           <form
-            className="vf"
+            className="w-full px-1"
             method="post"
             autoComplete="off"
-            onSubmit={submit}
+            onSubmit={form.handleSubmit(submit)}
           >
-            <p>
-              <label className="label_input">提醒类别</label>
-              <select
+            <FieldGroup>
+              <Controller
                 name="type"
-                value={item.type}
-                onChange={(e) =>
-                  setItem((prev: any) => ({
-                    ...prev,
-                    type: Number(e.target.value),
-                  }))
-                }
-              >
-                {Object.entries(remindType).map(([k, v]) => (
-                  <option key={k} value={k}>
-                    {v}
-                  </option>
-                ))}
-              </select>
-            </p>
-            <p>
-              <label className="label_input">提醒时间</label>
-              {[0, 6].includes(intRemindType) && (
-                <select
-                  value={item.month}
-                  onChange={(e) =>
-                    setItem((prev: any) => ({
-                      ...prev,
-                      month: Number(e.target.value),
-                    }))
-                  }
-                >
-                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                    <option key={m} value={m}>
-                      {monthFormat[m]}月
-                    </option>
-                  ))}
-                </select>
-              )}
-              {[4].includes(intRemindType) && (
-                <select
-                  value={item.week}
-                  onChange={(e) =>
-                    setItem((prev: any) => ({
-                      ...prev,
-                      week: Number(e.target.value),
-                    }))
-                  }
-                >
-                  {Array.from({ length: 7 }, (_, i) => i + 1).map((d) => (
-                    <option key={d} value={d}>
-                      周{weekFormat[d]}
-                    </option>
-                  ))}
-                </select>
-              )}
-              {[0, 5, 6].includes(intRemindType) && (
-                <select
-                  value={item.day}
-                  onChange={(e) =>
-                    setItem((prev: any) => ({
-                      ...prev,
-                      day: Number(e.target.value),
-                    }))
-                  }
-                >
-                  {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
-                    <option key={d} value={d}>
-                      {numFormat(d)}日
-                    </option>
-                  ))}
-                </select>
-              )}
-              {[0, 3, 4, 5, 6].includes(intRemindType) && (
-                <select
-                  value={item.hour}
-                  onChange={(e) =>
-                    setItem((prev: any) => ({
-                      ...prev,
-                      hour: Number(e.target.value),
-                    }))
-                  }
-                >
-                  {Array.from({ length: 24 }, (_, i) => i).map((d) => (
-                    <option key={d} value={d}>
-                      {numFormat(d)}时
-                    </option>
-                  ))}
-                </select>
-              )}
-              {[0, 2, 3, 4, 5, 6].includes(intRemindType) && (
-                <select
-                  value={item.minute}
-                  onChange={(e) =>
-                    setItem((prev: any) => ({
-                      ...prev,
-                      minute: Number(e.target.value),
-                    }))
-                  }
-                >
-                  {Array.from({ length: 60 }, (_, i) => i).map((d) => (
-                    <option key={d} value={d}>
-                      {numFormat(d)}分
-                    </option>
-                  ))}
-                </select>
-              )}
-            </p>
-            <p>
-              <label className="label_input">提醒内容</label>
-              <textarea
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    orientation="vertical"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <FieldLabel htmlFor="type">提醒类别</FieldLabel>
+                    <FieldContent>
+                      <Select
+                        value={String(field.value)}
+                        onValueChange={(v) => field.onChange(Number(v))}
+                      >
+                        <SelectTrigger size="sm">
+                          <SelectValue placeholder="请选择提醒类别" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(remindType).map(([k, v]) => (
+                            <SelectItem key={k} value={k}>
+                              {v}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+              <Field orientation="vertical">
+                <FieldLabel>提醒时间</FieldLabel>
+                <FieldContent>
+                  <div className="flex flex-col gap-2">
+                    {[0, 6].includes(intRemindType) && (
+                      <Controller
+                        name="month"
+                        control={form.control}
+                        render={({ field }) => (
+                          <Select
+                            value={String(field.value)}
+                            onValueChange={(v) => field.onChange(Number(v))}
+                          >
+                            <SelectTrigger size="sm">
+                            <SelectValue placeholder="月" />
+                          </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 12 }, (_, i) => i + 1).map(
+                                (m) => (
+                                  <SelectItem key={m} value={String(m)}>
+                                    {monthFormat[m]}月
+                                  </SelectItem>
+                                )
+                              )}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                    )}
+                    {[4].includes(intRemindType) && (
+                      <Controller
+                        name="week"
+                        control={form.control}
+                        render={({ field }) => (
+                          <Select
+                            value={String(field.value)}
+                            onValueChange={(v) => field.onChange(Number(v))}
+                          >
+                            <SelectTrigger size="sm">
+                            <SelectValue placeholder="周" />
+                          </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 7 }, (_, i) => i + 1).map(
+                                (d) => (
+                                  <SelectItem key={d} value={String(d)}>
+                                    周{weekFormat[d]}
+                                  </SelectItem>
+                                )
+                              )}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                    )}
+                    {[0, 5, 6].includes(intRemindType) && (
+                      <Controller
+                        name="day"
+                        control={form.control}
+                        render={({ field }) => (
+                          <Select
+                            value={String(field.value)}
+                            onValueChange={(v) => field.onChange(Number(v))}
+                          >
+                            <SelectTrigger size="sm">
+                            <SelectValue placeholder="日" />
+                          </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 31 }, (_, i) => i + 1).map(
+                                (d) => (
+                                  <SelectItem key={d} value={String(d)}>
+                                    {numFormat(d)}日
+                                  </SelectItem>
+                                )
+                              )}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                    )}
+                    {[0, 3, 4, 5, 6].includes(intRemindType) && (
+                      <Controller
+                        name="hour"
+                        control={form.control}
+                        render={({ field }) => (
+                          <Select
+                            value={String(field.value)}
+                            onValueChange={(v) => field.onChange(Number(v))}
+                          >
+                            <SelectTrigger size="sm">
+                            <SelectValue placeholder="时" />
+                          </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 24 }, (_, i) => i).map(
+                                (d) => (
+                                  <SelectItem key={d} value={String(d)}>
+                                    {numFormat(d)}时
+                                  </SelectItem>
+                                )
+                              )}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                    )}
+                    {[0, 2, 3, 4, 5, 6].includes(intRemindType) && (
+                      <Controller
+                        name="minute"
+                        control={form.control}
+                        render={({ field }) => (
+                          <Select
+                            value={String(field.value)}
+                            onValueChange={(v) => field.onChange(Number(v))}
+                          >
+                            <SelectTrigger size="sm">
+                            <SelectValue placeholder="分" />
+                          </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 60 }, (_, i) => i).map(
+                                (d) => (
+                                  <SelectItem key={d} value={String(d)}>
+                                    {numFormat(d)}分
+                                  </SelectItem>
+                                )
+                              )}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                    )}
+                  </div>
+                </FieldContent>
+              </Field>
+              <Controller
                 name="content"
-                rows={5}
-                cols={30}
-                value={item.content || ""}
-                onChange={(e) =>
-                  setItem((prev: any) => ({ ...prev, content: e.target.value }))
-                }
-              ></textarea>
-            </p>
-            <p className="act">
-              <button className="formbutton" type="submit">
-                {item.id ? "修改" : "添加"}
-              </button>
-              {item.id && (
-                <a
-                  className="ml-2.5"
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    cancel();
-                  }}
-                >
-                  取消
-                </a>
-              )}
-            </p>
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    orientation="vertical"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <FieldLabel htmlFor={field.name}>提醒内容</FieldLabel>
+                    <FieldContent>
+                      <Textarea {...field} id={field.name} rows={5} />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+              <Field orientation="horizontal">
+                <Button type="submit" size="sm">
+                  {item.id ? "修改" : "添加"}
+                </Button>
+                {item.id && (
+                  <Button
+                    size={"sm"}
+                    variant="link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      cancel();
+                    }}
+                  >
+                    取消
+                  </Button>
+                )}
+              </Field>
+            </FieldGroup>
           </form>
         </div>
       </div>

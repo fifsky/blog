@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   moodDeleteApi,
   moodListApi,
@@ -7,19 +7,41 @@ import {
 } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Paginate } from "@/components/Paginate";
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Field,
+  FieldLabel,
+  FieldError,
+  FieldGroup,
+  FieldContent,
+} from "@/components/ui/field";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
 export default function AdminMood() {
   const [list, setList] = useState<any[]>([]);
   const [item, setItem] = useState<any>({});
   const [pageTotal, setPageTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const formSchema = z.object({
+    content: z.string().min(1, "请输入心情内容"),
+  });
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { content: "" },
+    mode: "onChange",
+  });
   const loadList = async () => {
     const ret = await moodListApi({ page });
     setList(ret.list || []);
     setPageTotal(ret.page_total || 0);
   };
   const editItem = (id: number) => {
-    setItem(list.find((i) => i.id === id));
+    const it = list.find((i) => i.id === id);
+    setItem(it || {});
+    form.reset({ content: it?.content || "" });
   };
   const deleteItem = async (id: number) => {
     if (confirm("确认要删除？")) {
@@ -27,13 +49,15 @@ export default function AdminMood() {
       loadList();
     }
   };
-  const cancel = () => setItem({});
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { id, content } = item;
-    if (id) await moodUpdateApi({ id, content });
-    else await moodCreateApi({ content });
+  const cancel = () => {
     setItem({});
+    form.reset({ content: "" });
+  };
+  const submit = async (values: z.infer<typeof formSchema>) => {
+    const { id } = item || {};
+    if (id) await moodUpdateApi({ id, content: values.content });
+    else await moodCreateApi({ content: values.content });
+    cancel();
     loadList();
   };
   useEffect(() => {
@@ -83,7 +107,7 @@ export default function AdminMood() {
                       >
                         编辑
                       </a>
-                      <span className="line">|</span>
+                      <span className="px-1.5 text-[#ccc]">|</span>
                       <a
                         href="#"
                         onClick={(e) => {
@@ -105,40 +129,48 @@ export default function AdminMood() {
         </div>
         <div className="w-[250px]" style={{ paddingTop: 31 }}>
           <form
-            className="vf"
+            className="w-full px-1"
             method="post"
             autoComplete="off"
-            onSubmit={submit}
+            onSubmit={form.handleSubmit(submit)}
           >
-            <p>
-              <label className="label_input">发表心情</label>
-              <textarea
+            <FieldGroup>
+              <Controller
                 name="content"
-                rows={5}
-                cols={30}
-                value={item.content || ""}
-                onChange={(e) =>
-                  setItem((prev: any) => ({ ...prev, content: e.target.value }))
-                }
-              ></textarea>
-            </p>
-            <p className="act">
-              <button className="formbutton" type="submit">
-                {item.id ? "修改" : "添加"}
-              </button>
-              {item.id && (
-                <a
-                  className="ml-2.5"
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    cancel();
-                  }}
-                >
-                  取消
-                </a>
-              )}
-            </p>
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    orientation="vertical"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <FieldLabel htmlFor={field.name}>发表心情</FieldLabel>
+                    <FieldContent>
+                      <Textarea {...field} id={field.name} rows={5} />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+              <Field orientation="horizontal">
+                <Button type="submit" size="sm">
+                  {item.id ? "修改" : "添加"}
+                </Button>
+                {item.id && (
+                  <Button
+                    size={"sm"}
+                    variant="link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      cancel();
+                    }}
+                  >
+                    取消
+                  </Button>
+                )}
+              </Field>
+            </FieldGroup>
           </form>
         </div>
       </div>

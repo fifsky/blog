@@ -12,7 +12,6 @@ export function Comment({ postId }: { postId: number }) {
       if (!node) return;
       if (artalkRef.current) {
         artalkRef.current.destroy();
-        artalkRef.current = undefined;
       }
       artalkRef.current = Artalk.init({
         el: node,

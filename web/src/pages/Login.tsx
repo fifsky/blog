@@ -1,20 +1,42 @@
-import React, { useState } from "react";
 import { CHeader } from "@/components/CHeader";
 import { CFooter } from "@/components/CFooter";
 import { useStore } from "@/store/context";
 import { useNavigate } from "react-router";
 import { LoginRequest } from "@/types/openapi";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Field,
+  FieldLabel,
+  FieldError,
+  FieldGroup,
+} from "@/components/ui/field";
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function Login() {
-  const [formdata, setFormdata] = useState<LoginRequest>({
-    password: "",
-    user_name: "",
+  // 表单校验规则：用户名与密码为必填
+  const formSchema = z.object({
+    user_name: z.string().min(1, "请输入用户名"),
+    password: z.string().min(1, "请输入密码"),
   });
+
+  // 初始化 react-hook-form，集成 zodResolver 进行校验
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      user_name: "",
+      password: "",
+    },
+    mode: "onChange",
+  });
+
   const loginAction = useStore((s) => s.loginAction);
   const navigate = useNavigate();
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await loginAction(formdata);
+  // 提交处理：通过 react-hook-form 的 handleSubmit 获取已校验的数据
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    await loginAction(data as LoginRequest);
     navigate("/admin/index");
   };
   return (
@@ -24,39 +46,62 @@ export default function Login() {
         <div id="content">
           <div id="sign-in">
             <h2>博客管理登录</h2>
-            <form method="post" onSubmit={submit} className="vf lf">
-              <p>
-                <label className="label_input">用户名：</label>
-                <input
-                  type="text"
-                  className="input_text"
-                  value={formdata.user_name || ""}
-                  onChange={(e) =>
-                    setFormdata((prev) => ({
-                      ...prev,
-                      user_name: e.target.value,
-                    }))
-                  }
+            {/* 使用 react-hook-form + shadcn Field 改造登录表单 */}
+            <form
+              method="post"
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="vf lf"
+            >
+              {/* 使用 FieldGroup 包裹所有字段，统一布局与间距 */}
+              <FieldGroup>
+                {/* 用户名字段 */}
+                <Controller
+                  name="user_name"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      {/* 使用 FieldLabel 作为 label */}
+                      <FieldLabel htmlFor={field.name}>用户名</FieldLabel>
+                      {/* 输入框，绑定 RHF 的 field */}
+                      <Input
+                        {...field}
+                        id={field.name}
+                        type="text"
+                        aria-invalid={fieldState.invalid}
+                        autoComplete="username"
+                      />
+                      {/* 错误展示 */}
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
                 />
-              </p>
-              <p>
-                <label className="label_input">密码：</label>
-                <input
-                  type="password"
-                  className="input_text"
-                  value={formdata.password || ""}
-                  onChange={(e) =>
-                    setFormdata((prev) => ({
-                      ...prev,
-                      password: e.target.value,
-                    }))
-                  }
+                {/* 密码字段 */}
+                <Controller
+                  name="password"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>密码</FieldLabel>
+                      <Input
+                        {...field}
+                        id={field.name}
+                        type="password"
+                        aria-invalid={fieldState.invalid}
+                        autoComplete="current-password"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
                 />
-              </p>
-              <p className="act">
-                <button type="submit" className="formbutton">
-                  登录
-                </button>
+              </FieldGroup>
+              <p>
+                <Button type="submit" size={"sm"}>
+                  登 录
+                </Button>
               </p>
             </form>
           </div>

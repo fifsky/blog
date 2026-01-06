@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   linkDeleteApi,
   linkListApi,
@@ -6,28 +6,62 @@ import {
   linkUpdateApi,
 } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Field,
+  FieldLabel,
+  FieldError,
+  FieldGroup,
+  FieldDescription,
+  FieldContent,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
 export default function AdminLink() {
   const [list, setList] = useState<any[]>([]);
   const [item, setItem] = useState<any>({});
+  const formSchema = z.object({
+    name: z.string().min(1, "请输入链接名称"),
+    url: z.string().url("请输入正确的链接地址"),
+    desc: z.string().optional(),
+  });
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { name: "", url: "", desc: "" },
+    mode: "onChange",
+  });
   const loadList = async () => {
     const ret = await linkListApi({});
     setList(ret.list || []);
   };
-  const editItem = (id: number) => setItem(list.find((i) => i.id === id));
+  const editItem = (id: number) => {
+    const it = list.find((i) => i.id === id);
+    setItem(it || {});
+    form.reset({
+      name: it?.name || "",
+      url: it?.url || "",
+      desc: it?.desc || "",
+    });
+  };
   const deleteItem = async (id: number) => {
     if (confirm("确认要删除？")) {
       await linkDeleteApi({ id });
       loadList();
     }
   };
-  const cancel = () => setItem({});
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { id, name, url, desc } = item;
-    if (id) await linkUpdateApi({ id, name, url, desc });
-    else await linkCreateApi({ name, url, desc });
+  const cancel = () => {
     setItem({});
+    form.reset({ name: "", url: "", desc: "" });
+  };
+  const submit = async (values: z.infer<typeof formSchema>) => {
+    const { id } = item || {};
+    if (id) await linkUpdateApi({ id, ...values });
+    else await linkCreateApi(values);
+    cancel();
     loadList();
   };
   useEffect(() => {
@@ -80,7 +114,7 @@ export default function AdminLink() {
                       >
                         编辑
                       </a>
-                      <span className="line">|</span>
+                      <span className="px-1.5 text-[#ccc]">|</span>
                       <a
                         href="#"
                         onClick={(e) => {
@@ -101,65 +135,87 @@ export default function AdminLink() {
         </div>
         <div className="w-[250px]" style={{ paddingTop: 31 }}>
           <form
-            className="vf"
+            className="w-full px-1"
             method="post"
             autoComplete="off"
-            onSubmit={submit}
+            onSubmit={form.handleSubmit(submit)}
           >
-            <p>
-              <label className="label_input">链接名称</label>
-              <input
-                className="input_text"
-                size={30}
+            <FieldGroup>
+              <Controller
                 name="name"
-                value={item.name || ""}
-                onChange={(e) =>
-                  setItem((prev: any) => ({ ...prev, name: e.target.value }))
-                }
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    orientation="vertical"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <FieldLabel htmlFor={field.name}>链接名称</FieldLabel>
+                    <FieldContent>
+                      <Input {...field} id={field.name} />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
               />
-            </p>
-            <p>
-              <label className="label_input">链接地址</label>
-              <input
-                className="input_text"
-                size={30}
+              <Controller
                 name="url"
-                value={item.url || ""}
-                onChange={(e) =>
-                  setItem((prev: any) => ({ ...prev, url: e.target.value }))
-                }
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    orientation="vertical"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <FieldLabel htmlFor={field.name}>链接地址</FieldLabel>
+                    <FieldContent>
+                      <Input {...field} id={field.name} />
+                      <FieldDescription>
+                        例如：http://fifsky.com/
+                      </FieldDescription>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
               />
-              <span className="hint">例如：http://fifsky.com/</span>
-            </p>
-            <p>
-              <label className="label_input">链接描述</label>
-              <textarea
+              <Controller
                 name="desc"
-                rows={5}
-                cols={30}
-                value={item.desc || ""}
-                onChange={(e) =>
-                  setItem((prev: any) => ({ ...prev, desc: e.target.value }))
-                }
-              ></textarea>
-            </p>
-            <p className="act">
-              <button className="formbutton" type="submit">
-                {item.id ? "修改" : "添加"}
-              </button>
-              {item.id && (
-                <a
-                  className="ml-2.5"
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    cancel();
-                  }}
-                >
-                  取消
-                </a>
-              )}
-            </p>
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    orientation="vertical"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <FieldLabel htmlFor={field.name}>链接描述</FieldLabel>
+                    <FieldContent>
+                      <Textarea {...field} id={field.name} rows={5} />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+              <Field orientation="horizontal">
+                <Button type="submit" size="sm">
+                  {item.id ? "修改" : "添加"}
+                </Button>
+                {item.id && (
+                  <Button
+                    size={"sm"}
+                    variant="link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      cancel();
+                    }}
+                  >
+                    取消
+                  </Button>
+                )}
+              </Field>
+            </FieldGroup>
           </form>
         </div>
       </div>

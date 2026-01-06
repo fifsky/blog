@@ -3,21 +3,28 @@ import { useNavigate, useLocation } from "react-router";
 import { useStore } from "@/store/context";
 import { SidebarList } from "./SidebarList";
 import { Calendar } from "./Calendar";
+import {
+  InputGroup,
+  InputGroupInput,
+  InputGroupAddon,
+} from "@/components/ui/input-group";
+import { Search } from "lucide-react";
 
 export function Sidebar() {
   const keyword = useStore((s) => s.keyword);
   const setKeyword = useStore((s) => s.setKeyword);
   const navigate = useNavigate();
   const location = useLocation();
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    navigate({
-      pathname: "/search",
-      search: `?keyword=${encodeURIComponent(keyword)}`,
-    });
-  };
   const changeKeyword = (e: React.ChangeEvent<HTMLInputElement>) => {
     setKeyword(e.target.value);
+  };
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      navigate({
+        pathname: "/search",
+        search: `?keyword=${encodeURIComponent(keyword)}`,
+      });
+    }
   };
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -27,21 +34,18 @@ export function Sidebar() {
   return (
     <div id="sidebar">
       <div className="sect" id="search">
-        <form id="searchpanel" method="get" onSubmit={submit}>
-          <p>
-            <input
-              className="input_text"
-              type="text"
-              name="keyword"
-              onChange={changeKeyword}
-              value={keyword}
-            />
-            &nbsp;
-            <button className="formbutton" type="submit">
-              搜索
-            </button>
-          </p>
-        </form>
+        <InputGroup>
+          <InputGroupInput
+            placeholder="搜索..."
+            name="keyword"
+            value={keyword}
+            onChange={changeKeyword}
+            onKeyDown={onKeyDown}
+          />
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+        </InputGroup>
       </div>
       <Calendar />
       <SidebarList title="文章分类" api="cateAllApi" />

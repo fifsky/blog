@@ -6,15 +6,49 @@ import {
   cateUpdateApi,
 } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Field,
+  FieldLabel,
+  FieldError,
+  FieldGroup,
+  FieldDescription,
+  FieldContent,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
 export default function AdminCate() {
   const [list, setList] = useState<any[]>([]);
   const [item, setItem] = useState<any>({});
+  const formSchema = z.object({
+    name: z.string().min(1, "请输入分类名称"),
+    domain: z
+      .string()
+      .regex(/^[a-z][a-z0-9-]*$/, "缩略名需字母开头，包含小写字母、数字或-"),
+    desc: z.string().optional(),
+  });
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { name: "", domain: "", desc: "" },
+    mode: "onChange",
+  });
   const loadList = async () => {
     const ret = await cateListApi({});
     setList(ret.list || []);
   };
-  const editItem = (id: number) => setItem(list.find((i) => i.id === id));
+  const editItem = (id: number) => {
+    const it = list.find((i) => i.id === id);
+    setItem(it || {});
+    form.reset({
+      name: it?.name || "",
+      domain: it?.domain || "",
+      desc: it?.desc || "",
+    });
+  };
   const deleteItem = async (id: number) => {
     if (confirm("确认要删除？")) {
       await cateDeleteApi({ id });
@@ -22,12 +56,12 @@ export default function AdminCate() {
     }
   };
   const cancel = () => setItem({});
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { id, name, domain, desc } = item;
-    if (id) await cateUpdateApi({ id, name, domain, desc });
-    else await cateCreateApi({ name, domain, desc });
+  const submit = async (values: z.infer<typeof formSchema>) => {
+    const { id } = item || {};
+    if (id) await cateUpdateApi({ id, ...values });
+    else await cateCreateApi(values);
     setItem({});
+    form.reset({ name: "", domain: "", desc: "" });
     loadList();
   };
   useEffect(() => {
@@ -76,7 +110,7 @@ export default function AdminCate() {
                       >
                         编辑
                       </a>
-                      <span className="line">|</span>
+                      <span className="px-1.5 text-[#ccc]">|</span>
                       <a
                         href="#"
                         onClick={(e) => {
@@ -97,68 +131,90 @@ export default function AdminCate() {
         </div>
         <div className="w-[250px]" style={{ paddingTop: 31 }}>
           <form
-            className="vf"
+            className="w-full px-1"
             method="post"
             autoComplete="off"
-            onSubmit={submit}
+            onSubmit={form.handleSubmit(submit)}
           >
-            <p>
-              <label className="label_input">分类名称</label>
-              <input
-                type="text"
-                className="input_text"
-                size={30}
+            <FieldGroup>
+              <Controller
                 name="name"
-                value={item.name || ""}
-                onChange={(e) =>
-                  setItem((prev: any) => ({ ...prev, name: e.target.value }))
-                }
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    orientation="vertical"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <FieldLabel htmlFor={field.name}>分类名称</FieldLabel>
+                    <FieldContent>
+                      <Input {...field} id={field.name} />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
               />
-            </p>
-            <p>
-              <label className="label_input">分类缩略名</label>
-              <input
-                type="text"
-                className="input_text"
-                size={30}
+              <Controller
                 name="domain"
-                value={item.domain || ""}
-                onChange={(e) =>
-                  setItem((prev: any) => ({ ...prev, domain: e.target.value }))
-                }
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    orientation="vertical"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <FieldLabel htmlFor={field.name}>分类缩略名</FieldLabel>
+                    <FieldContent>
+                      <Input {...field} id={field.name} />
+                      <FieldDescription>
+                        缩略名，使用字母开头([a-z][0-9]-)
+                      </FieldDescription>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
               />
-              <span className="hint">缩略名，使用字母开头([a-z][0-9]-)</span>
-            </p>
-            <p>
-              <label className="label_input">分类描述</label>
-              <textarea
+              <Controller
                 name="desc"
-                rows={5}
-                cols={30}
-                value={item.desc || ""}
-                onChange={(e) =>
-                  setItem((prev: any) => ({ ...prev, desc: e.target.value }))
-                }
-              ></textarea>
-              <span className="hint">描述将在分类meta中显示</span>
-            </p>
-            <p className="act">
-              <button className="formbutton" type="submit">
-                {item.id ? "修改" : "添加"}
-              </button>
-              {item.id && (
-                <a
-                  className="ml-2.5"
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    cancel();
-                  }}
-                >
-                  取消
-                </a>
-              )}
-            </p>
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    orientation="vertical"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <FieldLabel htmlFor={field.name}>分类描述</FieldLabel>
+                    <FieldContent>
+                      <Textarea {...field} id={field.name} rows={5} />
+                      <FieldDescription>
+                        描述将在分类meta中显示
+                      </FieldDescription>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </FieldContent>
+                  </Field>
+                )}
+              />
+              <Field orientation="horizontal">
+                <Button type="submit" size="sm">
+                  {item.id ? "修改" : "添加"}
+                </Button>
+                {item.id && (
+                  <Button
+                    size={"sm"}
+                    variant="link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      cancel();
+                    }}
+                  >
+                    取消
+                  </Button>
+                )}
+              </Field>
+            </FieldGroup>
           </form>
         </div>
       </div>

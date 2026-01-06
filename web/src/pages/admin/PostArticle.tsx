@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   articleDetailApi,
   articleCreateApi,
@@ -14,16 +17,65 @@ import type {
   IToolbarConfig,
 } from "@wangeditor/editor";
 import { getApiUrl, getAccessToken } from "@/utils/common";
-import { dialog } from "@/utils/dialog";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Field,
+  FieldGroup,
+  FieldContent,
+  FieldDescription,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+const articleSchema = z.object({
+  id: z.number().optional(),
+  title: z.string().min(1, "标题不能为空"),
+  cate_id: z.number().min(1, "请选择分类"),
+  url: z.string().optional(),
+  content: z.string().optional(),
+  type: z.union([z.literal(1), z.literal(2)]),
+});
+
+type ArticleFormValues = z.infer<typeof articleSchema>;
 
 export default function PostArticle() {
-  const [article, setArticle] = useState<any>({ type: 1 });
   const [cates, setCates] = useState<any[]>([]);
   const [editor, setEditor] = useState<IDomEditor | null>(null);
 
   const location = useLocation();
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
+
+  const form = useForm<ArticleFormValues>({
+    resolver: zodResolver(articleSchema),
+    defaultValues: {
+      type: 1,
+      title: "",
+      cate_id: 0,
+      url: "",
+      content: "",
+    },
+  });
+
+
+  const isEditing = !!form.watch("id");
+  const articleType = form.watch("type");
 
   const toolbarConfig: Partial<IToolbarConfig> = {
     excludeKeys: ["uploadVideo", "fontFamily", "lineHeight", "group-indent"],
@@ -39,56 +91,65 @@ export default function PostArticle() {
         withCredentials: false,
         maxFileSize: 10 * 1024 * 1024,
         allowedFileTypes: ["image/*"],
-        onFailed(file: File, res: any) {
-          dialog.message(`${file.name} 上传失败` + (res.message || ""));
-        },
-        onError(file: File, err: any) {
-          dialog.message(`${file.name} 上传失败` + (err || ""));
-        },
       },
     },
   };
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { id, cate_id, title, content, type, url } = article;
-    if (!title || title.length === 0) {
-      dialog.message("标题不能为空");
-      return;
-    }
-    if (!cate_id || cate_id < 1) {
-      dialog.message("请选择分类");
-      return;
-    }
-    const data = { id, cate_id, title, content, type, url };
-    if (id)
-      await articleUpdateApi({
-        id,
-        cate_id,
-        title,
-        content,
-        type,
-        url,
+  const submit = async (values: ArticleFormValues) => {
+    const { id, cate_id, title, content, type, url } = values;
+    if (id) {
+      // 编辑状态：id 是必填的，content 可以是 undefined
+      await articleUpdateApi({ 
+        id, 
+        cate_id, 
+        title, 
+        content: content || "", 
+        type, 
+        url: url || ""
       });
-    else await articleCreateApi(data);
+    } else {
+      // 新建状态：id 不需要，content 是必填的
+      await articleCreateApi({ 
+        cate_id, 
+        title, 
+        content: content || "", 
+        type, 
+        url: url || ""
+      });
+    }
     navigate("/admin/articles");
   };
 
   useEffect(() => {
     (async () => {
+      // 先加载分类列表
+      const ret = await cateListApi({});
+      const categories = ret.list || [];
+      setCates(categories);
+      
+      // 然后处理文章详情
       if (params.get("id")) {
         const a = await articleDetailApi({ id: parseInt(params.get("id")!) });
-        setArticle(a);
+        form.reset({
+          id: a.id,
+          title: a.title || "",
+          cate_id: a.cate_id || 0,
+          url: a.url || "",
+          content: a.content || "",
+          type: a.type === 1 || a.type === 2 ? a.type : 1,
+        });
       }
-      const ret = await cateListApi({});
-      setCates(ret.list || []);
-      setArticle((prev: any) => ({
-        ...prev,
-        cate_id: prev.cate_id || ret.list?.[0]?.id || 0,
-      }));
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // 在分类列表加载完成后设置默认分类
+  useEffect(() => {
+    // 只在非编辑模式下设置默认分类
+    if (!isEditing && cates?.[0]?.id) {
+      form.setValue("cate_id", cates[0].id);
+    }
+  }, [cates, isEditing, form]);
+
   useEffect(() => {
     return () => {
       if (editor) editor.destroy();
@@ -96,143 +157,201 @@ export default function PostArticle() {
   }, [editor]);
 
   return (
-    <div id="articles">
+    <div id="articles" className="max-w-5xl mx-auto mt-3">
       <h2>
-        {article.id ? "编辑" : "撰写"}文章
+        {isEditing ? "编辑" : "撰写"}文章
         <Link to="/admin/articles">
           <i className="iconfont icon-undo" style={{ color: "#444" }}></i>
           返回列表
         </Link>
       </h2>
-      <form className="vf" method="post" autoComplete="off" onSubmit={submit}>
-        <div className="flex">
-          <div className="w-[700px]">
-            <p>
-              <label className="label_input">标题</label>
-              <input
-                type="text"
-                className="input_text"
-                maxLength={200}
-                size={50}
-                name="title"
-                value={article.title || ""}
-                onChange={(e) =>
-                  setArticle((prev: any) => ({
-                    ...prev,
-                    title: e.target.value,
-                  }))
-                }
-              />
-            </p>
-            <p>
-              <label className="label_input">分类</label>
-              {cates.length > 0 && (
-                <select
-                  name="cate_id"
-                  value={article.cate_id || ""}
-                  onChange={(e) =>
-                    setArticle((prev: any) => ({
-                      ...prev,
-                      cate_id: Number(e.target.value),
-                    }))
-                  }
-                >
-                  {cates.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </p>
-            {article.type == 2 && (
-              <p>
-                <label className="label_input">缩略名</label>
-                <input
-                  type="text"
-                  className="input_text"
-                  maxLength={200}
-                  size={50}
-                  name="url"
-                  value={article.url || ""}
-                  onChange={(e) =>
-                    setArticle((prev: any) => ({
-                      ...prev,
-                      url: e.target.value,
-                    }))
-                  }
+      <div className="mt-3">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(submit)} className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
+              {/* 左栏：占三分之二 - 标题和分类 */}
+              <FieldGroup>
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <Field>
+                      <FormLabel>
+                        标题 <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FieldContent>
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="请输入标题"
+                              maxLength={200}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      </FieldContent>
+                    </Field>
+                  )}
                 />
-                <span className="hint">
-                  页面的URL名称，如红色部分http://domain.com/
-                  <span style={{ color: "red" }}>about</span>
-                </span>
-              </p>
-            )}
-            <input type="hidden" name="id" value={article.id || ""} />
-          </div>
-          <div className="w-[250px]">
-            <p>
-              <label className="label_input">类型</label>
-              <input
-                className="input_check"
-                name="type"
-                type="radio"
-                value={1}
-                checked={article.type === 1}
-                onChange={() =>
-                  setArticle((prev: any) => ({ ...prev, type: 1 }))
-                }
-              />
-              文章
-              <input
-                className="input_check"
-                name="type"
-                type="radio"
-                value={2}
-                checked={article.type === 2}
-                onChange={() =>
-                  setArticle((prev: any) => ({ ...prev, type: 2 }))
-                }
-              />
-              页面
-            </p>
-          </div>
-        </div>
-        <div id="editor">
-          <div style={{ border: "1px solid #ddd" }}>
-            <Toolbar
-              editor={editor}
-              defaultConfig={toolbarConfig}
-              mode="default"
-              style={{ borderBottom: "1px solid #ddd" }}
+
+                <FormField
+                  control={form.control}
+                  name="cate_id"
+                  render={({ field }) => (
+                    <Field>
+                      <FormLabel>
+                        分类 <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FieldContent>
+                        <FormItem>
+                          <Select
+                            onValueChange={(value) =>
+                              field.onChange(parseInt(value))
+                            }
+                            value={field.value.toString()}
+                          >
+                            <FormControl>
+                              <SelectTrigger size={"sm"}>
+                                <SelectValue placeholder="请选择分类" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {cates.map((v) => (
+                                <SelectItem key={v.id} value={v.id.toString()}>
+                                  {v.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      </FieldContent>
+                    </Field>
+                  )}
+                />
+              </FieldGroup>
+
+              {/* 右栏：占三分之一 - 类型和缩略名 */}
+              <FieldGroup>
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <Field>
+                      <FormLabel>
+                        类型 <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FieldContent>
+                        <FormItem>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={(value) =>
+                                field.onChange(parseInt(value) as 1 | 2)
+                              }
+                              defaultValue={field.value.toString()}
+                              className="flex space-x-6"
+                            >
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="1" id="type-1" />
+                                <label
+                                  htmlFor="type-1"
+                                  className="cursor-pointer"
+                                >
+                                  文章
+                                </label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="2" id="type-2" />
+                                <label
+                                  htmlFor="type-2"
+                                  className="cursor-pointer"
+                                >
+                                  页面
+                                </label>
+                              </div>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      </FieldContent>
+                    </Field>
+                  )}
+                />
+
+                {articleType === 2 && (
+                  <FormField
+                    control={form.control}
+                    name="url"
+                    render={({ field }) => (
+                      <Field>
+                        <FormLabel>缩略名</FormLabel>
+                        <FieldContent>
+                          <FormItem>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="请输入缩略名"
+                                maxLength={200}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        </FieldContent>
+                        <FieldDescription>
+                          页面的URL名称，如红色部分http://domain.com/
+                          <span style={{ color: "red" }}>about</span>
+                        </FieldDescription>
+                      </Field>
+                    )}
+                  />
+                )}
+              </FieldGroup>
+            </div>
+
+            <FormField
+              control={form.control}
+              name="content"
+              render={({ field }) => (
+                <Field>
+                  <FieldContent>
+                    <FormItem>
+                      <FormControl>
+                        <div className="border border-border rounded-md">
+                          <Toolbar
+                            editor={editor}
+                            defaultConfig={toolbarConfig}
+                            mode="default"
+                            style={{ borderBottom: "1px solid #ddd" }}
+                          />
+                          <Editor
+                            style={{ height: 500, overflowY: "hidden" }}
+                            defaultConfig={editorConfig}
+                            value={field.value || ""}
+                            onCreated={(ed: IDomEditor) => setEditor(ed)}
+                            onChange={(ed: IDomEditor) =>
+                              field.onChange(ed.getHtml())
+                            }
+                            mode="default"
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  </FieldContent>
+                </Field>
+              )}
             />
-            <Editor
-              style={{ height: 500, overflowY: "hidden" }}
-              defaultConfig={editorConfig}
-              value={article.content || ""}
-              onCreated={(ed: IDomEditor) => setEditor(ed)}
-              onChange={(ed: IDomEditor) =>
-                setArticle((prev: any) => ({ ...prev, content: ed.getHtml() }))
-              }
-              mode="default"
-            />
-            <input type="hidden" name="content" value={article.content || ""} />
-          </div>
-        </div>
-        <p className="act">
-          <button className="formbutton" type="submit">
-            发布
-          </button>
-          <a
-            id="_save_draft"
-            href="#"
-            className="ml-2.5"
-            onClick={(e) => e.preventDefault()}
-          >
-            保存草稿
-          </a>
-        </p>
-      </form>
+
+            <Field orientation="horizontal">
+              <Button type="submit" size={"sm"}>发布</Button>
+              <Button type="button" size={"sm"} variant="outline">
+                保存草稿
+              </Button>
+            </Field>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }

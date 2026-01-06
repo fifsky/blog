@@ -1,100 +1,153 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { settingApi, settingUpdateApi } from "@/service";
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Field,
+  FieldLabel,
+  FieldError,
+  FieldGroup,
+  FieldDescription,
+  FieldContent,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertTitle } from "@/components/ui/alert";
+import { CheckCircle2Icon } from "lucide-react";
 
 export default function AdminIndex() {
-  const [formdata, setFormdata] = useState<Record<string, string>>({});
-  const [showMessage, setShowMessage] = useState(false);
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await settingUpdateApi({ kv: formdata });
+  const formSchema = z.object({
+    site_name: z.string().min(1, "请输入站点名称"),
+    site_desc: z.string().optional(),
+    site_keyword: z.string().optional(),
+    post_num: z.string().regex(/^\d+$/, "请输入数字"),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      site_name: "",
+      site_desc: "",
+      site_keyword: "",
+      post_num: "",
+    },
+    mode: "onChange",
+  });
+
+  const [showMessage, setShowMessage] = React.useState(false);
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    await settingUpdateApi({ kv: values });
     setShowMessage(true);
     setTimeout(() => setShowMessage(false), 3000);
   };
   useEffect(() => {
     (async () => {
       const data = await settingApi();
-      setFormdata(data.kv || {});
+      form.reset({
+        site_name: data.kv?.site_name || "",
+        site_desc: data.kv?.site_desc || "",
+        site_keyword: data.kv?.site_keyword || "",
+        post_num: data.kv?.post_num || "",
+      });
     })();
-  }, []);
+  }, [form]);
   return (
     <div id="settings">
       <h2>站点设置</h2>
-      {showMessage && <div className="message">保存成功</div>}
-      <form className="nf" method="post" autoComplete="off" onSubmit={submit}>
-        <p className="flex">
-          <label className="label_input">站点名称</label>
-          <div>
-            <input
-              type="text"
-              className="input_text"
-              size={50}
+      {showMessage && (
+        <Alert variant="success" className="mt-2">
+          <CheckCircle2Icon />
+          <AlertTitle>保存成功</AlertTitle>
+        </Alert>
+      )}
+      <div className="max-w-xl mx-auto mt-3">
+        <form
+          className="nf"
+          method="post"
+          autoComplete="off"
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
+          <FieldGroup>
+            <Controller
               name="site_name"
-              value={formdata.site_name || ""}
-              onChange={(e) =>
-                setFormdata((prev) => ({ ...prev, site_name: e.target.value }))
-              }
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field orientation="vertical" data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>站点名称</FieldLabel>
+                  <FieldContent>
+                    <Input {...field} id={field.name} />
+                    <FieldDescription>
+                      站点的名称将显示在网页的标题处。
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                </Field>
+              )}
             />
-            <span className="hint">站点的名称将显示在网页的标题处。</span>
-          </div>
-        </p>
-        <p className="flex">
-          <label className="label_input">站点描述</label>
-          <div>
-            <textarea
+            <Controller
               name="site_desc"
-              rows={3}
-              cols={50}
-              value={formdata.site_desc || ""}
-              onChange={(e) =>
-                setFormdata((prev) => ({ ...prev, site_desc: e.target.value }))
-              }
-            ></textarea>
-            <span className="hint">站点描述将显示在网页代码的头部。</span>
-          </div>
-        </p>
-        <p className="flex">
-          <label className="label_input">关键字</label>
-          <div>
-            <input
-              type="text"
-              className="input_text"
-              size={50}
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field orientation="vertical" data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>站点描述</FieldLabel>
+                  <FieldContent>
+                    <Textarea {...field} id={field.name} rows={3} />
+                    <FieldDescription>
+                      站点描述将显示在网页代码的头部。
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                </Field>
+              )}
+            />
+            <Controller
               name="site_keyword"
-              value={formdata.site_keyword || ""}
-              onChange={(e) =>
-                setFormdata((prev) => ({
-                  ...prev,
-                  site_keyword: e.target.value,
-                }))
-              }
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field orientation="vertical" data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>关键字</FieldLabel>
+                  <FieldContent>
+                    <Input {...field} id={field.name} />
+                    <FieldDescription>
+                      请以半角逗号","分割多个关键字。
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                </Field>
+              )}
             />
-            <span className="hint">请以半角逗号","分割多个关键字。</span>
-          </div>
-        </p>
-        <p className="flex">
-          <label className="label_input">每页显示文章数</label>
-          <div>
-            <input
-              className="input_text"
-              style={{ width: 50 }}
+            <Controller
               name="post_num"
-              type="text"
-              value={formdata.post_num || ""}
-              onChange={(e) =>
-                setFormdata((prev) => ({ ...prev, post_num: e.target.value }))
-              }
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field orientation="vertical" data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>每页显示文章数</FieldLabel>
+                  <FieldContent>
+                    <Input {...field} id={field.name} style={{ width: 80 }} />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </FieldContent>
+                </Field>
+              )}
             />
-          </div>
-        </p>
-        <p className="flex items-center">
-          <div className="label_input"></div>
-          <div>
-            <button className="formbutton" type="submit">
-              保存
-            </button>
-          </div>
-        </p>
-      </form>
+            <Field orientation="responsive">
+              <Button type="submit" size="sm">
+                保存
+              </Button>
+            </Field>
+          </FieldGroup>
+        </form>
+      </div>
     </div>
   );
 }
