@@ -43,7 +43,7 @@ export default function Login() {
     <div id="container">
       <CHeader />
       <div className="admin">
-        <div id="content">
+        <div className="p-5 border border-[#89d5ef] bg-white">
           <div className="px-[30px]">
             <h2>博客管理登录</h2>
             <form

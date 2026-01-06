@@ -73,43 +73,6 @@
   }
 
 
-
-  #content {
-    padding: 20px;
-    border: 1px solid #89d5ef;
-    background: #fff;
-  }
-  .tabs {
-    position: relative;
-    top: 1px;
-    font-size: 14px;
-  }
-  .tabs ul {
-    list-style: none;
-  }
-  .tabs li {
-    margin: 0 0 0 5px;
-  }
-  .tabs li a {
-    margin: 5px 0 0;
-    padding: 2px 14px;
-    background: #89d5ef;
-    border: 1px solid #89d5ef;
-    color: #333;
-    text-decoration: none;
-    display: inline-flex;
-  }
-  .tabs li a:hover {
-    background: #fff;
-    color: #ff7031;
-  }
-  .tabs li a.active {
-    margin: 0;
-    padding: 6px 16px 4px;
-    border: 1px solid #89d5ef;
-    border-bottom: 0;
-    background: #fff;
-  }
   #info {
     position: relative;
     margin: 0 0 10px;
