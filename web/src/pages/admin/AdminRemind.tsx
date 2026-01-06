@@ -304,7 +304,7 @@ export default function AdminRemind() {
               <Field orientation="vertical">
                 <FieldLabel>提醒时间</FieldLabel>
                 <FieldContent>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-row gap-2">
                     {[0, 6].includes(intRemindType) && (
                       <Controller
                         name="month"
@@ -315,8 +315,8 @@ export default function AdminRemind() {
                             onValueChange={(v) => field.onChange(Number(v))}
                           >
                             <SelectTrigger size="sm">
-                            <SelectValue placeholder="月" />
-                          </SelectTrigger>
+                              <SelectValue placeholder="月" />
+                            </SelectTrigger>
                             <SelectContent>
                               {Array.from({ length: 12 }, (_, i) => i + 1).map(
                                 (m) => (
@@ -340,8 +340,8 @@ export default function AdminRemind() {
                             onValueChange={(v) => field.onChange(Number(v))}
                           >
                             <SelectTrigger size="sm">
-                            <SelectValue placeholder="周" />
-                          </SelectTrigger>
+                              <SelectValue placeholder="周" />
+                            </SelectTrigger>
                             <SelectContent>
                               {Array.from({ length: 7 }, (_, i) => i + 1).map(
                                 (d) => (
@@ -365,8 +365,8 @@ export default function AdminRemind() {
                             onValueChange={(v) => field.onChange(Number(v))}
                           >
                             <SelectTrigger size="sm">
-                            <SelectValue placeholder="日" />
-                          </SelectTrigger>
+                              <SelectValue placeholder="日" />
+                            </SelectTrigger>
                             <SelectContent>
                               {Array.from({ length: 31 }, (_, i) => i + 1).map(
                                 (d) => (
@@ -390,8 +390,8 @@ export default function AdminRemind() {
                             onValueChange={(v) => field.onChange(Number(v))}
                           >
                             <SelectTrigger size="sm">
-                            <SelectValue placeholder="时" />
-                          </SelectTrigger>
+                              <SelectValue placeholder="时" />
+                            </SelectTrigger>
                             <SelectContent>
                               {Array.from({ length: 24 }, (_, i) => i).map(
                                 (d) => (
@@ -415,8 +415,8 @@ export default function AdminRemind() {
                             onValueChange={(v) => field.onChange(Number(v))}
                           >
                             <SelectTrigger size="sm">
-                            <SelectValue placeholder="分" />
-                          </SelectTrigger>
+                              <SelectValue placeholder="分" />
+                            </SelectTrigger>
                             <SelectContent>
                               {Array.from({ length: 60 }, (_, i) => i).map(
                                 (d) => (
