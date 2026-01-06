@@ -73,7 +73,6 @@ export default function PostArticle() {
     },
   });
 
-
   const isEditing = !!form.watch("id");
   const articleType = form.watch("type");
 
@@ -99,22 +98,22 @@ export default function PostArticle() {
     const { id, cate_id, title, content, type, url } = values;
     if (id) {
       // 编辑状态：id 是必填的，content 可以是 undefined
-      await articleUpdateApi({ 
-        id, 
-        cate_id, 
-        title, 
-        content: content || "", 
-        type, 
-        url: url || ""
+      await articleUpdateApi({
+        id,
+        cate_id,
+        title,
+        content: content || "",
+        type,
+        url: url || "",
       });
     } else {
       // 新建状态：id 不需要，content 是必填的
-      await articleCreateApi({ 
-        cate_id, 
-        title, 
-        content: content || "", 
-        type, 
-        url: url || ""
+      await articleCreateApi({
+        cate_id,
+        title,
+        content: content || "",
+        type,
+        url: url || "",
       });
     }
     navigate("/admin/articles");
@@ -126,7 +125,7 @@ export default function PostArticle() {
       const ret = await cateListApi({});
       const categories = ret.list || [];
       setCates(categories);
-      
+
       // 然后处理文章详情
       if (params.get("id")) {
         const a = await articleDetailApi({ id: parseInt(params.get("id")!) });
@@ -299,7 +298,7 @@ export default function PostArticle() {
                           </FormItem>
                         </FieldContent>
                         <FieldDescription>
-                          页面的URL名称，如红色部分http://domain.com/
+                          页面的URL名称，如http://domain.com/
                           <span style={{ color: "red" }}>about</span>
                         </FieldDescription>
                       </Field>
@@ -344,7 +343,9 @@ export default function PostArticle() {
             />
 
             <Field orientation="horizontal">
-              <Button type="submit" size={"sm"}>发布</Button>
+              <Button type="submit" size={"sm"}>
+                发布
+              </Button>
               <Button type="button" size={"sm"} variant="outline">
                 保存草稿
               </Button>
