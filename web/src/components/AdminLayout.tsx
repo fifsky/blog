@@ -15,6 +15,10 @@ export function AdminLayout() {
   const isPage = (...paths: string[]) =>
     paths.some((p) => location.pathname === p);
 
+  // 导航链接样式变量
+  const activeNavClass = "mt-0 px-4 py-1.5 pb-1 border border-[#89d5ef] border-b-[#fff] bg-white no-underline inline-flex text-gray-800";
+  const navClass = "mt-1.5 px-3.5 py-0.5 bg-[#89d5ef] border border-[#89d5ef] text-gray-800 no-underline inline-flex hover:bg-white hover:text-[#ff7031]";
+
   useEffect(() => {
     if (getAccessToken()) {
       (async () => {
@@ -41,9 +45,7 @@ export function AdminLayout() {
               <li className="ml-1.5">
                 <Link
                   to="/admin/index"
-                  className={isPage("/admin/index")
-                    ? "mt-0 px-4 py-1.5 pb-1 border border-[#89d5ef] border-b-[#fff] bg-white no-underline inline-flex text-gray-800"
-                    : "mt-1.5 px-3.5 py-0.5 bg-[#89d5ef] border border-[#89d5ef] text-gray-800 no-underline inline-flex hover:bg-white hover:text-[#ff7031]"}
+                  className={isPage("/admin/index") ? activeNavClass : navClass}
                 >
                   设置
                 </Link>
@@ -51,9 +53,7 @@ export function AdminLayout() {
               <li className="ml-1.5">
                 <Link
                   to="/admin/articles"
-                  className={isPage("/admin/articles", "/admin/post/article")
-                    ? "mt-0 px-4 py-1.5 pb-1 border border-[#89d5ef] border-b-[#fff] bg-white no-underline inline-flex text-gray-800"
-                    : "mt-1.5 px-3.5 py-0.5 bg-[#89d5ef] border border-[#89d5ef] text-gray-800 no-underline inline-flex hover:bg-white hover:text-[#ff7031]"}
+                  className={isPage("/admin/articles", "/admin/post/article") ? activeNavClass : navClass}
                 >
                   文章
                 </Link>
@@ -61,9 +61,7 @@ export function AdminLayout() {
               <li className="ml-1.5">
                 <Link
                   to="/admin/comments"
-                  className={isPage("/admin/comments")
-                    ? "mt-0 px-4 py-1.5 pb-1 border border-[#89d5ef] border-b-[#fff] bg-white no-underline inline-flex text-gray-800"
-                    : "mt-1.5 px-3.5 py-0.5 bg-[#89d5ef] border border-[#89d5ef] text-gray-800 no-underline inline-flex hover:bg-white hover:text-[#ff7031]"}
+                  className={isPage("/admin/comments") ? activeNavClass : navClass}
                 >
                   评论
                 </Link>
@@ -71,9 +69,7 @@ export function AdminLayout() {
               <li className="ml-1.5">
                 <Link
                   to="/admin/moods"
-                  className={isPage("/admin/moods")
-                    ? "mt-0 px-4 py-1.5 pb-1 border border-[#89d5ef] border-b-[#fff] bg-white no-underline inline-flex text-gray-800"
-                    : "mt-1.5 px-3.5 py-0.5 bg-[#89d5ef] border border-[#89d5ef] text-gray-800 no-underline inline-flex hover:bg-white hover:text-[#ff7031]"}
+                  className={isPage("/admin/moods") ? activeNavClass : navClass}
                 >
                   心情
                 </Link>
@@ -81,9 +77,7 @@ export function AdminLayout() {
               <li className="ml-1.5">
                 <Link
                   to="/admin/cates"
-                  className={isPage("/admin/cates")
-                    ? "mt-0 px-4 py-1.5 pb-1 border border-[#89d5ef] border-b-[#fff] bg-white no-underline inline-flex text-gray-800"
-                    : "mt-1.5 px-3.5 py-0.5 bg-[#89d5ef] border border-[#89d5ef] text-gray-800 no-underline inline-flex hover:bg-white hover:text-[#ff7031]"}
+                  className={isPage("/admin/cates") ? activeNavClass : navClass}
                 >
                   分类
                 </Link>
@@ -91,9 +85,7 @@ export function AdminLayout() {
               <li className="ml-1.5">
                 <Link
                   to="/admin/links"
-                  className={isPage("/admin/links")
-                    ? "mt-0 px-4 py-1.5 pb-1 border border-[#89d5ef] border-b-[#fff] bg-white no-underline inline-flex text-gray-800"
-                    : "mt-1.5 px-3.5 py-0.5 bg-[#89d5ef] border border-[#89d5ef] text-gray-800 no-underline inline-flex hover:bg-white hover:text-[#ff7031]"}
+                  className={isPage("/admin/links") ? activeNavClass : navClass}
                 >
                   链接
                 </Link>
@@ -101,9 +93,7 @@ export function AdminLayout() {
               <li className="ml-1.5">
                 <Link
                   to="/admin/remind"
-                  className={isPage("/admin/remind")
-                    ? "mt-0 px-4 py-1.5 pb-1 border border-[#89d5ef] border-b-[#fff] bg-white no-underline inline-flex text-gray-800"
-                    : "mt-1.5 px-3.5 py-0.5 bg-[#89d5ef] border border-[#89d5ef] text-gray-800 no-underline inline-flex hover:bg-white hover:text-[#ff7031]"}
+                  className={isPage("/admin/remind") ? activeNavClass : navClass}
                 >
                   提醒
                 </Link>
@@ -111,9 +101,7 @@ export function AdminLayout() {
               <li className="ml-1.5">
                 <Link
                   to="/admin/users"
-                  className={isPage("/admin/users")
-                    ? "mt-0 px-4 py-1.5 pb-1 border border-[#89d5ef] border-b-[#fff] bg-white no-underline inline-flex text-gray-800"
-                    : "mt-1.5 px-3.5 py-0.5 bg-[#89d5ef] border border-[#89d5ef] text-gray-800 no-underline inline-flex hover:bg-white hover:text-[#ff7031]"}
+                  className={isPage("/admin/users") ? activeNavClass : navClass}
                 >
                   用户
                 </Link>
