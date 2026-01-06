@@ -31,6 +31,7 @@ import {
   numFormat,
 } from "@/utils/remind_date";
 import { RemindItem } from "@/types/openapi";
+import { useEffect } from "react";
 
 interface AdminRemindDialogProps {
   isOpen: boolean;
@@ -68,6 +69,21 @@ export function AdminRemindDialog({
     },
     mode: "onChange",
   });
+
+  // 当 item 属性变化时，更新表单值
+  useEffect(() => {
+    if (item) {
+      form.reset({
+        type: item?.type ?? 0,
+        month: item?.month ?? 1,
+        week: item?.week ?? 1,
+        day: item?.day ?? 1,
+        hour: item?.hour ?? 0,
+        minute: item?.minute ?? 0,
+        content: item?.content ?? "",
+      });
+    }
+  }, [item, form]);
 
   const intRemindType = Number(form.watch("type"));
 
