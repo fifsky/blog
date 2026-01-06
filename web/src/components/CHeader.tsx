@@ -12,7 +12,7 @@ export function CHeader() {
     navigate("/");
   };
   return (
-    <div id="header" className="flex items-center justify-between">
+    <div className="flex items-center justify-between">
       <div className="group pt-1 pb-5 px-0">
         <Link to="/" className="no-underline">
           <img

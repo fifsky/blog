@@ -72,37 +72,7 @@
     overflow: hidden;
   }
 
-  #sidebar {
-    padding: 15px 10px 20px 18px;
-    border: 1px solid #89d5ef;
-    background: #fff;
-    font-size: 13px;
-  }
-  #sidebar ul {
-    list-style: none;
-  }
-  #sidebar ul.tlist {
-    list-style: disc inside none;
-  }
-  #sidebar ul.tlist li {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  #sidebar .sect {
-    margin: 0 0 1.5em;
-  }
-  #sidebar h2 {
-    margin: 0 0 0 -10px;
-    padding: 8px 5px 5px 10px;
-    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMUAAAAlCAMAAADFot1AAAAANlBMVEUAAAD////8/v/6/f73/P7z+/3w+f3r9/vt+Pzn9vvh8/rl9frc8vnU7vfG6fTM6/a55PK/5vPI1xmBAAAAAXRSTlMAQObYZgAAAW1JREFUWMPd1tuugyAQQFEug9ystv//sycVpOCIEk1Pgd2kjw0rzGgJIXZ64l5J06Y57YEbk0yUdWmf9KmlwSeiIMSjmI++I+Qxj+FXQ/KTWhuiBA6i+PKViXG2G70e0bO0Js6uYZBEnENMjsJyXVdMRhvjLh1RdGjXITYOeH9AnDJuC7DiKa1ZRnfEo2tTAhotIdLLKBDkp+nWRL2kLdm9s1m6en50+MsKGw+RF0hdtgu/GSG8F0p/1tlXeAGwie/1nfNjhdThcZSfoBuPIgz4gmKQTlA6QXWd3yvmQZ1dQDmA/RMAK8QgVcEK/H6FTxTHG1D3+b3iIUThBPEqAUEhTt9hUO35VwW0egGpAsoBrD6AU4wAUPsjqEDBk+O3MUFIYTj3gIYmaE/Bq/gXcU/ROMApLGtqAzIKzVjTAKeQrWzwsaLl0weFoqmgSQcZKG32CmJFBxFBO6gTBdAO6kTBaQd1omj9VeEUtIf+AGt9QDY3RRkOAAAAAElFTkSuQmCC)
-      0 0 no-repeat;
-    font-size: 14px;
-    font-weight: normal;
-  }
-  #sidebar p {
-    margin: 5px 0;
-  }
+
 
   #content {
     padding: 20px;

@@ -31,8 +31,8 @@ export function Sidebar() {
     setKeyword(params.get("keyword") || "");
   }, [location.search]);
   return (
-    <div id="sidebar">
-      <div className="sect" id="search">
+    <div className="p-[15px] border border-[#89d5ef] bg-white">
+      <div className="mb-5">
         <InputGroup>
           <InputGroupInput
             placeholder="搜索..."
@@ -50,7 +50,7 @@ export function Sidebar() {
       <SidebarList title="文章分类" api="cateAllApi" />
       <SidebarList title="历史存档" api="archiveApi" />
       <SidebarList title="我关注的" api="linkAllApi" />
-      <div>
+      <div className="mt-5">
         <i className="iconfont icon-rss" style={{ color: "orange" }}></i>
         <a
           className="pl-[5px]"

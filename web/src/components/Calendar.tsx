@@ -22,7 +22,7 @@ export function Calendar() {
   const isCurrDay = (d: string) => currMonth + "-" + d === currDay;
   useEffect(builder, [currMonth]);
   return (
-    <div className="sect">
+    <div className="mb-6">
       <div id="blog-calendar">
         <table className="w-[200px] text-[13px]">
           <tbody>
