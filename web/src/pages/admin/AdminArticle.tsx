@@ -23,7 +23,7 @@ export default function AdminArticle() {
     loadList();
   }, [page]);
   return (
-    <div id="articles">
+    <div>
       <h2 className="border-b border-b-[#cccccc] text-base">
         管理文章
         <Link to="/admin/post/article" className="ml-3 text-[14px]">
