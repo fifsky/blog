@@ -62,38 +62,6 @@
     white-space: -o-pre-wrap;
     word-wrap: break-word;
   }
-  form p {
-    margin: 10px 0;
-    line-height: 23px;
-  }
-  form p.error input,
-  form p.error textarea {
-    border-color: red;
-  }
-  .nf {
-    font-size: 13px;
-  }
-  .nf h3 {
-    width: 400px;
-    margin: 0.8em 0 0.5em 170px;
-    border-bottom: 1px solid #eee;
-    font-size: 13px;
-    color: #444;
-  }
-
-  .nf ul {
-    list-style: none;
-  }
-  .nf li {
-    margin: 0.5em 0;
-  }
-
-  .nf span.hidden {
-    display: none;
-  }
-  .nf p.err {
-    color: red;
-  }
   #container {
     width: 1024px;
     margin: 1em auto 0;

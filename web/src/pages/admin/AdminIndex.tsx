@@ -65,7 +65,6 @@ export default function AdminIndex() {
       )}
       <div className="max-w-xl mx-auto mt-3">
         <form
-          className="nf"
           method="post"
           autoComplete="off"
           onSubmit={form.handleSubmit(onSubmit)}
