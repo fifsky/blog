@@ -20,7 +20,6 @@ export default function AdminComment() {
   };
   useEffect(() => {
     loadList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
   return (
     <div>

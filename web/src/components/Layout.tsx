@@ -14,7 +14,6 @@ export function Layout() {
     if (getAccessToken()) {
       currentUserAction();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

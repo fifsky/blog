@@ -29,7 +29,6 @@ export function Sidebar() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     setKeyword(params.get("keyword") || "");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search]);
   return (
     <div id="sidebar">

@@ -19,7 +19,6 @@ export default function ArticleDetail() {
         document.title = `${a.title} - 無處告別`;
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id]);
   if (!article.id) return null;
   return (

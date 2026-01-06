@@ -25,12 +25,10 @@ export function AdminLayout() {
         }
       })();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (!getAccessToken()) navigate("/login");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   return (

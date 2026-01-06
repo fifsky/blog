@@ -41,7 +41,6 @@ export default function ArticleList() {
       setKeyword("");
     }
     loadList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, location.search]);
 
   return (

@@ -8,6 +8,7 @@ import {
 import { Layout } from "@/components/Layout";
 import { AdminLayout } from "@/components/AdminLayout";
 import { RouteProgress } from "@/components/RouteProgress";
+import { Loading } from "@/components/Loading";
 
 const ArticleList = lazy(() => import("@/pages/ArticleList"));
 const ArticleDetail = lazy(() => import("@/pages/ArticleDetail"));
@@ -28,14 +29,13 @@ function useTitleTemplate(title?: string) {
   useEffect(() => {
     const base = "無處告別";
     document.title = title ? `${title} - ${base}` : base;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, title]);
 }
 
 function TitleWrapper() {
   useTitleTemplate();
   return (
-    <Suspense fallback={<div style={{ padding: 16 }}>页面加载中...</div>}>
+    <Suspense fallback={<Loading />}>
       <RouteProgress />
       <Outlet />
     </Suspense>
