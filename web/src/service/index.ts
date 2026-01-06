@@ -31,6 +31,7 @@ import type {
   GetUserRequest,
   ArticleCreateRequest,
   ArticleUpdateRequest,
+  RemindListResponse,
 } from "@/types/openapi";
 
 export const loginApi = (
@@ -143,7 +144,7 @@ export const linkDeleteApi = (
 export const remindListApi = (
   data: PageRequest,
   errorHandler?: (e: AppError) => void
-) => createApi("/api/admin/remind/list", data, errorHandler);
+) => createApi<RemindListResponse>("/api/admin/remind/list", data, errorHandler);
 export const remindCreateApi = (
   data: RemindCreateRequest,
   errorHandler?: (e: AppError) => void

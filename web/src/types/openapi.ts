@@ -28,13 +28,6 @@ export type User = {
 
 export type PageRequest = { page?: number };
 
-export type UserCreateRequest = {
-  name: string;
-  password: string;
-  nick_name: string;
-  email?: string;
-  type: number;
-};
 export type UserUpdateRequest = {
   id: number;
   name?: string;
@@ -43,7 +36,6 @@ export type UserUpdateRequest = {
   email?: string;
   type?: number;
 };
-export type UserListResponse = { list: UserItem[]; page_total: number };
 export type GetUserRequest = { id: number };
 
 export type Options = { kv: Record<string, string> };
@@ -129,6 +121,49 @@ export type MoodListResponse = { list: MoodItem[]; page_total: number };
 export type MoodCreateRequest = { content: string };
 export type MoodUpdateRequest = { id: number; content?: string };
 
+// 缺失的类型定义
+export type ArticleDetailRequest = { id?: number; url?: string };
+export type GoogleProtobufAny = { '@type'?: string } & Record<string, any>;
+export type LinkItem = {
+  id: number;
+  name: string;
+  url: string;
+  desc?: string;
+  created_at: string;
+};
+export type LinkListResponse = { list: LinkItem[]; page_total: number };
+export type PrevNextRequest = { id: number };
+export type RemindItem = {
+  id: number;
+  type: number;
+  content: string;
+  month?: number;
+  week?: number;
+  day?: number;
+  hour?: number;
+  minute?: number;
+  status: number;
+  next_time: string;
+  created_at: string;
+};
+export type RemindListResponse = { list: RemindItem[]; page_total: number };
+export type Status = {
+  code: number;
+  message: string;
+  details?: GoogleProtobufAny[];
+};
+export type TextResponse = { text: string };
+export type UserCreateRequest = {
+  name: string;
+  password: string;
+  nick_name: string;
+  email?: string;
+  type: number;
+};
+export type UserListResponse = { list: UserItem[]; page_total: number };
+
+export type RemindChangeRequest = { token: string };
+export type RemindDelayRequest = { token: string };
 export type LinkCreateRequest = {
   name: string;
   url: string;
