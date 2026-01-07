@@ -13,6 +13,7 @@
   a:hover {
     color: #ff7031;
     text-decoration: underline;
+    text-underline-offset: 4px;
   }
   * {
     @apply border-border outline-ring/50;
@@ -130,23 +131,5 @@
   }
   table.list tr:hover {
     background: #eee;
-  }
-  table td.comment-num {
-    padding: 0;
-    text-align: right;
-  }
-  table td.comment-num a,
-  table td.art-num a {
-    background: none repeat scroll 0 0 #ccc;
-    border-radius: 2px 2px 2px 2px;
-    color: #ffffff;
-    font-weight: bold;
-    text-decoration: none;
-    padding: 2px 4px;
-  }
-  table td.comment-num a:hover,
-  table td.art-num a:hover {
-    background: none repeat scroll 0 0 #89d5ef;
-    text-decoration: none;
   }
 }

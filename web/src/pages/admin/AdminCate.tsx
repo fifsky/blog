@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function AdminCate() {
   const [list, setList] = useState<any[]>([]);
@@ -99,7 +100,7 @@ export default function AdminCate() {
                     </td>
                     <td>{v.name}</td>
                     <td>{v.domain}</td>
-                    <td className="art-num">{v.num}</td>
+                    <td><Badge variant="secondary">{v.num}</Badge></td>
                     <td>
                       <a
                         href="#"
