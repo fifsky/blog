@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
-import hljs from "highlight.js/lib/core";
+import { useMemo, useRef } from "react";
 import { Link, useLocation } from "react-router";
 
 export function CArticle({ article }: { article: any }) {
@@ -13,27 +12,6 @@ export function CArticle({ article }: { article: any }) {
     if (!k) return content;
     return content.replace(k, `<mark>${k}</mark>`);
   };
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-
-    const highlightAll = () => {
-      root.querySelectorAll("pre code").forEach((block) => {
-        if (!block.classList.contains("hljs")) {
-          hljs.highlightElement(block as HTMLElement);
-        }
-      });
-    };
-
-    highlightAll();
-
-    const observer = new MutationObserver(() => {
-      highlightAll();
-    });
-    observer.observe(root, { childList: true, subtree: true });
-
-    return () => observer.disconnect();
-  }, [article]);
   if (!article) return null;
   return (
     <div ref={rootRef}>

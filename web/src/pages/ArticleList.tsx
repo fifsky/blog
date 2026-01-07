@@ -4,6 +4,7 @@ import { CArticle } from "@/components/CArticle";
 import { Pagination } from "@/components/Pagination";
 import { articleListApi } from "@/service";
 import { useStore } from "@/store/context";
+import { usePrismHighlight } from "@/hooks";
 
 export default function ArticleList() {
   const [list, setList] = useState<any[]>([]);
@@ -42,6 +43,8 @@ export default function ArticleList() {
     }
     loadList();
   }, [location.pathname, location.search]);
+
+  usePrismHighlight([list]);
 
   return (
     <div>

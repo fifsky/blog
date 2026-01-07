@@ -48,11 +48,6 @@
     border-bottom: 1px dashed #666;
     cursor: help;
   }
-  pre.code,
-  code,
-  var {
-    font-family: "Courier New", Courier, monospace;
-  }
 
   .article {
     color: #555555;
@@ -70,16 +65,6 @@
     padding: 5px;
     background: #fff;
     box-shadow: 0 0 8px #e1e1e1;
-  }
-  .article pre code {
-    line-height: 1.5;
-    border-radius: 6px;
-    word-spacing: normal;
-    letter-spacing: normal;
-    padding: 16px;
-    background: #f6f8fa;
-    display: block;
-    overflow-x: auto;
   }
 
   .article p {
