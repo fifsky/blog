@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import hljs from "highlight.js/lib/core";
 import javascript from "highlight.js/lib/languages/javascript";
+import typescript from "highlight.js/lib/languages/typescript";
 import php from "highlight.js/lib/languages/php";
 import go from "highlight.js/lib/languages/go";
 import python from "highlight.js/lib/languages/python";
@@ -22,6 +23,7 @@ import "./index.css";
 dayjs.extend(isBetween);
 
 hljs.registerLanguage("javascript", javascript);
+hljs.registerLanguage("typescript", typescript);
 hljs.registerLanguage("php", php);
 hljs.registerLanguage("go", go);
 hljs.registerLanguage("python", python);
