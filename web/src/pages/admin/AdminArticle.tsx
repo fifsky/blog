@@ -33,8 +33,8 @@ export default function AdminArticle() {
     {
       title: <div style={{ width: 20 }}>&nbsp;</div>,
       key: "id",
-      render: (record) => (
-        <input type="checkbox" name="ids" value={record.id} />
+      render: (value) => (
+        <input type="checkbox" name="ids" value={value} />
       )
     },
     {
@@ -92,7 +92,7 @@ export default function AdminArticle() {
     {
       title: <div style={{ width: 90 }}>操作</div>,
       key: "id",
-      render: (record) => (
+      render: (_,record) => (
         <>
           <Link to={`/admin/post/article?id=${record.id}`}>编辑</Link>
           <span className="px-1.5 text-[#ccc]">|</span>

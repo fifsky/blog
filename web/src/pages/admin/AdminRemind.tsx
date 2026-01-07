@@ -12,6 +12,7 @@ import useDialog from "@/hooks/useDialog";
 import { AdminRemindDialog } from "@/components/AdminRemindDialog";
 import { remindTimeFormat, remindType } from "@/utils/remind_date";
 import { RemindItem } from "@/types/openapi";
+import { CTable, Column } from "@/components/CTable";
 
 export default function AdminRemind() {
   const [list, setList] = useState<RemindItem[]>([]);
@@ -62,6 +63,65 @@ export default function AdminRemind() {
   useEffect(() => {
     loadList();
   }, [page]);
+
+  // 定义表格列配置
+  const columns: Column<RemindItem>[] = [
+    {
+      title: <div style={{ width: 20 }}>&nbsp;</div>,
+      key: "id",
+      render: (_, record) => (
+        <input type="checkbox" name="ids" value={record.id} />
+      )
+    },
+    {
+      title: <div style={{ width: 80 }}>提醒类别</div>,
+      key: "type",
+      render: (value) => (
+        <>{remindType[value as keyof typeof remindType]}</>
+      )
+    },
+    {
+      title: <div style={{ width: 180 }}>时间</div>,
+      key: "id",
+      render: (_, record) => (
+        <>{remindTimeFormat(record)}</>
+      )
+    },
+    {
+      title: "内容",
+      key: "content"
+    },
+    {
+      title: <div style={{ width: 90 }}>操作</div>,
+      key: "id",
+      render: (_, record) => (
+        <>
+          <Button 
+            variant={"link"}
+            className="p-0 m-0 h-auto text-[13px]"
+            onClick={(e) => {
+              e.preventDefault();
+              editItem(record.id);
+            }}
+          >
+            编辑
+          </Button>
+          <span className="px-1.5 text-[#ccc]">|</span>
+          <Button 
+            variant={"link"}
+            className="p-0 m-0 h-auto text-[13px]"
+            onClick={(e) => {
+              e.preventDefault();
+              deleteItem(record.id);
+            }}
+          >
+            删除
+          </Button>
+        </>
+      )
+    }
+  ];
+
   return (
     <div>
       <h2 className="border-b border-b-[#cccccc] text-base">
@@ -76,56 +136,8 @@ export default function AdminRemind() {
           <div className="my-[10px] flex items-center">
             <BatchHandle />
           </div>
-          <table className="list">
-            <tbody>
-              <tr>
-                <th style={{ width: 20 }}>&nbsp;</th>
-                <th style={{ width: 80 }}>提醒类别</th>
-                <th style={{ width: 180 }}>时间</th>
-                <th>内容</th>
-                <th style={{ width: 90 }}>操作</th>
-              </tr>
-              {list.length === 0 && (
-                <tr>
-                  <td colSpan={7} align="center">
-                    还没有提醒！
-                  </td>
-                </tr>
-              )}
-              {list.length > 0 &&
-                list.map((v) => (
-                  <tr key={v.id}>
-                    <td>
-                      <input type="checkbox" name="ids" value={v.id} />
-                    </td>
-                    <td>{remindType[v.type]}</td>
-                    <td>{remindTimeFormat(v)}</td>
-                    <td>{v.content}</td>
-                    <td>
-                      <a
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          editItem(v.id);
-                        }}
-                      >
-                        编辑
-                      </a>
-                      <span className="px-1.5 text-[#ccc]">|</span>
-                      <a
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          deleteItem(v.id);
-                        }}
-                      >
-                        删除
-                      </a>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+          {/* 使用自定义表格组件 */}
+          <CTable data={list} columns={columns} />
           <div className="my-[10px] flex items-center justify-between">
             <BatchHandle />
             <Paginate page={page} pageTotal={pageTotal} onChange={setPage} />

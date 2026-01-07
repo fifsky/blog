@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { CTable, Column } from "@/components/CTable";
 
 export default function AdminLink() {
   const [list, setList] = useState<any[]>([]);
@@ -67,6 +68,63 @@ export default function AdminLink() {
   useEffect(() => {
     loadList();
   }, []);
+
+  // 定义表格列配置
+  const columns: Column<any>[] = [
+    {
+      title: <div style={{ width: 20 }}>&nbsp;</div>,
+      key: "id",
+      render: (_, record) => (
+        <input type="checkbox" name="ids" value={record.id} />
+      )
+    },
+    {
+      title: <div style={{ width: 120 }}>连接名</div>,
+      key: "name",
+      render: (value, record) => (
+        <a href={record.url} target="_blank" rel="noreferrer">
+          {value}
+        </a>
+      )
+    },
+    {
+      title: "地址",
+      key: "url",
+      render: (value) => (
+        <a href={value}>{value}</a>
+      )
+    },
+    {
+      title: <div style={{ width: 90 }}>操作</div>,
+      key: "id",
+      render: (_, record) => (
+        <>
+          <Button 
+            variant={"link"}
+            className="p-0 m-0 h-auto text-[13px]"
+            onClick={(e) => {
+              e.preventDefault();
+              editItem(record.id);
+            }}
+          >
+            编辑
+          </Button>
+          <span className="px-1.5 text-[#ccc]">|</span>
+          <Button 
+            variant={"link"}
+            className="p-0 m-0 h-auto text-[13px]"
+            onClick={(e) => {
+              e.preventDefault();
+              deleteItem(record.id);
+            }}
+          >
+            删除
+          </Button>
+        </>
+      )
+    }
+  ];
+
   return (
     <div>
       <h2 className="border-b border-b-[#cccccc] text-base">管理链接</h2>
@@ -75,60 +133,8 @@ export default function AdminLink() {
           <div className="my-[10px] flex items-center">
             <BatchHandle />
           </div>
-          <table className="list">
-            <tbody>
-              <tr>
-                <th style={{ width: 20 }}>&nbsp;</th>
-                <th style={{ width: 120 }}>连接名</th>
-                <th>地址</th>
-                <th style={{ width: 90 }}>操作</th>
-              </tr>
-              {list.length === 0 && (
-                <tr>
-                  <td colSpan={7} align="center">
-                    还没有链接！
-                  </td>
-                </tr>
-              )}
-              {list.length > 0 &&
-                list.map((v) => (
-                  <tr key={v.id}>
-                    <td>
-                      <input type="checkbox" name="ids" value={v.id} />
-                    </td>
-                    <td>
-                      <a href={v.url} target="_blank" rel="noreferrer">
-                        {v.name}
-                      </a>
-                    </td>
-                    <td>
-                      <a href={v.url}>{v.url}</a>
-                    </td>
-                    <td>
-                      <a
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          editItem(v.id);
-                        }}
-                      >
-                        编辑
-                      </a>
-                      <span className="px-1.5 text-[#ccc]">|</span>
-                      <a
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          deleteItem(v.id);
-                        }}
-                      >
-                        删除
-                      </a>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+          {/* 使用自定义表格组件 */}
+          <CTable data={list} columns={columns} />
           <div className="my-[10px] flex items-center justify-between">
             <BatchHandle />
           </div>

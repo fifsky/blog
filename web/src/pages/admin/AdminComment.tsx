@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { commentAdminListApi, commentDeleteApi } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Paginate } from "@/components/Paginate";
+import { CTable, Column } from "@/components/CTable";
+import { Button } from "@/components/ui/button";
 
 export default function AdminComment() {
   const [list, setList] = useState<any[]>([]);
@@ -21,66 +23,74 @@ export default function AdminComment() {
   useEffect(() => {
     loadList();
   }, [page]);
+
+  // 定义表格列配置
+  const columns: Column<any>[] = [
+    {
+      title: <div style={{ width: 20 }}>&nbsp;</div>,
+      key: "id",
+      render: (_, record) => (
+        <input type="checkbox" name="ids" value={record.id} />
+      )
+    },
+    {
+      title: <div style={{ width: 150 }}>文章</div>,
+      key: "article_title",
+      render: (value, record) => (
+        <a
+          href={`${record.type === 2 ? record.url : "/article" + record.id}#comments`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {value}
+        </a>
+      )
+    },
+    {
+      title: <div style={{ width: 60 }}>昵称</div>,
+      key: "name"
+    },
+    {
+      title: "评论",
+      key: "content"
+    },
+    {
+      title: <div style={{ width: 80 }}>IP</div>,
+      key: "ip"
+    },
+    {
+      title: <div style={{ width: 130 }}>日期</div>,
+      key: "created_at",
+      render: (value) => (
+        <>{new Date(value).toLocaleString()}</>
+      )
+    },
+    {
+      title: <div style={{ width: 80 }}>操作</div>,
+      key: "id",
+      render: (_, record) => (
+        <Button 
+          variant={"link"}
+          className="p-0 m-0 h-auto text-[13px]"
+          onClick={(e) => {
+            e.preventDefault();
+            deleteItem(record.id);
+          }}
+        >
+          删除
+        </Button>
+      )
+    }
+  ];
+
   return (
     <div>
       <h2 className="border-b border-b-[#cccccc] text-base">管理评论</h2>
       <div className="my-[10px] flex items-center">
         <BatchHandle />
       </div>
-      <table className="list">
-        <tbody>
-          <tr>
-            <th style={{ width: 20 }}>&nbsp;</th>
-            <th style={{ width: 150 }}>文章</th>
-            <th style={{ width: 60 }}>昵称</th>
-            <th>评论</th>
-            <th style={{ width: 80 }}>IP</th>
-            <th style={{ width: 130 }}>日期</th>
-            <th style={{ width: 80 }}>操作</th>
-          </tr>
-          {list.length === 0 && (
-            <tr>
-              <td colSpan={7} align="center">
-                还没有评论！
-              </td>
-            </tr>
-          )}
-          {list.length > 0 &&
-            list.map((v: any) => (
-              <tr key={v.id}>
-                <td>
-                  <input type="checkbox" name="ids" value={v.id} />
-                </td>
-                <td>
-                  <a
-                    href={`${
-                      v.type === 2 ? v.url : "/article" + v.id
-                    }#comments`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {v.article_title}
-                  </a>
-                </td>
-                <td>{v.name}</td>
-                <td>{v.content}</td>
-                <td>{v.ip}</td>
-                <td>{new Date(v.created_at).toLocaleString()}</td>
-                <td>
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      deleteItem(v.id);
-                    }}
-                  >
-                    删除
-                  </a>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+      {/* 使用自定义表格组件 */}
+      <CTable data={list} columns={columns} />
       <div className="my-[10px] flex items-center justify-between">
         <BatchHandle />
         <Paginate page={page} pageTotal={pageTotal} onChange={setPage} />

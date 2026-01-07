@@ -3,6 +3,8 @@ import { Link } from "react-router";
 import { userListApi, userStatusApi } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Paginate } from "@/components/Paginate";
+import { CTable, Column } from "@/components/CTable";
+import { Button } from "@/components/ui/button";
 export default function AdminUser() {
   const [list, setList] = useState<any[]>([]);
   const [pageTotal, setPageTotal] = useState(0);
@@ -21,6 +23,64 @@ export default function AdminUser() {
   useEffect(() => {
     loadList();
   }, [page]);
+
+  // 定义表格列配置
+  const columns: Column<any>[] = [
+    {
+      title: <div style={{ width: 20 }}>&nbsp;</div>,
+      key: "id",
+      render: (_, record) => (
+        <input type="checkbox" name="ids" value={record.id} />
+      )
+    },
+    {
+      title: <div style={{ width: 120 }}>用户名</div>,
+      key: "name"
+    },
+    {
+      title: <div style={{ width: 120 }}>昵称</div>,
+      key: "nick_name"
+    },
+    {
+      title: "邮箱",
+      key: "email"
+    },
+    {
+      title: <div style={{ width: 100 }}>角色</div>,
+      key: "type",
+      render: (value) => (
+        <>{value === 1 ? "管理员" : "编辑"}</>
+      )
+    },
+    {
+      title: <div style={{ width: 100 }}>状态</div>,
+      key: "status",
+      render: (value) => (
+        <>{value === 1 ? "启用" : "停用"}</>
+      )
+    },
+    {
+      title: <div style={{ width: 90 }}>操作</div>,
+      key: "id",
+      render: (_, record) => (
+        <>
+          <Link to={`/admin/post/user?id=${record.id}`}>编辑</Link>
+          <span className="px-1.5 text-[#ccc]">|</span>
+          <Button 
+            variant={"link"}
+            className="p-0 m-0 h-auto text-[13px]"
+            onClick={(e) => {
+              e.preventDefault();
+              deleteItem(record.id);
+            }}
+          >
+            {record.status === 1 ? "停用" : "启用"}
+          </Button>
+        </>
+      )
+    }
+  ];
+
   return (
     <div>
       <h2 className="border-b border-b-[#cccccc] text-base">
@@ -33,52 +93,8 @@ export default function AdminUser() {
       <div className="my-[10px] flex items-center">
         <BatchHandle />
       </div>
-      <table className="list">
-        <tbody>
-          <tr>
-            <th style={{ width: 20 }}>&nbsp;</th>
-            <th style={{ width: 120 }}>用户名</th>
-            <th style={{ width: 120 }}>昵称</th>
-            <th>邮箱</th>
-            <th style={{ width: 100 }}>角色</th>
-            <th style={{ width: 100 }}>状态</th>
-            <th style={{ width: 90 }}>操作</th>
-          </tr>
-          {list.length === 0 && (
-            <tr>
-              <td colSpan={7} align="center">
-                还没有用户！
-              </td>
-            </tr>
-          )}
-          {list.length > 0 &&
-            list.map((v) => (
-              <tr key={v.id}>
-                <td>
-                  <input type="checkbox" name="ids" value={v.id} />
-                </td>
-                <td>{v.name}</td>
-                <td>{v.nick_name}</td>
-                <td>{v.email}</td>
-                <td>{v.type === 1 ? "管理员" : "编辑"}</td>
-                <td>{v.status === 1 ? "启用" : "停用"}</td>
-                <td>
-                  <Link to={`/admin/post/user?id=${v.id}`}>编辑</Link>
-                  <span className="px-1.5 text-[#ccc]">|</span>
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      deleteItem(v.id);
-                    }}
-                  >
-                    {v.status === 1 ? "停用" : "启用"}
-                  </a>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+      {/* 使用自定义表格组件 */}
+      <CTable data={list} columns={columns} />
       <div className="my-[10px] flex items-center justify-between">
         <BatchHandle />
         <Paginate page={page} pageTotal={pageTotal} onChange={setPage} />
