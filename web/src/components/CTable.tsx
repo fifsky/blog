@@ -44,7 +44,7 @@ const getValueByJsonPath = (obj: any, path: string): any => {
  */
 export const CTable = <T,>({ data, columns, className = '' }: MyTableProps<T>) => {
   return (
-    <table className={`w-full text-xs ${className}`}>
+    <table className={`w-full text-[13px] ${className}`}>
       <tbody>
         <tr>
           {columns.map((column, index) => (
