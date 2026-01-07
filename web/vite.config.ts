@@ -32,7 +32,7 @@ export default defineConfig(() => {
       rollupOptions: {
         output: {
           manualChunks: {
-            "utils-vendor": ["dayjs", "highlight.js", "@wangeditor/editor"],
+            "utils-vendor": ["dayjs", "prismjs", "@wangeditor/editor"],
           },
         },
       },
