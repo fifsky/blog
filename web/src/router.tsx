@@ -1,10 +1,5 @@
 import { useEffect, lazy, Suspense } from "react";
-import {
-  createBrowserRouter,
-  Outlet,
-  useLocation,
-  type RouteObject,
-} from "react-router";
+import { createBrowserRouter, Outlet, useLocation, type RouteObject } from "react-router";
 import { Layout } from "@/components/Layout";
 import { AdminLayout } from "@/components/AdminLayout";
 import { RouteProgress } from "@/components/RouteProgress";

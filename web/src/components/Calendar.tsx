@@ -15,8 +15,7 @@ export function Calendar() {
       for (let i = 0; i < 35 - dayItem.length; i++) dayItem.push("");
     }
     const result: string[][] = [];
-    for (let i = 0; i < dayItem.length; i += 7)
-      result.push(dayItem.slice(i, i + 7).map(String));
+    for (let i = 0; i < dayItem.length; i += 7) result.push(dayItem.slice(i, i + 7).map(String));
     setItems(result);
   };
   const isCurrDay = (d: string) => currMonth + "-" + d === currDay;
@@ -32,9 +31,7 @@ export function Calendar() {
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-                    setCurrMonth(
-                      dayjs(currMonth).subtract(1, "year").format("YYYY-MM")
-                    );
+                    setCurrMonth(dayjs(currMonth).subtract(1, "year").format("YYYY-MM"));
                   }}
                 >
                   &lt;&lt;
@@ -45,9 +42,7 @@ export function Calendar() {
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-                    setCurrMonth(
-                      dayjs(currMonth).subtract(1, "month").format("YYYY-MM")
-                    );
+                    setCurrMonth(dayjs(currMonth).subtract(1, "month").format("YYYY-MM"));
                   }}
                 >
                   &lt;
@@ -61,9 +56,7 @@ export function Calendar() {
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-                    setCurrMonth(
-                      dayjs(currMonth).add(1, "month").format("YYYY-MM")
-                    );
+                    setCurrMonth(dayjs(currMonth).add(1, "month").format("YYYY-MM"));
                   }}
                 >
                   &gt;
@@ -74,9 +67,7 @@ export function Calendar() {
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-                    setCurrMonth(
-                      dayjs(currMonth).add(1, "year").format("YYYY-MM")
-                    );
+                    setCurrMonth(dayjs(currMonth).add(1, "year").format("YYYY-MM"));
                   }}
                 >
                   &gt;&gt;
@@ -97,9 +88,7 @@ export function Calendar() {
                 {days.map((d, i) => (
                   <td
                     key={i}
-                    className={`text-center ${
-                      isCurrDay(d) ? "bg-[#eeeeee] font-bold" : ""
-                    }`}
+                    className={`text-center ${isCurrDay(d) ? "bg-[#eeeeee] font-bold" : ""}`}
                   >
                     {d}
                   </td>

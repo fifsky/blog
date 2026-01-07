@@ -30,35 +30,29 @@ export default function AdminUser() {
     {
       title: <div style={{ width: 20 }}>&nbsp;</div>,
       key: "id",
-      render: (_, record) => (
-        <input type="checkbox" name="ids" value={record.id} />
-      )
+      render: (_, record) => <input type="checkbox" name="ids" value={record.id} />,
     },
     {
       title: <div style={{ width: 120 }}>用户名</div>,
-      key: "name"
+      key: "name",
     },
     {
       title: <div style={{ width: 120 }}>昵称</div>,
-      key: "nick_name"
+      key: "nick_name",
     },
     {
       title: "邮箱",
-      key: "email"
+      key: "email",
     },
     {
       title: <div style={{ width: 100 }}>角色</div>,
       key: "type",
-      render: (value) => (
-        <>{value === 1 ? "管理员" : "编辑"}</>
-      )
+      render: (value) => <>{value === 1 ? "管理员" : "编辑"}</>,
     },
     {
       title: <div style={{ width: 100 }}>状态</div>,
       key: "status",
-      render: (value) => (
-        <>{value === 1 ? "启用" : "停用"}</>
-      )
+      render: (value) => <>{value === 1 ? "启用" : "停用"}</>,
     },
     {
       title: <div style={{ width: 90 }}>操作</div>,
@@ -67,7 +61,7 @@ export default function AdminUser() {
         <>
           <Link to={`/admin/post/user?id=${record.id}`}>编辑</Link>
           <span className="px-1.5 text-[#ccc]">|</span>
-          <Button 
+          <Button
             variant={"link"}
             className="p-0 m-0 h-auto text-[13px]"
             onClick={(e) => {
@@ -78,8 +72,8 @@ export default function AdminUser() {
             {record.status === 1 ? "停用" : "启用"}
           </Button>
         </>
-      )
-    }
+      ),
+    },
   ];
 
   return (

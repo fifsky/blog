@@ -1,22 +1,11 @@
 import { useEffect, useState } from "react";
-import {
-  moodDeleteApi,
-  moodListApi,
-  moodCreateApi,
-  moodUpdateApi,
-} from "@/service";
+import { moodDeleteApi, moodListApi, moodCreateApi, moodUpdateApi } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Pagination } from "@/components/Pagination";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Field,
-  FieldLabel,
-  FieldError,
-  FieldGroup,
-  FieldContent,
-} from "@/components/ui/field";
+import { Field, FieldLabel, FieldError, FieldGroup, FieldContent } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { CTable, Column } from "@/components/CTable";
@@ -71,28 +60,26 @@ export default function AdminMood() {
     {
       title: <div style={{ width: 20 }}>&nbsp;</div>,
       key: "id",
-      render: (_, record) => (
-        <input type="checkbox" name="ids" value={record.id} />
-      )
+      render: (_, record) => <input type="checkbox" name="ids" value={record.id} />,
     },
     {
       title: <div style={{ width: 80 }}>作者</div>,
-      key: "user.name"
+      key: "user.name",
     },
     {
       title: "心情",
-      key: "content"
+      key: "content",
     },
     {
       title: <div style={{ width: 180 }}>日期</div>,
-      key: "created_at"
+      key: "created_at",
     },
     {
       title: <div style={{ width: 90 }}>操作</div>,
       key: "id",
-      render: (_,record) => (
+      render: (_, record) => (
         <>
-          <Button 
+          <Button
             variant={"link"}
             className="p-0 m-0 h-auto text-[13px]"
             onClick={(e) => {
@@ -103,7 +90,7 @@ export default function AdminMood() {
             编辑
           </Button>
           <span className="px-1.5 text-[#ccc]">|</span>
-          <Button 
+          <Button
             variant={"link"}
             className="p-0 m-0 h-auto text-[13px]"
             onClick={(e) => {
@@ -114,8 +101,8 @@ export default function AdminMood() {
             删除
           </Button>
         </>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -145,16 +132,11 @@ export default function AdminMood() {
                 name="content"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field
-                    orientation="vertical"
-                    data-invalid={fieldState.invalid}
-                  >
+                  <Field orientation="vertical" data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>发表心情</FieldLabel>
                     <FieldContent>
                       <Textarea {...field} id={field.name} rows={5} />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </FieldContent>
                   </Field>
                 )}

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "oxfmt --write"
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",

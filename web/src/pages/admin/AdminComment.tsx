@@ -30,9 +30,7 @@ export default function AdminComment() {
     {
       title: <div style={{ width: 20 }}>&nbsp;</div>,
       key: "id",
-      render: (_, record) => (
-        <input type="checkbox" name="ids" value={record.id} />
-      )
+      render: (_, record) => <input type="checkbox" name="ids" value={record.id} />,
     },
     {
       title: <div style={{ width: 150 }}>文章</div>,
@@ -45,32 +43,30 @@ export default function AdminComment() {
         >
           {value}
         </a>
-      )
+      ),
     },
     {
       title: <div style={{ width: 60 }}>昵称</div>,
-      key: "name"
+      key: "name",
     },
     {
       title: "评论",
-      key: "content"
+      key: "content",
     },
     {
       title: <div style={{ width: 80 }}>IP</div>,
-      key: "ip"
+      key: "ip",
     },
     {
       title: <div style={{ width: 130 }}>日期</div>,
       key: "created_at",
-      render: (value) => (
-        <>{new Date(value).toLocaleString()}</>
-      )
+      render: (value) => <>{new Date(value).toLocaleString()}</>,
     },
     {
       title: <div style={{ width: 80 }}>操作</div>,
       key: "id",
       render: (_, record) => (
-        <Button 
+        <Button
           variant={"link"}
           className="p-0 m-0 h-auto text-[13px]"
           onClick={(e) => {
@@ -80,8 +76,8 @@ export default function AdminComment() {
         >
           删除
         </Button>
-      )
-    }
+      ),
+    },
   ];
 
   return (

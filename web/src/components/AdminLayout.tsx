@@ -12,12 +12,13 @@ export function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isPage = (...paths: string[]) =>
-    paths.some((p) => location.pathname === p);
+  const isPage = (...paths: string[]) => paths.some((p) => location.pathname === p);
 
   // 导航链接样式变量
-  const activeNavClass = "mt-0 px-4 py-1.5 pb-1 border border-[#89d5ef] border-b-[#fff] bg-white no-underline inline-flex text-gray-800";
-  const navClass = "mt-1.5 px-3.5 py-0.5 bg-[#89d5ef] border border-[#89d5ef] text-gray-800 no-underline inline-flex hover:bg-white hover:text-[#ff7031]";
+  const activeNavClass =
+    "mt-0 px-4 py-1.5 pb-1 border border-[#89d5ef] border-b-[#fff] bg-white no-underline inline-flex text-gray-800";
+  const navClass =
+    "mt-1.5 px-3.5 py-0.5 bg-[#89d5ef] border border-[#89d5ef] text-gray-800 no-underline inline-flex hover:bg-white hover:text-[#ff7031]";
 
   useEffect(() => {
     if (getAccessToken()) {
@@ -53,7 +54,9 @@ export function AdminLayout() {
               <li className="ml-1.5">
                 <Link
                   to="/admin/articles"
-                  className={isPage("/admin/articles", "/admin/post/article") ? activeNavClass : navClass}
+                  className={
+                    isPage("/admin/articles", "/admin/post/article") ? activeNavClass : navClass
+                  }
                 >
                   文章
                 </Link>

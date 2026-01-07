@@ -7,29 +7,19 @@ function humanTime(v: string) {
   const itemTime = dayjs(v);
   if (itemTime.isBetween(currTime.subtract(60, "second"), currTime)) {
     return currTime.diff(itemTime, "second") + "秒前";
-  } else if (
-    itemTime.isBetween(
-      currTime.subtract(60, "minute"),
-      currTime.subtract(1, "minute")
-    )
-  ) {
+  } else if (itemTime.isBetween(currTime.subtract(60, "minute"), currTime.subtract(1, "minute"))) {
     return currTime.diff(itemTime, "minute") + "分钟前";
-  } else if (
-    itemTime.isBetween(currTime.startOf("day"), currTime.endOf("day"))
-  ) {
+  } else if (itemTime.isBetween(currTime.startOf("day"), currTime.endOf("day"))) {
     return "今天" + itemTime.format("HH:mm");
   } else if (
     itemTime.isBetween(
       currTime.subtract(1, "day").startOf("day"),
-      currTime.subtract(1, "day").endOf("day")
+      currTime.subtract(1, "day").endOf("day"),
     )
   ) {
     return "昨天" + itemTime.format("HH:mm");
   } else if (
-    itemTime.isBetween(
-      currTime.startOf("year"),
-      currTime.subtract(1, "day").endOf("day")
-    )
+    itemTime.isBetween(currTime.startOf("year"), currTime.subtract(1, "day").endOf("day"))
   ) {
     return itemTime.format("MM月DD日 HH:mm");
   } else {

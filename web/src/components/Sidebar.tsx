@@ -3,11 +3,7 @@ import { useNavigate, useLocation } from "react-router";
 import { useStore } from "@/store/context";
 import { SidebarList } from "./SidebarList";
 import { Calendar } from "./Calendar";
-import {
-  InputGroup,
-  InputGroupInput,
-  InputGroupAddon,
-} from "@/components/ui/input-group";
+import { InputGroup, InputGroupInput, InputGroupAddon } from "@/components/ui/input-group";
 import { Search } from "lucide-react";
 
 export function Sidebar() {

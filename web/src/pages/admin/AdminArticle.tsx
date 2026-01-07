@@ -33,9 +33,7 @@ export default function AdminArticle() {
     {
       title: <div style={{ width: 20 }}>&nbsp;</div>,
       key: "id",
-      render: (value) => (
-        <input type="checkbox" name="ids" value={value} />
-      )
+      render: (value) => <input type="checkbox" name="ids" value={value} />,
     },
     {
       title: (
@@ -44,9 +42,7 @@ export default function AdminArticle() {
         </div>
       ),
       key: "id",
-      render: () => (
-        <Badge variant="secondary">0</Badge>
-      )
+      render: () => <Badge variant="secondary">0</Badge>,
     },
     {
       title: "标题",
@@ -59,44 +55,38 @@ export default function AdminArticle() {
         >
           {value}
         </a>
-      )
+      ),
     },
     {
       title: <div style={{ width: 60 }}>作者</div>,
-      key: "user.nick_name"
+      key: "user.nick_name",
     },
     {
       title: <div style={{ width: 80 }}>分类</div>,
       key: "cate.name",
       render: (value, record) => (
-        <a
-          href={`/category/${record.cate.domain}`}
-          target="_blank"
-          rel="noreferrer"
-        >
+        <a href={`/category/${record.cate.domain}`} target="_blank" rel="noreferrer">
           {value}
         </a>
-      )
+      ),
     },
     {
       title: <div style={{ width: 80 }}>类型</div>,
       key: "type",
-      render: (value) => (
-        value === 1 ? "文章" : "页面"
-      )
+      render: (value) => (value === 1 ? "文章" : "页面"),
     },
     {
       title: <div style={{ width: 180 }}>日期</div>,
-      key: "updated_at"
+      key: "updated_at",
     },
     {
       title: <div style={{ width: 90 }}>操作</div>,
       key: "id",
-      render: (_,record) => (
+      render: (_, record) => (
         <>
           <Link to={`/admin/post/article?id=${record.id}`}>编辑</Link>
           <span className="px-1.5 text-[#ccc]">|</span>
-          <Button 
+          <Button
             variant={"link"}
             className={cn("p-0 m-0 h-auto text-[13px]")}
             onClick={(e) => {
@@ -107,8 +97,8 @@ export default function AdminArticle() {
             删除
           </Button>
         </>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -122,10 +112,10 @@ export default function AdminArticle() {
       <div className="my-[10px] flex items-center">
         <BatchHandle />
       </div>
-      
+
       {/* 使用自定义表格组件 */}
       <CTable data={list} columns={columns} />
-      
+
       <div className="my-[10px] flex items-center justify-between">
         <BatchHandle />
         <Pagination page={page} pageTotal={pageTotal} onChange={setPage} />

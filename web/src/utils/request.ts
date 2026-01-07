@@ -11,7 +11,7 @@ type RequestOptions = {
 
 export async function request<T = any>(
   option: RequestOptions,
-  errorHandler?: (e: AppError) => void
+  errorHandler?: (e: AppError) => void,
 ) {
   const { url, method = "GET", headers = {}, data } = option;
   const init: RequestInit = {
@@ -28,8 +28,7 @@ export async function request<T = any>(
       // 让浏览器自动设置 multipart/form-data 边界
     } else {
       init.body = JSON.stringify(data);
-      (init.headers as Record<string, string>)["Content-Type"] =
-        "application/json";
+      (init.headers as Record<string, string>)["Content-Type"] = "application/json";
     }
   }
 
@@ -49,18 +48,10 @@ export async function request<T = any>(
         throw new AppError(p.code, p.msg);
       }
     }
-    throw new AppError(
-      resp.status,
-      getErrorMessage(payload)
-    );
+    throw new AppError(resp.status, getErrorMessage(payload));
   } catch (e: any) {
     const err: AppError =
-      e instanceof AppError
-        ? e
-        : new AppError(
-            getErrorCode(e.code),
-            getErrorMessage(e)
-          );
+      e instanceof AppError ? e : new AppError(getErrorCode(e.code), getErrorMessage(e));
     if (errorHandler) {
       errorHandler(err);
       // 返回一个 rejected promise 让调用方自行停止后续逻辑或继续链式处理
@@ -102,7 +93,7 @@ function getErrorMessage(error: unknown, fallback = "Unknown error"): string {
 export const createApi = <TResp = any>(
   url: string,
   data?: any,
-  errorHandler?: (e: AppError) => void
+  errorHandler?: (e: AppError) => void,
 ) => {
   const headers = {
     "Access-Token": localStorage.getItem("access_token") || "",

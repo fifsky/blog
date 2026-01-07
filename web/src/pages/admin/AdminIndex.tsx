@@ -56,7 +56,7 @@ export default function AdminIndex() {
   }, [form]);
   return (
     <div>
-       <h2 className="border-b border-b-[#cccccc] text-base">站点设置</h2>
+      <h2 className="border-b border-b-[#cccccc] text-base">站点设置</h2>
       {showMessage && (
         <Alert variant="success" className="mt-2">
           <CheckCircle2Icon />
@@ -64,11 +64,7 @@ export default function AdminIndex() {
         </Alert>
       )}
       <div className="max-w-xl mx-auto mt-3">
-        <form
-          method="post"
-          autoComplete="off"
-          onSubmit={form.handleSubmit(onSubmit)}
-        >
+        <form method="post" autoComplete="off" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Controller
               name="site_name"
@@ -78,12 +74,8 @@ export default function AdminIndex() {
                   <FieldLabel htmlFor={field.name}>站点名称</FieldLabel>
                   <FieldContent>
                     <Input {...field} id={field.name} />
-                    <FieldDescription>
-                      站点的名称将显示在网页的标题处。
-                    </FieldDescription>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    <FieldDescription>站点的名称将显示在网页的标题处。</FieldDescription>
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </FieldContent>
                 </Field>
               )}
@@ -96,12 +88,8 @@ export default function AdminIndex() {
                   <FieldLabel htmlFor={field.name}>站点描述</FieldLabel>
                   <FieldContent>
                     <Textarea {...field} id={field.name} rows={3} />
-                    <FieldDescription>
-                      站点描述将显示在网页代码的头部。
-                    </FieldDescription>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    <FieldDescription>站点描述将显示在网页代码的头部。</FieldDescription>
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </FieldContent>
                 </Field>
               )}
@@ -114,12 +102,8 @@ export default function AdminIndex() {
                   <FieldLabel htmlFor={field.name}>关键字</FieldLabel>
                   <FieldContent>
                     <Input {...field} id={field.name} />
-                    <FieldDescription>
-                      请以半角逗号","分割多个关键字。
-                    </FieldDescription>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    <FieldDescription>请以半角逗号","分割多个关键字。</FieldDescription>
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </FieldContent>
                 </Field>
               )}
@@ -132,9 +116,7 @@ export default function AdminIndex() {
                   <FieldLabel htmlFor={field.name}>每页显示文章数</FieldLabel>
                   <FieldContent>
                     <Input {...field} id={field.name} style={{ width: 80 }} />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </FieldContent>
                 </Field>
               )}

@@ -135,7 +135,7 @@ export type CommentListResponse = { list: CommentItem[]; page_total: number };
 
 // 缺失的类型定义
 export type ArticleDetailRequest = { id?: number; url?: string };
-export type GoogleProtobufAny = { '@type'?: string } & Record<string, any>;
+export type GoogleProtobufAny = { "@type"?: string } & Record<string, any>;
 export type LinkItem = {
   id: number;
   name: string;

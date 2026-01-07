@@ -1,35 +1,12 @@
-
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
-import {
-  Field,
-  FieldLabel,
-  FieldError,
-  FieldGroup,
-  FieldContent,
-} from "./ui/field";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Field, FieldLabel, FieldError, FieldGroup, FieldContent } from "./ui/field";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "./ui/dialog";
-import {
-  remindType,
-  monthFormat,
-  weekFormat,
-  numFormat,
-} from "@/utils/remind_date";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { remindType, monthFormat, weekFormat, numFormat } from "@/utils/remind_date";
 import { RemindItem } from "@/types/openapi";
 import { useEffect } from "react";
 
@@ -50,12 +27,7 @@ const formSchema = z.object({
   content: z.string().min(1, "请输入提醒内容"),
 });
 
-export function AdminRemindDialog({
-  isOpen,
-  onClose,
-  item,
-  onSubmit,
-}: AdminRemindDialogProps) {
+export function AdminRemindDialog({ isOpen, onClose, item, onSubmit }: AdminRemindDialogProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -115,10 +87,7 @@ export function AdminRemindDialog({
               name="type"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field
-                  orientation="vertical"
-                  data-invalid={fieldState.invalid}
-                >
+                <Field orientation="vertical" data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="type">提醒类别</FieldLabel>
                   <FieldContent>
                     <Select
@@ -136,9 +105,7 @@ export function AdminRemindDialog({
                         ))}
                       </SelectContent>
                     </Select>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </FieldContent>
                 </Field>
               )}
@@ -160,13 +127,11 @@ export function AdminRemindDialog({
                             <SelectValue placeholder="月" />
                           </SelectTrigger>
                           <SelectContent>
-                            {Array.from({ length: 12 }, (_, i) => i + 1).map(
-                              (m) => (
-                                <SelectItem key={m} value={String(m)}>
-                                  {monthFormat[m]}月
-                                </SelectItem>
-                              )
-                            )}
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                              <SelectItem key={m} value={String(m)}>
+                                {monthFormat[m]}月
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       )}
@@ -185,13 +150,11 @@ export function AdminRemindDialog({
                             <SelectValue placeholder="周" />
                           </SelectTrigger>
                           <SelectContent>
-                            {Array.from({ length: 7 }, (_, i) => i + 1).map(
-                              (d) => (
-                                <SelectItem key={d} value={String(d)}>
-                                  周{weekFormat[d]}
-                                </SelectItem>
-                              )
-                            )}
+                            {Array.from({ length: 7 }, (_, i) => i + 1).map((d) => (
+                              <SelectItem key={d} value={String(d)}>
+                                周{weekFormat[d]}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       )}
@@ -210,13 +173,11 @@ export function AdminRemindDialog({
                             <SelectValue placeholder="日" />
                           </SelectTrigger>
                           <SelectContent>
-                            {Array.from({ length: 31 }, (_, i) => i + 1).map(
-                              (d) => (
-                                <SelectItem key={d} value={String(d)}>
-                                  {numFormat(d)}日
-                                </SelectItem>
-                              )
-                            )}
+                            {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                              <SelectItem key={d} value={String(d)}>
+                                {numFormat(d)}日
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       )}
@@ -235,13 +196,11 @@ export function AdminRemindDialog({
                             <SelectValue placeholder="时" />
                           </SelectTrigger>
                           <SelectContent>
-                            {Array.from({ length: 24 }, (_, i) => i).map(
-                              (d) => (
-                                <SelectItem key={d} value={String(d)}>
-                                  {numFormat(d)}时
-                                </SelectItem>
-                              )
-                            )}
+                            {Array.from({ length: 24 }, (_, i) => i).map((d) => (
+                              <SelectItem key={d} value={String(d)}>
+                                {numFormat(d)}时
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       )}
@@ -260,13 +219,11 @@ export function AdminRemindDialog({
                             <SelectValue placeholder="分" />
                           </SelectTrigger>
                           <SelectContent>
-                            {Array.from({ length: 60 }, (_, i) => i).map(
-                              (d) => (
-                                <SelectItem key={d} value={String(d)}>
-                                  {numFormat(d)}分
-                                </SelectItem>
-                              )
-                            )}
+                            {Array.from({ length: 60 }, (_, i) => i).map((d) => (
+                              <SelectItem key={d} value={String(d)}>
+                                {numFormat(d)}分
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       )}
@@ -279,16 +236,11 @@ export function AdminRemindDialog({
               name="content"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field
-                  orientation="vertical"
-                  data-invalid={fieldState.invalid}
-                >
+                <Field orientation="vertical" data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>提醒内容</FieldLabel>
                   <FieldContent>
                     <Textarea {...field} id={field.name} rows={5} />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </FieldContent>
                 </Field>
               )}

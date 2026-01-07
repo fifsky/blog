@@ -19,11 +19,7 @@ export function CFooter() {
           最好的她们
         </a>
         <span className="mx-1">&copy;2026</span>
-        <a
-          href="https://github.com/fifsky/blog"
-          target="_blank"
-          rel="noreferrer"
-        >
+        <a href="https://github.com/fifsky/blog" target="_blank" rel="noreferrer">
           fifsky.com
         </a>
       </p>

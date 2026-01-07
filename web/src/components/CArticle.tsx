@@ -6,7 +6,7 @@ export function CArticle({ article }: { article: any }) {
   const location = useLocation();
   const keyword = useMemo(
     () => new URLSearchParams(location.search).get("keyword") || "",
-    [location.search]
+    [location.search],
   );
   const markHigh = (content: string, k: string) => {
     if (!k) return content;
@@ -16,11 +16,7 @@ export function CArticle({ article }: { article: any }) {
   return (
     <div ref={rootRef}>
       <div className="flex justify-between items-center h-[54px] overflow-hidden">
-        <img
-          className="p-[2px] w-[40px] h-[40px]"
-          src="/assets/images/avatar.jpg"
-          alt=""
-        />
+        <img className="p-[2px] w-[40px] h-[40px]" src="/assets/images/avatar.jpg" alt="" />
         <div className="flex-1 ml-4">
           <h2 className="text-[14px]">
             <Link
@@ -44,10 +40,7 @@ export function CArticle({ article }: { article: any }) {
           </div>
         </div>
       </div>
-      <div
-        className="article"
-        dangerouslySetInnerHTML={{ __html: article.content }}
-      />
+      <div className="article" dangerouslySetInnerHTML={{ __html: article.content }} />
     </div>
   );
 }

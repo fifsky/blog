@@ -8,11 +8,7 @@ import {
   Loader2Icon,
 } from "lucide-react";
 
-const Toaster = ({
-  position = "top-center",
-  richColors = true,
-  ...props
-}: ToasterProps) => {
+const Toaster = ({ position = "top-center", richColors = true, ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme();
 
   return (

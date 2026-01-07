@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  cateDeleteApi,
-  cateListApi,
-  cateCreateApi,
-  cateUpdateApi,
-} from "@/service";
+import { cateDeleteApi, cateListApi, cateCreateApi, cateUpdateApi } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
@@ -29,9 +24,7 @@ export default function AdminCate() {
   const [item, setItem] = useState<CateListItem>();
   const formSchema = z.object({
     name: z.string().min(1, "请输入分类名称"),
-    domain: z
-      .string()
-      .regex(/^[a-z][a-z0-9-]*$/, "缩略名需字母开头，包含小写字母、数字或-"),
+    domain: z.string().regex(/^[a-z][a-z0-9-]*$/, "缩略名需字母开头，包含小写字母、数字或-"),
     desc: z.string().optional(),
   });
   const form = useForm<z.infer<typeof formSchema>>({
@@ -76,31 +69,27 @@ export default function AdminCate() {
     {
       title: <div style={{ width: 20 }}>&nbsp;</div>,
       key: "id",
-      render: (_, record) => (
-        <input type="checkbox" name="ids" value={record.id} />
-      )
+      render: (_, record) => <input type="checkbox" name="ids" value={record.id} />,
     },
     {
       title: "分类名",
-      key: "name"
+      key: "name",
     },
     {
       title: <div style={{ width: 90 }}>缩略名</div>,
-      key: "domain"
+      key: "domain",
     },
     {
       title: <div style={{ width: 60 }}>文章数</div>,
       key: "num",
-      render: (value) => (
-        <Badge variant="secondary">{value}</Badge>
-      )
+      render: (value) => <Badge variant="secondary">{value}</Badge>,
     },
     {
       title: <div style={{ width: 90 }}>操作</div>,
       key: "id",
       render: (_, record) => (
         <>
-          <Button 
+          <Button
             variant={"link"}
             className="p-0 m-0 h-auto text-[13px]"
             onClick={(e) => {
@@ -111,7 +100,7 @@ export default function AdminCate() {
             编辑
           </Button>
           <span className="px-1.5 text-[#ccc]">|</span>
-          <Button 
+          <Button
             variant={"link"}
             className="p-0 m-0 h-auto text-[13px]"
             onClick={(e) => {
@@ -122,8 +111,8 @@ export default function AdminCate() {
             删除
           </Button>
         </>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -152,16 +141,11 @@ export default function AdminCate() {
                 name="name"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field
-                    orientation="vertical"
-                    data-invalid={fieldState.invalid}
-                  >
+                  <Field orientation="vertical" data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>分类名称</FieldLabel>
                     <FieldContent>
                       <Input {...field} id={field.name} />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </FieldContent>
                   </Field>
                 )}
@@ -170,19 +154,12 @@ export default function AdminCate() {
                 name="domain"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field
-                    orientation="vertical"
-                    data-invalid={fieldState.invalid}
-                  >
+                  <Field orientation="vertical" data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>分类缩略名</FieldLabel>
                     <FieldContent>
                       <Input {...field} id={field.name} />
-                      <FieldDescription>
-                        缩略名，使用字母开头([a-z][0-9]-)
-                      </FieldDescription>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
+                      <FieldDescription>缩略名，使用字母开头([a-z][0-9]-)</FieldDescription>
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </FieldContent>
                   </Field>
                 )}
@@ -191,19 +168,12 @@ export default function AdminCate() {
                 name="desc"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field
-                    orientation="vertical"
-                    data-invalid={fieldState.invalid}
-                  >
+                  <Field orientation="vertical" data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>分类描述</FieldLabel>
                     <FieldContent>
                       <Textarea {...field} id={field.name} rows={5} />
-                      <FieldDescription>
-                        描述将在分类meta中显示
-                      </FieldDescription>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
+                      <FieldDescription>描述将在分类meta中显示</FieldDescription>
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </FieldContent>
                   </Field>
                 )}

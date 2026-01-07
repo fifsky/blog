@@ -13,12 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Field,
-  FieldGroup,
-  FieldContent,
-  FieldDescription,
-} from "@/components/ui/field";
+import { Field, FieldGroup, FieldContent, FieldDescription } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -87,7 +82,7 @@ export default function PostUser() {
           name: u.name || "",
           email: u.email || "",
           nick_name: u.nick_name || "",
-          type: (u.type === 1 || u.type === 2) ? u.type : 1,
+          type: u.type === 1 || u.type === 2 ? u.type : 1,
           password1: "",
           password2: "",
         });
@@ -110,156 +105,154 @@ export default function PostUser() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(submit)} className="space-y-6">
             <FieldGroup>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <Field>
-                  <FormLabel>
-                    用户名 <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <FieldContent>
-                    <FormItem>
-                      <FormControl>
-                        <Input {...field} placeholder="请输入用户名" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  </FieldContent>
-                  <FieldDescription>
-                    此用户名将作为用户登录时所用的名称，请不要与系统中现有的用户名重复。
-                  </FieldDescription>
-                </Field>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <Field>
-                  <FormLabel>
-                    邮箱 <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <FieldContent>
-                    <FormItem>
-                      <FormControl>
-                        <Input {...field} placeholder="请输入邮箱" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  </FieldContent>
-                  <FieldDescription>
-                    电子邮箱地址将作为此用户的主要联系方式，请不要与系统中现有的电子邮箱地址重复。
-                  </FieldDescription>
-                </Field>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="nick_name"
-              render={({ field }) => (
-                <Field>
-                  <FormLabel>昵称</FormLabel>
-                  <FieldContent>
-                    <FormItem>
-                      <FormControl>
-                        <Input {...field} placeholder="请输入昵称" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  </FieldContent>
-                  <FieldDescription>
-                    用户昵称可以与用户名不同，用于前台显示，如果你将此项留空，将默认使用用户名。
-                  </FieldDescription>
-                </Field>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password1"
-              render={({ field }) => (
-                <Field>
-                  <FormLabel>
-                    密码 <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <FieldContent>
-                    <FormItem>
-                      <FormControl>
-                        <Input {...field} type="password" placeholder="请输入密码" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  </FieldContent>
-                  <FieldDescription>为用户分配一个密码。</FieldDescription>
-                </Field>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password2"
-              render={({ field }) => (
-                <Field>
-                  <FormLabel>
-                    确认密码 <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <FieldContent>
-                    <FormItem>
-                      <FormControl>
-                        <Input {...field} type="password" placeholder="请再次输入密码" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  </FieldContent>
-                  <FieldDescription>
-                    请确认你的密码，与上面输入的密码保持一致。
-                  </FieldDescription>
-                </Field>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <Field>
-                  <FormLabel>
-                    角色 <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <FieldContent>
-                    <FormItem>
-                      <Select
-                        onValueChange={(value) => field.onChange(parseInt(value) as 1 | 2)}
-                        defaultValue={field.value.toString()}
-                      >
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <Field>
+                    <FormLabel>
+                      用户名 <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <FieldContent>
+                      <FormItem>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="请选择角色" />
-                          </SelectTrigger>
+                          <Input {...field} placeholder="请输入用户名" />
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="1">管理员</SelectItem>
-                          <SelectItem value="2">编辑</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  </FieldContent>
-                  <FieldDescription>
-                    管理员具有所有操作权限，编辑仅能包含文章、评论、心情的操作权限。
-                  </FieldDescription>
-                </Field>
-              )}
-            />
-            <Field orientation="horizontal">
-              <Button type="submit">保存</Button>
-            </Field>
-          </FieldGroup>
-        </form>
-      </Form>
+                        <FormMessage />
+                      </FormItem>
+                    </FieldContent>
+                    <FieldDescription>
+                      此用户名将作为用户登录时所用的名称，请不要与系统中现有的用户名重复。
+                    </FieldDescription>
+                  </Field>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <Field>
+                    <FormLabel>
+                      邮箱 <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <FieldContent>
+                      <FormItem>
+                        <FormControl>
+                          <Input {...field} placeholder="请输入邮箱" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    </FieldContent>
+                    <FieldDescription>
+                      电子邮箱地址将作为此用户的主要联系方式，请不要与系统中现有的电子邮箱地址重复。
+                    </FieldDescription>
+                  </Field>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="nick_name"
+                render={({ field }) => (
+                  <Field>
+                    <FormLabel>昵称</FormLabel>
+                    <FieldContent>
+                      <FormItem>
+                        <FormControl>
+                          <Input {...field} placeholder="请输入昵称" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    </FieldContent>
+                    <FieldDescription>
+                      用户昵称可以与用户名不同，用于前台显示，如果你将此项留空，将默认使用用户名。
+                    </FieldDescription>
+                  </Field>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password1"
+                render={({ field }) => (
+                  <Field>
+                    <FormLabel>
+                      密码 <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <FieldContent>
+                      <FormItem>
+                        <FormControl>
+                          <Input {...field} type="password" placeholder="请输入密码" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    </FieldContent>
+                    <FieldDescription>为用户分配一个密码。</FieldDescription>
+                  </Field>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password2"
+                render={({ field }) => (
+                  <Field>
+                    <FormLabel>
+                      确认密码 <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <FieldContent>
+                      <FormItem>
+                        <FormControl>
+                          <Input {...field} type="password" placeholder="请再次输入密码" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    </FieldContent>
+                    <FieldDescription>请确认你的密码，与上面输入的密码保持一致。</FieldDescription>
+                  </Field>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <Field>
+                    <FormLabel>
+                      角色 <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <FieldContent>
+                      <FormItem>
+                        <Select
+                          onValueChange={(value) => field.onChange(parseInt(value) as 1 | 2)}
+                          defaultValue={field.value.toString()}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="请选择角色" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="1">管理员</SelectItem>
+                            <SelectItem value="2">编辑</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    </FieldContent>
+                    <FieldDescription>
+                      管理员具有所有操作权限，编辑仅能包含文章、评论、心情的操作权限。
+                    </FieldDescription>
+                  </Field>
+                )}
+              />
+              <Field orientation="horizontal">
+                <Button type="submit">保存</Button>
+              </Field>
+            </FieldGroup>
+          </form>
+        </Form>
       </div>
     </div>
   );

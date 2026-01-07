@@ -7,12 +7,7 @@ interface PaginationProps {
   showPageCount?: number;
 }
 
-export function Pagination({
-  page,
-  pageTotal,
-  onChange,
-  showPageCount = 5,
-}: PaginationProps) {
+export function Pagination({ page, pageTotal, onChange, showPageCount = 5 }: PaginationProps) {
   const getPageNumbers = () => {
     if (pageTotal <= showPageCount + 2) {
       return Array.from({ length: pageTotal }, (_, i) => i + 1);
@@ -53,7 +48,7 @@ export function Pagination({
             "px-2 py-[2px] border border-[#ddd] no-underline select-none outline-none",
             page === 1
               ? "bg-[#f5f5f5] text-[#ccc] cursor-not-allowed"
-              : "hover:border-[#06c] hover:bg-[#06c] hover:text-white cursor-pointer"
+              : "hover:border-[#06c] hover:bg-[#06c] hover:text-white cursor-pointer",
           )}
           onClick={page === 1 ? undefined : () => onChange(page - 1)}
         >
@@ -63,16 +58,14 @@ export function Pagination({
       {pages.map((p, index) => (
         <li key={index} className="mx-[0.2em] inline">
           {p === "..." ? (
-            <span className="px-2 py-[2px] border border-[#ddd] text-[#999]">
-              ...
-            </span>
+            <span className="px-2 py-[2px] border border-[#ddd] text-[#999]">...</span>
           ) : (
             <a
               className={cn(
                 "px-2 py-[2px] border border-[#ddd] no-underline select-none outline-none",
                 p === page
                   ? "bg-[#ddd] text-[#555] cursor-default"
-                  : "hover:border-[#06c] hover:bg-[#06c] hover:text-white cursor-pointer"
+                  : "hover:border-[#06c] hover:bg-[#06c] hover:text-white cursor-pointer",
               )}
               onClick={p === page ? undefined : () => onChange(p as number)}
             >
@@ -87,7 +80,7 @@ export function Pagination({
             "px-2 py-[2px] border border-[#ddd] no-underline select-none outline-none",
             page === pageTotal
               ? "bg-[#f5f5f5] text-[#ccc] cursor-not-allowed"
-              : "hover:border-[#06c] hover:bg-[#06c] hover:text-white cursor-pointer"
+              : "hover:border-[#06c] hover:bg-[#06c] hover:text-white cursor-pointer",
           )}
           onClick={page === pageTotal ? undefined : () => onChange(page + 1)}
         >

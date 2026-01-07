@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  remindDeleteApi,
-  remindListApi,
-  remindCreateApi,
-  remindUpdateApi,
-} from "@/service";
+import { remindDeleteApi, remindListApi, remindCreateApi, remindUpdateApi } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Pagination } from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
@@ -21,7 +16,7 @@ export default function AdminRemind() {
   const [page, setPage] = useState(1);
   const [item, setItem] = useState<RemindItem>();
   const { isOpen, open: openDialog, close: closeDialog } = useDialog(false);
-  
+
   const loadList = async () => {
     const ret = await remindListApi({ page });
     setList(ret.list || []);
@@ -38,7 +33,7 @@ export default function AdminRemind() {
       loadList();
     }
   };
-  
+
   const handleSubmit = async (values: any) => {
     const { id } = item || ({} as RemindItem);
     const data = {
@@ -56,7 +51,7 @@ export default function AdminRemind() {
     setItem(undefined);
     loadList();
   };
-  
+
   const handleOpenDialog = () => {
     setItem(undefined);
     openDialog();
@@ -70,34 +65,28 @@ export default function AdminRemind() {
     {
       title: <div style={{ width: 20 }}>&nbsp;</div>,
       key: "id",
-      render: (_, record) => (
-        <input type="checkbox" name="ids" value={record.id} />
-      )
+      render: (_, record) => <input type="checkbox" name="ids" value={record.id} />,
     },
     {
       title: <div style={{ width: 80 }}>提醒类别</div>,
       key: "type",
-      render: (value) => (
-        <>{remindType[value as keyof typeof remindType]}</>
-      )
+      render: (value) => <>{remindType[value as keyof typeof remindType]}</>,
     },
     {
       title: <div style={{ width: 180 }}>时间</div>,
       key: "id",
-      render: (_, record) => (
-        <>{remindTimeFormat(record)}</>
-      )
+      render: (_, record) => <>{remindTimeFormat(record)}</>,
     },
     {
       title: "内容",
-      key: "content"
+      key: "content",
     },
     {
       title: <div style={{ width: 90 }}>操作</div>,
       key: "id",
       render: (_, record) => (
         <>
-          <Button 
+          <Button
             variant={"link"}
             className="p-0 m-0 h-auto text-[13px]"
             onClick={(e) => {
@@ -108,7 +97,7 @@ export default function AdminRemind() {
             编辑
           </Button>
           <span className="px-1.5 text-[#ccc]">|</span>
-          <Button 
+          <Button
             variant={"link"}
             className="p-0 m-0 h-auto text-[13px]"
             onClick={(e) => {
@@ -119,15 +108,19 @@ export default function AdminRemind() {
             删除
           </Button>
         </>
-      )
-    }
+      ),
+    },
   ];
 
   return (
     <div>
       <h2 className="border-b border-b-[#cccccc] text-base">
         管理提醒
-        <Button variant={"link"} onClick={handleOpenDialog} className={cn("p-0 m-0 ml-3 leading-[21px] h-auto text-[14px] gap-0")}>
+        <Button
+          variant={"link"}
+          onClick={handleOpenDialog}
+          className={cn("p-0 m-0 ml-3 leading-[21px] h-auto text-[14px] gap-0")}
+        >
           <i className="iconfont icon-add" style={{ color: "#444" }}></i>
           <span>新增提醒</span>
         </Button>
@@ -145,7 +138,7 @@ export default function AdminRemind() {
           </div>
         </div>
       </div>
-      
+
       {/* 提醒对话框 */}
       <AdminRemindDialog
         isOpen={isOpen}

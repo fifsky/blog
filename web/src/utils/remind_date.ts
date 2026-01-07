@@ -57,23 +57,10 @@ export const remindTimeFormat = (v: any) => {
       str = numFormat(v.hour) + "时" + numFormat(v.minute) + "分";
       break;
     case 4:
-      str =
-        "周" +
-        weekFormat[v.week] +
-        " " +
-        numFormat(v.hour) +
-        "时" +
-        numFormat(v.minute) +
-        "分";
+      str = "周" + weekFormat[v.week] + " " + numFormat(v.hour) + "时" + numFormat(v.minute) + "分";
       break;
     case 5:
-      str =
-        numFormat(v.day) +
-        "日 " +
-        numFormat(v.hour) +
-        "时" +
-        numFormat(v.minute) +
-        "分";
+      str = numFormat(v.day) + "日 " + numFormat(v.hour) + "时" + numFormat(v.minute) + "分";
       break;
     case 6:
       str =

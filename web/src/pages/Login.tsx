@@ -5,12 +5,7 @@ import { useNavigate } from "react-router";
 import { LoginRequest } from "@/types/openapi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Field,
-  FieldLabel,
-  FieldError,
-  FieldGroup,
-} from "@/components/ui/field";
+import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,68 +37,64 @@ export default function Login() {
   return (
     <div className="w-[1024px] mt-4 mx-auto min-h-[500px]">
       <CHeader />
-        <div className="p-5 border border-[#89d5ef] bg-white">
-          <div className="px-[30px]">
-            <h2 className="border-b border-b-[#cccccc] text-base">博客管理登录</h2>
-            <form
-              method="post"
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="w-[300px] mx-auto my-[30px]"
-            >
-              {/* 使用 FieldGroup 包裹所有字段，统一布局与间距 */}
-              <FieldGroup>
-                {/* 用户名字段 */}
-                <Controller
-                  name="user_name"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      {/* 使用 FieldLabel 作为 label */}
-                      <FieldLabel htmlFor={field.name}>用户名</FieldLabel>
-                      {/* 输入框，绑定 RHF 的 field */}
-                      <Input
-                        {...field}
-                        id={field.name}
-                        type="text"
-                        aria-invalid={fieldState.invalid}
-                        autoComplete="username"
-                      />
-                      {/* 错误展示 */}
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-                {/* 密码字段 */}
-                <Controller
-                  name="password"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>密码</FieldLabel>
-                      <Input
-                        {...field}
-                        id={field.name}
-                        type="password"
-                        aria-invalid={fieldState.invalid}
-                        autoComplete="current-password"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-                <Field>
-                  <Button type="submit" size={"sm"}>
-                    登 录
-                  </Button>
-                </Field>
-              </FieldGroup>
-            </form>
-          </div>
+      <div className="p-5 border border-[#89d5ef] bg-white">
+        <div className="px-[30px]">
+          <h2 className="border-b border-b-[#cccccc] text-base">博客管理登录</h2>
+          <form
+            method="post"
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="w-[300px] mx-auto my-[30px]"
+          >
+            {/* 使用 FieldGroup 包裹所有字段，统一布局与间距 */}
+            <FieldGroup>
+              {/* 用户名字段 */}
+              <Controller
+                name="user_name"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    {/* 使用 FieldLabel 作为 label */}
+                    <FieldLabel htmlFor={field.name}>用户名</FieldLabel>
+                    {/* 输入框，绑定 RHF 的 field */}
+                    <Input
+                      {...field}
+                      id={field.name}
+                      type="text"
+                      aria-invalid={fieldState.invalid}
+                      autoComplete="username"
+                    />
+                    {/* 错误展示 */}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+              {/* 密码字段 */}
+              <Controller
+                name="password"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>密码</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      type="password"
+                      aria-invalid={fieldState.invalid}
+                      autoComplete="current-password"
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+              <Field>
+                <Button type="submit" size={"sm"}>
+                  登 录
+                </Button>
+              </Field>
+            </FieldGroup>
+          </form>
         </div>
+      </div>
       <CFooter />
     </div>
   );

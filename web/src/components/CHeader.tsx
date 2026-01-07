@@ -15,20 +15,19 @@ export function CHeader() {
     <div className="flex items-center justify-between">
       <div className="group pt-1 pb-5 px-0">
         <Link to="/" className="no-underline">
-          <img
-            className="inline-block"
-            alt="首页"
-            src="/assets/images/logo.png"
-          />
-          <span className="hidden ml-2 group-hover:inline group-hover:text-white">
-            首页
-          </span>
+          <img className="inline-block" alt="首页" src="/assets/images/logo.png" />
+          <span className="hidden ml-2 group-hover:inline group-hover:text-white">首页</span>
         </Link>
       </div>
       <div className="inline-flex items-center h-[35px] my-2 px-3 bg-white rounded-lg whitespace-nowrap">
         <ul className="flex items-center list-none">
           <li className="bg-white">
-            <Link to="/" className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline">首页</Link>
+            <Link
+              to="/"
+              className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+            >
+              首页
+            </Link>
           </li>
           <li className="bg-white">
             <a
@@ -41,17 +40,37 @@ export function CHeader() {
             </a>
           </li>
           <li className="bg-white">
-            <a href="https://gist.github.com/fifsky" className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline">技术</a>
+            <a
+              href="https://gist.github.com/fifsky"
+              className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+            >
+              技术
+            </a>
           </li>
           <li className="bg-white">
-            <Link to="/about" className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline">关于</Link>
+            <Link
+              to="/about"
+              className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+            >
+              关于
+            </Link>
           </li>
           <li className="bg-white">
-            <a href="https://caixudong.com" className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline">简历</a>
+            <a
+              href="https://caixudong.com"
+              className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+            >
+              简历
+            </a>
           </li>
           {isLogin && (
             <li className="bg-white">
-              <Link to="/admin/index" className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline">管理中心</Link>
+              <Link
+                to="/admin/index"
+                className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+              >
+                管理中心
+              </Link>
             </li>
           )}
           {isLogin && (
@@ -70,7 +89,12 @@ export function CHeader() {
           )}
           {!isLogin && (
             <li className="bg-white">
-              <Link to="/login" className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline">登录</Link>
+              <Link
+                to="/login"
+                className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+              >
+                登录
+              </Link>
             </li>
           )}
         </ul>

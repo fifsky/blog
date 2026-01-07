@@ -2,20 +2,11 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {
-  articleDetailApi,
-  articleCreateApi,
-  articleUpdateApi,
-  cateListApi,
-} from "@/service";
+import { articleDetailApi, articleCreateApi, articleUpdateApi, cateListApi } from "@/service";
 import { useLocation, useNavigate, Link } from "react-router";
 import "@wangeditor/editor/dist/css/style.css";
 import { Editor, Toolbar } from "@wangeditor/editor-for-react";
-import type {
-  IDomEditor,
-  IEditorConfig,
-  IToolbarConfig,
-} from "@wangeditor/editor";
+import type { IDomEditor, IEditorConfig, IToolbarConfig } from "@wangeditor/editor";
 import { getApiUrl, getAccessToken } from "@/utils/common";
 import { CateListItem } from "@/types/openapi";
 
@@ -178,11 +169,7 @@ export default function PostArticle() {
                     <FieldContent>
                       <FormItem>
                         <FormControl>
-                          <Input
-                            {...field}
-                            placeholder="请输入标题"
-                            maxLength={200}
-                          />
+                          <Input {...field} placeholder="请输入标题" maxLength={200} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -204,27 +191,19 @@ export default function PostArticle() {
                       <FormItem>
                         <FormControl>
                           <RadioGroup
-                            onValueChange={(value) =>
-                              field.onChange(parseInt(value) as 1 | 2)
-                            }
+                            onValueChange={(value) => field.onChange(parseInt(value) as 1 | 2)}
                             defaultValue={field.value.toString()}
                             className="flex space-x-6"
                           >
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="1" id="type-1" />
-                              <label
-                                htmlFor="type-1"
-                                className="cursor-pointer"
-                              >
+                              <label htmlFor="type-1" className="cursor-pointer">
                                 文章
                               </label>
                             </div>
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="2" id="type-2" />
-                              <label
-                                htmlFor="type-2"
-                                className="cursor-pointer"
-                              >
+                              <label htmlFor="type-2" className="cursor-pointer">
                                 页面
                               </label>
                             </div>
@@ -249,9 +228,7 @@ export default function PostArticle() {
                     <FieldContent>
                       <FormItem>
                         <Select
-                          onValueChange={(value) =>
-                            field.onChange(parseInt(value))
-                          }
+                          onValueChange={(value) => field.onChange(parseInt(value))}
                           value={field.value.toString()}
                         >
                           <FormControl>
@@ -325,9 +302,7 @@ export default function PostArticle() {
                             defaultConfig={editorConfig}
                             value={field.value || ""}
                             onCreated={(ed: IDomEditor) => setEditor(ed)}
-                            onChange={(ed: IDomEditor) =>
-                              field.onChange(ed.getHtml())
-                            }
+                            onChange={(ed: IDomEditor) => field.onChange(ed.getHtml())}
                             mode="default"
                           />
                         </div>

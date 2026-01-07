@@ -25,10 +25,7 @@ export function usePrismHighlight(dependencies: any[] = []) {
     }
     const highlightCode = () => {
       document.querySelectorAll("pre code").forEach((block) => {
-        if (
-          !block.classList.contains("token") &&
-          !(block as HTMLElement).dataset.highlighted
-        ) {
+        if (!block.classList.contains("token") && !(block as HTMLElement).dataset.highlighted) {
           (block as HTMLElement).dataset.highlighted = "true";
           const pre = block.parentElement;
           pre?.classList.add("line-numbers");
