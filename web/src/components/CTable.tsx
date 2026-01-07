@@ -44,18 +44,16 @@ const getValueByJsonPath = (obj: any, path: string): any => {
  */
 export const CTable = <T,>({ data, columns, className = '' }: MyTableProps<T>) => {
   return (
-    <table className={`list ${className}`}>
+    <table className={`w-full text-xs ${className}`}>
       <tbody>
-        {/* 表头 */}
         <tr>
           {columns.map((column, index) => (
-            <th key={index} style={column.style}>
+            <th key={index} style={column.style} className="border-b-2 border-[#d9e0ec] text-left pl-[10px]">
               {column.title}
             </th>
           ))}
         </tr>
         
-        {/* 空数据提示 */}
         {data.length === 0 && (
           <tr>
             <td colSpan={columns.length} align="center">
@@ -64,16 +62,13 @@ export const CTable = <T,>({ data, columns, className = '' }: MyTableProps<T>) =
           </tr>
         )}
         
-        {/* 数据行 */}
         {data.length > 0 && data.map((record, rowIndex) => (
-          <tr key={rowIndex}>
+          <tr key={rowIndex} className="hover:bg-[#eee]">
             {columns.map((column, colIndex) => {
-              // 获取当前列对应的数据值
               const value = getValueByJsonPath(record, column.key);
               
               return (
-                <td key={colIndex}>
-                  {/* 如果有自定义渲染函数，使用渲染函数；否则直接显示值 */}
+                <td key={colIndex} className="border-b border-dashed border-[#d9e0ec] border-t-0 py-[5px] px-[10px]">
                   {column.render ? column.render(value, record, rowIndex) : value}
                 </td>
               );
