@@ -48,7 +48,7 @@ export default function ArticleDetail() {
           </div>
         </div>
       </div>
-      <Comment postId={article.id} />
+      <Comment />
     </div>
   );
 }
