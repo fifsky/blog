@@ -1,9 +1,9 @@
 import Giscus from "@giscus/react";
 
-export function Comment({ postId }: { postId: number }) {
+export function Comment() {
   // const { pathname } = useLocation();
-  console.log(postId)
-  return <Giscus
+  return (
+    <Giscus
       id="comments"
       repo="fifsky/blog"
       repoId="MDEwOlJlcG9zaXRvcnkyMDU5ODYyODc="
@@ -17,5 +17,6 @@ export function Comment({ postId }: { postId: number }) {
       theme="light_protanopia"
       lang="zh-CN"
       loading="lazy"
-    />;
+    />
+  );
 }

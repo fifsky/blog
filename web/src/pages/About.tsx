@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { CArticle } from "@/components/CArticle";
+import { Comment } from "@/components/Comment";
 import { articleDetailApi } from "@/service";
 
 export default function About() {
@@ -17,6 +18,7 @@ export default function About() {
       <div className="mb-[10px]">
         <CArticle article={article} />
       </div>
+      <Comment />
     </div>
   );
 }
