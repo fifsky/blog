@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { CArticle } from "@/components/CArticle";
-import { Paginate } from "@/components/Paginate";
+import { Pagination } from "@/components/Pagination";
 import { articleListApi } from "@/service";
 import { useStore } from "@/store/context";
 
@@ -51,7 +51,7 @@ export default function ArticleList() {
           <div className="border-t border-t-dashed border-t-[#dbdbdb] mt-5 pt-2.5 pb-2.5 text-right"></div>
         </div>
       ))}
-      <Paginate page={page} pageTotal={pageTotal} onChange={changePage} />
+      <Pagination page={page} pageTotal={pageTotal} onChange={changePage} />
     </div>
   );
 }

@@ -6,7 +6,7 @@ import {
   remindUpdateApi,
 } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
-import { Paginate } from "@/components/Paginate";
+import { Pagination } from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
 import useDialog from "@/hooks/useDialog";
 import { AdminRemindDialog } from "@/components/AdminRemindDialog";
@@ -141,7 +141,7 @@ export default function AdminRemind() {
           <CTable data={list} columns={columns} />
           <div className="my-[10px] flex items-center justify-between">
             <BatchHandle />
-            <Paginate page={page} pageTotal={pageTotal} onChange={setPage} />
+            <Pagination page={page} pageTotal={pageTotal} onChange={setPage} />
           </div>
         </div>
       </div>

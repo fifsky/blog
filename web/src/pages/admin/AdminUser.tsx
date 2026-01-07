@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { userListApi, userStatusApi } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
-import { Paginate } from "@/components/Paginate";
+import { Pagination } from "@/components/Pagination";
 import { CTable, Column } from "@/components/CTable";
 import { Button } from "@/components/ui/button";
 import { UserItem } from "@/types/openapi";
@@ -98,7 +98,7 @@ export default function AdminUser() {
       <CTable data={list} columns={columns} />
       <div className="my-[10px] flex items-center justify-between">
         <BatchHandle />
-        <Paginate page={page} pageTotal={pageTotal} onChange={setPage} />
+        <Pagination page={page} pageTotal={pageTotal} onChange={setPage} />
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { articleDeleteApi, articleListApi } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
-import { Paginate } from "@/components/Paginate";
+import { Pagination } from "@/components/Pagination";
 import { CTable, Column } from "@/components/CTable";
 import { Badge } from "@/components/ui/badge";
 import { ArticleItem } from "@/types/openapi";
@@ -128,7 +128,7 @@ export default function AdminArticle() {
       
       <div className="my-[10px] flex items-center justify-between">
         <BatchHandle />
-        <Paginate page={page} pageTotal={pageTotal} onChange={setPage} />
+        <Pagination page={page} pageTotal={pageTotal} onChange={setPage} />
       </div>
     </div>
   );

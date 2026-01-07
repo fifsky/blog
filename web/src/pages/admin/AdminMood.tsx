@@ -6,7 +6,7 @@ import {
   moodUpdateApi,
 } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
-import { Paginate } from "@/components/Paginate";
+import { Pagination } from "@/components/Pagination";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -130,7 +130,7 @@ export default function AdminMood() {
           <CTable data={list} columns={columns} />
           <div className="my-2.5 flex items-center justify-between">
             <BatchHandle />
-            <Paginate page={page} pageTotal={pageTotal} onChange={setPage} />
+            <Pagination page={page} pageTotal={pageTotal} onChange={setPage} />
           </div>
         </div>
         <div className="w-[250px]" style={{ paddingTop: 31 }}>
