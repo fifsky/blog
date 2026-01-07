@@ -1,29 +1,21 @@
-import { useCallback, useRef } from "react";
-import { useLocation } from "react-router";
-import Artalk from "artalk";
-import "artalk/Artalk.css";
+import Giscus from "@giscus/react";
 
 export function Comment({ postId }: { postId: number }) {
-  const { pathname } = useLocation();
-  const artalkRef = useRef<Artalk>();
-
-  const initContainer = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (!node) return;
-      if (artalkRef.current) {
-        artalkRef.current.destroy();
-      }
-      artalkRef.current = Artalk.init({
-        el: node,
-        pageKey: pathname || String(postId),
-        pageTitle: document.title,
-        server: "https://comment-api.fifsky.com",
-        site: "FIFSKY",
-        useBackendConf: true,
-      });
-    },
-    [pathname, postId]
-  );
-
-  return <div className="comment" ref={initContainer}></div>;
+  // const { pathname } = useLocation();
+  console.log(postId)
+  return <Giscus
+      id="comments"
+      repo="fifsky/blog"
+      repoId="MDEwOlJlcG9zaXRvcnkyMDU5ODYyODc="
+      category="Comment"
+      categoryId="DIC_kwDODEcZ784C0rJu"
+      mapping="pathname"
+      term="Hello"
+      reactionsEnabled="1"
+      emitMetadata="0"
+      inputPosition="top"
+      theme="light_protanopia"
+      lang="zh-CN"
+      loading="lazy"
+    />;
 }
