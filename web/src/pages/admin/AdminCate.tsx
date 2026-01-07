@@ -22,10 +22,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CTable, Column } from "@/components/CTable";
+import { CateListItem } from "@/types/openapi";
 
 export default function AdminCate() {
-  const [list, setList] = useState<any[]>([]);
-  const [item, setItem] = useState<any>({});
+  const [list, setList] = useState<CateListItem[]>([]);
+  const [item, setItem] = useState<CateListItem>();
   const formSchema = z.object({
     name: z.string().min(1, "请输入分类名称"),
     domain: z
@@ -44,7 +45,7 @@ export default function AdminCate() {
   };
   const editItem = (id: number) => {
     const it = list.find((i) => i.id === id);
-    setItem(it || {});
+    setItem(it);
     form.reset({
       name: it?.name || "",
       domain: it?.domain || "",
@@ -57,12 +58,12 @@ export default function AdminCate() {
       loadList();
     }
   };
-  const cancel = () => setItem({});
+  const cancel = () => setItem({} as CateListItem);
   const submit = async (values: z.infer<typeof formSchema>) => {
     const { id } = item || {};
     if (id) await cateUpdateApi({ id, ...values });
     else await cateCreateApi(values);
-    setItem({});
+    setItem(undefined);
     form.reset({ name: "", domain: "", desc: "" });
     loadList();
   };
@@ -209,9 +210,9 @@ export default function AdminCate() {
               />
               <Field orientation="horizontal">
                 <Button type="submit" size="sm">
-                  {item.id ? "修改" : "添加"}
+                  {item?.id ? "修改" : "添加"}
                 </Button>
-                {item.id && (
+                {item?.id && (
                   <Button
                     size={"sm"}
                     variant="link"

@@ -5,8 +5,9 @@ import { BatchHandle } from "@/components/BatchHandle";
 import { Paginate } from "@/components/Paginate";
 import { CTable, Column } from "@/components/CTable";
 import { Button } from "@/components/ui/button";
+import { UserItem } from "@/types/openapi";
 export default function AdminUser() {
-  const [list, setList] = useState<any[]>([]);
+  const [list, setList] = useState<UserItem[]>([]);
   const [pageTotal, setPageTotal] = useState(0);
   const [page, setPage] = useState(1);
   const loadList = async () => {
@@ -25,7 +26,7 @@ export default function AdminUser() {
   }, [page]);
 
   // 定义表格列配置
-  const columns: Column<any>[] = [
+  const columns: Column<UserItem>[] = [
     {
       title: <div style={{ width: 20 }}>&nbsp;</div>,
       key: "id",

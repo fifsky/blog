@@ -21,13 +21,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { CTable, Column } from "@/components/CTable";
+import { LinkItem } from "@/types/openapi";
 
 export default function AdminLink() {
-  const [list, setList] = useState<any[]>([]);
-  const [item, setItem] = useState<any>({});
+  const [list, setList] = useState<LinkItem[]>([]);
+  const [item, setItem] = useState<LinkItem | undefined>();
   const formSchema = z.object({
     name: z.string().min(1, "请输入链接名称"),
-    url: z.string().url("请输入正确的链接地址"),
+    url: z.url("请输入正确的链接地址"),
     desc: z.string().optional(),
   });
   const form = useForm<z.infer<typeof formSchema>>({
@@ -41,7 +42,7 @@ export default function AdminLink() {
   };
   const editItem = (id: number) => {
     const it = list.find((i) => i.id === id);
-    setItem(it || {});
+    setItem(it);
     form.reset({
       name: it?.name || "",
       url: it?.url || "",
@@ -55,7 +56,7 @@ export default function AdminLink() {
     }
   };
   const cancel = () => {
-    setItem({});
+    setItem(undefined);
     form.reset({ name: "", url: "", desc: "" });
   };
   const submit = async (values: z.infer<typeof formSchema>) => {
@@ -206,9 +207,9 @@ export default function AdminLink() {
               />
               <Field orientation="horizontal">
                 <Button type="submit" size="sm">
-                  {item.id ? "修改" : "添加"}
+                  {item?.id ? "修改" : "添加"}
                 </Button>
-                {item.id && (
+                {item?.id && (
                   <Button
                     size={"sm"}
                     variant="link"

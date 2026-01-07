@@ -18,7 +18,7 @@ export default function AdminRemind() {
   const [list, setList] = useState<RemindItem[]>([]);
   const [pageTotal, setPageTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [item, setItem] = useState<RemindItem>({} as RemindItem);
+  const [item, setItem] = useState<RemindItem>();
   const { isOpen, open: openDialog, close: closeDialog } = useDialog(false);
   
   const loadList = async () => {
@@ -28,7 +28,7 @@ export default function AdminRemind() {
   };
   const editItem = (id: number) => {
     const it = list.find((i) => i.id === id);
-    setItem(it || ({} as RemindItem));
+    setItem(it);
     openDialog();
   };
   const deleteItem = async (id: number) => {
@@ -52,12 +52,12 @@ export default function AdminRemind() {
     };
     if (id) await remindUpdateApi(data);
     else await remindCreateApi(data);
-    setItem({} as RemindItem);
+    setItem(undefined);
     loadList();
   };
   
   const handleOpenDialog = () => {
-    setItem({} as RemindItem);
+    setItem(undefined);
     openDialog();
   };
   useEffect(() => {

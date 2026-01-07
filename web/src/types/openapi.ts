@@ -121,6 +121,18 @@ export type MoodListResponse = { list: MoodItem[]; page_total: number };
 export type MoodCreateRequest = { content: string };
 export type MoodUpdateRequest = { id: number; content?: string };
 
+export type CommentItem = {
+  id: number;
+  article_title: string;
+  name: string;
+  content: string;
+  ip: string;
+  created_at: string;
+  type: number;
+  url?: string;
+};
+export type CommentListResponse = { list: CommentItem[]; page_total: number };
+
 // 缺失的类型定义
 export type ArticleDetailRequest = { id?: number; url?: string };
 export type GoogleProtobufAny = { '@type'?: string } & Record<string, any>;

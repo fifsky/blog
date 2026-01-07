@@ -36,7 +36,7 @@ import { useEffect } from "react";
 interface AdminRemindDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  item: RemindItem;
+  item: RemindItem | undefined;
   onSubmit: (values: z.infer<typeof formSchema>) => Promise<void>;
 }
 
@@ -102,7 +102,7 @@ export function AdminRemindDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{item.id ? "编辑提醒" : "新增提醒"}</DialogTitle>
+          <DialogTitle>{item?.id ? "编辑提醒" : "新增提醒"}</DialogTitle>
         </DialogHeader>
         <form
           className="w-full px-1"
@@ -295,9 +295,9 @@ export function AdminRemindDialog({
             />
             <Field orientation="horizontal">
               <Button type="submit" size="sm">
-                {item.id ? "修改" : "添加"}
+                {item?.id ? "修改" : "添加"}
               </Button>
-              {item.id && (
+              {item?.id && (
                 <Button
                   size={"sm"}
                   variant="link"

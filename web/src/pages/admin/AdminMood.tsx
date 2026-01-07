@@ -20,10 +20,11 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { CTable, Column } from "@/components/CTable";
+import { MoodItem } from "@/types/openapi";
 
 export default function AdminMood() {
-  const [list, setList] = useState<any[]>([]);
-  const [item, setItem] = useState<any>({});
+  const [list, setList] = useState<MoodItem[]>([]);
+  const [item, setItem] = useState<MoodItem | undefined>();
   const [pageTotal, setPageTotal] = useState(0);
   const [page, setPage] = useState(1);
   const formSchema = z.object({
@@ -41,7 +42,7 @@ export default function AdminMood() {
   };
   const editItem = (id: number) => {
     const it = list.find((i) => i.id === id);
-    setItem(it || {});
+    setItem(it);
     form.reset({ content: it?.content || "" });
   };
   const deleteItem = async (id: number) => {
@@ -51,7 +52,7 @@ export default function AdminMood() {
     }
   };
   const cancel = () => {
-    setItem({});
+    setItem(undefined);
     form.reset({ content: "" });
   };
   const submit = async (values: z.infer<typeof formSchema>) => {
@@ -66,7 +67,7 @@ export default function AdminMood() {
   }, [page]);
 
   // 定义表格列配置
-  const columns: Column<any>[] = [
+  const columns: Column<MoodItem>[] = [
     {
       title: <div style={{ width: 20 }}>&nbsp;</div>,
       key: "id",
@@ -160,9 +161,9 @@ export default function AdminMood() {
               />
               <Field orientation="horizontal">
                 <Button type="submit" size="sm">
-                  {item.id ? "修改" : "添加"}
+                  {item?.id ? "修改" : "添加"}
                 </Button>
-                {item.id && (
+                {item?.id && (
                   <Button
                     size={"sm"}
                     variant="link"

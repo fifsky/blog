@@ -17,6 +17,7 @@ import type {
   IToolbarConfig,
 } from "@wangeditor/editor";
 import { getApiUrl, getAccessToken } from "@/utils/common";
+import { CateListItem } from "@/types/openapi";
 
 import {
   Form,
@@ -51,7 +52,7 @@ const articleSchema = z.object({
 type ArticleFormValues = z.infer<typeof articleSchema>;
 
 export default function PostArticle() {
-  const [cates, setCates] = useState<any[]>([]);
+  const [cates, setCates] = useState<CateListItem[]>([]);
   const [editor, setEditor] = useState<IDomEditor | null>(null);
 
   const location = useLocation();
