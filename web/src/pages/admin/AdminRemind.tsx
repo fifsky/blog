@@ -13,6 +13,7 @@ import { AdminRemindDialog } from "@/components/AdminRemindDialog";
 import { remindTimeFormat, remindType } from "@/utils/remind_date";
 import { RemindItem } from "@/types/openapi";
 import { CTable, Column } from "@/components/CTable";
+import { cn } from "@/lib/utils";
 
 export default function AdminRemind() {
   const [list, setList] = useState<RemindItem[]>([]);
@@ -126,9 +127,9 @@ export default function AdminRemind() {
     <div>
       <h2 className="border-b border-b-[#cccccc] text-base">
         管理提醒
-        <Button variant={"link"} onClick={handleOpenDialog}>
+        <Button variant={"link"} onClick={handleOpenDialog} className={cn("p-0 m-0 ml-3 leading-[21px] h-auto text-[14px] gap-0")}>
           <i className="iconfont icon-add" style={{ color: "#444" }}></i>
-          新增提醒
+          <span>新增提醒</span>
         </Button>
       </h2>
       <div className="flex">
