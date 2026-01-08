@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { commentAdminListApi, commentDeleteApi } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Pagination } from "@/components/Pagination";
 import { CTable, Column } from "@/components/CTable";

@@ -64,7 +64,7 @@ export function Mood() {
       </div>
       <div className="absolute bottom-0 left-[125px] cursor-pointer user-select-none opacity-0 group-hover:opacity-100 transition-opacity">
         <i
-          className="iconfont icon-left text-[20px] text-[rgba(48,175,255,0.5)] hover:text-[rgba(48,175,255,1)] mr-[10px]"
+          className="iconfont icon-left text-[20px] text-[rgba(48,175,255,0.5)] hover:text-[rgba(48,175,255,1)]"
           title="上一条"
           onClick={prev}
         />
