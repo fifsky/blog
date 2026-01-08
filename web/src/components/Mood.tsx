@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { moodListApi } from "@/service";
 import dayjs from "dayjs";
+import { MoodItem } from "@/types/openapi";
 
 function humanTime(v: string) {
   const currTime = dayjs().add(1, "second");
@@ -28,7 +29,7 @@ function humanTime(v: string) {
 }
 
 export function Mood() {
-  const [moods, setMoods] = useState<any[]>([]);
+  const [moods, setMoods] = useState<MoodItem[]>([]);
   const [index, setIndex] = useState(0);
   useEffect(() => {
     (async () => {

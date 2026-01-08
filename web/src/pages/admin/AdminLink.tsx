@@ -66,7 +66,7 @@ export default function AdminLink() {
   }, []);
 
   // 定义表格列配置
-  const columns: Column<any>[] = [
+  const columns: Column<LinkItem>[] = [
     {
       title: <div style={{ width: 20 }}>&nbsp;</div>,
       key: "id",

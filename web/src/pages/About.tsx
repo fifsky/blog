@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { CArticle } from "@/components/CArticle";
 import { Comment } from "@/components/Comment";
 import { articleDetailApi } from "@/service";
+import { ArticleItem } from "@/types/openapi";
 
 export default function About() {
-  const [article, setArticle] = useState<any>({});
+  const [article, setArticle] = useState<ArticleItem>();
   useEffect(() => {
     (async () => {
       const a = await articleDetailApi({ url: "about" });
@@ -12,7 +13,7 @@ export default function About() {
       document.title = "关于我 - 無處告別";
     })();
   }, []);
-  if (!article.id) return null;
+  if (!article?.id) return null;
   return (
     <div>
       <div className="mb-[10px]">

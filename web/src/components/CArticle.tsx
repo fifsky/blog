@@ -1,7 +1,8 @@
+import { ArticleItem } from "@/types/openapi";
 import { useMemo, useRef } from "react";
 import { Link, useLocation } from "react-router";
 
-export function CArticle({ article }: { article: any }) {
+export function CArticle({ article }: { article: ArticleItem }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const keyword = useMemo(

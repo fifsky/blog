@@ -4,10 +4,11 @@ import { CArticle } from "@/components/CArticle";
 import { Comment } from "@/components/Comment";
 import { usePrismHighlight } from "@/hooks";
 import { articleDetailApi, prevnextArticleApi } from "@/service";
+import { ArticleItem, PrevNextItem } from "@/types/openapi";
 
 export default function ArticleDetail() {
-  const [article, setArticle] = useState<any>({});
-  const [data, setData] = useState<{ prev?: any; next?: any }>({});
+  const [article, setArticle] = useState<ArticleItem>();
+  const [data, setData] = useState<{ prev?: PrevNextItem; next?: PrevNextItem }>({});
   const params = useParams();
   useEffect(() => {
     (async () => {
@@ -24,7 +25,7 @@ export default function ArticleDetail() {
 
   usePrismHighlight([article]);
 
-  if (!article.id) return null;
+  if (!article?.id) return null;
   return (
     <div>
       <div className="mb-[10px]">
@@ -32,7 +33,7 @@ export default function ArticleDetail() {
         <div className="my-5 flex justify-between">
           <div className="w-[400px] overflow-hidden text-ellipsis whitespace-nowrap">
             <strong>上一篇：</strong>
-            {data.prev && data.prev.id ? (
+            {data.prev?.id ? (
               <Link to={`/article/${data.prev.id}`}>{data.prev.title}</Link>
             ) : (
               <span>嘿，这已经是最新的文章啦</span>
@@ -40,7 +41,7 @@ export default function ArticleDetail() {
           </div>
           <div className="w-[400px] overflow-hidden text-ellipsis whitespace-nowrap text-right">
             <strong>下一篇：</strong>
-            {data.next && data.next.id ? (
+            {data.next?.id ? (
               <Link to={`/article/${data.next.id}`}>{data.next.title}</Link>
             ) : (
               <span>嘿，这已经是最后的文章啦</span>

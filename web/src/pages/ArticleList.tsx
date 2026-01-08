@@ -5,9 +5,10 @@ import { Pagination } from "@/components/Pagination";
 import { articleListApi } from "@/service";
 import { useStore } from "@/store/context";
 import { usePrismHighlight } from "@/hooks";
+import { ArticleItem, ArticleListRequest } from "@/types/openapi";
 
 export default function ArticleList() {
-  const [list, setList] = useState<any[]>([]);
+  const [list, setList] = useState<ArticleItem[]>([]);
   const [pageTotal, setPageTotal] = useState(0);
   const [page, setPage] = useState(1);
   const location = useLocation();
@@ -19,7 +20,7 @@ export default function ArticleList() {
     const q = new URLSearchParams(location.search);
     const currentPage = q.get("page") ? parseInt(q.get("page")!) : 1;
     setPage(currentPage);
-    const data: any = {
+    const data: ArticleListRequest = {
       ...params,
       keyword: q.get("keyword") || "",
       page: currentPage,

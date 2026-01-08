@@ -65,7 +65,7 @@ export default function AdminCate() {
   }, []);
 
   // 定义表格列配置
-  const columns: Column<any>[] = [
+  const columns: Column<CateListItem>[] = [
     {
       title: <div style={{ width: 20 }}>&nbsp;</div>,
       key: "id",
