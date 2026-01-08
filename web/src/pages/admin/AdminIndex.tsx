@@ -18,6 +18,8 @@ import { Alert, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
 
 export default function AdminIndex() {
+  const [loading, setLoading] = React.useState(false);
+
   const formSchema = z.object({
     site_name: z.string().min(1, "请输入站点名称"),
     site_desc: z.string().optional(),
@@ -39,9 +41,14 @@ export default function AdminIndex() {
   const [showMessage, setShowMessage] = React.useState(false);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    await settingUpdateApi({ kv: values });
-    setShowMessage(true);
-    setTimeout(() => setShowMessage(false), 3000);
+    setLoading(true);
+    try {
+      await settingUpdateApi({ kv: values });
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 3000);
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => {
     (async () => {
@@ -122,7 +129,7 @@ export default function AdminIndex() {
               )}
             />
             <Field orientation="responsive">
-              <Button type="submit" size="sm">
+              <Button type="submit" size="sm" loading={loading}>
                 保存
               </Button>
             </Field>

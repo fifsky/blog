@@ -22,6 +22,8 @@ import { CateListItem } from "@/types/openapi";
 export default function AdminCate() {
   const [list, setList] = useState<CateListItem[]>([]);
   const [item, setItem] = useState<CateListItem>();
+  const [loading, setLoading] = useState(false);
+
   const formSchema = z.object({
     name: z.string().min(1, "请输入分类名称"),
     domain: z.string().regex(/^[a-z][a-z0-9-]*$/, "缩略名需字母开头，包含小写字母、数字或-"),
@@ -53,12 +55,17 @@ export default function AdminCate() {
   };
   const cancel = () => setItem({} as CateListItem);
   const submit = async (values: z.infer<typeof formSchema>) => {
-    const { id } = item || {};
-    if (id) await cateUpdateApi({ id, ...values });
-    else await cateCreateApi(values);
-    setItem(undefined);
-    form.reset({ name: "", domain: "", desc: "" });
-    loadList();
+    setLoading(true);
+    try {
+      const { id } = item || {};
+      if (id) await cateUpdateApi({ id, ...values });
+      else await cateCreateApi(values);
+      setItem(undefined);
+      form.reset({ name: "", domain: "", desc: "" });
+      loadList();
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => {
     loadList();
@@ -179,7 +186,7 @@ export default function AdminCate() {
                 )}
               />
               <Field orientation="horizontal">
-                <Button type="submit" size="sm">
+                <Button type="submit" size="sm" loading={loading}>
                   {item?.id ? "修改" : "添加"}
                 </Button>
                 {item?.id && (
@@ -190,6 +197,7 @@ export default function AdminCate() {
                       e.preventDefault();
                       cancel();
                     }}
+                    disabled={loading}
                   >
                     取消
                   </Button>

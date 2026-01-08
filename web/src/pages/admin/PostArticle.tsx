@@ -45,6 +45,7 @@ type ArticleFormValues = z.infer<typeof articleSchema>;
 export default function PostArticle() {
   const [cates, setCates] = useState<CateListItem[]>([]);
   const [editor, setEditor] = useState<IDomEditor | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -83,28 +84,33 @@ export default function PostArticle() {
   };
 
   const submit = async (values: ArticleFormValues) => {
-    const { id, cate_id, title, content, type, url } = values;
-    if (id) {
-      // 编辑状态：id 是必填的，content 可以是 undefined
-      await articleUpdateApi({
-        id,
-        cate_id,
-        title,
-        content: content || "",
-        type,
-        url: url || "",
-      });
-    } else {
-      // 新建状态：id 不需要，content 是必填的
-      await articleCreateApi({
-        cate_id,
-        title,
-        content: content || "",
-        type,
-        url: url || "",
-      });
+    setLoading(true);
+    try {
+      const { id, cate_id, title, content, type, url } = values;
+      if (id) {
+        // 编辑状态：id 是必填的，content 可以是 undefined
+        await articleUpdateApi({
+          id,
+          cate_id,
+          title,
+          content: content || "",
+          type,
+          url: url || "",
+        });
+      } else {
+        // 新建状态：id 不需要，content 是必填的
+        await articleCreateApi({
+          cate_id,
+          title,
+          content: content || "",
+          type,
+          url: url || "",
+        });
+      }
+      navigate("/admin/articles");
+    } finally {
+      setLoading(false);
     }
-    navigate("/admin/articles");
   };
 
   useEffect(() => {
@@ -315,10 +321,10 @@ export default function PostArticle() {
             />
 
             <Field orientation="horizontal">
-              <Button type="submit" size={"sm"}>
+              <Button type="submit" size={"sm"} loading={loading}>
                 发布
               </Button>
-              <Button type="button" size={"sm"} variant="outline">
+              <Button type="button" size={"sm"} variant="outline" disabled={loading}>
                 保存草稿
               </Button>
             </Field>

@@ -21,6 +21,8 @@ import { LinkItem } from "@/types/openapi";
 export default function AdminLink() {
   const [list, setList] = useState<LinkItem[]>([]);
   const [item, setItem] = useState<LinkItem | undefined>();
+  const [loading, setLoading] = useState(false);
+
   const formSchema = z.object({
     name: z.string().min(1, "请输入链接名称"),
     url: z.url("请输入正确的链接地址"),
@@ -55,11 +57,16 @@ export default function AdminLink() {
     form.reset({ name: "", url: "", desc: "" });
   };
   const submit = async (values: z.infer<typeof formSchema>) => {
-    const { id } = item || {};
-    if (id) await linkUpdateApi({ id, ...values });
-    else await linkCreateApi(values);
-    cancel();
-    loadList();
+    setLoading(true);
+    try {
+      const { id } = item || {};
+      if (id) await linkUpdateApi({ id, ...values });
+      else await linkCreateApi(values);
+      cancel();
+      loadList();
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => {
     loadList();
@@ -180,7 +187,7 @@ export default function AdminLink() {
                 )}
               />
               <Field orientation="horizontal">
-                <Button type="submit" size="sm">
+                <Button type="submit" size="sm" loading={loading}>
                   {item?.id ? "修改" : "添加"}
                 </Button>
                 {item?.id && (

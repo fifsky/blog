@@ -8,7 +8,7 @@ import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { remindType, monthFormat, weekFormat, numFormat } from "@/utils/remind_date";
 import { RemindItem } from "@/types/openapi";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface AdminRemindDialogProps {
   isOpen: boolean;
@@ -28,6 +28,8 @@ const formSchema = z.object({
 });
 
 export function AdminRemindDialog({ isOpen, onClose, item, onSubmit }: AdminRemindDialogProps) {
+  const [loading, setLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -60,9 +62,14 @@ export function AdminRemindDialog({ isOpen, onClose, item, onSubmit }: AdminRemi
   const intRemindType = Number(form.watch("type"));
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    await onSubmit(values);
-    onClose();
-    form.reset();
+    setLoading(true);
+    try {
+      await onSubmit(values);
+      onClose();
+      form.reset();
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -246,7 +253,7 @@ export function AdminRemindDialog({ isOpen, onClose, item, onSubmit }: AdminRemi
               )}
             />
             <Field orientation="horizontal">
-              <Button type="submit" size="sm">
+              <Button type="submit" size="sm" loading={loading}>
                 {item?.id ? "修改" : "添加"}
               </Button>
               {item?.id && (
@@ -257,6 +264,7 @@ export function AdminRemindDialog({ isOpen, onClose, item, onSubmit }: AdminRemi
                     e.preventDefault();
                     handleCancel();
                   }}
+                  disabled={loading}
                 >
                   取消
                 </Button>

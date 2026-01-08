@@ -9,6 +9,7 @@ import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 
 export default function Login() {
   // 表单校验规则：用户名与密码为必填
@@ -26,12 +27,14 @@ export default function Login() {
     },
     mode: "onChange",
   });
-
+  const [loading, setLoading] = useState(false);
   const loginAction = useStore((s) => s.loginAction);
   const navigate = useNavigate();
   // 提交处理：通过 react-hook-form 的 handleSubmit 获取已校验的数据
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setLoading(true);
     await loginAction(data as LoginRequest);
+    setLoading(false);
     navigate("/admin/index");
   };
   return (
@@ -87,7 +90,7 @@ export default function Login() {
                 )}
               />
               <Field>
-                <Button type="submit" size={"sm"}>
+                <Button type="submit" size={"sm"} loading={loading}>
                   登 录
                 </Button>
               </Field>

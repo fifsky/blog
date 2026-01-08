@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -45,6 +45,7 @@ export default function PostUser() {
   const location = useLocation();
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userSchema),
@@ -59,18 +60,23 @@ export default function PostUser() {
   });
 
   const submit = async (values: UserFormValues) => {
-    const { id, name, nick_name, password1, email, type } = values;
-    const data = {
-      id: id || 0,
-      name,
-      nick_name: nick_name || "",
-      password: password1,
-      email,
-      type,
-    };
-    if (id) await userUpdateApi(data);
-    else await userCreateApi(data);
-    navigate("/admin/users");
+    setLoading(true);
+    try {
+      const { id, name, nick_name, password1, email, type } = values;
+      const data = {
+        id: id || 0,
+        name,
+        nick_name: nick_name || "",
+        password: password1,
+        email,
+        type,
+      };
+      if (id) await userUpdateApi(data);
+      else await userCreateApi(data);
+      navigate("/admin/users");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -248,7 +254,9 @@ export default function PostUser() {
                 )}
               />
               <Field orientation="horizontal">
-                <Button type="submit">保存</Button>
+                <Button type="submit" loading={loading}>
+                  保存
+                </Button>
               </Field>
             </FieldGroup>
           </form>

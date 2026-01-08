@@ -16,6 +16,8 @@ export default function AdminMood() {
   const [item, setItem] = useState<MoodItem | undefined>();
   const [pageTotal, setPageTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+
   const formSchema = z.object({
     content: z.string().min(1, "请输入心情内容"),
   });
@@ -45,11 +47,16 @@ export default function AdminMood() {
     form.reset({ content: "" });
   };
   const submit = async (values: z.infer<typeof formSchema>) => {
-    const { id } = item || {};
-    if (id) await moodUpdateApi({ id, content: values.content });
-    else await moodCreateApi({ content: values.content });
-    cancel();
-    loadList();
+    setLoading(true);
+    try {
+      const { id } = item || {};
+      if (id) await moodUpdateApi({ id, content: values.content });
+      else await moodCreateApi({ content: values.content });
+      cancel();
+      loadList();
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => {
     loadList();
@@ -142,7 +149,7 @@ export default function AdminMood() {
                 )}
               />
               <Field orientation="horizontal">
-                <Button type="submit" size="sm">
+                <Button type="submit" size="sm" loading={loading}>
                   {item?.id ? "修改" : "添加"}
                 </Button>
                 {item?.id && (
