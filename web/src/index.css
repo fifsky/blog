@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "./assets/iconfont/iconfont.css";
 @import "tw-animate-css";
+@import "@wangeditor/editor/dist/css/style.css";
 @import "./themes/default.css";
 
 @custom-variant dark (&:is(.dark *));

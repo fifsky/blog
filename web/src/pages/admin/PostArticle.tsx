@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { articleDetailApi, articleCreateApi, articleUpdateApi, cateListApi } from "@/service";
 import { useLocation, useNavigate, Link } from "react-router";
-import "@wangeditor/editor/dist/css/style.css";
 import { Editor, Toolbar } from "@wangeditor/editor-for-react";
 import type { IDomEditor, IEditorConfig, IToolbarConfig } from "@wangeditor/editor";
 import { getApiUrl, getAccessToken } from "@/utils/common";
@@ -292,31 +291,27 @@ export default function PostArticle() {
               control={form.control}
               name="content"
               render={({ field }) => (
-                <Field>
-                  <FieldContent>
-                    <FormItem>
-                      <FormControl>
-                        <div className="border border-border rounded-md">
-                          <Toolbar
-                            editor={editor}
-                            defaultConfig={toolbarConfig}
-                            mode="default"
-                            style={{ borderBottom: "1px solid #ddd" }}
-                          />
-                          <Editor
-                            style={{ height: 500, overflowY: "hidden" }}
-                            defaultConfig={editorConfig}
-                            value={field.value || ""}
-                            onCreated={(ed: IDomEditor) => setEditor(ed)}
-                            onChange={(ed: IDomEditor) => field.onChange(ed.getHtml())}
-                            mode="default"
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  </FieldContent>
-                </Field>
+                <FormItem className="grid grid-cols-1">
+                  <FormControl>
+                    <div className="border border-border">
+                      <Toolbar
+                        editor={editor}
+                        defaultConfig={toolbarConfig}
+                        mode="default"
+                        style={{ borderBottom: "1px solid #ddd" }}
+                      />
+                      <Editor
+                        style={{ height: 500, overflowY: "hidden" }}
+                        defaultConfig={editorConfig}
+                        value={field.value || ""}
+                        onCreated={(ed: IDomEditor) => setEditor(ed)}
+                        onChange={(ed: IDomEditor) => field.onChange(ed.getHtml())}
+                        mode="default"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
