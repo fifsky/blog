@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
+import { FileText } from "lucide-react";
 import { CArticle } from "@/components/CArticle";
 import { Pagination } from "@/components/Pagination";
+import { Empty } from "@/components/Empty";
 import { articleListApi } from "@/service";
 import { useStore } from "@/store/context";
 import { usePrismHighlight } from "@/hooks";
@@ -48,13 +50,19 @@ export default function ArticleList() {
 
   return (
     <div>
-      {list.map((v, k) => (
-        <div className="articles" key={k}>
-          <CArticle article={v} />
-          <div className="border-t border-t-dashed border-t-[#dbdbdb] mt-5 pt-2.5 pb-2.5 text-right"></div>
-        </div>
-      ))}
-      <Pagination page={page} pageTotal={pageTotal} onChange={changePage} />
+      {list.length === 0 ? (
+        <Empty icon={<FileText />} title="暂无文章" content="当前没有可显示的文章内容" />
+      ) : (
+        <>
+          {list.map((v, k) => (
+            <div className="articles" key={k}>
+              <CArticle article={v} />
+              <div className="border-t border-t-dashed border-t-[#dbdbdb] mt-5 pt-2.5 pb-2.5 text-right"></div>
+            </div>
+          ))}
+          <Pagination page={page} pageTotal={pageTotal} onChange={changePage} />
+        </>
+      )}
     </div>
   );
 }

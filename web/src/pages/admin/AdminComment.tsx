@@ -11,13 +11,14 @@ export default function AdminComment() {
   const [pageTotal, setPageTotal] = useState(0);
   const [page, setPage] = useState(1);
   const loadList = async () => {
-    const ret = await commentAdminListApi({ page });
-    setList(ret.list || []);
-    setPageTotal(ret.page_total || 0);
+    // 暂未实现
+    setList([]);
+    setPageTotal(0);
   };
   const deleteItem = async (id: number) => {
     if (confirm("确认要删除？")) {
-      await commentDeleteApi({ id });
+      // 暂未实现
+      console.log(id);
       loadList();
     }
   };
