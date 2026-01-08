@@ -15,7 +15,6 @@ export default function ArticleList() {
   const navigate = useNavigate();
   const params = useParams();
   const setKeyword = useStore((s) => s.setKeyword);
-
   const loadList = async () => {
     const q = new URLSearchParams(location.search);
     const currentPage = q.get("page") ? parseInt(q.get("page")!) : 1;

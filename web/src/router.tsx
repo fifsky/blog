@@ -4,6 +4,7 @@ import { Layout } from "@/components/Layout";
 import { AdminLayout } from "@/components/AdminLayout";
 import { RouteProgress } from "@/components/RouteProgress";
 import { Loading } from "@/components/Loading";
+import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
 
 const ArticleList = lazy(() => import("@/pages/ArticleList"));
 const ArticleDetail = lazy(() => import("@/pages/ArticleDetail"));
@@ -40,6 +41,7 @@ function TitleWrapper() {
 const routesConfig: RouteObject[] = [
   {
     element: <TitleWrapper />,
+    errorElement: <RouteErrorBoundary />,
     children: [
       {
         path: "/",
