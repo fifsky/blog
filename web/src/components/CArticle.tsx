@@ -31,7 +31,7 @@ export function CArticle({ article }: { article: ArticleItem }) {
           <div className="text-[12px] text-[#999]">
             by&nbsp;{article.user.nick_name}&nbsp;&nbsp;/&nbsp;&nbsp;
             <Link
-              to={`/categroy/${article.cate.domain}`}
+              to={`/category/${article.cate.domain}`}
               rel="category tag"
               title={`查看 ${article.cate.name} 中的全部文章`}
             >

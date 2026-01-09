@@ -31,7 +31,6 @@ export async function request<T = any>(
       (init.headers as Record<string, string>)["Content-Type"] = "application/json";
     }
   }
-
   try {
     const resp = await fetch(url, init);
     const contentType = resp.headers.get("content-type") || "";

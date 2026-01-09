@@ -63,7 +63,7 @@ const routesConfig: RouteObject[] = [
             ),
           },
           {
-            path: "categroy/:domain",
+            path: "category/:domain",
             element: (
               <Suspense fallback={<SkeletonArticleList />}>
                 <ArticleList />
