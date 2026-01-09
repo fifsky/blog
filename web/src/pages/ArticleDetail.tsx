@@ -4,7 +4,6 @@ import { CArticle } from "@/components/CArticle";
 import { Comment } from "@/components/Comment";
 import { articleDetailApi, prevnextArticleApi } from "@/service";
 import { ArticleItem, PrevNextItem } from "@/types/openapi";
-import { Spinner } from "@/components/ui/spinner";
 
 export default function ArticleDetail() {
   const [article, setArticle] = useState<ArticleItem>();

@@ -9,7 +9,7 @@ import { useStore } from "@/store/context";
 import { ArticleItem, ArticleListRequest } from "@/types/openapi";
 
 export default function ArticleList() {
-  const [list, setList] = useState<ArticleItem[]>([]);
+  const [list, setList] = useState<ArticleItem[]>();
   const [pageTotal, setPageTotal] = useState(0);
   const [page, setPage] = useState(1);
   const location = useLocation();
@@ -45,8 +45,7 @@ export default function ArticleList() {
     loadList();
   }, [location.pathname, location.search]);
 
-  if (!list) return null;
-
+  if (!list) return;
   return (
     <div>
       <title>無處告別</title>
