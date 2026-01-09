@@ -39,6 +39,7 @@ export default function Login() {
   };
   return (
     <div className="w-[1024px] mt-4 mx-auto min-h-[500px]">
+      <title>登录</title>
       <CHeader />
       <div className="p-5 border border-[#89d5ef] bg-white">
         <div className="px-[30px]">

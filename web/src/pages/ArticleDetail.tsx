@@ -17,14 +17,14 @@ export default function ArticleDetail() {
       if (id) {
         const pn = await prevnextArticleApi({ id });
         setData(pn);
-        document.title = `${a.title} - 無處告別`;
       }
     })();
   }, [params.id]);
-
+  const pageTitle = `${article?.title ? article?.title + " - " : ""}無處告別`;
   if (!article?.id) return null;
   return (
-    <div>
+    <>
+      <title>{pageTitle}</title>
       <div className="mb-[10px]">
         <CArticle article={article} />
         <div className="my-5 flex justify-between">
@@ -47,6 +47,6 @@ export default function ArticleDetail() {
         </div>
       </div>
       <Comment />
-    </div>
+    </>
   );
 }

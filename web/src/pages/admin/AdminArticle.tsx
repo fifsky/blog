@@ -103,6 +103,7 @@ export default function AdminArticle() {
 
   return (
     <div>
+      <title>管理文章 - 無處告別</title>
       <h2 className="border-b border-b-[#cccccc] text-base">
         管理文章
         <Link to="/admin/post/article" className="ml-3 text-[14px]">

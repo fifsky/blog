@@ -150,6 +150,7 @@ export default function PostArticle() {
 
   return (
     <div className="max-w-5xl mx-auto">
+      <title>{isEditing ? "编辑文章" : "撰写文章"}</title>
       <h2 className="border-b border-b-[#cccccc] text-base">
         {isEditing ? "编辑" : "撰写"}文章
         <Link to="/admin/articles" className="ml-3 text-[14px]">

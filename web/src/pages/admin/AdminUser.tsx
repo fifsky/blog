@@ -78,6 +78,7 @@ export default function AdminUser() {
 
   return (
     <div>
+      <title>管理用户 - 無處告別</title>
       <h2 className="border-b border-b-[#cccccc] text-base">
         管理用户
         <Link to="/admin/post/user" className="ml-3 text-[14px]">

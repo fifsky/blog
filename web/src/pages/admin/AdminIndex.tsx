@@ -63,6 +63,7 @@ export default function AdminIndex() {
   }, [form]);
   return (
     <div>
+      <title>站点设置 - 無處告別</title>
       <h2 className="border-b border-b-[#cccccc] text-base">站点设置</h2>
       {showMessage && (
         <Alert variant="success" className="mt-2">

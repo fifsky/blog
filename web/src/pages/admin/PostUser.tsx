@@ -100,6 +100,7 @@ export default function PostUser() {
 
   return (
     <div>
+      <title>{isEditing ? "编辑用户" : "新增用户"}</title>
       <h2 className="border-b border-b-[#cccccc] text-base">
         {isEditing ? "编辑" : "新增"}用户
         <Link to="/admin/users" className="ml-3 text-[14px]">

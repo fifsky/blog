@@ -124,6 +124,7 @@ export default function AdminCate() {
 
   return (
     <div>
+      <title>管理分类 - 無處告別</title>
       <h2 className="border-b border-b-[#cccccc] text-base">管理分类</h2>
       <div className="flex justify-between">
         <div className="w-[700px]">

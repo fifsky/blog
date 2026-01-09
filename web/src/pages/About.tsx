@@ -10,16 +10,18 @@ export default function About() {
     (async () => {
       const a = await articleDetailApi({ url: "about" });
       setArticle(a);
-      document.title = "关于我 - 無處告別";
     })();
   }, []);
   if (!article?.id) return null;
   return (
-    <div>
-      <div className="mb-[10px]">
-        <CArticle article={article} />
+    <>
+      <title>关于我 - 無處告別</title>
+      <div>
+        <div className="mb-[10px]">
+          <CArticle article={article} />
+        </div>
+        <Comment />
       </div>
-      <Comment />
-    </div>
+    </>
   );
 }

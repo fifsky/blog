@@ -47,6 +47,7 @@ export default function ArticleList() {
 
   return (
     <div>
+      <title>無處告別</title>
       {list.length === 0 ? (
         <Empty icon={<FileText />} title="暂无文章" content="当前没有可显示的文章内容" />
       ) : (

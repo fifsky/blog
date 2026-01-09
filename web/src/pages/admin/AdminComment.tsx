@@ -82,6 +82,7 @@ export default function AdminComment() {
 
   return (
     <div>
+      <title>管理评论 - 無處告別</title>
       <h2 className="border-b border-b-[#cccccc] text-base">管理评论</h2>
       <div className="my-[10px] flex items-center">
         <BatchHandle />

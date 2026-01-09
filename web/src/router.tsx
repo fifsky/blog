@@ -1,10 +1,9 @@
-import { useEffect, lazy, Suspense } from "react";
-import { createBrowserRouter, Outlet, useLocation, type RouteObject } from "react-router";
+import { lazy } from "react";
+import { createBrowserRouter, type RouteObject } from "react-router";
 import { Layout } from "@/components/Layout";
 import { AdminLayout } from "@/components/AdminLayout";
-import { RouteProgress } from "@/components/RouteProgress";
-import { Loading } from "@/components/Loading";
 import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
+import App from "./App";
 
 const ArticleList = lazy(() => import("@/pages/ArticleList"));
 const ArticleDetail = lazy(() => import("@/pages/ArticleDetail"));
@@ -20,27 +19,10 @@ const AdminRemind = lazy(() => import("@/pages/admin/AdminRemind"));
 const AdminUser = lazy(() => import("@/pages/admin/AdminUser"));
 const PostArticle = lazy(() => import("@/pages/admin/PostArticle"));
 const PostUser = lazy(() => import("@/pages/admin/PostUser"));
-function useTitleTemplate(title?: string) {
-  const location = useLocation();
-  useEffect(() => {
-    const base = "無處告別";
-    document.title = title ? `${title} - ${base}` : base;
-  }, [location.pathname, title]);
-}
-
-function TitleWrapper() {
-  useTitleTemplate();
-  return (
-    <Suspense fallback={<Loading />}>
-      <RouteProgress />
-      <Outlet />
-    </Suspense>
-  );
-}
 
 const routesConfig: RouteObject[] = [
   {
-    element: <TitleWrapper />,
+    element: <App />,
     errorElement: <RouteErrorBoundary />,
     children: [
       {

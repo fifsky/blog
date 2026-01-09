@@ -1,12 +1,13 @@
-import { RouterProvider } from "react-router";
-import { router } from "./router";
-import { Toaster } from "@/components/ui/sonner";
+import { Outlet } from "react-router";
+import { Suspense } from "react";
+import { RouteProgress } from "@/components/RouteProgress";
+import Loading from "@/components/Loading";
 
 export default function App() {
   return (
-    <>
-      <Toaster position="top-center" duration={3000} />
-      <RouterProvider router={router} />
-    </>
+    <Suspense fallback={<Loading />}>
+      <RouteProgress />
+      <Outlet />
+    </Suspense>
   );
 }
