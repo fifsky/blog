@@ -43,7 +43,6 @@ export function CArticle({ article }: { article: ArticleItem }) {
         </div>
       </div>
       <CodeHighlight htmlContent={article.content} />
-      {/* <div className="article" dangerouslySetInnerHTML={{ __html: article.content }} /> */}
     </div>
   );
 }

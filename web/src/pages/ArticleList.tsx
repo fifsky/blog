@@ -45,6 +45,8 @@ export default function ArticleList() {
     loadList();
   }, [location.pathname, location.search]);
 
+  if (!list) return null;
+
   return (
     <div>
       <title>無處告別</title>
@@ -55,7 +57,7 @@ export default function ArticleList() {
           {list.map((v, k) => (
             <div className="articles" key={k}>
               <CArticle article={v} />
-              <div className="border-t border-t-dashed border-t-[#dbdbdb] mt-5 pt-2.5 pb-2.5 text-right"></div>
+              <div className="border-t border-dashed border-t-[#dbdbdb] mt-5 pt-2.5 pb-2.5 text-right"></div>
             </div>
           ))}
           <Pagination page={page} pageTotal={pageTotal} onChange={changePage} />

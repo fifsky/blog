@@ -23,17 +23,7 @@ export default function ArticleDetail() {
     })();
   }, [params.id]);
   const pageTitle = `${article?.title ? article?.title + " - " : ""}無處告別`;
-  if (!article?.id) {
-    return (
-      <>
-        <title>{pageTitle}</title>
-        <div className="flex items-center justify-center py-20 text-gray-600">
-          <Spinner className="size-6" />
-          <span className="ml-2 text-sm">加载中...</span>
-        </div>
-      </>
-    );
-  }
+  if (!article?.id) return;
   return (
     <>
       <title>{pageTitle}</title>

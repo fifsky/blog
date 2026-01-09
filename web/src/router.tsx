@@ -1,9 +1,10 @@
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 import { createBrowserRouter, type RouteObject } from "react-router";
 import { Layout } from "@/components/Layout";
 import { AdminLayout } from "@/components/AdminLayout";
 import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
 import App from "./App";
+import { SkeletonArticle, SkeletonArticleList } from "@/components/Skeleton";
 
 const ArticleList = lazy(() => import("@/pages/ArticleList"));
 const ArticleDetail = lazy(() => import("@/pages/ArticleDetail"));
@@ -29,12 +30,54 @@ const routesConfig: RouteObject[] = [
         path: "/",
         element: <Layout />,
         children: [
-          { index: true, element: <ArticleList /> },
-          { path: "search", element: <ArticleList /> },
-          { path: "about", element: <About /> },
-          { path: "date/:year/:month", element: <ArticleList /> },
-          { path: "categroy/:domain", element: <ArticleList /> },
-          { path: "article/:id", element: <ArticleDetail /> },
+          {
+            index: true,
+            element: (
+              <Suspense fallback={<SkeletonArticleList />}>
+                <ArticleList />
+              </Suspense>
+            ),
+          },
+          {
+            path: "search",
+            element: (
+              <Suspense fallback={<SkeletonArticleList />}>
+                <ArticleList />
+              </Suspense>
+            ),
+          },
+          {
+            path: "about",
+            element: (
+              <Suspense fallback={<SkeletonArticle />}>
+                <About />
+              </Suspense>
+            ),
+          },
+          {
+            path: "date/:year/:month",
+            element: (
+              <Suspense fallback={<SkeletonArticleList />}>
+                <ArticleList />
+              </Suspense>
+            ),
+          },
+          {
+            path: "categroy/:domain",
+            element: (
+              <Suspense fallback={<SkeletonArticleList />}>
+                <ArticleList />
+              </Suspense>
+            ),
+          },
+          {
+            path: "article/:id",
+            element: (
+              <Suspense fallback={<SkeletonArticle />}>
+                <ArticleDetail />
+              </Suspense>
+            ),
+          },
         ],
       },
       { path: "/login", element: <Login /> },
