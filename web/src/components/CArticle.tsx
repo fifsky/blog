@@ -1,6 +1,7 @@
 import { ArticleItem } from "@/types/openapi";
 import { useMemo, useRef } from "react";
 import { Link, useLocation } from "react-router";
+import CodeHighlight from "./CodeHighlight";
 
 export function CArticle({ article }: { article: ArticleItem }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -41,7 +42,8 @@ export function CArticle({ article }: { article: ArticleItem }) {
           </div>
         </div>
       </div>
-      <div className="article" dangerouslySetInnerHTML={{ __html: article.content }} />
+      <CodeHighlight htmlContent={article.content} />
+      {/* <div className="article" dangerouslySetInnerHTML={{ __html: article.content }} /> */}
     </div>
   );
 }

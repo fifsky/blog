@@ -6,7 +6,6 @@ import { Pagination } from "@/components/Pagination";
 import { Empty } from "@/components/Empty";
 import { articleListApi } from "@/service";
 import { useStore } from "@/store/context";
-import { usePrismHighlight } from "@/hooks";
 import { ArticleItem, ArticleListRequest } from "@/types/openapi";
 
 export default function ArticleList() {
@@ -45,8 +44,6 @@ export default function ArticleList() {
     }
     loadList();
   }, [location.pathname, location.search]);
-
-  usePrismHighlight([list]);
 
   return (
     <div>

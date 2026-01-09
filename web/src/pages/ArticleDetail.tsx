@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router";
 import { CArticle } from "@/components/CArticle";
 import { Comment } from "@/components/Comment";
-import { usePrismHighlight } from "@/hooks";
 import { articleDetailApi, prevnextArticleApi } from "@/service";
 import { ArticleItem, PrevNextItem } from "@/types/openapi";
 
@@ -22,8 +21,6 @@ export default function ArticleDetail() {
       }
     })();
   }, [params.id]);
-
-  usePrismHighlight([article]);
 
   if (!article?.id) return null;
   return (
