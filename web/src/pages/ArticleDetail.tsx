@@ -4,6 +4,7 @@ import { CArticle } from "@/components/CArticle";
 import { Comment } from "@/components/Comment";
 import { articleDetailApi, prevnextArticleApi } from "@/service";
 import { ArticleItem, PrevNextItem } from "@/types/openapi";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function ArticleDetail() {
   const [article, setArticle] = useState<ArticleItem>();
@@ -12,6 +13,7 @@ export default function ArticleDetail() {
   useEffect(() => {
     (async () => {
       const id = params.id ? parseInt(params.id) : undefined;
+      setArticle(undefined);
       const a = await articleDetailApi({ id });
       setArticle(a);
       if (id) {
@@ -21,7 +23,17 @@ export default function ArticleDetail() {
     })();
   }, [params.id]);
   const pageTitle = `${article?.title ? article?.title + " - " : ""}無處告別`;
-  if (!article?.id) return null;
+  if (!article?.id) {
+    return (
+      <>
+        <title>{pageTitle}</title>
+        <div className="flex items-center justify-center py-20 text-gray-600">
+          <Spinner className="size-6" />
+          <span className="ml-2 text-sm">加载中...</span>
+        </div>
+      </>
+    );
+  }
   return (
     <>
       <title>{pageTitle}</title>
