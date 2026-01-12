@@ -1,5 +1,3 @@
-# 开发规范
-
 ## 项目规范
 
 项目采用 React + TypeScript + TailwindCSS 实现开发，技术栈如下
