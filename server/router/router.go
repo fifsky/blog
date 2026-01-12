@@ -78,6 +78,9 @@ func (r *Router) Handler() http.Handler {
 		w.WriteHeader(http.StatusOK)
 	})
 
+	api.HandleFunc("GET /api/weixin/notify", r.service.Weixin.Notify)
+	api.HandleFunc("POST /api/weixin/notify", r.service.Weixin.Notify)
+
 	codec := contract.NewCodec()
 	apiv1.RegisterArticleServiceHTTPServer(api, codec, r.service.Article)
 	apiv1.RegisterMoodServiceHTTPServer(api, codec, r.service.Mood)
@@ -86,6 +89,7 @@ func (r *Router) Handler() http.Handler {
 	apiv1.RegisterRemindServiceHTTPServer(api, codec, r.service.Remind)
 	apiv1.RegisterUserServiceHTTPServer(api, codec, r.service.User)
 	apiv1.RegisterSettingServiceHTTPServer(api, codec, r.service.Setting)
+	apiv1.RegisterWeixinServiceHTTPServer(api, codec, r.service.Weixin)
 
 	adminAuth := api.Use(middleware.NewAuthLogin(r.store, r.conf))
 	adminAuth.HandleFunc("POST /api/admin/upload", r.admin.Article.Upload)

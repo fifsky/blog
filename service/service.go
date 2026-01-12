@@ -16,6 +16,7 @@ type Service struct {
 	Mood    *Mood
 	Remind  *Remind
 	Setting *Setting
+	Weixin  *Weixin
 }
 
 func New(db *sql.DB, conf *config.Config, robot *wechat.Robot) *Service {
@@ -28,5 +29,6 @@ func New(db *sql.DB, conf *config.Config, robot *wechat.Robot) *Service {
 		Mood:    NewMood(s),
 		Remind:  NewRemind(s, robot, conf),
 		Setting: NewSetting(s),
+		Weixin:  NewWeixin(s, conf),
 	}
 }

@@ -872,6 +872,31 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/weixin/message:
+        post:
+            tags:
+                - WeixinService
+            description: Message 发送模板消息
+            operationId: WeixinService_Message
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/MessageRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/WeixinResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /feed.xml:
         get:
             tags:
@@ -1205,6 +1230,29 @@ components:
                     type: string
                 user:
                     $ref: '#/components/schemas/UserItem'
+        MessageRequest:
+            required:
+                - touser
+                - templateId
+                - data
+            type: object
+            properties:
+                touser:
+                    type: string
+                    description: 接收人OpenID
+                templateId:
+                    type: string
+                    description: 模板ID
+                data:
+                    type: object
+                    additionalProperties:
+                        $ref: '#/components/schemas/MessageRequest_Value'
+                    description: 模板数据
+        MessageRequest_Value:
+            type: object
+            properties:
+                value:
+                    type: string
         MoodCreateRequest:
             required:
                 - content
@@ -1499,6 +1547,9 @@ components:
                 type:
                     type: integer
                     format: int32
+        WeixinResponse:
+            type: object
+            properties: {}
 tags:
     - name: ArticleService
       description: ArticleService 提供文章相关的接口
@@ -1528,3 +1579,5 @@ tags:
       description: UserService 提供用户相关的接口
     - name: UserService
       description: UserService 提供用户相关的接口
+    - name: WeixinService
+      description: WeixinService 提供微信相关的接口

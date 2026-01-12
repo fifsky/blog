@@ -23,12 +23,19 @@ type ossConf struct {
 	Bucket       string `yaml:"bucket"`
 }
 
+type WeixinConf struct {
+	Appid     string `yaml:"appid"`
+	AppSecret string `yaml:"app_secret"`
+	Token     string `yaml:"token"`
+}
+
 type Config struct {
 	Env     string
-	AppName string  `yaml:"app_name"`
-	Common  common  `yaml:"common"`
-	DB      DBConf  `yaml:"database"`
-	OSS     ossConf `yaml:"oss"`
+	AppName string     `yaml:"app_name"`
+	Common  common     `yaml:"common"`
+	DB      DBConf     `yaml:"database"`
+	OSS     ossConf    `yaml:"oss"`
+	Weixin  WeixinConf `yaml:"weixin"`
 }
 
 func New() *Config {
