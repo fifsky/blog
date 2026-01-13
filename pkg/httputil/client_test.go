@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"app/pkg/httputil"
-	"app/pkg/httputil/middleware"
 	"app/pkg/logger"
 	"app/pkg/logger/sloghttp"
 
@@ -42,7 +41,7 @@ func TestRequestWithLogInfo(t *testing.T) {
 	})
 
 	request := map[string]any{"app_key": "ARkBS09IS0saFExLThQ", "sign": "test", "time": "test"}
-	client := httputil.NewClient(httputil.WithMiddleware(middleware.AccessLog(l)))
+	client := httputil.NewClient(httputil.WithMiddleware(httputil.AccessLog(l)))
 	b, _ := json.Marshal(request)
 	ctx := context.Background()
 	ctx = sloghttp.NewContextAttributes(ctx, slog.String("other", "is other info"))
@@ -72,7 +71,7 @@ func TestNewClientWithTarce(t *testing.T) {
 	)
 	span.End()
 
-	client := httputil.NewClient(httputil.WithMiddleware(middleware.Debug(), middleware.Trace()))
+	client := httputil.NewClient(httputil.WithMiddleware(httputil.Debug(), httputil.Trace()))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://httpbin.org/json", nil)
 	require.NoError(t, err)
 	resp, err := client.Do(req)

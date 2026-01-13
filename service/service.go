@@ -2,6 +2,7 @@ package service
 
 import (
 	"database/sql"
+	"net/http"
 
 	"app/config"
 	"app/pkg/wechat"
@@ -19,7 +20,7 @@ type Service struct {
 	Weixin  *Weixin
 }
 
-func New(db *sql.DB, conf *config.Config, robot *wechat.Robot) *Service {
+func New(db *sql.DB, conf *config.Config, robot *wechat.Robot, httpClient *http.Client) *Service {
 	s := store.New(db)
 	return &Service{
 		User:    NewUser(s, conf),
@@ -29,6 +30,6 @@ func New(db *sql.DB, conf *config.Config, robot *wechat.Robot) *Service {
 		Mood:    NewMood(s),
 		Remind:  NewRemind(s, robot, conf),
 		Setting: NewSetting(s),
-		Weixin:  NewWeixin(s, conf),
+		Weixin:  NewWeixin(s, conf, httpClient),
 	}
 }

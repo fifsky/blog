@@ -1,4 +1,4 @@
-package middleware
+package httputil
 
 import (
 	"net/http"
@@ -8,8 +8,8 @@ import (
 // Middleware is HTTP Client transport middleware.
 type Middleware func(http.RoundTripper) http.RoundTripper
 
-// Chain returns a Middleware that specifies the chained handler for endpoint.
-func Chain(rt http.RoundTripper, middlewares ...Middleware) http.RoundTripper {
+// chain returns a Middleware that specifies the chained handler for endpoint.
+func chain(rt http.RoundTripper, middlewares ...Middleware) http.RoundTripper {
 	if rt == nil {
 		rt = http.DefaultTransport
 	}

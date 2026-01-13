@@ -8,6 +8,7 @@ import (
 
 	"app/cmd"
 	"app/config"
+	"app/pkg/httputil"
 	"app/pkg/logger"
 	"app/pkg/wechat"
 	"app/remind"
@@ -29,6 +30,9 @@ func main() {
 		Detail:   true,
 	}))
 
+	// httpClient
+	httpClient := httputil.NewClient(httputil.WithMiddleware(httputil.AccessLog(logger.Default())))
+
 	robot := wechat.NewRobot(conf.Common.RobotToken)
 	// crontab setup
 	s := store.New(db)
@@ -39,7 +43,7 @@ func main() {
 		Name:  "blog",
 		Usage: "fifsky blog",
 		Commands: []*cli.Command{
-			cmd.NewHttp(db, conf, robot),
+			cmd.NewHttp(db, conf, robot, httpClient),
 		},
 	}
 

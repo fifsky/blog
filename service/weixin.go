@@ -23,13 +23,14 @@ var _ apiv1.WeixinServiceServer = (*Weixin)(nil)
 // Weixin 使用微信测试账号发送消息 https://mp.weixin.qq.com/debug/cgi-bin/sandboxinfo?action=showinfo&t=sandbox/index
 type Weixin struct {
 	apiv1.UnimplementedWeixinServiceServer
-	store *store.Store
-	conf  *config.Config
+	store      *store.Store
+	conf       *config.Config
+	httpClient *http.Client
 }
 
 // NewWeixin 构造函数
-func NewWeixin(store *store.Store, conf *config.Config) *Weixin {
-	return &Weixin{store: store, conf: conf}
+func NewWeixin(store *store.Store, conf *config.Config, httpClient *http.Client) *Weixin {
+	return &Weixin{store: store, conf: conf, httpClient: httpClient}
 }
 
 // verifyWeixinSignature 按微信官方文档校验签名

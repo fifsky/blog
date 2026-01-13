@@ -2,6 +2,7 @@ package service
 
 import (
 	"app/config"
+	"app/pkg/httputil"
 	apiv1 "app/proto/gen/api/v1"
 	"context"
 	"crypto/sha1"
@@ -46,7 +47,7 @@ func TestWeixin_getAccessToken(t *testing.T) {
 	conf.Weixin.Appid = os.Getenv("WEIXIN_APPID")
 	conf.Weixin.AppSecret = os.Getenv("WEIXIN_APPSECRET")
 	conf.Weixin.Token = os.Getenv("WEIXIN_TOKEN")
-	s := NewWeixin(nil, conf)
+	s := NewWeixin(nil, conf, httputil.NewClient(httputil.WithMiddleware(httputil.Debug())))
 	resp, err := s.getAccessToken()
 	if err != nil {
 		t.Fatalf("getAccessToken failed: %v", err)
@@ -69,7 +70,7 @@ func TestWeixin_Message(t *testing.T) {
 	conf.Weixin.Appid = os.Getenv("WEIXIN_APPID")
 	conf.Weixin.AppSecret = os.Getenv("WEIXIN_APPSECRET")
 	conf.Weixin.Token = os.Getenv("WEIXIN_TOKEN")
-	s := NewWeixin(nil, conf)
+	s := NewWeixin(nil, conf, httputil.NewClient(httputil.WithMiddleware(httputil.Debug())))
 	req := &apiv1.MessageRequest{
 		Touser:     "ofPKKs4q2T_Padf5oQU94JHESzkY",
 		TemplateId: "mxrP6OFuLOy4UW1IKnsis0aR4FhxCXk77yS-LHdHvIQ",

@@ -1,4 +1,4 @@
-package middleware
+package httputil
 
 import (
 	"fmt"
@@ -40,8 +40,8 @@ func tr() http.RoundTripper {
 	})
 }
 
-func ExampleChain() {
-	tr := Chain(tr(), []Middleware{mid1(), mid2()}...)
+func Example_chain() {
+	tr := chain(tr(), []Middleware{mid1(), mid2()}...)
 
 	client := http.Client{
 		Transport: tr,

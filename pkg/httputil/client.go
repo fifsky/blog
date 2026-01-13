@@ -3,15 +3,13 @@ package httputil
 import (
 	"net/http"
 	"time"
-
-	"app/pkg/httputil/middleware"
 )
 
 type Option func(c *Client)
 
 type Client struct {
 	timeout     time.Duration
-	middlewares []middleware.Middleware
+	middlewares []Middleware
 	transport   http.RoundTripper
 }
 
@@ -21,7 +19,7 @@ func WithTimeout(t time.Duration) Option {
 	}
 }
 
-func WithMiddleware(middleware ...middleware.Middleware) Option {
+func WithMiddleware(middleware ...Middleware) Option {
 	return func(c *Client) {
 		c.middlewares = append(c.middlewares, middleware...)
 	}
@@ -43,7 +41,7 @@ func NewClient(options ...Option) *http.Client {
 
 	c := &Client{
 		timeout:     5 * time.Second,
-		middlewares: []middleware.Middleware{},
+		middlewares: []Middleware{},
 		transport:   t,
 	}
 	for _, option := range options {
@@ -51,7 +49,7 @@ func NewClient(options ...Option) *http.Client {
 	}
 
 	return &http.Client{
-		Transport: middleware.Chain(c.transport, c.middlewares...),
+		Transport: chain(c.transport, c.middlewares...),
 		Timeout:   c.timeout,
 	}
 }
