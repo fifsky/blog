@@ -7,6 +7,7 @@ import (
 	"context"
 	"crypto/sha1"
 	"fmt"
+	"net/http"
 	"os"
 	"sort"
 	"strings"
@@ -38,16 +39,24 @@ func TestVerifyWeixinSignature(t *testing.T) {
 	}
 }
 
-func TestWeixin_getAccessToken(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping test in short mode")
+func newTestHttpClient(isMock bool, suites []httputil.MockSuite) *http.Client {
+	if isMock {
+		return httputil.NewClient(httputil.WithMiddleware(httputil.Debug(), httputil.Mock(suites)))
 	}
+	return httputil.NewClient(httputil.WithMiddleware(httputil.Debug()))
+}
 
+func TestWeixin_getAccessToken(t *testing.T) {
 	conf := &config.Config{}
 	conf.Weixin.Appid = os.Getenv("WEIXIN_APPID")
 	conf.Weixin.AppSecret = os.Getenv("WEIXIN_APPSECRET")
 	conf.Weixin.Token = os.Getenv("WEIXIN_TOKEN")
-	s := NewWeixin(nil, conf, httputil.NewClient(httputil.WithMiddleware(httputil.Debug())))
+	s := NewWeixin(nil, conf, newTestHttpClient(true, []httputil.MockSuite{
+		{
+			URI:          "/cgi-bin/stable_token",
+			ResponseBody: `{"access_token":"mock_access_token","expires_in":7200}`,
+		},
+	}))
 	resp, err := s.getAccessToken()
 	if err != nil {
 		t.Fatalf("getAccessToken failed: %v", err)
