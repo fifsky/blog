@@ -4,7 +4,6 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -26,18 +25,21 @@ func NewMiddleware(logger *slog.Logger, config Config) func(http.Handler) http.H
 			}
 
 			// dump request body
-			br := newBodyReader(r.Body, RequestBodyMaxSize, config.WithRequestBody)
-			r.Body = br
+			var br *bodyReader
+			if r.Body != nil {
+				br = newBodyReader(r.Body, RequestBodyMaxSize, config.WithRequestBody)
+				r.Body = br
+			}
 
 			// dump response body
 			bw := newBodyWriter(w, ResponseBodyMaxSize, config.WithResponseBody)
 
 			// Make sure we create a map only once per request (in case we have multiple middleware instances)
 			if v := r.Context().Value(customAttributesCtxKey); v == nil {
-				r = r.WithContext(context.WithValue(r.Context(), customAttributesCtxKey, &sync.Map{}))
+				r = r.WithContext(NewContextAttributes(r.Context()))
 			}
 
-			defer log(logger, config, r, bw, br, start)
+			defer log(logger, config, r, bw, br, start, nil)
 
 			next.ServeHTTP(bw, r)
 		})

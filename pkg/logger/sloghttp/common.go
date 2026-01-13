@@ -76,7 +76,7 @@ var DefaultConfig = Config{
 	Filters: []Filter{},
 }
 
-func log(logger *slog.Logger, config Config, r *http.Request, wr WrapResponse, br *bodyReader, start time.Time) {
+func log(logger *slog.Logger, config Config, r *http.Request, wr WrapResponse, br *bodyReader, start time.Time, err error) {
 	for _, filter := range config.Filters {
 		if !filter(wr, r) {
 			return
@@ -110,6 +110,10 @@ func log(logger *slog.Logger, config Config, r *http.Request, wr WrapResponse, b
 		slog.Int("status", status),
 	}
 
+	if err != nil {
+		responseAttributes = append(responseAttributes, slog.Any("http_error", err))
+	}
+
 	if config.WithRequestID {
 		reqID := GetRequestIDFromContext(r.Context())
 		if reqID != "" {
@@ -119,10 +123,12 @@ func log(logger *slog.Logger, config Config, r *http.Request, wr WrapResponse, b
 
 	baseAttributes = append(baseAttributes, extractTraceSpanID(r.Context(), config.WithTraceID, config.WithSpanID)...)
 
-	requestAttributes = append(requestAttributes, slog.Int("length", br.bytes))
-	if config.WithRequestBody {
-		if br.body != nil {
-			requestAttributes = append(requestAttributes, slog.String("body", br.body.String()))
+	if br != nil {
+		requestAttributes = append(requestAttributes, slog.Int("length", br.bytes))
+		if config.WithRequestBody {
+			if br.body != nil {
+				requestAttributes = append(requestAttributes, slog.String("body", br.body.String()))
+			}
 		}
 	}
 
@@ -208,12 +214,19 @@ func GetRequestIDFromContext(ctx context.Context) string {
 	return ""
 }
 
-// AddCustomAttributes adds custom attributes to the request context. This func can be called from any handler or middleware, as long as the slog-http middleware is already mounted.
-func AddCustomAttributes(r *http.Request, attrs ...slog.Attr) {
-	AddContextAttributes(r.Context(), attrs...)
+// NewContextAttributes creates a new context with custom attributes.
+func NewContextAttributes(ctx context.Context, attrs ...slog.Attr) context.Context {
+	if v := ctx.Value(customAttributesCtxKey); v == nil {
+		ctx = context.WithValue(ctx, customAttributesCtxKey, &sync.Map{})
+		AddContextAttributes(ctx, attrs...)
+	} else {
+		AddContextAttributes(ctx, attrs...)
+	}
+
+	return ctx
 }
 
-// AddContextAttributes is the same as AddCustomAttributes, but it doesn't need access to the request struct.
+// AddContextAttributes add custom attributes to the context, context must be created by NewContextAttributes.
 func AddContextAttributes(ctx context.Context, attrs ...slog.Attr) {
 	if v := ctx.Value(customAttributesCtxKey); v != nil {
 		if m, ok := v.(*sync.Map); ok {

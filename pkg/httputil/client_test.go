@@ -45,8 +45,8 @@ func TestRequestWithLogInfo(t *testing.T) {
 	client := httputil.NewClient(httputil.WithMiddleware(middleware.AccessLog(l)))
 	b, _ := json.Marshal(request)
 	ctx := context.Background()
+	ctx = sloghttp.NewContextAttributes(ctx, slog.String("other", "is other info"))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://httpbin.org/anything", bytes.NewReader(b))
-	sloghttp.AddCustomAttributes(req, slog.String("other", "is other info"))
 
 	assert.NoError(t, err)
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")

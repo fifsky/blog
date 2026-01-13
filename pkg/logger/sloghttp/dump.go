@@ -148,10 +148,42 @@ type response struct {
 func newResponse(res *http.Response, maxSize int, recordBody bool) *response {
 	var body *bytes.Buffer
 	if recordBody {
-		body = bytes.NewBufferString("")
-		_, err := io.Copy(body, res.Body)
-		if err != nil {
-			slog.Error("failed to read response body", "error", err)
+		body = bytes.NewBuffer(make([]byte, 0, 1024))
+		// limit read response body
+		if res.Body != nil {
+			// Read up to maxSize+1 to check if body is larger than maxSize
+			limit := int64(maxSize) + 1
+			lr := io.LimitReader(res.Body, limit)
+			_, err := body.ReadFrom(lr)
+			if err != nil {
+				slog.Error("failed to read response body", "error", err)
+			}
+
+			// Restore response body
+			// We need to create a new reader that contains the bytes we read + the remaining bytes in res.Body
+			// If we read less than limit, it means we reached EOF of the original body.
+			// If we read limit, it means there might be more bytes in the original body.
+
+			// Note: body contains what we read.
+			// res.Body has been consumed by the amount we read.
+			// We need to construct a new ReadCloser.
+
+			// Make a copy of the read data for restoration before potentially truncating 'body'
+			readBytes := make([]byte, body.Len())
+			copy(readBytes, body.Bytes())
+
+			res.Body = &struct {
+				io.Reader
+				io.Closer
+			}{
+				Reader: io.MultiReader(bytes.NewReader(readBytes), res.Body),
+				Closer: res.Body,
+			}
+
+			// Truncate the log buffer if it exceeds maxSize
+			if body.Len() > maxSize {
+				body.Truncate(maxSize)
+			}
 		}
 	}
 
@@ -178,3 +210,10 @@ func (r *response) BytesWritten() int {
 func (r *response) Body() []byte {
 	return r.body.Bytes()
 }
+
+type noopResponse struct{}
+
+func (n noopResponse) Header() http.Header { return http.Header{} }
+func (n noopResponse) Status() int         { return 0 }
+func (n noopResponse) BytesWritten() int   { return 0 }
+func (n noopResponse) Body() []byte        { return nil }

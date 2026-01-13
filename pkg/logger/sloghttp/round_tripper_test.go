@@ -68,3 +68,45 @@ func TestNewRoundTripper_RequestIDAndLogging(t *testing.T) {
 	require.True(t, ok)
 	require.Equal(t, idHdr, ri.Value.String())
 }
+
+type errorRT struct{}
+
+func (d errorRT) RoundTrip(r *http.Request) (*http.Response, error) {
+	return nil, io.ErrUnexpectedEOF
+}
+
+func TestRoundTripper_Error(t *testing.T) {
+	h := &captureHandler{}
+	logger := slog.New(h)
+
+	cfg := DefaultConfig
+	cfg.WithResponseBody = true
+
+	rt := NewRoundTripper(logger, errorRT{}, cfg)
+
+	req, err := http.NewRequest(http.MethodGet, "http://example.com", nil)
+	require.NoError(t, err)
+
+	res, err := rt.RoundTrip(req)
+	require.ErrorIs(t, err, io.ErrUnexpectedEOF)
+	require.Nil(t, res)
+
+	require.NotEmpty(t, h.records)
+	var top slogRecord
+	for _, r := range h.records {
+		if r.Msg != "" {
+			top = r
+			break
+		}
+	}
+	require.NotEmpty(t, top.Attrs)
+
+	resGroup, ok := findAttr(top.Attrs, "response")
+	require.True(t, ok)
+
+	// t.Logf("Response Group Attrs: %+v", resGroup.Value.Group())
+
+	errAttr, ok := findAttr(resGroup.Value.Group(), "http_error")
+	require.True(t, ok)
+	require.Equal(t, io.ErrUnexpectedEOF, errAttr.Value.Any())
+}

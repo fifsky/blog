@@ -25,7 +25,7 @@ func TestNewMiddleware_RequestID_Logging_CustomAttr(t *testing.T) {
 	var capturedID string
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		capturedID = GetRequestID(r)
-		AddCustomAttributes(r, slog.String("foo", "bar"))
+		AddContextAttributes(r.Context(), slog.String("foo", "bar"))
 		_, ok := r.Body.(*bodyReader)
 		require.True(t, ok)
 		_, _ = w.Write([]byte("ok"))
