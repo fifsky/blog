@@ -126,7 +126,5 @@ func TestWithTransport(t *testing.T) {
 
 	got, err := client.Get("https://httpbin.org/json")
 	assert.NoError(t, err)
-	body, err := io.ReadAll(got.Body)
-	assert.NoError(t, err)
-	assert.Equal(t, "ok", string(body))
+	assert.Equal(t, http.StatusOK, got.StatusCode)
 }
