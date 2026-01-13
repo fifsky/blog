@@ -101,7 +101,13 @@ func (s *Weixin) getAccessToken() (*AccessTokenResponse, error) {
 		return nil, err
 	}
 
-	resp, err := http.Post("https://api.weixin.qq.com/cgi-bin/stable_token", "application/json", bytes.NewBuffer(reqBody))
+	request, err := http.NewRequest(http.MethodPost, "https://api.weixin.qq.com/cgi-bin/stable_token", bytes.NewBuffer(reqBody))
+	if err != nil {
+		return nil, err
+	}
+	request.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.httpClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +201,7 @@ func (s *Weixin) Message(ctx context.Context, req *apiv1.MessageRequest) (*apiv1
 	}
 	request.Header.Set("Content-Type", "application/json")
 
-	resp, err := http.DefaultClient.Do(request)
+	resp, err := s.httpClient.Do(request)
 	if err != nil {
 		return nil, err
 	}

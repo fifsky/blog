@@ -71,15 +71,20 @@ func TestWeixin_getAccessToken(t *testing.T) {
 }
 
 func TestWeixin_Message(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping test in short mode")
-	}
-
 	conf := &config.Config{}
 	conf.Weixin.Appid = os.Getenv("WEIXIN_APPID")
 	conf.Weixin.AppSecret = os.Getenv("WEIXIN_APPSECRET")
 	conf.Weixin.Token = os.Getenv("WEIXIN_TOKEN")
-	s := NewWeixin(nil, conf, httputil.NewClient(httputil.WithMiddleware(httputil.Debug())))
+	s := NewWeixin(nil, conf, newTestHttpClient(true, []httputil.MockSuite{
+		{
+			URI:          "/cgi-bin/stable_token",
+			ResponseBody: `{"access_token":"mock_access_token","expires_in":7200}`,
+		},
+		{
+			URI:          "/cgi-bin/message/template/send",
+			ResponseBody: `{"errcode":0,"errmsg":"ok"}`,
+		},
+	}))
 	req := &apiv1.MessageRequest{
 		Touser:     "ofPKKs4q2T_Padf5oQU94JHESzkY",
 		TemplateId: "mxrP6OFuLOy4UW1IKnsis0aR4FhxCXk77yS-LHdHvIQ",
