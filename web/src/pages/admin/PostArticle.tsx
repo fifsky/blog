@@ -37,6 +37,7 @@ const articleSchema = z.object({
   url: z.string().optional(),
   content: z.string().optional(),
   type: z.union([z.literal(1), z.literal(2)]),
+  status: z.number().optional(),
 });
 
 type ArticleFormValues = z.infer<typeof articleSchema>;
@@ -63,6 +64,7 @@ export default function PostArticle() {
 
   const isEditing = !!form.watch("id");
   const articleType = form.watch("type");
+  const articleStatus = form.watch("status");
 
   const toolbarConfig: Partial<IToolbarConfig> = {
     excludeKeys: ["uploadVideo", "fontFamily", "lineHeight", "group-indent"],
@@ -131,18 +133,19 @@ export default function PostArticle() {
       const categories = ret.list || [];
       setCates(categories);
 
-      // 然后处理文章详情
-      if (params.get("id")) {
-        const a = await articleDetailApi({ id: parseInt(params.get("id")!) });
-        form.reset({
-          id: a.id,
-          title: a.title || "",
-          cate_id: a.cate_id || 0,
-          url: a.url || "",
-          content: a.content || "",
-          type: a.type === 1 || a.type === 2 ? a.type : 1,
-        });
-      }
+       // 然后处理文章详情
+       if (params.get("id")) {
+         const a = await articleDetailApi({ id: parseInt(params.get("id")!) });
+         form.reset({
+           id: a.id,
+           title: a.title || "",
+           cate_id: a.cate_id || 0,
+           url: a.url || "",
+           content: a.content || "",
+           type: a.type === 1 || a.type === 2 ? a.type : 1,
+           status: a.status,
+         });
+       }
     })();
   }, []);
 
@@ -328,13 +331,15 @@ export default function PostArticle() {
               )}
             />
 
-            <Field orientation="horizontal">
+             <Field orientation="horizontal">
               <Button type="button" size={"sm"} loading={loading} onClick={handlePublish}>
                 发布
               </Button>
-              <Button type="button" size={"sm"} variant="outline" disabled={loading} onClick={handleSaveDraft}>
-                保存草稿
-              </Button>
+              {(isEditing && articleStatus !== 1) || !isEditing ? (
+                <Button type="button" size={"sm"} variant="outline" disabled={loading} onClick={handleSaveDraft}>
+                  保存草稿
+                </Button>
+              ) : null}
             </Field>
           </form>
         </Form>

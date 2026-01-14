@@ -20,10 +20,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ArticleService_Create_FullMethodName = "/fifsky.blog.admin.v1.ArticleService/Create"
-	ArticleService_Update_FullMethodName = "/fifsky.blog.admin.v1.ArticleService/Update"
-	ArticleService_Delete_FullMethodName = "/fifsky.blog.admin.v1.ArticleService/Delete"
-	ArticleService_List_FullMethodName   = "/fifsky.blog.admin.v1.ArticleService/List"
+	ArticleService_Create_FullMethodName  = "/fifsky.blog.admin.v1.ArticleService/Create"
+	ArticleService_Update_FullMethodName  = "/fifsky.blog.admin.v1.ArticleService/Update"
+	ArticleService_Delete_FullMethodName  = "/fifsky.blog.admin.v1.ArticleService/Delete"
+	ArticleService_List_FullMethodName    = "/fifsky.blog.admin.v1.ArticleService/List"
+	ArticleService_Restore_FullMethodName = "/fifsky.blog.admin.v1.ArticleService/Restore"
 )
 
 // ArticleServiceClient is the client API for ArticleService service.
@@ -40,6 +41,8 @@ type ArticleServiceClient interface {
 	Delete(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// List 获取文章列表
 	List(ctx context.Context, in *ArticleListRequest, opts ...grpc.CallOption) (*ArticleListResponse, error)
+	// Restore 恢复已删除文章
+	Restore(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*IDResponse, error)
 }
 
 type articleServiceClient struct {
@@ -90,6 +93,16 @@ func (c *articleServiceClient) List(ctx context.Context, in *ArticleListRequest,
 	return out, nil
 }
 
+func (c *articleServiceClient) Restore(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*IDResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(IDResponse)
+	err := c.cc.Invoke(ctx, ArticleService_Restore_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArticleServiceServer is the server API for ArticleService service.
 // All implementations must embed UnimplementedArticleServiceServer
 // for forward compatibility.
@@ -104,6 +117,8 @@ type ArticleServiceServer interface {
 	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
 	// List 获取文章列表
 	List(context.Context, *ArticleListRequest) (*ArticleListResponse, error)
+	// Restore 恢复已删除文章
+	Restore(context.Context, *IDRequest) (*IDResponse, error)
 	mustEmbedUnimplementedArticleServiceServer()
 }
 
@@ -125,6 +140,9 @@ func (UnimplementedArticleServiceServer) Delete(context.Context, *IDRequest) (*e
 }
 func (UnimplementedArticleServiceServer) List(context.Context, *ArticleListRequest) (*ArticleListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method List not implemented")
+}
+func (UnimplementedArticleServiceServer) Restore(context.Context, *IDRequest) (*IDResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Restore not implemented")
 }
 func (UnimplementedArticleServiceServer) mustEmbedUnimplementedArticleServiceServer() {}
 func (UnimplementedArticleServiceServer) testEmbeddedByValue()                        {}
@@ -219,6 +237,24 @@ func _ArticleService_List_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArticleService_Restore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArticleServiceServer).Restore(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArticleService_Restore_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArticleServiceServer).Restore(ctx, req.(*IDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArticleService_ServiceDesc is the grpc.ServiceDesc for ArticleService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -241,6 +277,10 @@ var ArticleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "List",
 			Handler:    _ArticleService_List_Handler,
+		},
+		{
+			MethodName: "Restore",
+			Handler:    _ArticleService_Restore_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

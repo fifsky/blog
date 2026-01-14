@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { articleDeleteApi, articleListAdminApi } from "@/service";
+import { articleDeleteApi, articleListAdminApi, articleRestoreApi } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Pagination } from "@/components/Pagination";
 import { CTable, Column } from "@/components/CTable";
@@ -40,6 +40,12 @@ export default function AdminArticle() {
   const deleteItem = async (id: number) => {
     if (confirm("确认要删除？")) {
       await articleDeleteApi({ id });
+      loadList();
+    }
+  };
+  const restoreItem = async (id: number) => {
+    if (confirm("确认要恢复为草稿？")) {
+      await articleRestoreApi({ id });
       loadList();
     }
   };
@@ -157,18 +163,37 @@ export default function AdminArticle() {
       key: "id",
       render: (_, record) => (
         <>
-          <Link to={`/admin/post/article?id=${record.id}`}>编辑</Link>
-          <span className="px-1.5 text-[#ccc]">|</span>
-          <Button
-            variant={"link"}
-            className={cn("p-0 m-0 h-auto text-[13px]")}
-            onClick={(e) => {
-              e.preventDefault();
-              deleteItem(record.id);
-            }}
-          >
-            删除
-          </Button>
+          {record.status !== 2 && (
+            <>
+              <Link to={`/admin/post/article?id=${record.id}`}>编辑</Link>
+              <span className="px-1.5 text-[#ccc]">|</span>
+            </>
+          )}
+          {record.status === 2 ? (
+            <Button
+              variant={"link"}
+              className={cn("p-0 m-0 h-auto text-[13px]")}
+              onClick={async () => {
+                if (confirm("确认要恢复为草稿？")) {
+                  await restoreItem(record.id);
+                  loadList();
+                }
+              }}
+            >
+              恢复
+            </Button>
+          ) : (
+            <Button
+              variant={"link"}
+              className={cn("p-0 m-0 h-auto text-[13px]")}
+              onClick={(e) => {
+                e.preventDefault();
+                deleteItem(record.id);
+              }}
+            >
+              删除
+            </Button>
+          )}
         </>
       ),
     },

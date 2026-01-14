@@ -490,12 +490,13 @@ const file_admin_v1_article_proto_rawDesc = "" +
 	"updated_at\x18\n" +
 	" \x01(\tR\tupdatedAt\x125\n" +
 	"\x04user\x18\v \x01(\v2!.fifsky.blog.admin.v1.UserSummaryR\x04user\x125\n" +
-	"\x04cate\x18\f \x01(\v2!.fifsky.blog.admin.v1.CateSummaryR\x04cate2\xf6\x03\n" +
+	"\x04cate\x18\f \x01(\v2!.fifsky.blog.admin.v1.CateSummaryR\x04cate2\xeb\x04\n" +
 	"\x0eArticleService\x12|\n" +
 	"\x06Create\x12*.fifsky.blog.admin.v1.ArticleCreateRequest\x1a .fifsky.blog.admin.v1.IDResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/article/create\x12|\n" +
 	"\x06Update\x12*.fifsky.blog.admin.v1.ArticleUpdateRequest\x1a .fifsky.blog.admin.v1.IDResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/article/update\x12g\n" +
 	"\x06Delete\x12\x1f.fifsky.blog.admin.v1.IDRequest\x1a\x16.google.protobuf.Empty\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/article/delete\x12\x7f\n" +
-	"\x04List\x12(.fifsky.blog.admin.v1.ArticleListRequest\x1a).fifsky.blog.admin.v1.ArticleListResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/api/admin/article/listB\xbb\x01\n" +
+	"\x04List\x12(.fifsky.blog.admin.v1.ArticleListRequest\x1a).fifsky.blog.admin.v1.ArticleListResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/api/admin/article/list\x12s\n" +
+	"\aRestore\x12\x1f.fifsky.blog.admin.v1.IDRequest\x1a .fifsky.blog.admin.v1.IDResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/admin/article/restoreB\xbb\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\fArticleProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var (
@@ -531,12 +532,14 @@ var file_admin_v1_article_proto_depIdxs = []int32{
 	1, // 4: fifsky.blog.admin.v1.ArticleService.Update:input_type -> fifsky.blog.admin.v1.ArticleUpdateRequest
 	7, // 5: fifsky.blog.admin.v1.ArticleService.Delete:input_type -> fifsky.blog.admin.v1.IDRequest
 	2, // 6: fifsky.blog.admin.v1.ArticleService.List:input_type -> fifsky.blog.admin.v1.ArticleListRequest
-	8, // 7: fifsky.blog.admin.v1.ArticleService.Create:output_type -> fifsky.blog.admin.v1.IDResponse
-	8, // 8: fifsky.blog.admin.v1.ArticleService.Update:output_type -> fifsky.blog.admin.v1.IDResponse
-	9, // 9: fifsky.blog.admin.v1.ArticleService.Delete:output_type -> google.protobuf.Empty
-	3, // 10: fifsky.blog.admin.v1.ArticleService.List:output_type -> fifsky.blog.admin.v1.ArticleListResponse
-	7, // [7:11] is the sub-list for method output_type
-	3, // [3:7] is the sub-list for method input_type
+	7, // 7: fifsky.blog.admin.v1.ArticleService.Restore:input_type -> fifsky.blog.admin.v1.IDRequest
+	8, // 8: fifsky.blog.admin.v1.ArticleService.Create:output_type -> fifsky.blog.admin.v1.IDResponse
+	8, // 9: fifsky.blog.admin.v1.ArticleService.Update:output_type -> fifsky.blog.admin.v1.IDResponse
+	9, // 10: fifsky.blog.admin.v1.ArticleService.Delete:output_type -> google.protobuf.Empty
+	3, // 11: fifsky.blog.admin.v1.ArticleService.List:output_type -> fifsky.blog.admin.v1.ArticleListResponse
+	8, // 12: fifsky.blog.admin.v1.ArticleService.Restore:output_type -> fifsky.blog.admin.v1.IDResponse
+	8, // [8:13] is the sub-list for method output_type
+	3, // [3:8] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
 	3, // [3:3] is the sub-list for extension extendee
 	0, // [0:3] is the sub-list for field type_name

@@ -77,6 +77,10 @@ export const articleUpdateApi = (
 ) => createApi<IDResponse>("/api/admin/article/update", data, errorHandler);
 export const articleDeleteApi = (data: IDRequest, errorHandler?: (e: AppError) => void) =>
   createApi("/api/admin/article/delete", data, errorHandler);
+export const articleRestoreApi = (
+  data: IDRequest,
+  errorHandler?: (e: AppError) => void,
+) => createApi<IDResponse>("/api/admin/article/restore", data, errorHandler);
 export const articleListAdminApi = (
   data: AdminArticleListRequest,
   errorHandler?: (e: AppError) => void,

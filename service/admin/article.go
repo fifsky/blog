@@ -100,6 +100,14 @@ func (a *Article) Delete(ctx context.Context, req *adminv1.IDRequest) (*emptypb.
 	return &emptypb.Empty{}, nil
 }
 
+func (a *Article) Restore(ctx context.Context, req *adminv1.IDRequest) (*adminv1.IDResponse, error) {
+	err := a.store.RestorePost(ctx, int(req.Id))
+	if err != nil {
+		return nil, err
+	}
+	return &adminv1.IDResponse{Id: req.Id}, nil
+}
+
 func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*adminv1.ArticleListResponse, error) {
 	page := 1
 	if req.Page > 0 {

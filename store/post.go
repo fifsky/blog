@@ -223,6 +223,11 @@ func (s *Store) SoftDeletePost(ctx context.Context, id int) error {
 	return err
 }
 
+func (s *Store) RestorePost(ctx context.Context, id int) error {
+	_, err := s.db.ExecContext(ctx, "update posts set status = 3 where id = ?", id)
+	return err
+}
+
 func (s *Store) ListPostForAdmin(ctx context.Context, p *model.Post, start int, num int) ([]model.Post, error) {
 	posts := make([]model.Post, 0)
 	offset := (start - 1) * num

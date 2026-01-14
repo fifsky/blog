@@ -39,6 +39,13 @@ service ArticleService {
       body: "*"
     };
   }
+  // Restore 恢复已删除文章
+  rpc Restore(IDRequest) returns (IDResponse) {
+    option (google.api.http) = {
+      post: "/api/admin/article/restore"
+      body: "*"
+    };
+  }
 }
 
 message ArticleCreateRequest {
