@@ -62,12 +62,14 @@ export function AdminLayout() {
                 </Link>
               </li>
               <li className="ml-1.5">
-                <Link
-                  to="/admin/comments"
-                  className={isPage("/admin/comments") ? activeNavClass : navClass}
+                <a
+                  href="https://github.com/fifsky/blog/discussions/categories/comment"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={navClass}
                 >
                   评论
-                </Link>
+                </a>
               </li>
               <li className="ml-1.5">
                 <Link

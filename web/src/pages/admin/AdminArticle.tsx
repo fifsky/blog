@@ -21,8 +21,8 @@ const STATUS_MAP: Record<
   { label: string; variant: "default" | "secondary" | "destructive" | "outline" }
 > = {
   1: { label: "已发布", variant: "default" },
-  2: { label: "已删除", variant: "destructive" },
-  3: { label: "草稿", variant: "secondary" },
+  2: { label: "已删除", variant: "secondary" },
+  3: { label: "草稿", variant: "outline" },
 };
 
 export default function AdminArticle() {

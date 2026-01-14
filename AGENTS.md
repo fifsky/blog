@@ -47,7 +47,7 @@ cd web && pnpm tsc --noEmit --skipLibCheck
 pnpm dev
 
 # Run backend
-./app http --addr=:8080
+make run
 ```
 
 ### Code Style - Backend

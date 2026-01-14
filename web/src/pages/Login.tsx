@@ -2,14 +2,15 @@ import { CHeader } from "@/components/CHeader";
 import { CFooter } from "@/components/CFooter";
 import { useStore } from "@/store/context";
 import { useNavigate } from "react-router";
-import { LoginRequest } from "@/types/openapi";
+import { LoginRequest, Options } from "@/types/openapi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { settingApi } from "@/service";
 
 export default function Login() {
   // 表单校验规则：用户名与密码为必填
@@ -28,8 +29,17 @@ export default function Login() {
     mode: "onChange",
   });
   const [loading, setLoading] = useState(false);
+  const [settings, setSettings] = useState<Options>();
   const loginAction = useStore((s) => s.loginAction);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    (async () => {
+      const s = await settingApi();
+      setSettings(s);
+    })();
+  }, []);
+
   // 提交处理：通过 react-hook-form 的 handleSubmit 获取已校验的数据
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setLoading(true);
@@ -37,9 +47,14 @@ export default function Login() {
     setLoading(false);
     navigate("/admin/index");
   };
+
+  const siteName = settings?.kv?.site_name || "無處告別";
+  const pageTitle = `登录 - ${siteName}`;
   return (
     <div className="w-[1024px] mt-4 mx-auto min-h-[500px]">
-      <title>登录</title>
+      <title>{pageTitle}</title>
+      <meta name="description" content={settings?.kv?.site_desc || ""} />
+      <meta name="keywords" content={settings?.kv?.site_keyword || ""} />
       <CHeader />
       <div className="p-5 border border-[#89d5ef] bg-white">
         <div className="px-[30px]">

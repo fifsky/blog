@@ -4,14 +4,15 @@ import { FileText } from "lucide-react";
 import { CArticle } from "@/components/CArticle";
 import { Pagination } from "@/components/Pagination";
 import { Empty } from "@/components/Empty";
-import { articleListApi } from "@/service";
+import { articleListApi, settingApi } from "@/service";
 import { useStore } from "@/store/context";
-import { ArticleItem, ArticleListRequest } from "@/types/openapi";
+import { ArticleItem, ArticleListRequest, Options } from "@/types/openapi";
 
 export default function ArticleList() {
   const [list, setList] = useState<ArticleItem[]>();
   const [pageTotal, setPageTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const [settings, setSettings] = useState<Options>();
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams();
@@ -26,9 +27,10 @@ export default function ArticleList() {
       page: currentPage,
       type: 1,
     };
-    const ret = await articleListApi(data);
+    const [ret, s] = await Promise.all([articleListApi(data), settingApi()]);
     setList(ret.list || []);
     setPageTotal(ret.page_total || 0);
+    setSettings(s);
   };
 
   const changePage = (p: number) => {
@@ -46,9 +48,12 @@ export default function ArticleList() {
   }, [location.pathname, location.search]);
 
   if (!list) return;
+  const siteName = settings?.kv?.site_name || "無處告別";
   return (
     <div>
-      <title>無處告別</title>
+      <title>{siteName}</title>
+      <meta name="description" content={settings?.kv?.site_desc || ""} />
+      <meta name="keywords" content={settings?.kv?.site_keyword || ""} />
       {list.length === 0 ? (
         <Empty icon={<FileText />} title="暂无文章" content="当前没有可显示的文章内容" />
       ) : (

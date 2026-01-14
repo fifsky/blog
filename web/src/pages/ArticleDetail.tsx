@@ -2,30 +2,35 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router";
 import { CArticle } from "@/components/CArticle";
 import { Comment } from "@/components/Comment";
-import { articleDetailApi, prevnextArticleApi } from "@/service";
-import { ArticleItem, PrevNextItem } from "@/types/openapi";
+import { articleDetailApi, prevnextArticleApi, settingApi } from "@/service";
+import { ArticleItem, PrevNextItem, Options } from "@/types/openapi";
 
 export default function ArticleDetail() {
   const [article, setArticle] = useState<ArticleItem>();
   const [data, setData] = useState<{ prev?: PrevNextItem; next?: PrevNextItem }>({});
+  const [settings, setSettings] = useState<Options>();
   const params = useParams();
   useEffect(() => {
     (async () => {
       const id = params.id ? parseInt(params.id) : undefined;
       setArticle(undefined);
-      const a = await articleDetailApi({ id });
+      const [a, s] = await Promise.all([articleDetailApi({ id }), settingApi()]);
       setArticle(a);
+      setSettings(s);
       if (id) {
         const pn = await prevnextArticleApi({ id });
         setData(pn);
       }
     })();
   }, [params.id]);
-  const pageTitle = `${article?.title ? article?.title + " - " : ""}無處告別`;
+  const siteName = settings?.kv?.site_name || "無處告別";
+  const pageTitle = `${article?.title ? article?.title + " - " : ""}${siteName}`;
   if (!article?.id) return;
   return (
     <>
       <title>{pageTitle}</title>
+      <meta name="description" content={settings?.kv?.site_desc || ""} />
+      <meta name="keywords" content={settings?.kv?.site_keyword || ""} />
       <div className="mb-[10px]">
         <CArticle article={article} />
         <div className="my-5 flex justify-between">

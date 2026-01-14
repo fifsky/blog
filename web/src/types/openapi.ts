@@ -37,7 +37,11 @@ export type UserUpdateRequest = {
   type?: number;
 };
 export type GetUserRequest = { id: number };
-
+// 站点设置
+// site_name: 站点名称
+// site_desc: 站点描述
+// site_keyword: 站点关键字
+// post_num: 每页显示文章数
 export type Options = { kv: Record<string, string> };
 
 export type CateMenuItem = { url: string; content: string };
