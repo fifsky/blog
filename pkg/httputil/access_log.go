@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"app/pkg/logger/sloghttp"
+	"github.com/goapt/logger/sloghttp"
 )
 
 func AccessLog(logger *slog.Logger) Middleware {

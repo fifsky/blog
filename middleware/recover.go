@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"runtime"
 
-	"app/pkg/logger"
+	"github.com/goapt/logger"
 	"app/response"
 )
 

@@ -14,8 +14,8 @@ import (
 	"time"
 
 	"app/pkg/httputil"
-	"app/pkg/logger"
-	"app/pkg/logger/sloghttp"
+	"github.com/goapt/logger"
+	"github.com/goapt/logger/sloghttp"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

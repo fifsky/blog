@@ -4,8 +4,8 @@ import (
 	"log/slog"
 	"net/http"
 
-	"app/pkg/logger"
-	"app/pkg/logger/sloghttp"
+	"github.com/goapt/logger"
+	"github.com/goapt/logger/sloghttp"
 )
 
 func Debug() Middleware {

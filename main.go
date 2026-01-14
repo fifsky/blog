@@ -9,7 +9,7 @@ import (
 	"app/cmd"
 	"app/config"
 	"app/pkg/httputil"
-	"app/pkg/logger"
+	"github.com/goapt/logger"
 	"app/pkg/wechat"
 	"app/remind"
 	"app/store"

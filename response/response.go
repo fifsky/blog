@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"app/pkg/logger"
+	"github.com/goapt/logger"
 	apiv1 "app/proto/gen/api/v1"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"

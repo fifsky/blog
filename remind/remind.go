@@ -14,7 +14,7 @@ import (
 	"app/config"
 	"app/model"
 	"app/pkg/aesutil"
-	"app/pkg/logger"
+	"github.com/goapt/logger"
 	"app/pkg/wechat"
 	"app/store"
 )
