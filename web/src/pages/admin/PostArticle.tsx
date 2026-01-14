@@ -84,31 +84,27 @@ export default function PostArticle() {
     },
   };
 
-  const submit = async (values: ArticleFormValues, status: number = 1) => {
+  // 提交表单逻辑
+  const submit = async (values: ArticleFormValues) => {
     setLoading(true);
     try {
-      const { id, cate_id, title, content, type, url } = values;
+      const { id, cate_id, title, content, type, url, status } = values;
+      // 构造通用请求载荷，status 默认为 1 (发布)
+      const payload = {
+        cate_id,
+        title,
+        content: content || "",
+        type,
+        url: url || "",
+        status: status || 1,
+      };
+
       if (id) {
-        // 编辑状态：id 是必填的，content 可以是 undefined
-        await articleUpdateApi({
-          id,
-          cate_id,
-          title,
-          content: content || "",
-          type,
-          url: url || "",
-          status,
-        });
+        // 编辑状态：调用更新接口，需要传入 id
+        await articleUpdateApi({ ...payload, id });
       } else {
-        // 新建状态：id 不需要，content 是必填的
-        await articleCreateApi({
-          cate_id,
-          title,
-          content: content || "",
-          type,
-          url: url || "",
-          status,
-        });
+        // 新建状态：调用创建接口
+        await articleCreateApi(payload);
       }
       navigate("/admin/articles");
     } finally {
@@ -116,14 +112,16 @@ export default function PostArticle() {
     }
   };
 
-  const handlePublish = async () => {
-    const values = form.getValues();
-    await submit(values, 1);
+  // 发布文章：设置为发布状态并提交
+  const handlePublish = () => {
+    form.setValue("status", 1);
+    form.handleSubmit(submit)();
   };
 
-  const handleSaveDraft = async () => {
-    const values = form.getValues();
-    await submit(values, 3);
+  // 保存草稿：设置为草稿状态并提交
+  const handleSaveDraft = () => {
+    form.setValue("status", 3); // 3 代表草稿
+    form.handleSubmit(submit)();
   };
 
   useEffect(() => {
@@ -133,19 +131,19 @@ export default function PostArticle() {
       const categories = ret.list || [];
       setCates(categories);
 
-       // 然后处理文章详情
-       if (params.get("id")) {
-         const a = await articleDetailApi({ id: parseInt(params.get("id")!) });
-         form.reset({
-           id: a.id,
-           title: a.title || "",
-           cate_id: a.cate_id || 0,
-           url: a.url || "",
-           content: a.content || "",
-           type: a.type === 1 || a.type === 2 ? a.type : 1,
-           status: a.status,
-         });
-       }
+      // 然后处理文章详情
+      if (params.get("id")) {
+        const a = await articleDetailApi({ id: parseInt(params.get("id")!) });
+        form.reset({
+          id: a.id,
+          title: a.title || "",
+          cate_id: a.cate_id || 0,
+          url: a.url || "",
+          content: a.content || "",
+          type: a.type === 1 || a.type === 2 ? a.type : 1,
+          status: a.status,
+        });
+      }
     })();
   }, []);
 
@@ -331,12 +329,18 @@ export default function PostArticle() {
               )}
             />
 
-             <Field orientation="horizontal">
+            <Field orientation="horizontal">
               <Button type="button" size={"sm"} loading={loading} onClick={handlePublish}>
                 发布
               </Button>
               {(isEditing && articleStatus !== 1) || !isEditing ? (
-                <Button type="button" size={"sm"} variant="outline" disabled={loading} onClick={handleSaveDraft}>
+                <Button
+                  type="button"
+                  size={"sm"}
+                  variant="outline"
+                  disabled={loading}
+                  onClick={handleSaveDraft}
+                >
                   保存草稿
                 </Button>
               ) : null}
