@@ -9,10 +9,10 @@ import (
 	"app/cmd"
 	"app/config"
 	"app/pkg/httputil"
-	"github.com/goapt/logger"
 	"app/pkg/wechat"
 	"app/remind"
 	"app/store"
+	"github.com/goapt/logger"
 
 	"github.com/urfave/cli/v3"
 )

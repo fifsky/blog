@@ -14,9 +14,9 @@ import (
 	"app/config"
 	"app/model"
 	"app/pkg/aesutil"
-	"github.com/goapt/logger"
 	"app/pkg/wechat"
 	"app/store"
+	"github.com/goapt/logger"
 )
 
 type Remind struct {

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"runtime"
 
-	"github.com/goapt/logger"
 	"app/response"
+	"github.com/goapt/logger"
 )
 
 func NewRecover(next http.Handler) http.Handler {
