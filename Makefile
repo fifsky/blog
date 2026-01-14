@@ -14,6 +14,7 @@ generate:
 .PHONY: test
 test:
 	$(GO) test -short -v -coverprofile=cover.out ./...
+	grep -v "proto/gen" cover.out > cover.out.tmp && mv cover.out.tmp cover.out
 
 .PHONY: cover
 cover:
