@@ -80,7 +80,7 @@ message ArticleItem {
 
 message ArticleListResponse {
   repeated ArticleItem list = 1;
-  int32 page_total = 2;
+  int32 total = 2;
 }
 
 message PrevNextRequest {

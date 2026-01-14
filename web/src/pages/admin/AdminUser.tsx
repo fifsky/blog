@@ -8,12 +8,12 @@ import { Button } from "@/components/ui/button";
 import { UserItem } from "@/types/openapi";
 export default function AdminUser() {
   const [list, setList] = useState<UserItem[]>([]);
-  const [pageTotal, setPageTotal] = useState(0);
+  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const loadList = async () => {
     const ret = await userListApi({ page });
     setList(ret.list || []);
-    setPageTotal(ret.page_total || 0);
+    setTotal(ret.total || 0);
   };
   const deleteItem = async (id: number) => {
     if (confirm("确认要操作？")) {
@@ -93,7 +93,7 @@ export default function AdminUser() {
       <CTable data={list} columns={columns} />
       <div className="my-[10px] flex items-center justify-between">
         <BatchHandle />
-        <Pagination page={page} pageTotal={pageTotal} onChange={setPage} />
+        <Pagination page={page} total={total} pageSize={10} onChange={setPage} />
       </div>
     </div>
   );

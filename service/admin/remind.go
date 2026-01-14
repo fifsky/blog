@@ -6,8 +6,8 @@ import (
 
 	"app/model"
 	adminv1 "app/proto/gen/admin/v1"
-	"app/service"
 	"app/store"
+
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -49,8 +49,8 @@ func (r *Remind) List(ctx context.Context, req *adminv1.PageRequest) (*adminv1.R
 		return nil, err
 	}
 	return &adminv1.RemindListResponse{
-		List:      items,
-		PageTotal: int32(service.TotalPages(total, num)),
+		List:  items,
+		Total: int32(total),
 	}, nil
 }
 

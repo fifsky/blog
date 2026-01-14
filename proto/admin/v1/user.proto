@@ -116,5 +116,5 @@ message UserItem {
 }
 message UserListResponse {
   repeated UserItem list = 1;
-  int32 page_total = 2;
+  int32 total = 2;
 }

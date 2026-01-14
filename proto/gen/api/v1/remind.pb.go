@@ -239,7 +239,7 @@ func (x *RemindItem) GetCreatedAt() string {
 type RemindListResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	List          []*RemindItem          `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	PageTotal     int32                  `protobuf:"varint,2,opt,name=page_total,json=pageTotal,proto3" json:"page_total,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -281,9 +281,9 @@ func (x *RemindListResponse) GetList() []*RemindItem {
 	return nil
 }
 
-func (x *RemindListResponse) GetPageTotal() int32 {
+func (x *RemindListResponse) GetTotal() int32 {
 	if x != nil {
-		return x.PageTotal
+		return x.Total
 	}
 	return 0
 }
@@ -311,11 +311,10 @@ const file_api_v1_remind_proto_rawDesc = "" +
 	"\tnext_time\x18\n" +
 	" \x01(\tR\bnextTime\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\v \x01(\tR\tcreatedAt\"g\n" +
+	"created_at\x18\v \x01(\tR\tcreatedAt\"^\n" +
 	"\x12RemindListResponse\x122\n" +
-	"\x04list\x18\x01 \x03(\v2\x1e.fifsky.blog.api.v1.RemindItemR\x04list\x12\x1d\n" +
-	"\n" +
-	"page_total\x18\x02 \x01(\x05R\tpageTotal2\xef\x01\n" +
+	"\x04list\x18\x01 \x03(\v2\x1e.fifsky.blog.api.v1.RemindItemR\x04list\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total2\xef\x01\n" +
 	"\rRemindService\x12o\n" +
 	"\x06Change\x12'.fifsky.blog.api.v1.RemindActionRequest\x1a .fifsky.blog.api.v1.TextResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/remind/change\x12m\n" +
 	"\x05Delay\x12'.fifsky.blog.api.v1.RemindActionRequest\x1a .fifsky.blog.api.v1.TextResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/api/remind/delayB\xac\x01\n" +

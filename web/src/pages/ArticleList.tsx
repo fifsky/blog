@@ -10,7 +10,7 @@ import { ArticleItem, ArticleListRequest, Options } from "@/types/openapi";
 
 export default function ArticleList() {
   const [list, setList] = useState<ArticleItem[]>();
-  const [pageTotal, setPageTotal] = useState(0);
+  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [settings, setSettings] = useState<Options>();
   const location = useLocation();
@@ -29,8 +29,8 @@ export default function ArticleList() {
     };
     const [ret, s] = await Promise.all([articleListApi(data), settingApi()]);
     setList(ret.list || []);
-    setPageTotal(ret.page_total || 0);
     setSettings(s);
+    setTotal(ret.total || 0);
   };
 
   const changePage = (p: number) => {
@@ -64,7 +64,12 @@ export default function ArticleList() {
               <div className="border-t border-dashed border-t-[#dbdbdb] mt-5 pt-2.5 pb-2.5 text-right"></div>
             </div>
           ))}
-          <Pagination page={page} pageTotal={pageTotal} onChange={changePage} />
+          <Pagination
+            page={page}
+            total={total}
+            pageSize={parseInt(settings?.kv?.post_num || "10") || 10}
+            onChange={changePage}
+          />
         </>
       )}
     </div>

@@ -7,12 +7,12 @@ import { CommentItem } from "@/types/openapi";
 
 export default function AdminComment() {
   const [list, setList] = useState<CommentItem[]>([]);
-  const [pageTotal, setPageTotal] = useState(0);
+  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const loadList = async () => {
     // 暂未实现
     setList([]);
-    setPageTotal(0);
+    setTotal(0);
   };
   const deleteItem = async (id: number) => {
     if (confirm("确认要删除？")) {
@@ -91,7 +91,7 @@ export default function AdminComment() {
       <CTable data={list} columns={columns} />
       <div className="my-[10px] flex items-center justify-between">
         <BatchHandle />
-        <Pagination page={page} pageTotal={pageTotal} onChange={setPage} />
+        <Pagination page={page} total={total} pageSize={10} onChange={setPage} />
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ const STATUS_MAP: Record<
 
 export default function AdminArticle() {
   const [list, setList] = useState<ArticleItem[]>([]);
-  const [pageTotal, setPageTotal] = useState(0);
+  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [statusFilter, setStatusFilter] = useState<number | undefined>(undefined);
@@ -36,7 +36,7 @@ export default function AdminArticle() {
   const loadList = async () => {
     const ret = await articleListAdminApi({ page, type: 1, status: statusFilter });
     setList(ret.list || []);
-    setPageTotal(ret.page_total || 0);
+    setTotal(ret.total || 0);
   };
   const deleteItem = async (id: number) => {
     if (confirm("确认要删除？")) {
@@ -272,7 +272,7 @@ export default function AdminArticle() {
           onBatchOperation={handleBatchOperation}
           disabled={batchLoading}
         />
-        <Pagination page={page} pageTotal={pageTotal} onChange={setPage} />
+        <Pagination page={page} total={total} pageSize={20} onChange={setPage} />
       </div>
     </div>
   );

@@ -17,17 +17,3 @@ func clientIP(r *http.Request) string {
 	}
 	return r.RemoteAddr
 }
-
-func totalPages(total, pagingNum int) int {
-	if total == 0 {
-		return 1
-	}
-	if total%pagingNum == 0 {
-		return total / pagingNum
-	}
-	return total/pagingNum + 1
-}
-
-func TotalPages(total, pagingNum int) int {
-	return totalPages(total, pagingNum)
-}

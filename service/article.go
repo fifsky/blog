@@ -10,6 +10,7 @@ import (
 	"app/model"
 	apiv1 "app/proto/gen/api/v1"
 	"app/store"
+
 	"google.golang.org/genproto/googleapis/api/httpbody"
 	"google.golang.org/protobuf/types/known/emptypb"
 
@@ -116,8 +117,8 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 		return nil, err
 	}
 	return &apiv1.ArticleListResponse{
-		List:      items,
-		PageTotal: int32(totalPages(total, num)),
+		List:  items,
+		Total: int32(total),
 	}, nil
 }
 

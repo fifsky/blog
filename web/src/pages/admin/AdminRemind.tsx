@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 
 export default function AdminRemind() {
   const [list, setList] = useState<RemindItem[]>([]);
-  const [pageTotal, setPageTotal] = useState(0);
+  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [item, setItem] = useState<RemindItem>();
   const { isOpen, open: openDialog, close: closeDialog } = useDialog(false);
@@ -20,7 +20,7 @@ export default function AdminRemind() {
   const loadList = async () => {
     const ret = await remindListApi({ page });
     setList(ret.list || []);
-    setPageTotal(ret.page_total || 0);
+    setTotal(ret.total || 0);
   };
   const editItem = (id: number) => {
     const it = list.find((i) => i.id === id);
@@ -135,7 +135,7 @@ export default function AdminRemind() {
           <CTable data={list} columns={columns} />
           <div className="my-[10px] flex items-center justify-between">
             <BatchHandle />
-            <Pagination page={page} pageTotal={pageTotal} onChange={setPage} />
+            <Pagination page={page} total={total} pageSize={10} onChange={setPage} />
           </div>
         </div>
       </div>

@@ -151,7 +151,7 @@ func (x *RemindItem) GetCreatedAt() string {
 type RemindListResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	List          []*RemindItem          `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	PageTotal     int32                  `protobuf:"varint,2,opt,name=page_total,json=pageTotal,proto3" json:"page_total,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -193,9 +193,9 @@ func (x *RemindListResponse) GetList() []*RemindItem {
 	return nil
 }
 
-func (x *RemindListResponse) GetPageTotal() int32 {
+func (x *RemindListResponse) GetTotal() int32 {
 	if x != nil {
-		return x.PageTotal
+		return x.Total
 	}
 	return 0
 }
@@ -411,11 +411,10 @@ const file_admin_v1_remind_proto_rawDesc = "" +
 	"\tnext_time\x18\n" +
 	" \x01(\tR\bnextTime\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\v \x01(\tR\tcreatedAt\"i\n" +
+	"created_at\x18\v \x01(\tR\tcreatedAt\"`\n" +
 	"\x12RemindListResponse\x124\n" +
-	"\x04list\x18\x01 \x03(\v2 .fifsky.blog.admin.v1.RemindItemR\x04list\x12\x1d\n" +
-	"\n" +
-	"page_total\x18\x02 \x01(\x05R\tpageTotal\"\xb6\x01\n" +
+	"\x04list\x18\x01 \x03(\v2 .fifsky.blog.admin.v1.RemindItemR\x04list\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"\xb6\x01\n" +
 	"\x13RemindCreateRequest\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\x05R\x04type\x12#\n" +
 	"\acontent\x18\x02 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\acontent\x12\x14\n" +

@@ -2,12 +2,21 @@ import { cn } from "@/lib/utils";
 
 interface PaginationProps {
   page: number;
-  pageTotal: number;
+  total: number;
+  pageSize?: number;
   onChange: (p: number) => void;
   showPageCount?: number;
 }
 
-export function Pagination({ page, pageTotal, onChange, showPageCount = 5 }: PaginationProps) {
+export function Pagination({
+  page,
+  total,
+  pageSize = 10,
+  onChange,
+  showPageCount = 5,
+}: PaginationProps) {
+  const pageTotal = Math.max(1, Math.ceil(total / pageSize));
+
   const getPageNumbers = () => {
     if (pageTotal <= showPageCount + 2) {
       return Array.from({ length: pageTotal }, (_, i) => i + 1);

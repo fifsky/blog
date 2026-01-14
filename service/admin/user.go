@@ -9,8 +9,8 @@ import (
 	"app/config"
 	"app/model"
 	adminv1 "app/proto/gen/admin/v1"
-	"app/service"
 	"app/store"
+
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -127,8 +127,8 @@ func (u *User) List(ctx context.Context, req *adminv1.PageRequest) (*adminv1.Use
 		return nil, err
 	}
 	return &adminv1.UserListResponse{
-		List:      items,
-		PageTotal: int32(service.TotalPages(total, num)),
+		List:  items,
+		Total: int32(total),
 	}, nil
 }
 

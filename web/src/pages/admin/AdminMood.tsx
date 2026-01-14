@@ -14,7 +14,7 @@ import { MoodItem } from "@/types/openapi";
 export default function AdminMood() {
   const [list, setList] = useState<MoodItem[]>([]);
   const [item, setItem] = useState<MoodItem | undefined>();
-  const [pageTotal, setPageTotal] = useState(0);
+  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +29,7 @@ export default function AdminMood() {
   const loadList = async () => {
     const ret = await moodListApi({ page });
     setList(ret.list || []);
-    setPageTotal(ret.page_total || 0);
+    setTotal(ret.total || 0);
   };
   const editItem = (id: number) => {
     const it = list.find((i) => i.id === id);
@@ -125,7 +125,7 @@ export default function AdminMood() {
           <CTable data={list} columns={columns} />
           <div className="my-2.5 flex items-center justify-between">
             <BatchHandle />
-            <Pagination page={page} pageTotal={pageTotal} onChange={setPage} />
+            <Pagination page={page} total={total} pageSize={10} onChange={setPage} />
           </div>
         </div>
         <div className="w-[250px]" style={{ paddingTop: 31 }}>

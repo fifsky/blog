@@ -60,7 +60,7 @@ export type CateListItem = {
   updated_at: string;
   num: number;
 };
-export type CateListResponse = { list: CateListItem[]; page_total: number };
+export type CateListResponse = { list: CateListItem[]; total: number };
 export type CateCreateRequest = { name: string; domain: string; desc?: string };
 export type CateUpdateRequest = {
   id: number;
@@ -94,7 +94,7 @@ export type ArticleListRequest = {
   page?: number;
   type?: number;
 };
-export type ArticleListResponse = { list: ArticleItem[]; page_total: number };
+export type ArticleListResponse = { list: ArticleItem[]; total: number };
 export type ArticleCreateRequest = {
   cate_id: number;
   type: number;
@@ -121,7 +121,7 @@ export type AdminArticleListRequest = {
 
 export type AdminArticleListResponse = {
   list: ArticleItem[];
-  page_total: number;
+  total: number;
 };
 
 export type PrevNextItem = { id: number; title: string };
@@ -133,7 +133,7 @@ export type MoodItem = {
   user: UserSummary;
   created_at: string;
 };
-export type MoodListResponse = { list: MoodItem[]; page_total: number };
+export type MoodListResponse = { list: MoodItem[]; total: number };
 export type MoodCreateRequest = { content: string };
 export type MoodUpdateRequest = { id: number; content?: string };
 
@@ -147,7 +147,7 @@ export type CommentItem = {
   type: number;
   url?: string;
 };
-export type CommentListResponse = { list: CommentItem[]; page_total: number };
+export type CommentListResponse = { list: CommentItem[]; total: number };
 
 // 缺失的类型定义
 export type ArticleDetailRequest = { id?: number; url?: string };
@@ -159,7 +159,7 @@ export type LinkItem = {
   desc?: string;
   created_at: string;
 };
-export type LinkListResponse = { list: LinkItem[]; page_total: number };
+export type LinkListResponse = { list: LinkItem[]; total: number };
 export type PrevNextRequest = { id: number };
 export type RemindItem = {
   id: number;
@@ -174,7 +174,7 @@ export type RemindItem = {
   next_time: string;
   created_at: string;
 };
-export type RemindListResponse = { list: RemindItem[]; page_total: number };
+export type RemindListResponse = { list: RemindItem[]; total: number };
 export type Status = {
   code: number;
   message: string;
@@ -188,7 +188,7 @@ export type UserCreateRequest = {
   email?: string;
   type: number;
 };
-export type UserListResponse = { list: UserItem[]; page_total: number };
+export type UserListResponse = { list: UserItem[]; total: number };
 
 export type RemindChangeRequest = { token: string };
 export type RemindDelayRequest = { token: string };

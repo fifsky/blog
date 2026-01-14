@@ -263,7 +263,7 @@ func (x *ArticleListRequest) GetStatus() int32 {
 type ArticleListResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	List          []*ArticleItem         `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	PageTotal     int32                  `protobuf:"varint,2,opt,name=page_total,json=pageTotal,proto3" json:"page_total,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -305,9 +305,9 @@ func (x *ArticleListResponse) GetList() []*ArticleItem {
 	return nil
 }
 
-func (x *ArticleListResponse) GetPageTotal() int32 {
+func (x *ArticleListResponse) GetTotal() int32 {
 	if x != nil {
-		return x.PageTotal
+		return x.Total
 	}
 	return 0
 }
@@ -470,11 +470,10 @@ const file_admin_v1_article_proto_rawDesc = "" +
 	"\x12ArticleListRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\x05R\x04type\x12\x16\n" +
-	"\x06status\x18\x03 \x01(\x05R\x06status\"k\n" +
+	"\x06status\x18\x03 \x01(\x05R\x06status\"b\n" +
 	"\x13ArticleListResponse\x125\n" +
-	"\x04list\x18\x01 \x03(\v2!.fifsky.blog.admin.v1.ArticleItemR\x04list\x12\x1d\n" +
-	"\n" +
-	"page_total\x18\x02 \x01(\x05R\tpageTotal\"\xe9\x02\n" +
+	"\x04list\x18\x01 \x03(\v2!.fifsky.blog.admin.v1.ArticleItemR\x04list\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"\xe9\x02\n" +
 	"\vArticleItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x17\n" +
 	"\acate_id\x18\x02 \x01(\x05R\x06cateId\x12\x12\n" +

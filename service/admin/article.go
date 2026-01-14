@@ -177,8 +177,8 @@ func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*a
 		return nil, err
 	}
 	return &adminv1.ArticleListResponse{
-		List:      items,
-		PageTotal: int32(totalPages(total, num)),
+		List:  items,
+		Total: int32(total),
 	}, nil
 }
 

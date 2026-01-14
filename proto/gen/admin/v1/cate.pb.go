@@ -119,7 +119,7 @@ func (x *CateListItem) GetNum() int32 {
 type CateListResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	List          []*CateListItem        `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	PageTotal     int32                  `protobuf:"varint,2,opt,name=page_total,json=pageTotal,proto3" json:"page_total,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -161,9 +161,9 @@ func (x *CateListResponse) GetList() []*CateListItem {
 	return nil
 }
 
-func (x *CateListResponse) GetPageTotal() int32 {
+func (x *CateListResponse) GetTotal() int32 {
 	if x != nil {
-		return x.PageTotal
+		return x.Total
 	}
 	return 0
 }
@@ -310,11 +310,10 @@ const file_admin_v1_cate_proto_rawDesc = "" +
 	"created_at\x18\x05 \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
 	"updated_at\x18\x06 \x01(\tR\tupdatedAt\x12\x10\n" +
-	"\x03num\x18\a \x01(\x05R\x03num\"i\n" +
+	"\x03num\x18\a \x01(\x05R\x03num\"`\n" +
 	"\x10CateListResponse\x126\n" +
-	"\x04list\x18\x01 \x03(\v2\".fifsky.blog.admin.v1.CateListItemR\x04list\x12\x1d\n" +
-	"\n" +
-	"page_total\x18\x02 \x01(\x05R\tpageTotal\"i\n" +
+	"\x04list\x18\x01 \x03(\v2\".fifsky.blog.admin.v1.CateListItemR\x04list\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"i\n" +
 	"\x11CateCreateRequest\x12\x1d\n" +
 	"\x04name\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x04name\x12\x12\n" +
 	"\x04desc\x18\x02 \x01(\tR\x04desc\x12!\n" +

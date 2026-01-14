@@ -48,7 +48,7 @@ func (m *Mood) List(ctx context.Context, req *apiv1.PageRequest) (*apiv1.MoodLis
 		return nil, err
 	}
 	return &apiv1.MoodListResponse{
-		List:      items,
-		PageTotal: int32(totalPages(total, num)),
+		List:  items,
+		Total: int32(total),
 	}, nil
 }

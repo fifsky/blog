@@ -431,7 +431,7 @@ func (x *UserItem) GetUpdatedAt() string {
 type UserListResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	List          []*UserItem            `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	PageTotal     int32                  `protobuf:"varint,2,opt,name=page_total,json=pageTotal,proto3" json:"page_total,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -473,9 +473,9 @@ func (x *UserListResponse) GetList() []*UserItem {
 	return nil
 }
 
-func (x *UserListResponse) GetPageTotal() int32 {
+func (x *UserListResponse) GetTotal() int32 {
 	if x != nil {
-		return x.PageTotal
+		return x.Total
 	}
 	return 0
 }
@@ -524,11 +524,10 @@ const file_admin_v1_user_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\a \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\b \x01(\tR\tupdatedAt\"e\n" +
+	"updated_at\x18\b \x01(\tR\tupdatedAt\"\\\n" +
 	"\x10UserListResponse\x122\n" +
-	"\x04list\x18\x01 \x03(\v2\x1e.fifsky.blog.admin.v1.UserItemR\x04list\x12\x1d\n" +
-	"\n" +
-	"page_total\x18\x02 \x01(\x05R\tpageTotal2\xa2\x05\n" +
+	"\x04list\x18\x01 \x03(\v2\x1e.fifsky.blog.admin.v1.UserItemR\x04list\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total2\xa2\x05\n" +
 	"\vUserService\x12g\n" +
 	"\x03Get\x12$.fifsky.blog.admin.v1.GetUserRequest\x1a\x1a.fifsky.blog.admin.v1.User\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/admin/user/get\x12v\n" +
 	"\x06Create\x12'.fifsky.blog.admin.v1.UserCreateRequest\x1a .fifsky.blog.admin.v1.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/user/create\x12v\n" +

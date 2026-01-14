@@ -199,7 +199,7 @@ func (x *LinkItem) GetCreatedAt() string {
 type LinkListResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	List          []*LinkItem            `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	PageTotal     int32                  `protobuf:"varint,2,opt,name=page_total,json=pageTotal,proto3" json:"page_total,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -241,9 +241,9 @@ func (x *LinkListResponse) GetList() []*LinkItem {
 	return nil
 }
 
-func (x *LinkListResponse) GetPageTotal() int32 {
+func (x *LinkListResponse) GetTotal() int32 {
 	if x != nil {
-		return x.PageTotal
+		return x.Total
 	}
 	return 0
 }
@@ -264,11 +264,10 @@ const file_api_v1_link_proto_rawDesc = "" +
 	"\x03url\x18\x03 \x01(\tR\x03url\x12\x12\n" +
 	"\x04desc\x18\x04 \x01(\tR\x04desc\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\tR\tcreatedAt\"c\n" +
+	"created_at\x18\x05 \x01(\tR\tcreatedAt\"Z\n" +
 	"\x10LinkListResponse\x120\n" +
-	"\x04list\x18\x01 \x03(\v2\x1c.fifsky.blog.api.v1.LinkItemR\x04list\x12\x1d\n" +
-	"\n" +
-	"page_total\x18\x02 \x01(\x05R\tpageTotal2l\n" +
+	"\x04list\x18\x01 \x03(\v2\x1c.fifsky.blog.api.v1.LinkItemR\x04list\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total2l\n" +
 	"\vLinkService\x12]\n" +
 	"\x03All\x12\x16.google.protobuf.Empty\x1a$.fifsky.blog.api.v1.LinkMenuResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/link/allB\xaa\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\tLinkProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"

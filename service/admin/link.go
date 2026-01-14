@@ -7,6 +7,7 @@ import (
 	"app/model"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/store"
+
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -37,8 +38,8 @@ func (l *Link) List(ctx context.Context, _ *emptypb.Empty) (*adminv1.LinkListRes
 		})
 	}
 	return &adminv1.LinkListResponse{
-		List:      items,
-		PageTotal: int32(len(items)),
+		List:  items,
+		Total: int32(len(items)),
 	}, nil
 }
 

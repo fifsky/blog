@@ -1055,7 +1055,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/ArticleItem'
-                pageTotal:
+                total:
                     type: integer
                     format: int32
         ArticleUpdateRequest:
@@ -1119,7 +1119,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/CateListItem'
-                pageTotal:
+                total:
                     type: integer
                     format: int32
         CateMenuItem:
@@ -1233,7 +1233,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/LinkItem'
-                pageTotal:
+                total:
                     type: integer
                     format: int32
         LinkMenuItem:
@@ -1330,7 +1330,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/MoodItem'
-                pageTotal:
+                total:
                     type: integer
                     format: int32
         MoodUpdateRequest:
@@ -1444,7 +1444,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/RemindItem'
-                pageTotal:
+                total:
                     type: integer
                     format: int32
         RemindUpdateRequest:
@@ -1566,7 +1566,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/UserItem'
-                pageTotal:
+                total:
                     type: integer
                     format: int32
         UserSummary:
