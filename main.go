@@ -8,10 +8,10 @@ import (
 
 	"app/cmd"
 	"app/config"
-	"app/pkg/httputil"
 	"app/pkg/wechat"
 	"app/remind"
 	"app/store"
+	"github.com/goapt/httpx"
 	"github.com/goapt/logger"
 
 	"github.com/urfave/cli/v3"
@@ -31,7 +31,7 @@ func main() {
 	}))
 
 	// httpClient
-	httpClient := httputil.NewClient(httputil.WithMiddleware(httputil.AccessLog(logger.Default())))
+	httpClient := httpx.NewClient(httpx.WithMiddleware(httpx.AccessLog(logger.Default())))
 
 	robot := wechat.NewRobot(conf.Common.RobotToken)
 	// crontab setup

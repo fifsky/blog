@@ -2,7 +2,6 @@ package service
 
 import (
 	"app/config"
-	"app/pkg/httputil"
 	apiv1 "app/proto/gen/api/v1"
 	"context"
 	"crypto/sha1"
@@ -12,6 +11,8 @@ import (
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/goapt/httpx"
 )
 
 // TestVerifyWeixinSignature 验证签名校验流程是否符合微信官方要求
@@ -39,11 +40,11 @@ func TestVerifyWeixinSignature(t *testing.T) {
 	}
 }
 
-func newTestHttpClient(isMock bool, suites []httputil.MockSuite) *http.Client {
+func newTestHttpClient(isMock bool, suites []httpx.MockSuite) *http.Client {
 	if isMock {
-		return httputil.NewClient(httputil.WithMiddleware(httputil.Debug(), httputil.Mock(suites)))
+		return httpx.NewClient(httpx.WithMiddleware(httpx.Debug(), httpx.Mock(suites)))
 	}
-	return httputil.NewClient(httputil.WithMiddleware(httputil.Debug()))
+	return httpx.NewClient(httpx.WithMiddleware(httpx.Debug()))
 }
 
 func TestWeixin_getAccessToken(t *testing.T) {
@@ -51,7 +52,7 @@ func TestWeixin_getAccessToken(t *testing.T) {
 	conf.Weixin.Appid = os.Getenv("WEIXIN_APPID")
 	conf.Weixin.AppSecret = os.Getenv("WEIXIN_APPSECRET")
 	conf.Weixin.Token = os.Getenv("WEIXIN_TOKEN")
-	s := NewWeixin(nil, conf, newTestHttpClient(true, []httputil.MockSuite{
+	s := NewWeixin(nil, conf, newTestHttpClient(true, []httpx.MockSuite{
 		{
 			URI:          "/cgi-bin/stable_token",
 			ResponseBody: `{"access_token":"mock_access_token","expires_in":7200}`,
@@ -75,7 +76,7 @@ func TestWeixin_Message(t *testing.T) {
 	conf.Weixin.Appid = os.Getenv("WEIXIN_APPID")
 	conf.Weixin.AppSecret = os.Getenv("WEIXIN_APPSECRET")
 	conf.Weixin.Token = os.Getenv("WEIXIN_TOKEN")
-	s := NewWeixin(nil, conf, newTestHttpClient(true, []httputil.MockSuite{
+	s := NewWeixin(nil, conf, newTestHttpClient(true, []httpx.MockSuite{
 		{
 			URI:          "/cgi-bin/stable_token",
 			ResponseBody: `{"access_token":"mock_access_token","expires_in":7200}`,
