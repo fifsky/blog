@@ -3,9 +3,26 @@ interface BatchHandleProps {
   totalCount?: number;
   onSelectAll?: () => void;
   onInverseSelected?: () => void;
+  onBatchOperation?: (operation: string) => void;
+  disabled?: boolean;
 }
 
-export function BatchHandle({ selectedCount = 0, totalCount = 0, onSelectAll, onInverseSelected }: BatchHandleProps) {
+export function BatchHandle({
+  selectedCount = 0,
+  totalCount = 0,
+  onSelectAll,
+  onInverseSelected,
+  onBatchOperation,
+  disabled = false,
+}: BatchHandleProps) {
+  const handleOperationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (value && onBatchOperation) {
+      onBatchOperation(value);
+      e.target.value = ""; // 重置选择
+    }
+  };
+
   return (
     <div className="flex items-center gap-2">
       <a
@@ -36,10 +53,13 @@ export function BatchHandle({ selectedCount = 0, totalCount = 0, onSelectAll, on
         </span>
       )}
       &nbsp;&nbsp;
-      <select name="batch_operation">
-        <option value="" defaultChecked>
-          批量操作
-        </option>
+      <select
+        name="batch_operation"
+        onChange={handleOperationChange}
+        disabled={disabled || selectedCount === 0}
+        defaultValue=""
+      >
+        <option value="">批量操作</option>
         <option value="1">置顶</option>
         <option value="2">删除</option>
       </select>

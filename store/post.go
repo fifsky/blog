@@ -218,8 +218,13 @@ func (s *Store) UpdatePost(ctx context.Context, p *model.UpdatePost) error {
 	return err
 }
 
-func (s *Store) SoftDeletePost(ctx context.Context, id int) error {
-	_, err := s.db.ExecContext(ctx, "update posts set status = 2 where id = ?", id)
+func (s *Store) SoftDeletePost(ctx context.Context, ids []int) error {
+	if len(ids) == 0 {
+		return nil
+	}
+	placeholders, args := In(ids)
+	query := "update posts set status = 2 where id in (" + placeholders + ")"
+	_, err := s.db.ExecContext(ctx, query, args...)
 	return err
 }
 

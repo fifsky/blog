@@ -94,7 +94,19 @@ func (a *Article) Update(ctx context.Context, req *adminv1.ArticleUpdateRequest)
 }
 
 func (a *Article) Delete(ctx context.Context, req *adminv1.IDRequest) (*emptypb.Empty, error) {
-	if err := a.store.SoftDeletePost(ctx, int(req.Id)); err != nil {
+	ids := make([]int, 0)
+	if req.Id > 0 {
+		ids = append(ids, int(req.Id))
+	}
+	for _, id := range req.Ids {
+		if id > 0 {
+			ids = append(ids, int(id))
+		}
+	}
+	if len(ids) == 0 {
+		return &emptypb.Empty{}, nil
+	}
+	if err := a.store.SoftDeletePost(ctx, ids); err != nil {
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil

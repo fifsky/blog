@@ -7,6 +7,10 @@ VETPACKAGES ?= $(shell $(GO) list ./... | grep -v /vendor/ | grep -v /examples/)
 build: fmt-check
 	$(GO) build -o app
 
+.PHONY: run
+run: build
+	./app http --addr=:8080
+
 .PHONY: generate
 generate:
 	$(GO) generate

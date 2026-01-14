@@ -26,6 +26,7 @@ const (
 type IDRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Ids           []int32                `protobuf:"varint,2,rep,packed,name=ids,proto3" json:"ids,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -65,6 +66,13 @@ func (x *IDRequest) GetId() int32 {
 		return x.Id
 	}
 	return 0
+}
+
+func (x *IDRequest) GetIds() []int32 {
+	if x != nil {
+		return x.Ids
+	}
+	return nil
 }
 
 type IDResponse struct {
@@ -323,10 +331,10 @@ var File_admin_v1_common_proto protoreflect.FileDescriptor
 
 const file_admin_v1_common_proto_rawDesc = "" +
 	"\n" +
-	"\x15admin/v1/common.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/api/field_behavior.proto\"'\n" +
-	"\tIDRequest\x12\x1a\n" +
-	"\x02id\x18\x01 \x01(\x05B\n" +
-	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"\x1c\n" +
+	"\x15admin/v1/common.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/api/field_behavior.proto\"-\n" +
+	"\tIDRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x10\n" +
+	"\x03ids\x18\x02 \x03(\x05R\x03ids\"\x1c\n" +
 	"\n" +
 	"IDResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\"*\n" +

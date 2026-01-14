@@ -1,4 +1,4 @@
-export type IDRequest = { id: number };
+export type IDRequest = { id?: number; ids?: number[] };
 export type IDResponse = { id: number };
 
 export type LoginRequest = { user_name: string; password: string };

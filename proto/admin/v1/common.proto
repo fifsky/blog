@@ -7,10 +7,8 @@ import "google/api/field_behavior.proto";
 option go_package = "gen/admin/v1";
 
 message IDRequest {
-  int32 id = 1 [
-    (buf.validate.field).int32.gt = 0,
-    (google.api.field_behavior) = REQUIRED
-  ];
+  int32 id = 1;
+  repeated int32 ids = 2;
 }
 
 message IDResponse {

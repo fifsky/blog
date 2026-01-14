@@ -31,6 +31,7 @@ export default function AdminArticle() {
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [statusFilter, setStatusFilter] = useState<number | undefined>(undefined);
+  const [batchLoading, setBatchLoading] = useState(false);
 
   const loadList = async () => {
     const ret = await articleListAdminApi({ page, type: 1, status: statusFilter });
@@ -47,6 +48,32 @@ export default function AdminArticle() {
     if (confirm("确认要恢复为草稿？")) {
       await articleRestoreApi({ id });
       loadList();
+    }
+  };
+
+  // 批量删除
+  const batchDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`确认要删除选中的 ${selectedIds.size} 篇文章？`)) return;
+
+    setBatchLoading(true);
+    try {
+      await articleDeleteApi({ ids: Array.from(selectedIds) });
+      setSelectedIds(new Set());
+      await loadList();
+    } finally {
+      setBatchLoading(false);
+    }
+  };
+
+  // 批量操作处理
+  const handleBatchOperation = (operation: string) => {
+    if (operation === "2") {
+      // 删除
+      batchDelete();
+    } else if (operation === "1") {
+      // 置顶 - 暂未实现
+      alert("置顶功能暂未实现");
     }
   };
 
@@ -214,6 +241,8 @@ export default function AdminArticle() {
           totalCount={list.length}
           onSelectAll={handleSelectAll}
           onInverseSelected={handleInverseSelected}
+          onBatchOperation={handleBatchOperation}
+          disabled={batchLoading}
         />
         <Select
           value={statusFilter?.toString() || "all"}
@@ -240,6 +269,8 @@ export default function AdminArticle() {
           totalCount={list.length}
           onSelectAll={handleSelectAll}
           onInverseSelected={handleInverseSelected}
+          onBatchOperation={handleBatchOperation}
+          disabled={batchLoading}
         />
         <Pagination page={page} pageTotal={pageTotal} onChange={setPage} />
       </div>
