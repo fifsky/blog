@@ -41,6 +41,10 @@ func NewArticle(s *store.Store, conf *config.Config) *Article {
 func (a *Article) Create(ctx context.Context, req *adminv1.ArticleCreateRequest) (*adminv1.IDResponse, error) {
 	loginUser := GetLoginUser(ctx)
 	now := time.Now()
+	status := int32(1)
+	if req.Status > 0 {
+		status = req.Status
+	}
 	c := &model.Post{
 		CateId:    int(req.CateId),
 		Type:      int(req.Type),
@@ -48,7 +52,7 @@ func (a *Article) Create(ctx context.Context, req *adminv1.ArticleCreateRequest)
 		Title:     req.Title,
 		Url:       req.Url,
 		Content:   req.Content,
-		Status:    1,
+		Status:    int(status),
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
@@ -94,6 +98,68 @@ func (a *Article) Delete(ctx context.Context, req *adminv1.IDRequest) (*emptypb.
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil
+}
+
+func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*adminv1.ArticleListResponse, error) {
+	page := 1
+	if req.Page > 0 {
+		page = int(req.Page)
+	}
+	num := 20
+	posts, err := a.store.ListPostForAdmin(ctx, &model.Post{
+		Type:   int(req.Type),
+		Status: int(req.Status),
+	}, page, num)
+	if err != nil {
+		return nil, err
+	}
+	items := make([]*adminv1.ArticleItem, 0, len(posts))
+	uids := make([]int, 0, len(posts))
+	cids := make([]int, 0, len(posts))
+	for _, p := range posts {
+		uids = append(uids, p.UserId)
+		cids = append(cids, p.CateId)
+	}
+	um, err := a.store.GetUserByIds(ctx, uids)
+	if err != nil {
+		return nil, err
+	}
+	cm, err := a.store.GetCatesByIds(ctx, cids)
+	if err != nil {
+		return nil, err
+	}
+	for _, p := range posts {
+		item := &adminv1.ArticleItem{
+			Id:        int32(p.Id),
+			CateId:    int32(p.CateId),
+			Type:      int32(p.Type),
+			UserId:    int32(p.UserId),
+			Title:     p.Title,
+			Url:       p.Url,
+			Content:   p.Content,
+			Status:    int32(p.Status),
+			CreatedAt: p.CreatedAt.Format(time.DateTime),
+			UpdatedAt: p.UpdatedAt.Format(time.DateTime),
+		}
+		if u, ok := um[p.UserId]; ok {
+			item.User = &adminv1.UserSummary{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}
+		}
+		if c, ok := cm[p.CateId]; ok {
+			item.Cate = &adminv1.CateSummary{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}
+		}
+		items = append(items, item)
+	}
+	total, err := a.store.CountPostsForAdmin(ctx, &model.Post{
+		Type:   int(req.Type),
+		Status: int(req.Status),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &adminv1.ArticleListResponse{
+		List:      items,
+		PageTotal: int32(totalPages(total, num)),
+	}, nil
 }
 
 // Upload 上传接口（仅管理员）

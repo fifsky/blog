@@ -20,3 +20,13 @@ func GetLoginUser(ctx context.Context) *model.User {
 	}
 	return u.(*model.User)
 }
+
+func totalPages(total, pagingNum int) int {
+	if total == 0 {
+		return 1
+	}
+	if total%pagingNum == 0 {
+		return total / pagingNum
+	}
+	return total/pagingNum + 1
+}

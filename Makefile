@@ -59,7 +59,7 @@ lint:
 
 .PHONY: buildui
 buildui:
-	cd web && npm run build
+	cd web && pnpm run build
 
 .PHONY: upload
 upload:
@@ -69,7 +69,3 @@ dockerui: buildui upload
 	docker login --username=${ALIYUN_DOCKER_USERNAME} --password=${ALIYUN_DOCKER_PASSWORD} registry.cn-shanghai.aliyuncs.com
 	cd web && docker build . --file Dockerfile --tag registry.cn-shanghai.aliyuncs.com/fifsky/blog-web
 	docker push registry.cn-shanghai.aliyuncs.com/fifsky/blog-web
-
-.PHONY: shadui
-shadui:
-	cd web && pnpm dlx shadcn@latest create --preset "https://ui.shadcn.com/init?base=radix&style=nova&baseColor=neutral&theme=indigo&iconLibrary=lucide&font=inter&menuAccent=subtle&menuColor=default&radius=none&template=vite" --template vite

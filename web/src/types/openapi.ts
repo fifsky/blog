@@ -97,6 +97,7 @@ export type ArticleCreateRequest = {
   title: string;
   url?: string;
   content: string;
+  status?: number;
 };
 export type ArticleUpdateRequest = {
   id: number;
@@ -106,6 +107,17 @@ export type ArticleUpdateRequest = {
   url?: string;
   content?: string;
   status?: number;
+};
+
+export type AdminArticleListRequest = {
+  page?: number;
+  type?: number;
+  status?: number;
+};
+
+export type AdminArticleListResponse = {
+  list: ArticleItem[];
+  page_total: number;
 };
 
 export type PrevNextItem = { id: number; title: string };

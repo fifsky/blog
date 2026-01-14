@@ -12,7 +12,7 @@ CREATE TABLE `cates` (
                          `updated_at` datetime NOT NULL,
                          PRIMARY KEY (`id`),
                          UNIQUE KEY `un_domain` (`domain`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 # Dump of table links
 # ------------------------------------------------------------
@@ -26,7 +26,7 @@ CREATE TABLE `links` (
                          `desc` varchar(255) NOT NULL DEFAULT '',
                          `created_at` datetime NOT NULL,
                          PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 # Dump of table moods
 # ------------------------------------------------------------
@@ -39,7 +39,7 @@ CREATE TABLE `moods` (
                          `user_id` int(10) unsigned NOT NULL,
                          `created_at` datetime NOT NULL,
                          PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 # Dump of table options
 # ------------------------------------------------------------
@@ -51,8 +51,8 @@ CREATE TABLE `options` (
                            `option_key` varchar(100) NOT NULL DEFAULT '',
                            `option_value` varchar(200) NOT NULL DEFAULT '',
                            PRIMARY KEY (`id`),
-                           UNIQUE KEY `option_name` (`option_key`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+                           UNIQUE KEY `un_option_key` (`option_key`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 # Dump of table posts
 # ------------------------------------------------------------
@@ -60,23 +60,23 @@ CREATE TABLE `options` (
 DROP TABLE IF EXISTS `posts`;
 
 CREATE TABLE `posts` (
-                         `id` int unsigned NOT NULL AUTO_INCREMENT,
-                         `cate_id` int unsigned NOT NULL DEFAULT '1',
-                         `type` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '1:文章,2:页面',
-                         `user_id` int unsigned NOT NULL,
-                         `title` varchar(200) NOT NULL DEFAULT '',
-                         `url` varchar(100) NOT NULL DEFAULT '' COMMENT '页面缩略名',
-                         `content` longtext NOT NULL,
-                         `view_num` int NOT NULL DEFAULT '1',
-                         `created_at` datetime NOT NULL COMMENT '创建时间',
-                         `updated_at` datetime NOT NULL COMMENT '更新时间',
-                         `status` int NOT NULL DEFAULT '1' COMMENT '状态',
-                         PRIMARY KEY (`id`),
-                         KEY `post_author` (`user_id`),
-                         KEY `type_status_date` (`id`,`type`),
-                         KEY `post_name` (`url`) USING BTREE,
-                         KEY `post_title` (`title`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'PK',
+  `cate_id` int unsigned NOT NULL DEFAULT '1' COMMENT '文章分类ID',
+  `type` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '1:文章,2:页面',
+  `user_id` int unsigned NOT NULL COMMENT '文章作者ID',
+  `title` varchar(200) NOT NULL DEFAULT '' COMMENT '文章标题',
+  `url` varchar(100) NOT NULL DEFAULT '' COMMENT '页面缩略名',
+  `content` longtext NOT NULL COMMENT '文章内容',
+  `view_num` int NOT NULL DEFAULT '1' COMMENT '浏览次数',
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态，1正常 2删除 3草稿',
+  `created_at` datetime NOT NULL COMMENT '创建时间',
+  `updated_at` datetime NOT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_user` (`user_id`),
+  KEY `idx_url` (`url`),
+  KEY `idx_created_at` (`created_at`),
+  KEY `idx_updated_at` (`updated_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 # Dump of table comments
 # ------------------------------------------------------------
@@ -91,7 +91,7 @@ CREATE TABLE `comments` (
                             `ip` varchar(100) NOT NULL DEFAULT '' COMMENT 'IP',
                             `created_at` datetime NOT NULL COMMENT '评论时间',
                             PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 # Dump of table users
 # ------------------------------------------------------------
@@ -100,19 +100,18 @@ DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
                          `id` int unsigned NOT NULL AUTO_INCREMENT,
-                         `name` varchar(100) NOT NULL DEFAULT '',
-                         `password` varchar(100) NOT NULL DEFAULT '',
-                         `nick_name` varchar(100) NOT NULL DEFAULT '',
-                         `email` varchar(100) NOT NULL DEFAULT '',
+                         `name` varchar(100) NOT NULL DEFAULT '用户名',
+                         `password` varchar(100) NOT NULL DEFAULT '密码',
+                         `nick_name` varchar(100) NOT NULL DEFAULT '昵称',
+                         `email` varchar(100) NOT NULL DEFAULT '邮箱',
                          `status` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '1正常，2删除',
                          `type` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '1:管理员,2:编辑',
                          `created_at` datetime NOT NULL,
                          `updated_at` datetime NOT NULL,
                          PRIMARY KEY (`id`),
                          UNIQUE KEY `un_user_name` (`name`),
-                         UNIQUE KEY `uix_users_email` (`email`),
-                         UNIQUE KEY `uix_users_name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+                         UNIQUE KEY `un_users_email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 # Dump of table reminds
 # ------------------------------------------------------------
@@ -132,4 +131,4 @@ CREATE TABLE `reminds` (
                            `status` int NOT NULL DEFAULT '1',
                            `next_time` datetime NOT NULL COMMENT '下次提醒时间',
                            PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

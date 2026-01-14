@@ -31,6 +31,7 @@ type ArticleCreateRequest struct {
 	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
 	Url           string                 `protobuf:"bytes,4,opt,name=url,proto3" json:"url,omitempty"`
 	Content       string                 `protobuf:"bytes,5,opt,name=content,proto3" json:"content,omitempty"`
+	Status        int32                  `protobuf:"varint,6,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -98,6 +99,13 @@ func (x *ArticleCreateRequest) GetContent() string {
 		return x.Content
 	}
 	return ""
+}
+
+func (x *ArticleCreateRequest) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
 }
 
 type ArticleUpdateRequest struct {
@@ -192,11 +200,255 @@ func (x *ArticleUpdateRequest) GetStatus() int32 {
 	return 0
 }
 
+type ArticleListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	Type          int32                  `protobuf:"varint,2,opt,name=type,proto3" json:"type,omitempty"`
+	Status        int32                  `protobuf:"varint,3,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ArticleListRequest) Reset() {
+	*x = ArticleListRequest{}
+	mi := &file_admin_v1_article_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ArticleListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ArticleListRequest) ProtoMessage() {}
+
+func (x *ArticleListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_article_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ArticleListRequest.ProtoReflect.Descriptor instead.
+func (*ArticleListRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_article_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ArticleListRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *ArticleListRequest) GetType() int32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+func (x *ArticleListRequest) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+type ArticleListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	List          []*ArticleItem         `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
+	PageTotal     int32                  `protobuf:"varint,2,opt,name=page_total,json=pageTotal,proto3" json:"page_total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ArticleListResponse) Reset() {
+	*x = ArticleListResponse{}
+	mi := &file_admin_v1_article_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ArticleListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ArticleListResponse) ProtoMessage() {}
+
+func (x *ArticleListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_article_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ArticleListResponse.ProtoReflect.Descriptor instead.
+func (*ArticleListResponse) Descriptor() ([]byte, []int) {
+	return file_admin_v1_article_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *ArticleListResponse) GetList() []*ArticleItem {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+func (x *ArticleListResponse) GetPageTotal() int32 {
+	if x != nil {
+		return x.PageTotal
+	}
+	return 0
+}
+
+type ArticleItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	CateId        int32                  `protobuf:"varint,2,opt,name=cate_id,json=cateId,proto3" json:"cate_id,omitempty"`
+	Type          int32                  `protobuf:"varint,3,opt,name=type,proto3" json:"type,omitempty"`
+	UserId        int32                  `protobuf:"varint,4,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Title         string                 `protobuf:"bytes,5,opt,name=title,proto3" json:"title,omitempty"`
+	Url           string                 `protobuf:"bytes,6,opt,name=url,proto3" json:"url,omitempty"`
+	Content       string                 `protobuf:"bytes,7,opt,name=content,proto3" json:"content,omitempty"`
+	Status        int32                  `protobuf:"varint,8,opt,name=status,proto3" json:"status,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	User          *UserSummary           `protobuf:"bytes,11,opt,name=user,proto3" json:"user,omitempty"`
+	Cate          *CateSummary           `protobuf:"bytes,12,opt,name=cate,proto3" json:"cate,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ArticleItem) Reset() {
+	*x = ArticleItem{}
+	mi := &file_admin_v1_article_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ArticleItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ArticleItem) ProtoMessage() {}
+
+func (x *ArticleItem) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_article_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ArticleItem.ProtoReflect.Descriptor instead.
+func (*ArticleItem) Descriptor() ([]byte, []int) {
+	return file_admin_v1_article_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ArticleItem) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *ArticleItem) GetCateId() int32 {
+	if x != nil {
+		return x.CateId
+	}
+	return 0
+}
+
+func (x *ArticleItem) GetType() int32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+func (x *ArticleItem) GetUserId() int32 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *ArticleItem) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *ArticleItem) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *ArticleItem) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *ArticleItem) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *ArticleItem) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *ArticleItem) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+func (x *ArticleItem) GetUser() *UserSummary {
+	if x != nil {
+		return x.User
+	}
+	return nil
+}
+
+func (x *ArticleItem) GetCate() *CateSummary {
+	if x != nil {
+		return x.Cate
+	}
+	return nil
+}
+
 var File_admin_v1_article_proto protoreflect.FileDescriptor
 
 const file_admin_v1_article_proto_rawDesc = "" +
 	"\n" +
-	"\x16admin/v1/article.proto\x12\x14fifsky.blog.admin.v1\x1a\x15admin/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xb3\x01\n" +
+	"\x16admin/v1/article.proto\x12\x14fifsky.blog.admin.v1\x1a\x15admin/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xcb\x01\n" +
 	"\x14ArticleCreateRequest\x12#\n" +
 	"\acate_id\x18\x01 \x01(\x05B\n" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x06cateId\x12\x1e\n" +
@@ -204,7 +456,8 @@ const file_admin_v1_article_proto_rawDesc = "" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x04type\x12\x1f\n" +
 	"\x05title\x18\x03 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x05title\x12\x10\n" +
 	"\x03url\x18\x04 \x01(\tR\x03url\x12#\n" +
-	"\acontent\x18\x05 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\acontent\"\xb9\x01\n" +
+	"\acontent\x18\x05 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\acontent\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\x05R\x06status\"\xb9\x01\n" +
 	"\x14ArticleUpdateRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\x12\x17\n" +
@@ -213,11 +466,36 @@ const file_admin_v1_article_proto_rawDesc = "" +
 	"\x05title\x18\x04 \x01(\tR\x05title\x12\x10\n" +
 	"\x03url\x18\x05 \x01(\tR\x03url\x12\x18\n" +
 	"\acontent\x18\x06 \x01(\tR\acontent\x12\x16\n" +
-	"\x06status\x18\a \x01(\x05R\x06status2\xf5\x02\n" +
+	"\x06status\x18\a \x01(\x05R\x06status\"T\n" +
+	"\x12ArticleListRequest\x12\x12\n" +
+	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x12\n" +
+	"\x04type\x18\x02 \x01(\x05R\x04type\x12\x16\n" +
+	"\x06status\x18\x03 \x01(\x05R\x06status\"k\n" +
+	"\x13ArticleListResponse\x125\n" +
+	"\x04list\x18\x01 \x03(\v2!.fifsky.blog.admin.v1.ArticleItemR\x04list\x12\x1d\n" +
+	"\n" +
+	"page_total\x18\x02 \x01(\x05R\tpageTotal\"\xe9\x02\n" +
+	"\vArticleItem\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x17\n" +
+	"\acate_id\x18\x02 \x01(\x05R\x06cateId\x12\x12\n" +
+	"\x04type\x18\x03 \x01(\x05R\x04type\x12\x17\n" +
+	"\auser_id\x18\x04 \x01(\x05R\x06userId\x12\x14\n" +
+	"\x05title\x18\x05 \x01(\tR\x05title\x12\x10\n" +
+	"\x03url\x18\x06 \x01(\tR\x03url\x12\x18\n" +
+	"\acontent\x18\a \x01(\tR\acontent\x12\x16\n" +
+	"\x06status\x18\b \x01(\x05R\x06status\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\t \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\n" +
+	" \x01(\tR\tupdatedAt\x125\n" +
+	"\x04user\x18\v \x01(\v2!.fifsky.blog.admin.v1.UserSummaryR\x04user\x125\n" +
+	"\x04cate\x18\f \x01(\v2!.fifsky.blog.admin.v1.CateSummaryR\x04cate2\xf6\x03\n" +
 	"\x0eArticleService\x12|\n" +
 	"\x06Create\x12*.fifsky.blog.admin.v1.ArticleCreateRequest\x1a .fifsky.blog.admin.v1.IDResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/article/create\x12|\n" +
 	"\x06Update\x12*.fifsky.blog.admin.v1.ArticleUpdateRequest\x1a .fifsky.blog.admin.v1.IDResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/article/update\x12g\n" +
-	"\x06Delete\x12\x1f.fifsky.blog.admin.v1.IDRequest\x1a\x16.google.protobuf.Empty\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/article/deleteB\xbb\x01\n" +
+	"\x06Delete\x12\x1f.fifsky.blog.admin.v1.IDRequest\x1a\x16.google.protobuf.Empty\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/article/delete\x12\x7f\n" +
+	"\x04List\x12(.fifsky.blog.admin.v1.ArticleListRequest\x1a).fifsky.blog.admin.v1.ArticleListResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/api/admin/article/listB\xbb\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\fArticleProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var (
@@ -232,26 +510,36 @@ func file_admin_v1_article_proto_rawDescGZIP() []byte {
 	return file_admin_v1_article_proto_rawDescData
 }
 
-var file_admin_v1_article_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_admin_v1_article_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_admin_v1_article_proto_goTypes = []any{
 	(*ArticleCreateRequest)(nil), // 0: fifsky.blog.admin.v1.ArticleCreateRequest
 	(*ArticleUpdateRequest)(nil), // 1: fifsky.blog.admin.v1.ArticleUpdateRequest
-	(*IDRequest)(nil),            // 2: fifsky.blog.admin.v1.IDRequest
-	(*IDResponse)(nil),           // 3: fifsky.blog.admin.v1.IDResponse
-	(*emptypb.Empty)(nil),        // 4: google.protobuf.Empty
+	(*ArticleListRequest)(nil),   // 2: fifsky.blog.admin.v1.ArticleListRequest
+	(*ArticleListResponse)(nil),  // 3: fifsky.blog.admin.v1.ArticleListResponse
+	(*ArticleItem)(nil),          // 4: fifsky.blog.admin.v1.ArticleItem
+	(*UserSummary)(nil),          // 5: fifsky.blog.admin.v1.UserSummary
+	(*CateSummary)(nil),          // 6: fifsky.blog.admin.v1.CateSummary
+	(*IDRequest)(nil),            // 7: fifsky.blog.admin.v1.IDRequest
+	(*IDResponse)(nil),           // 8: fifsky.blog.admin.v1.IDResponse
+	(*emptypb.Empty)(nil),        // 9: google.protobuf.Empty
 }
 var file_admin_v1_article_proto_depIdxs = []int32{
-	0, // 0: fifsky.blog.admin.v1.ArticleService.Create:input_type -> fifsky.blog.admin.v1.ArticleCreateRequest
-	1, // 1: fifsky.blog.admin.v1.ArticleService.Update:input_type -> fifsky.blog.admin.v1.ArticleUpdateRequest
-	2, // 2: fifsky.blog.admin.v1.ArticleService.Delete:input_type -> fifsky.blog.admin.v1.IDRequest
-	3, // 3: fifsky.blog.admin.v1.ArticleService.Create:output_type -> fifsky.blog.admin.v1.IDResponse
-	3, // 4: fifsky.blog.admin.v1.ArticleService.Update:output_type -> fifsky.blog.admin.v1.IDResponse
-	4, // 5: fifsky.blog.admin.v1.ArticleService.Delete:output_type -> google.protobuf.Empty
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	4, // 0: fifsky.blog.admin.v1.ArticleListResponse.list:type_name -> fifsky.blog.admin.v1.ArticleItem
+	5, // 1: fifsky.blog.admin.v1.ArticleItem.user:type_name -> fifsky.blog.admin.v1.UserSummary
+	6, // 2: fifsky.blog.admin.v1.ArticleItem.cate:type_name -> fifsky.blog.admin.v1.CateSummary
+	0, // 3: fifsky.blog.admin.v1.ArticleService.Create:input_type -> fifsky.blog.admin.v1.ArticleCreateRequest
+	1, // 4: fifsky.blog.admin.v1.ArticleService.Update:input_type -> fifsky.blog.admin.v1.ArticleUpdateRequest
+	7, // 5: fifsky.blog.admin.v1.ArticleService.Delete:input_type -> fifsky.blog.admin.v1.IDRequest
+	2, // 6: fifsky.blog.admin.v1.ArticleService.List:input_type -> fifsky.blog.admin.v1.ArticleListRequest
+	8, // 7: fifsky.blog.admin.v1.ArticleService.Create:output_type -> fifsky.blog.admin.v1.IDResponse
+	8, // 8: fifsky.blog.admin.v1.ArticleService.Update:output_type -> fifsky.blog.admin.v1.IDResponse
+	9, // 9: fifsky.blog.admin.v1.ArticleService.Delete:output_type -> google.protobuf.Empty
+	3, // 10: fifsky.blog.admin.v1.ArticleService.List:output_type -> fifsky.blog.admin.v1.ArticleListResponse
+	7, // [7:11] is the sub-list for method output_type
+	3, // [3:7] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_admin_v1_article_proto_init() }
@@ -266,7 +554,7 @@ func file_admin_v1_article_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_article_proto_rawDesc), len(file_admin_v1_article_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -21,6 +21,8 @@ type ArticleServiceHTTPServer interface {
 	Create(context.Context, *ArticleCreateRequest) (*IDResponse, error)
 	// Delete 删除文章
 	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	// List 获取文章列表
+	List(context.Context, *ArticleListRequest) (*ArticleListResponse, error)
 	// Update 更新文章
 	Update(context.Context, *ArticleUpdateRequest) (*IDResponse, error)
 }
@@ -35,6 +37,7 @@ func (s *ArticleService) RegisterService() {
 	s.mux.HandleFunc("POST /api/admin/article/create", s.Create)
 	s.mux.HandleFunc("POST /api/admin/article/update", s.Update)
 	s.mux.HandleFunc("POST /api/admin/article/delete", s.Delete)
+	s.mux.HandleFunc("POST /api/admin/article/list", s.List)
 }
 
 func RegisterArticleServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv ArticleServiceHTTPServer) {
@@ -105,5 +108,26 @@ func (s *ArticleService) Delete(w http.ResponseWriter, r *http.Request) {
 		s.codec.Encode(w, r, err)
 		return
 	}
+	return
+}
+
+func (s *ArticleService) List(w http.ResponseWriter, r *http.Request) {
+	var in ArticleListRequest
+	if err := s.codec.Decode(r, &in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	if err := s.codec.Validate(&in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	out, err := s.server.List(r.Context(), &in)
+	if err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+	s.codec.Encode(w, r, out)
 	return
 }

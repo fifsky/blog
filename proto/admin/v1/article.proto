@@ -32,6 +32,13 @@ service ArticleService {
       body: "*"
     };
   }
+  // List 获取文章列表
+  rpc List(ArticleListRequest) returns (ArticleListResponse) {
+    option (google.api.http) = {
+      post: "/api/admin/article/list"
+      body: "*"
+    };
+  }
 }
 
 message ArticleCreateRequest {
@@ -52,6 +59,7 @@ message ArticleCreateRequest {
     (buf.validate.field).required = true,
     (google.api.field_behavior) = REQUIRED
   ];
+  int32 status = 6;
 }
 
 message ArticleUpdateRequest {
@@ -65,4 +73,30 @@ message ArticleUpdateRequest {
   string url = 5;
   string content = 6;
   int32 status = 7;
+}
+
+message ArticleListRequest {
+  int32 page = 1;
+  int32 type = 2;
+  int32 status = 3;
+}
+
+message ArticleListResponse {
+  repeated ArticleItem list = 1;
+  int32 page_total = 2;
+}
+
+message ArticleItem {
+  int32 id = 1;
+  int32 cate_id = 2;
+  int32 type = 3;
+  int32 user_id = 4;
+  string title = 5;
+  string url = 6;
+  string content = 7;
+  int32 status = 8;
+  string created_at = 9;
+  string updated_at = 10;
+  UserSummary user = 11;
+  CateSummary cate = 12;
 }

@@ -24,3 +24,15 @@ message PageRequest {
 message Options {
   map<string, string> kv = 1 [(buf.validate.field).map.min_pairs = 1];
 }
+
+message UserSummary {
+  int32 id = 1;
+  string name = 2;
+  string nick_name = 3;
+}
+
+message CateSummary {
+  int32 id = 1;
+  string name = 2;
+  string domain = 3;
+}

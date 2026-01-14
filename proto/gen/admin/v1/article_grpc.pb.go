@@ -23,6 +23,7 @@ const (
 	ArticleService_Create_FullMethodName = "/fifsky.blog.admin.v1.ArticleService/Create"
 	ArticleService_Update_FullMethodName = "/fifsky.blog.admin.v1.ArticleService/Update"
 	ArticleService_Delete_FullMethodName = "/fifsky.blog.admin.v1.ArticleService/Delete"
+	ArticleService_List_FullMethodName   = "/fifsky.blog.admin.v1.ArticleService/List"
 )
 
 // ArticleServiceClient is the client API for ArticleService service.
@@ -37,6 +38,8 @@ type ArticleServiceClient interface {
 	Update(ctx context.Context, in *ArticleUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error)
 	// Delete 删除文章
 	Delete(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// List 获取文章列表
+	List(ctx context.Context, in *ArticleListRequest, opts ...grpc.CallOption) (*ArticleListResponse, error)
 }
 
 type articleServiceClient struct {
@@ -77,6 +80,16 @@ func (c *articleServiceClient) Delete(ctx context.Context, in *IDRequest, opts .
 	return out, nil
 }
 
+func (c *articleServiceClient) List(ctx context.Context, in *ArticleListRequest, opts ...grpc.CallOption) (*ArticleListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ArticleListResponse)
+	err := c.cc.Invoke(ctx, ArticleService_List_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArticleServiceServer is the server API for ArticleService service.
 // All implementations must embed UnimplementedArticleServiceServer
 // for forward compatibility.
@@ -89,6 +102,8 @@ type ArticleServiceServer interface {
 	Update(context.Context, *ArticleUpdateRequest) (*IDResponse, error)
 	// Delete 删除文章
 	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	// List 获取文章列表
+	List(context.Context, *ArticleListRequest) (*ArticleListResponse, error)
 	mustEmbedUnimplementedArticleServiceServer()
 }
 
@@ -107,6 +122,9 @@ func (UnimplementedArticleServiceServer) Update(context.Context, *ArticleUpdateR
 }
 func (UnimplementedArticleServiceServer) Delete(context.Context, *IDRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedArticleServiceServer) List(context.Context, *ArticleListRequest) (*ArticleListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method List not implemented")
 }
 func (UnimplementedArticleServiceServer) mustEmbedUnimplementedArticleServiceServer() {}
 func (UnimplementedArticleServiceServer) testEmbeddedByValue()                        {}
@@ -183,6 +201,24 @@ func _ArticleService_Delete_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArticleService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ArticleListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArticleServiceServer).List(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArticleService_List_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArticleServiceServer).List(ctx, req.(*ArticleListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArticleService_ServiceDesc is the grpc.ServiceDesc for ArticleService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -201,6 +237,10 @@ var ArticleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _ArticleService_Delete_Handler,
+		},
+		{
+			MethodName: "List",
+			Handler:    _ArticleService_List_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

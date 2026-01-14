@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { articleDeleteApi, articleListApi } from "@/service";
+import { articleDeleteApi, articleListAdminApi } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Pagination } from "@/components/Pagination";
 import { CTable, Column } from "@/components/CTable";
@@ -8,13 +8,32 @@ import { Badge } from "@/components/ui/badge";
 import { ArticleItem } from "@/types/openapi";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const STATUS_MAP: Record<
+  number,
+  { label: string; variant: "default" | "secondary" | "destructive" | "outline" }
+> = {
+  1: { label: "已发布", variant: "default" },
+  2: { label: "已删除", variant: "destructive" },
+  3: { label: "草稿", variant: "secondary" },
+};
 
 export default function AdminArticle() {
   const [list, setList] = useState<ArticleItem[]>([]);
   const [pageTotal, setPageTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [statusFilter, setStatusFilter] = useState<number | undefined>(undefined);
+
   const loadList = async () => {
-    const ret = await articleListApi({ page, type: 1 });
+    const ret = await articleListAdminApi({ page, type: 1, status: statusFilter });
     setList(ret.list || []);
     setPageTotal(ret.page_total || 0);
   };
@@ -24,16 +43,62 @@ export default function AdminArticle() {
       loadList();
     }
   };
+
+  const handleSelectAll = () => {
+    if (selectedIds.size === list.length && list.length > 0) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(list.map((item) => item.id)));
+    }
+  };
+
+  const handleInverseSelected = () => {
+    const allIds = new Set(list.map((item) => item.id));
+    const newSelectedIds = new Set<number>();
+    allIds.forEach((id) => {
+      if (!selectedIds.has(id)) {
+        newSelectedIds.add(id);
+      }
+    });
+    setSelectedIds(newSelectedIds);
+  };
+
+  const handleToggleSelect = (id: number) => {
+    const newSelectedIds = new Set(selectedIds);
+    if (newSelectedIds.has(id)) {
+      newSelectedIds.delete(id);
+    } else {
+      newSelectedIds.add(id);
+    }
+    setSelectedIds(newSelectedIds);
+  };
+
   useEffect(() => {
     loadList();
+  }, [page, statusFilter]);
+
+  useEffect(() => {
+    setSelectedIds(new Set());
   }, [page]);
 
   // 定义表格列配置
   const columns: Column<ArticleItem>[] = [
     {
-      title: <div style={{ width: 20 }}>&nbsp;</div>,
+      title: (
+        <input
+          type="checkbox"
+          checked={selectedIds.size === list.length && list.length > 0}
+          onChange={handleSelectAll}
+        />
+      ),
       key: "id",
-      render: (value) => <input type="checkbox" name="ids" value={value} />,
+      render: (value) => (
+        <input
+          type="checkbox"
+          checked={selectedIds.has(value)}
+          onChange={() => handleToggleSelect(value)}
+        />
+      ),
     },
     {
       title: (
@@ -76,6 +141,14 @@ export default function AdminArticle() {
       render: (value) => (value === 1 ? "文章" : "页面"),
     },
     {
+      title: <div style={{ width: 80 }}>状态</div>,
+      key: "status",
+      render: (value) => {
+        const statusInfo = STATUS_MAP[value] || STATUS_MAP[1];
+        return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
+      },
+    },
+    {
       title: <div style={{ width: 180 }}>日期</div>,
       key: "updated_at",
     },
@@ -110,15 +183,39 @@ export default function AdminArticle() {
           <i className="iconfont icon-edit" style={{ color: "#444" }}></i>写文章
         </Link>
       </h2>
-      <div className="my-[10px] flex items-center">
-        <BatchHandle />
+      <div className="my-[10px] flex items-center justify-between">
+        <BatchHandle
+          selectedCount={selectedIds.size}
+          totalCount={list.length}
+          onSelectAll={handleSelectAll}
+          onInverseSelected={handleInverseSelected}
+        />
+        <Select
+          value={statusFilter?.toString() || "all"}
+          onValueChange={(value) => setStatusFilter(value === "all" ? undefined : parseInt(value))}
+        >
+          <SelectTrigger className="w-[120px]" size={"sm"}>
+            <SelectValue placeholder="全部状态" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">全部状态</SelectItem>
+            <SelectItem value="1">已发布</SelectItem>
+            <SelectItem value="3">草稿</SelectItem>
+            <SelectItem value="2">已删除</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* 使用自定义表格组件 */}
       <CTable data={list} columns={columns} />
 
       <div className="my-[10px] flex items-center justify-between">
-        <BatchHandle />
+        <BatchHandle
+          selectedCount={selectedIds.size}
+          totalCount={list.length}
+          onSelectAll={handleSelectAll}
+          onInverseSelected={handleInverseSelected}
+        />
         <Pagination page={page} pageTotal={pageTotal} onChange={setPage} />
       </div>
     </div>

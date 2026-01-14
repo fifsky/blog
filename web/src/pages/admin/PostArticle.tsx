@@ -82,7 +82,7 @@ export default function PostArticle() {
     },
   };
 
-  const submit = async (values: ArticleFormValues) => {
+  const submit = async (values: ArticleFormValues, status: number = 1) => {
     setLoading(true);
     try {
       const { id, cate_id, title, content, type, url } = values;
@@ -95,6 +95,7 @@ export default function PostArticle() {
           content: content || "",
           type,
           url: url || "",
+          status,
         });
       } else {
         // 新建状态：id 不需要，content 是必填的
@@ -104,12 +105,23 @@ export default function PostArticle() {
           content: content || "",
           type,
           url: url || "",
+          status,
         });
       }
       navigate("/admin/articles");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePublish = async () => {
+    const values = form.getValues();
+    await submit(values, 1);
+  };
+
+  const handleSaveDraft = async () => {
+    const values = form.getValues();
+    await submit(values, 3);
   };
 
   useEffect(() => {
@@ -317,10 +329,10 @@ export default function PostArticle() {
             />
 
             <Field orientation="horizontal">
-              <Button type="submit" size={"sm"} loading={loading}>
+              <Button type="button" size={"sm"} loading={loading} onClick={handlePublish}>
                 发布
               </Button>
-              <Button type="button" size={"sm"} variant="outline" disabled={loading}>
+              <Button type="button" size={"sm"} variant="outline" disabled={loading} onClick={handleSaveDraft}>
                 保存草稿
               </Button>
             </Field>

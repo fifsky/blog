@@ -32,6 +32,8 @@ import type {
   ArticleCreateRequest,
   ArticleUpdateRequest,
   RemindListResponse,
+  AdminArticleListRequest,
+  AdminArticleListResponse,
 } from "@/types/openapi";
 
 export const loginApi = (data: LoginRequest, errorHandler?: (e: AppError) => void) =>
@@ -75,6 +77,10 @@ export const articleUpdateApi = (
 ) => createApi<IDResponse>("/api/admin/article/update", data, errorHandler);
 export const articleDeleteApi = (data: IDRequest, errorHandler?: (e: AppError) => void) =>
   createApi("/api/admin/article/delete", data, errorHandler);
+export const articleListAdminApi = (
+  data: AdminArticleListRequest,
+  errorHandler?: (e: AppError) => void,
+) => createApi<AdminArticleListResponse>("/api/admin/article/list", data, errorHandler);
 export const uploadApi = (data: any, errorHandler?: (e: AppError) => void) =>
   createApi("/api/admin/upload", data, errorHandler);
 export const commentAdminListApi = (data: PageRequest, errorHandler?: (e: AppError) => void) =>

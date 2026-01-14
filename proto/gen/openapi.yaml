@@ -53,6 +53,31 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/admin/article/list:
+        post:
+            tags:
+                - ArticleService
+            description: List 获取文章列表
+            operationId: ArticleService_List
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ArticleListRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ArticleListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /api/admin/article/update:
         post:
             tags:
@@ -943,6 +968,9 @@ components:
                     type: string
                 content:
                     type: string
+                status:
+                    type: integer
+                    format: int32
         ArticleDetailRequest:
             type: object
             properties:
@@ -986,18 +1014,13 @@ components:
         ArticleListRequest:
             type: object
             properties:
-                year:
-                    type: string
-                month:
-                    type: string
-                domain:
-                    type: string
-                keyword:
-                    type: string
                 page:
                     type: integer
                     format: int32
                 type:
+                    type: integer
+                    format: int32
+                status:
                     type: integer
                     format: int32
         ArticleListResponse:

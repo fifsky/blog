@@ -1,18 +1,213 @@
-## 项目规范
+## Project Overview
 
-项目采用 React + TypeScript + TailwindCSS 实现开发，技术栈如下
+Full-stack blog application with Go backend and React frontend.
 
-- React 19
-- TypeScript 5.9
-- TailwindCSS 4
-- React Hook Form：表单统一使用 react-hook-form 处理
-- Zod 4：用于表单验证
-- React Router 7：请不要使用旧版本的 react-router-dom，统一采用新版的 react-router
-- Shadcn UI：如果你需要安装响应的组件，请执行命令`pnpm dlx shadcn@latest add button`, 更多组件请参考[Shadcn UI 文档](https://ui.shadcn.com/docs/components)
-- Zustand：状态管理统一使用 zustand 处理
-- dayjs：日期处理统一使用 dayjs 处理
+## Backend (Go)
 
-## 注意事项
+### Tech Stack
 
-- 请不要在每次任务执行完都执行`pnpm build`，在开发模式我可以实时看到编译结果，不需要执行打包命令
-- 执行`pnpm tsc --noEmit`检查前端代码是否有类型错误的时候请忽略`node_modules`目录
+- **Go 1.25.5** - No framework, uses native `net/http`
+- **Protobuf** - API definitions with buf (googleapis)
+- **Validation** - buf protovalidate
+- **Database** - MySQL with native `database/sql` (no ORM)
+- **Logging** - slog
+- **Testing** - standard Go testing + dbunit
+
+### Commands
+
+```bash
+# Build backend
+make build
+
+# Run all tests
+make test
+
+# Run single test
+go test -v -run TestUser_Login ./service
+
+# Check test coverage
+make cover
+
+# Format code
+make fmt
+
+# Lint code
+make lint
+
+# Generate protobuf code
+make proto
+
+# Build frontend
+make buildui
+
+# Type check frontend (ignore node_modules)
+cd web && pnpm tsc --noEmit --skipLibCheck
+
+# Development
+pnpm dev
+
+# Run backend
+./app http --addr=:8080
+```
+
+### Code Style - Backend
+
+**Imports:** Standard library first, third-party packages last (grouped with blank line)
+
+```go
+import (
+    "context"
+    "fmt"
+
+    "app/config"
+    "app/store"
+
+    "github.com/golang-jwt/jwt/v5"
+)
+```
+
+**Error Handling:**
+
+- Use `fmt.Errorf()` for wrapping errors
+- Use `response.Fail(w, code, msg)` for HTTP error responses
+- Return `sql.ErrNoRows` for not found cases
+
+**Naming Conventions:**
+
+- Interfaces: `Store`, `UserServiceServer`
+- Structs: `User`, `Post`
+- Methods: `GetPost(ctx, id)`, `Login(ctx, req)`
+- Test functions: `TestUser_Login(t *testing.T)`
+- Private members: lowercase, public: PascalCase
+
+**Database:**
+
+- Always use `QueryContext(ctx, query, args...)` for queries
+- Always `defer rows.Close()` after creating rows
+- Use context throughout: `ctx context.Context` as first param
+- Return errors directly, don't panic
+
+**Protobuf:**
+
+- Generate with `make proto`
+- Generated code excluded from golangci-lint (see .golangci.yml)
+
+## Frontend (React + TypeScript)
+
+### Tech Stack
+
+- **React 19**
+- **TypeScript 5.9**
+- **TailwindCSS 4**
+- **React Router 7** (NEW: use `react-router`, NOT `react-router-dom`)
+- **React Hook Form + Zod** (forms & validation)
+- **Zustand** (state management)
+- **Shadcn UI** (UI components)
+- **dayjs** (dates)
+- **pnpm 10.27.0** (package manager)
+
+### Commands
+
+```bash
+cd web
+
+# Development server
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Format code
+pnpm format
+
+# Type check
+pnpm tsc --noEmit --skipLibCheck
+```
+
+### Code Style - Frontend
+
+**Imports:**
+
+- React/Router hooks first, then internal imports with `@` alias
+- No `react-router-dom` - use `react-router` instead
+
+```typescript
+import { lazy, Suspense } from "react";
+import { useNavigate } from "react-router";
+import { CArticle } from "@/components/CArticle";
+import { articleListApi } from "@/service";
+```
+
+**Component Structure:**
+
+- Functional components with hooks
+- Use TypeScript interfaces/types for props
+- Lazy load route components with `lazy()` + `Suspense`
+
+**State Management:**
+
+- Local state: `useState`, `useReducer`
+- Global state: Zustand stores in `@/store`
+- Forms: React Hook Form with Zod schemas
+
+**API Requests:**
+
+- Use `request<T>()` wrapper from `@/utils/request`
+- Use `createApi<T>()` for authenticated requests
+- Errors: `AppError` class with code/message
+- Use `dialog.message()` for error notifications
+
+**Styling:**
+
+- TailwindCSS 4 utility classes
+- Use `@tailwindcss/vite` plugin
+- Import from `@/components/ui` for Shadcn components
+- Custom styles in `@layer base` in `index.css`
+
+**Path Aliases:**
+
+- `@/*` → `./src/*`
+- `@/components` → `./src/components`
+- `@/lib` → `./src/lib`
+- `@/hooks` → `./src/hooks`
+- `@/utils` → `./src/utils`
+
+**Naming Conventions:**
+
+- Components: PascalCase (e.g., `ArticleList`, `CArticle`)
+- Hooks: camelCase with `use` prefix (e.g., `useDialog`)
+- Utils: camelCase (e.g., `getApiUrl`)
+- Types/Interfaces: PascalCase (e.g., `ArticleItem`, `ArticleListRequest`)
+- Constants: UPPER_SNAKE_CASE
+
+## Important Notes
+
+### Backend
+
+- No ORM - use raw SQL with `database/sql`
+- Always pass context through the call chain
+- Use `make fmt` before committing
+- Generated protobuf code is in `proto/gen/` (excluded from lint)
+
+### Frontend
+
+- Do NOT run `pnpm build` after each task - dev mode shows real-time compilation
+- Always use `react-router` (v7), never `react-router-dom` (old version)
+- Install Shadcn components: `pnpm dlx shadcn@latest add [component-name]`
+- Use `pnpm` for all package operations (not npm/yarn)
+- When adding UI components (visual/styling changes), delegate to frontend-ui-ux-engineer
+- When adding logic to frontend files, handle directly
+
+### Testing
+
+- Backend: `go test -v ./...` runs all tests
+- Single test: `go test -v -run TestName ./path/to/package`
+- Use dbunit fixtures in `testdata/` directory
+- Linter configuration: `.golangci.yml`
+
+### General
+
+- Commit messages should follow conventional commit format
+- All files should have proper headers/comments where necessary
+- Keep functions small and focused
+- Handle errors explicitly, don't swallow them

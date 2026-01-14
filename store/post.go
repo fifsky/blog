@@ -15,9 +15,9 @@ func (s *Store) GetPost(ctx context.Context, id int, url string) (*model.Post, e
 	var rows *sql.Rows
 	var err error
 	if id > 0 {
-		rows, err = s.db.QueryContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where id = ? and status = 1 limit 1", id)
+		rows, err = s.db.QueryContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where id = ? limit 1", id)
 	} else {
-		rows, err = s.db.QueryContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where url = ? and status = 1 limit 1", url)
+		rows, err = s.db.QueryContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where url = ? limit 1", url)
 	}
 	if err != nil {
 		return nil, err
@@ -221,4 +221,72 @@ func (s *Store) UpdatePost(ctx context.Context, p *model.UpdatePost) error {
 func (s *Store) SoftDeletePost(ctx context.Context, id int) error {
 	_, err := s.db.ExecContext(ctx, "update posts set status = 2 where id = ?", id)
 	return err
+}
+
+func (s *Store) ListPostForAdmin(ctx context.Context, p *model.Post, start int, num int) ([]model.Post, error) {
+	posts := make([]model.Post, 0)
+	offset := (start - 1) * num
+
+	args := make([]any, 0)
+	where := "1=1"
+
+	if p.CateId > 0 {
+		where += " and cate_id = ?"
+		args = append(args, p.CateId)
+	}
+	if p.Type > 0 {
+		where += " and type = ?"
+		args = append(args, p.Type)
+	}
+	if p.Status > 0 {
+		where += " and status = ?"
+		args = append(args, p.Status)
+	}
+	args = append(args, num, offset)
+
+	query := "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where " + where + " order by id desc limit ? offset ?"
+	rows, err := s.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var bp model.Post
+		if err := rows.Scan(&bp.Id, &bp.CateId, &bp.Type, &bp.UserId, &bp.Title, &bp.Url, &bp.Content, &bp.Status, &bp.CreatedAt, &bp.UpdatedAt); err != nil {
+			return nil, err
+		}
+		posts = append(posts, bp)
+	}
+	return posts, nil
+}
+
+func (s *Store) CountPostsForAdmin(ctx context.Context, p *model.Post) (int, error) {
+	args := make([]any, 0)
+	where := "1=1"
+	if p.CateId > 0 {
+		where += " and cate_id = ?"
+		args = append(args, p.CateId)
+	}
+	if p.Type > 0 {
+		where += " and type = ?"
+		args = append(args, p.Type)
+	}
+	if p.Status > 0 {
+		where += " and status = ?"
+		args = append(args, p.Status)
+	}
+	q := "select count(*) from posts where " + where
+	rows, err := s.db.QueryContext(ctx, q, args...)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+	var total int
+	if rows.Next() {
+		if err := rows.Scan(&total); err != nil {
+			return 0, err
+		}
+	}
+	return total, nil
 }

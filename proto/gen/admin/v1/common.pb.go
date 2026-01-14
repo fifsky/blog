@@ -199,6 +199,126 @@ func (x *Options) GetKv() map[string]string {
 	return nil
 }
 
+type UserSummary struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	NickName      string                 `protobuf:"bytes,3,opt,name=nick_name,json=nickName,proto3" json:"nick_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserSummary) Reset() {
+	*x = UserSummary{}
+	mi := &file_admin_v1_common_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserSummary) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserSummary) ProtoMessage() {}
+
+func (x *UserSummary) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_common_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserSummary.ProtoReflect.Descriptor instead.
+func (*UserSummary) Descriptor() ([]byte, []int) {
+	return file_admin_v1_common_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *UserSummary) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UserSummary) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UserSummary) GetNickName() string {
+	if x != nil {
+		return x.NickName
+	}
+	return ""
+}
+
+type CateSummary struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Domain        string                 `protobuf:"bytes,3,opt,name=domain,proto3" json:"domain,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CateSummary) Reset() {
+	*x = CateSummary{}
+	mi := &file_admin_v1_common_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CateSummary) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CateSummary) ProtoMessage() {}
+
+func (x *CateSummary) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_common_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CateSummary.ProtoReflect.Descriptor instead.
+func (*CateSummary) Descriptor() ([]byte, []int) {
+	return file_admin_v1_common_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *CateSummary) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *CateSummary) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CateSummary) GetDomain() string {
+	if x != nil {
+		return x.Domain
+	}
+	return ""
+}
+
 var File_admin_v1_common_proto protoreflect.FileDescriptor
 
 const file_admin_v1_common_proto_rawDesc = "" +
@@ -216,7 +336,15 @@ const file_admin_v1_common_proto_rawDesc = "" +
 	"\x02kv\x18\x01 \x03(\v2%.fifsky.blog.admin.v1.Options.KvEntryB\b\xbaH\x05\x9a\x01\x02\b\x01R\x02kv\x1a5\n" +
 	"\aKvEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\xba\x01\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"N\n" +
+	"\vUserSummary\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
+	"\tnick_name\x18\x03 \x01(\tR\bnickName\"I\n" +
+	"\vCateSummary\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
+	"\x06domain\x18\x03 \x01(\tR\x06domainB\xba\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\vCommonProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var (
@@ -231,16 +359,18 @@ func file_admin_v1_common_proto_rawDescGZIP() []byte {
 	return file_admin_v1_common_proto_rawDescData
 }
 
-var file_admin_v1_common_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_admin_v1_common_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_admin_v1_common_proto_goTypes = []any{
 	(*IDRequest)(nil),   // 0: fifsky.blog.admin.v1.IDRequest
 	(*IDResponse)(nil),  // 1: fifsky.blog.admin.v1.IDResponse
 	(*PageRequest)(nil), // 2: fifsky.blog.admin.v1.PageRequest
 	(*Options)(nil),     // 3: fifsky.blog.admin.v1.Options
-	nil,                 // 4: fifsky.blog.admin.v1.Options.KvEntry
+	(*UserSummary)(nil), // 4: fifsky.blog.admin.v1.UserSummary
+	(*CateSummary)(nil), // 5: fifsky.blog.admin.v1.CateSummary
+	nil,                 // 6: fifsky.blog.admin.v1.Options.KvEntry
 }
 var file_admin_v1_common_proto_depIdxs = []int32{
-	4, // 0: fifsky.blog.admin.v1.Options.kv:type_name -> fifsky.blog.admin.v1.Options.KvEntry
+	6, // 0: fifsky.blog.admin.v1.Options.kv:type_name -> fifsky.blog.admin.v1.Options.KvEntry
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -259,7 +389,7 @@ func file_admin_v1_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_common_proto_rawDesc), len(file_admin_v1_common_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
