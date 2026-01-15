@@ -41,7 +41,7 @@ export function ConfirmDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={(isOpen) => !isOpen && handleCancel()}>
-      <AlertDialogContent>
+      <AlertDialogContent className="top-[100px] translate-y-0">
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
