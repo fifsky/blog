@@ -26,16 +26,10 @@ func (s *Store) ListMood(ctx context.Context, start int, num int) ([]model.Mood,
 }
 
 func (s *Store) CountMoodTotal(ctx context.Context) (int, error) {
-	rows, err := s.db.QueryContext(ctx, "select count(*) from moods")
+	var total int
+	err := s.db.QueryRowContext(ctx, "select count(*) from moods").Scan(&total)
 	if err != nil {
 		return 0, err
-	}
-	defer rows.Close()
-	var total int
-	if rows.Next() {
-		if err := rows.Scan(&total); err != nil {
-			return 0, err
-		}
 	}
 	return total, nil
 }

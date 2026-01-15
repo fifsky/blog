@@ -97,16 +97,10 @@ func (s *Store) GetCatesByIds(ctx context.Context, ids []int) (map[int]model.Cat
 }
 
 func (s *Store) PostsCount(ctx context.Context, cateId int) (int, error) {
-	rows, err := s.db.QueryContext(ctx, "select count(*) from posts where cate_id = ?", cateId)
+	var total int
+	err := s.db.QueryRowContext(ctx, "select count(*) from posts where cate_id = ?", cateId).Scan(&total)
 	if err != nil {
 		return 0, err
-	}
-	defer rows.Close()
-	var total int
-	if rows.Next() {
-		if err := rows.Scan(&total); err != nil {
-			return 0, err
-		}
 	}
 	return total, nil
 }

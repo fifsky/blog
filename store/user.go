@@ -2,7 +2,6 @@ package store
 
 import (
 	"context"
-	"database/sql"
 	"strings"
 
 	"app/model"
@@ -40,34 +39,21 @@ func (s *Store) ListUser(ctx context.Context, start int, num int) ([]model.User,
 }
 
 func (s *Store) CountUserTotal(ctx context.Context) (int, error) {
-	rows, err := s.db.QueryContext(ctx, "select count(*) from users")
+	var total int
+	err := s.db.QueryRowContext(ctx, "select count(*) from users").Scan(&total)
 	if err != nil {
 		return 0, err
-	}
-	defer rows.Close()
-	var total int
-	if rows.Next() {
-		if err := rows.Scan(&total); err != nil {
-			return 0, err
-		}
 	}
 	return total, nil
 }
 
 func (s *Store) GetUserByName(ctx context.Context, name string) (*model.User, error) {
-	rows, err := s.db.QueryContext(ctx, "select id,name,password,nick_name,email,status,`type`,created_at,updated_at from users where name = ? limit 1", name)
+	var user model.User
+	err := s.db.QueryRowContext(ctx, "select id,name,password,nick_name,email,status,`type`,created_at,updated_at from users where name = ? limit 1", name).Scan(&user.Id, &user.Name, &user.Password, &user.NickName, &user.Email, &user.Status, &user.Type, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	if rows.Next() {
-		var user model.User
-		if err := rows.Scan(&user.Id, &user.Name, &user.Password, &user.NickName, &user.Email, &user.Status, &user.Type, &user.CreatedAt, &user.UpdatedAt); err != nil {
-			return nil, err
-		}
-		return &user, nil
-	}
-	return nil, sql.ErrNoRows
+	return &user, nil
 }
 
 func (s *Store) CreateUser(ctx context.Context, users *model.User) (int64, error) {

@@ -138,6 +138,9 @@ func (a *Article) Detail(ctx context.Context, req *apiv1.ArticleDetailRequest) (
 	if err != nil {
 		return nil, err
 	}
+
+	
+
 	item := &apiv1.ArticleItem{
 		Id:        int32(post.Id),
 		CateId:    int32(post.CateId),

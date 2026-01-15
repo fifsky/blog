@@ -2,7 +2,6 @@ package store
 
 import (
 	"context"
-	"database/sql"
 	"strings"
 	"time"
 
@@ -11,19 +10,12 @@ import (
 
 func (s *Store) GetRemind(ctx context.Context, id int) (*model.Remind, error) {
 	query := "select id,`type`,content,month,week,`day`,`hour`,minute,status,next_time,created_at from reminds where id = ?"
-	rows, err := s.db.QueryContext(ctx, query, id)
+	var m model.Remind
+	err := s.db.QueryRowContext(ctx, query, id).Scan(&m.Id, &m.Type, &m.Content, &m.Month, &m.Week, &m.Day, &m.Hour, &m.Minute, &m.Status, &m.NextTime, &m.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	if rows.Next() {
-		var m model.Remind
-		if err := rows.Scan(&m.Id, &m.Type, &m.Content, &m.Month, &m.Week, &m.Day, &m.Hour, &m.Minute, &m.Status, &m.NextTime, &m.CreatedAt); err != nil {
-			return nil, err
-		}
-		return &m, nil
-	}
-	return nil, sql.ErrNoRows
+	return &m, nil
 }
 
 func (s *Store) ListRemind(ctx context.Context, start int, num int) ([]*model.Remind, error) {
@@ -63,16 +55,10 @@ func (s *Store) RemindAll(ctx context.Context) ([]model.Remind, error) {
 }
 
 func (s *Store) CountRemindTotal(ctx context.Context) (int, error) {
-	rows, err := s.db.QueryContext(ctx, "select count(*) from reminds")
+	var total int
+	err := s.db.QueryRowContext(ctx, "select count(*) from reminds").Scan(&total)
 	if err != nil {
 		return 0, err
-	}
-	defer rows.Close()
-	var total int
-	if rows.Next() {
-		if err := rows.Scan(&total); err != nil {
-			return 0, err
-		}
 	}
 	return total, nil
 }

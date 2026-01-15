@@ -2,7 +2,6 @@ package store
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"strings"
 
@@ -12,59 +11,41 @@ import (
 func (s *Store) GetPost(ctx context.Context, id int, url string) (*model.Post, error) {
 	var p model.Post
 
-	var rows *sql.Rows
-	var err error
+	var where string
+	var arg any
 	if id > 0 {
-		rows, err = s.db.QueryContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where id = ? limit 1", id)
+		where = "id = ?"
+		arg = id
 	} else {
-		rows, err = s.db.QueryContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where url = ? limit 1", url)
+		where = "url = ?"
+		arg = url
 	}
+
+	query := "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where " + where + " limit 1"
+	err := s.db.QueryRowContext(ctx, query, arg).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
 	if err != nil {
 		return nil, err
-	}
-	defer rows.Close()
-
-	if rows.Next() {
-		if err := rows.Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt); err != nil {
-			return nil, err
-		}
-	} else {
-		return nil, sql.ErrNoRows
 	}
 
 	return &p, nil
 }
 
 func (s *Store) PrevPost(ctx context.Context, id int) (*model.Post, error) {
-	rows, err := s.db.QueryContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where id < ? and status = 1 and type = 1 order by id desc limit 1", id)
+	var p model.Post
+	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where id < ? and status = 1 and type = 1 order by id desc limit 1", id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	if rows.Next() {
-		var p model.Post
-		if err := rows.Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt); err != nil {
-			return nil, err
-		}
-		return &p, nil
-	}
-	return nil, sql.ErrNoRows
+	return &p, nil
 }
 
 func (s *Store) NextPost(ctx context.Context, id int) (*model.Post, error) {
-	rows, err := s.db.QueryContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where id > ? and status = 1 and type = 1 order by id asc limit 1", id)
+	var p model.Post
+	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where id > ? and status = 1 and type = 1 order by id asc limit 1", id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	if rows.Next() {
-		var p model.Post
-		if err := rows.Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt); err != nil {
-			return nil, err
-		}
-		return &p, nil
-	}
-	return nil, sql.ErrNoRows
+	return &p, nil
 }
 
 func (s *Store) PostArchive(ctx context.Context) ([]model.PostArchive, error) {
@@ -149,34 +130,21 @@ func (s *Store) CountPosts(ctx context.Context, p *model.Post, artdate, keyword 
 		args = append(args, fmt.Sprintf("%%%s%%", keyword))
 	}
 	q := "select count(*) from posts where " + where
-	rows, err := s.db.QueryContext(ctx, q, args...)
+	var total int
+	err := s.db.QueryRowContext(ctx, q, args...).Scan(&total)
 	if err != nil {
 		return 0, err
-	}
-	defer rows.Close()
-	var total int
-	if rows.Next() {
-		if err := rows.Scan(&total); err != nil {
-			return 0, err
-		}
 	}
 	return total, nil
 }
 
 func (s *Store) GetCateByDomain(ctx context.Context, domain string) (*model.Cate, error) {
-	rows, err := s.db.QueryContext(ctx, "select id,name,`desc`,domain,created_at,updated_at from cates where domain = ? limit 1", domain)
+	var c model.Cate
+	err := s.db.QueryRowContext(ctx, "select id,name,`desc`,domain,created_at,updated_at from cates where domain = ? limit 1", domain).Scan(&c.Id, &c.Name, &c.Desc, &c.Domain, &c.CreatedAt, &c.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	if rows.Next() {
-		var c model.Cate
-		if err := rows.Scan(&c.Id, &c.Name, &c.Desc, &c.Domain, &c.CreatedAt, &c.UpdatedAt); err != nil {
-			return nil, err
-		}
-		return &c, nil
-	}
-	return nil, sql.ErrNoRows
+	return &c, nil
 }
 
 func (s *Store) CreatePost(ctx context.Context, p *model.Post) (int64, error) {
@@ -287,16 +255,10 @@ func (s *Store) CountPostsForAdmin(ctx context.Context, p *model.Post) (int, err
 		args = append(args, p.Status)
 	}
 	q := "select count(*) from posts where " + where
-	rows, err := s.db.QueryContext(ctx, q, args...)
+	var total int
+	err := s.db.QueryRowContext(ctx, q, args...).Scan(&total)
 	if err != nil {
 		return 0, err
-	}
-	defer rows.Close()
-	var total int
-	if rows.Next() {
-		if err := rows.Scan(&total); err != nil {
-			return 0, err
-		}
 	}
 	return total, nil
 }
