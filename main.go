@@ -45,7 +45,7 @@ func main() {
 
 	ai := motto.NewOpenAIProvider(conf.Common.AIToken, conf.Common.AIEndpoint, "kimi-k2-turbo-preview")
 	m := motto.New(s, conf, barkClient, ai)
-	go m.Start("*/10 * * * *")
+	go m.Start("0 9 * * *")
 
 	app := &cli.Command{
 		Name:  "blog",
