@@ -7,6 +7,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -24,6 +25,51 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// CateDeleteRequest 删除分类请求
+type CateDeleteRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CateDeleteRequest) Reset() {
+	*x = CateDeleteRequest{}
+	mi := &file_admin_v1_cate_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CateDeleteRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CateDeleteRequest) ProtoMessage() {}
+
+func (x *CateDeleteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_cate_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CateDeleteRequest.ProtoReflect.Descriptor instead.
+func (*CateDeleteRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_cate_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *CateDeleteRequest) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 type CateListItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -39,7 +85,7 @@ type CateListItem struct {
 
 func (x *CateListItem) Reset() {
 	*x = CateListItem{}
-	mi := &file_admin_v1_cate_proto_msgTypes[0]
+	mi := &file_admin_v1_cate_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -51,7 +97,7 @@ func (x *CateListItem) String() string {
 func (*CateListItem) ProtoMessage() {}
 
 func (x *CateListItem) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_cate_proto_msgTypes[0]
+	mi := &file_admin_v1_cate_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -64,7 +110,7 @@ func (x *CateListItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CateListItem.ProtoReflect.Descriptor instead.
 func (*CateListItem) Descriptor() ([]byte, []int) {
-	return file_admin_v1_cate_proto_rawDescGZIP(), []int{0}
+	return file_admin_v1_cate_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CateListItem) GetId() int32 {
@@ -126,7 +172,7 @@ type CateListResponse struct {
 
 func (x *CateListResponse) Reset() {
 	*x = CateListResponse{}
-	mi := &file_admin_v1_cate_proto_msgTypes[1]
+	mi := &file_admin_v1_cate_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -138,7 +184,7 @@ func (x *CateListResponse) String() string {
 func (*CateListResponse) ProtoMessage() {}
 
 func (x *CateListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_cate_proto_msgTypes[1]
+	mi := &file_admin_v1_cate_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -151,7 +197,7 @@ func (x *CateListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CateListResponse.ProtoReflect.Descriptor instead.
 func (*CateListResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_cate_proto_rawDescGZIP(), []int{1}
+	return file_admin_v1_cate_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CateListResponse) GetList() []*CateListItem {
@@ -179,7 +225,7 @@ type CateCreateRequest struct {
 
 func (x *CateCreateRequest) Reset() {
 	*x = CateCreateRequest{}
-	mi := &file_admin_v1_cate_proto_msgTypes[2]
+	mi := &file_admin_v1_cate_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -191,7 +237,7 @@ func (x *CateCreateRequest) String() string {
 func (*CateCreateRequest) ProtoMessage() {}
 
 func (x *CateCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_cate_proto_msgTypes[2]
+	mi := &file_admin_v1_cate_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -204,7 +250,7 @@ func (x *CateCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CateCreateRequest.ProtoReflect.Descriptor instead.
 func (*CateCreateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_cate_proto_rawDescGZIP(), []int{2}
+	return file_admin_v1_cate_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *CateCreateRequest) GetName() string {
@@ -240,7 +286,7 @@ type CateUpdateRequest struct {
 
 func (x *CateUpdateRequest) Reset() {
 	*x = CateUpdateRequest{}
-	mi := &file_admin_v1_cate_proto_msgTypes[3]
+	mi := &file_admin_v1_cate_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -252,7 +298,7 @@ func (x *CateUpdateRequest) String() string {
 func (*CateUpdateRequest) ProtoMessage() {}
 
 func (x *CateUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_cate_proto_msgTypes[3]
+	mi := &file_admin_v1_cate_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -265,7 +311,7 @@ func (x *CateUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CateUpdateRequest.ProtoReflect.Descriptor instead.
 func (*CateUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_cate_proto_rawDescGZIP(), []int{3}
+	return file_admin_v1_cate_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CateUpdateRequest) GetId() int32 {
@@ -300,7 +346,10 @@ var File_admin_v1_cate_proto protoreflect.FileDescriptor
 
 const file_admin_v1_cate_proto_rawDesc = "" +
 	"\n" +
-	"\x13admin/v1/cate.proto\x12\x14fifsky.blog.admin.v1\x1a\x15admin/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xae\x01\n" +
+	"\x13admin/v1/cate.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"/\n" +
+	"\x11CateDeleteRequest\x12\x1a\n" +
+	"\x02id\x18\x01 \x01(\x05B\n" +
+	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"\xae\x01\n" +
 	"\fCateListItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
@@ -323,12 +372,12 @@ const file_admin_v1_cate_proto_rawDesc = "" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
 	"\x04desc\x18\x03 \x01(\tR\x04desc\x12\x16\n" +
-	"\x06domain\x18\x04 \x01(\tR\x06domain2\xcc\x03\n" +
+	"\x06domain\x18\x04 \x01(\tR\x06domain2\xce\x03\n" +
 	"\vCateService\x12g\n" +
-	"\x04List\x12\x16.google.protobuf.Empty\x1a&.fifsky.blog.admin.v1.CateListResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/admin/cate/list\x12v\n" +
-	"\x06Create\x12'.fifsky.blog.admin.v1.CateCreateRequest\x1a .fifsky.blog.admin.v1.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/cate/create\x12v\n" +
-	"\x06Update\x12'.fifsky.blog.admin.v1.CateUpdateRequest\x1a .fifsky.blog.admin.v1.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/cate/update\x12d\n" +
-	"\x06Delete\x12\x1f.fifsky.blog.admin.v1.IDRequest\x1a\x16.google.protobuf.Empty\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/cate/deleteB\xb8\x01\n" +
+	"\x04List\x12\x16.google.protobuf.Empty\x1a&.fifsky.blog.admin.v1.CateListResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/admin/cate/list\x12s\n" +
+	"\x06Create\x12'.fifsky.blog.admin.v1.CateCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/cate/create\x12s\n" +
+	"\x06Update\x12'.fifsky.blog.admin.v1.CateUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/cate/update\x12l\n" +
+	"\x06Delete\x12'.fifsky.blog.admin.v1.CateDeleteRequest\x1a\x16.google.protobuf.Empty\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/cate/deleteB\xb8\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\tCateProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var (
@@ -343,26 +392,26 @@ func file_admin_v1_cate_proto_rawDescGZIP() []byte {
 	return file_admin_v1_cate_proto_rawDescData
 }
 
-var file_admin_v1_cate_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_admin_v1_cate_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_admin_v1_cate_proto_goTypes = []any{
-	(*CateListItem)(nil),      // 0: fifsky.blog.admin.v1.CateListItem
-	(*CateListResponse)(nil),  // 1: fifsky.blog.admin.v1.CateListResponse
-	(*CateCreateRequest)(nil), // 2: fifsky.blog.admin.v1.CateCreateRequest
-	(*CateUpdateRequest)(nil), // 3: fifsky.blog.admin.v1.CateUpdateRequest
-	(*emptypb.Empty)(nil),     // 4: google.protobuf.Empty
-	(*IDRequest)(nil),         // 5: fifsky.blog.admin.v1.IDRequest
-	(*IDResponse)(nil),        // 6: fifsky.blog.admin.v1.IDResponse
+	(*CateDeleteRequest)(nil), // 0: fifsky.blog.admin.v1.CateDeleteRequest
+	(*CateListItem)(nil),      // 1: fifsky.blog.admin.v1.CateListItem
+	(*CateListResponse)(nil),  // 2: fifsky.blog.admin.v1.CateListResponse
+	(*CateCreateRequest)(nil), // 3: fifsky.blog.admin.v1.CateCreateRequest
+	(*CateUpdateRequest)(nil), // 4: fifsky.blog.admin.v1.CateUpdateRequest
+	(*emptypb.Empty)(nil),     // 5: google.protobuf.Empty
+	(*types.IDResponse)(nil),  // 6: fifsky.blog.types.IDResponse
 }
 var file_admin_v1_cate_proto_depIdxs = []int32{
-	0, // 0: fifsky.blog.admin.v1.CateListResponse.list:type_name -> fifsky.blog.admin.v1.CateListItem
-	4, // 1: fifsky.blog.admin.v1.CateService.List:input_type -> google.protobuf.Empty
-	2, // 2: fifsky.blog.admin.v1.CateService.Create:input_type -> fifsky.blog.admin.v1.CateCreateRequest
-	3, // 3: fifsky.blog.admin.v1.CateService.Update:input_type -> fifsky.blog.admin.v1.CateUpdateRequest
-	5, // 4: fifsky.blog.admin.v1.CateService.Delete:input_type -> fifsky.blog.admin.v1.IDRequest
-	1, // 5: fifsky.blog.admin.v1.CateService.List:output_type -> fifsky.blog.admin.v1.CateListResponse
-	6, // 6: fifsky.blog.admin.v1.CateService.Create:output_type -> fifsky.blog.admin.v1.IDResponse
-	6, // 7: fifsky.blog.admin.v1.CateService.Update:output_type -> fifsky.blog.admin.v1.IDResponse
-	4, // 8: fifsky.blog.admin.v1.CateService.Delete:output_type -> google.protobuf.Empty
+	1, // 0: fifsky.blog.admin.v1.CateListResponse.list:type_name -> fifsky.blog.admin.v1.CateListItem
+	5, // 1: fifsky.blog.admin.v1.CateService.List:input_type -> google.protobuf.Empty
+	3, // 2: fifsky.blog.admin.v1.CateService.Create:input_type -> fifsky.blog.admin.v1.CateCreateRequest
+	4, // 3: fifsky.blog.admin.v1.CateService.Update:input_type -> fifsky.blog.admin.v1.CateUpdateRequest
+	0, // 4: fifsky.blog.admin.v1.CateService.Delete:input_type -> fifsky.blog.admin.v1.CateDeleteRequest
+	2, // 5: fifsky.blog.admin.v1.CateService.List:output_type -> fifsky.blog.admin.v1.CateListResponse
+	6, // 6: fifsky.blog.admin.v1.CateService.Create:output_type -> fifsky.blog.types.IDResponse
+	6, // 7: fifsky.blog.admin.v1.CateService.Update:output_type -> fifsky.blog.types.IDResponse
+	5, // 8: fifsky.blog.admin.v1.CateService.Delete:output_type -> google.protobuf.Empty
 	5, // [5:9] is the sub-list for method output_type
 	1, // [1:5] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -375,14 +424,13 @@ func file_admin_v1_cate_proto_init() {
 	if File_admin_v1_cate_proto != nil {
 		return
 	}
-	file_admin_v1_common_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_cate_proto_rawDesc), len(file_admin_v1_cate_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

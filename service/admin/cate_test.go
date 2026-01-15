@@ -7,6 +7,7 @@ import (
 	adminv1 "app/proto/gen/admin/v1"
 	"app/store"
 	"app/testutil"
+
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/goapt/dbunit"
@@ -28,7 +29,7 @@ func TestAdminCate_ListCreateUpdateDelete(t *testing.T) {
 		if err2 != nil {
 			t.Fatalf("unexpected err=%v", err2)
 		}
-		_, err3 := svc.Delete(context.Background(), &adminv1.IDRequest{Id: 3})
+		_, err3 := svc.Delete(context.Background(), &adminv1.CateDeleteRequest{Id: 3})
 		if err3 != nil {
 			t.Fatalf("unexpected err=%v", err3)
 		}

@@ -1,7 +1,7 @@
 syntax = "proto3";
 package fifsky.blog.admin.v1;
 
-import "admin/v1/common.proto";
+import "types/common.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
@@ -10,7 +10,7 @@ option go_package = "gen/admin/v1";
 // SettingService 提供设置相关的接口
 service SettingService {
   // Update 更新设置
-  rpc Update(Options) returns (Options) {
+  rpc Update(fifsky.blog.types.Options) returns (fifsky.blog.types.Options) {
     option (google.api.http) = {
       post: "/api/admin/setting/update"
       body: "*"

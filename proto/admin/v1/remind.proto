@@ -1,39 +1,39 @@
 syntax = "proto3";
 package fifsky.blog.admin.v1;
 
-import "admin/v1/common.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
+import "types/common.proto";
 
 option go_package = "gen/admin/v1";
 
 // RemindService 提供提醒相关的接口
 service RemindService {
   // List 获取提醒列表
-  rpc List(PageRequest) returns (RemindListResponse) {
+  rpc List(RemindListRequest) returns (RemindListResponse) {
     option (google.api.http) = {
       post: "/api/admin/remind/list"
       body: "*"
     };
   }
   // Create 创建提醒
-  rpc Create(RemindCreateRequest) returns (IDResponse) {
+  rpc Create(RemindCreateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/remind/create"
       body: "*"
     };
   }
   // Update 更新提醒
-  rpc Update(RemindUpdateRequest) returns (IDResponse) {
+  rpc Update(RemindUpdateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/remind/update"
       body: "*"
     };
   }
   // Delete 删除提醒
-  rpc Delete(IDRequest) returns (google.protobuf.Empty) {
+  rpc Delete(RemindDeleteRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/admin/remind/delete"
       body: "*"
@@ -53,6 +53,19 @@ message RemindItem {
   int32 status = 9;
   string next_time = 10;
   string created_at = 11;
+}
+
+// RemindListRequest 分页请求
+message RemindListRequest {
+  int32 page = 1 [(buf.validate.field).int32.gt = 0];
+}
+
+// RemindDeleteRequest 删除提醒请求
+message RemindDeleteRequest {
+  int32 id = 1 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
 }
 message RemindListResponse {
   repeated RemindItem list = 1;

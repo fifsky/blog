@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	types "app/proto/gen/types"
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	httpbody "google.golang.org/genproto/googleapis/api/httpbody"
@@ -217,8 +218,8 @@ type ArticleItem struct {
 	Status        int32                  `protobuf:"varint,8,opt,name=status,proto3" json:"status,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     string                 `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	User          *UserSummary           `protobuf:"bytes,11,opt,name=user,proto3" json:"user,omitempty"`
-	Cate          *CateSummary           `protobuf:"bytes,12,opt,name=cate,proto3" json:"cate,omitempty"`
+	User          *types.UserSummary     `protobuf:"bytes,11,opt,name=user,proto3" json:"user,omitempty"`
+	Cate          *types.CateSummary     `protobuf:"bytes,12,opt,name=cate,proto3" json:"cate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -323,14 +324,14 @@ func (x *ArticleItem) GetUpdatedAt() string {
 	return ""
 }
 
-func (x *ArticleItem) GetUser() *UserSummary {
+func (x *ArticleItem) GetUser() *types.UserSummary {
 	if x != nil {
 		return x.User
 	}
 	return nil
 }
 
-func (x *ArticleItem) GetCate() *CateSummary {
+func (x *ArticleItem) GetCate() *types.CateSummary {
 	if x != nil {
 		return x.Cate
 	}
@@ -593,7 +594,7 @@ var File_api_v1_article_proto protoreflect.FileDescriptor
 
 const file_api_v1_article_proto_rawDesc = "" +
 	"\n" +
-	"\x14api/v1/article.proto\x12\x12fifsky.blog.api.v1\x1a\x13api/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/httpbody.proto\x1a\x1bgoogle/protobuf/empty.proto\"J\n" +
+	"\x14api/v1/article.proto\x12\x12fifsky.blog.api.v1\x1a\x12types/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/httpbody.proto\x1a\x1bgoogle/protobuf/empty.proto\"J\n" +
 	"\x0fArchiveResponse\x127\n" +
 	"\x04list\x18\x01 \x03(\v2#.fifsky.blog.api.v1.DateArchiveItemR\x04list\"=\n" +
 	"\x0fDateArchiveItem\x12\x10\n" +
@@ -605,7 +606,7 @@ const file_api_v1_article_proto_rawDesc = "" +
 	"\x06domain\x18\x03 \x01(\tR\x06domain\x12\x18\n" +
 	"\akeyword\x18\x04 \x01(\tR\akeyword\x12\x12\n" +
 	"\x04page\x18\x05 \x01(\x05R\x04page\x12\x12\n" +
-	"\x04type\x18\x06 \x01(\x05R\x04type\"\xe5\x02\n" +
+	"\x04type\x18\x06 \x01(\x05R\x04type\"\xe3\x02\n" +
 	"\vArticleItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x17\n" +
 	"\acate_id\x18\x02 \x01(\x05R\x06cateId\x12\x12\n" +
@@ -619,9 +620,9 @@ const file_api_v1_article_proto_rawDesc = "" +
 	"created_at\x18\t \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
 	"updated_at\x18\n" +
-	" \x01(\tR\tupdatedAt\x123\n" +
-	"\x04user\x18\v \x01(\v2\x1f.fifsky.blog.api.v1.UserSummaryR\x04user\x123\n" +
-	"\x04cate\x18\f \x01(\v2\x1f.fifsky.blog.api.v1.CateSummaryR\x04cate\"`\n" +
+	" \x01(\tR\tupdatedAt\x122\n" +
+	"\x04user\x18\v \x01(\v2\x1e.fifsky.blog.types.UserSummaryR\x04user\x122\n" +
+	"\x04cate\x18\f \x01(\v2\x1e.fifsky.blog.types.CateSummaryR\x04cate\"`\n" +
 	"\x13ArticleListResponse\x123\n" +
 	"\x04list\x18\x01 \x03(\v2\x1f.fifsky.blog.api.v1.ArticleItemR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\"-\n" +
@@ -670,15 +671,15 @@ var file_api_v1_article_proto_goTypes = []any{
 	(*PrevNextItem)(nil),         // 6: fifsky.blog.api.v1.PrevNextItem
 	(*PrevNextResponse)(nil),     // 7: fifsky.blog.api.v1.PrevNextResponse
 	(*ArticleDetailRequest)(nil), // 8: fifsky.blog.api.v1.ArticleDetailRequest
-	(*UserSummary)(nil),          // 9: fifsky.blog.api.v1.UserSummary
-	(*CateSummary)(nil),          // 10: fifsky.blog.api.v1.CateSummary
+	(*types.UserSummary)(nil),    // 9: fifsky.blog.types.UserSummary
+	(*types.CateSummary)(nil),    // 10: fifsky.blog.types.CateSummary
 	(*emptypb.Empty)(nil),        // 11: google.protobuf.Empty
 	(*httpbody.HttpBody)(nil),    // 12: google.api.HttpBody
 }
 var file_api_v1_article_proto_depIdxs = []int32{
 	1,  // 0: fifsky.blog.api.v1.ArchiveResponse.list:type_name -> fifsky.blog.api.v1.DateArchiveItem
-	9,  // 1: fifsky.blog.api.v1.ArticleItem.user:type_name -> fifsky.blog.api.v1.UserSummary
-	10, // 2: fifsky.blog.api.v1.ArticleItem.cate:type_name -> fifsky.blog.api.v1.CateSummary
+	9,  // 1: fifsky.blog.api.v1.ArticleItem.user:type_name -> fifsky.blog.types.UserSummary
+	10, // 2: fifsky.blog.api.v1.ArticleItem.cate:type_name -> fifsky.blog.types.CateSummary
 	3,  // 3: fifsky.blog.api.v1.ArticleListResponse.list:type_name -> fifsky.blog.api.v1.ArticleItem
 	6,  // 4: fifsky.blog.api.v1.PrevNextResponse.prev:type_name -> fifsky.blog.api.v1.PrevNextItem
 	6,  // 5: fifsky.blog.api.v1.PrevNextResponse.next:type_name -> fifsky.blog.api.v1.PrevNextItem
@@ -704,7 +705,6 @@ func file_api_v1_article_proto_init() {
 	if File_api_v1_article_proto != nil {
 		return
 	}
-	file_api_v1_common_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

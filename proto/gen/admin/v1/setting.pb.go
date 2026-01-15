@@ -7,6 +7,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -26,17 +27,17 @@ var File_admin_v1_setting_proto protoreflect.FileDescriptor
 
 const file_admin_v1_setting_proto_rawDesc = "" +
 	"\n" +
-	"\x16admin/v1/setting.proto\x12\x14fifsky.blog.admin.v1\x1a\x15admin/v1/common.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto2~\n" +
-	"\x0eSettingService\x12l\n" +
-	"\x06Update\x12\x1d.fifsky.blog.admin.v1.Options\x1a\x1d.fifsky.blog.admin.v1.Options\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/setting/updateB\xbb\x01\n" +
+	"\x16admin/v1/setting.proto\x12\x14fifsky.blog.admin.v1\x1a\x12types/common.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto2x\n" +
+	"\x0eSettingService\x12f\n" +
+	"\x06Update\x12\x1a.fifsky.blog.types.Options\x1a\x1a.fifsky.blog.types.Options\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/setting/updateB\xbb\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\fSettingProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var file_admin_v1_setting_proto_goTypes = []any{
-	(*Options)(nil), // 0: fifsky.blog.admin.v1.Options
+	(*types.Options)(nil), // 0: fifsky.blog.types.Options
 }
 var file_admin_v1_setting_proto_depIdxs = []int32{
-	0, // 0: fifsky.blog.admin.v1.SettingService.Update:input_type -> fifsky.blog.admin.v1.Options
-	0, // 1: fifsky.blog.admin.v1.SettingService.Update:output_type -> fifsky.blog.admin.v1.Options
+	0, // 0: fifsky.blog.admin.v1.SettingService.Update:input_type -> fifsky.blog.types.Options
+	0, // 1: fifsky.blog.admin.v1.SettingService.Update:output_type -> fifsky.blog.types.Options
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -49,7 +50,6 @@ func file_admin_v1_setting_proto_init() {
 	if File_admin_v1_setting_proto != nil {
 		return
 	}
-	file_admin_v1_common_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

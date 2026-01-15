@@ -10,6 +10,7 @@ import (
 	adminv1 "app/proto/gen/admin/v1"
 	"app/store"
 	"app/testutil"
+
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/goapt/dbunit"
@@ -45,17 +46,17 @@ func TestAdminUser_LoginUserGetListStatusCreate(t *testing.T) {
 		}
 
 		// List
-		resp3, err3 := svc.List(context.Background(), &adminv1.PageRequest{Page: 1})
+		resp3, err3 := svc.List(context.Background(), &adminv1.UserListRequest{Page: 1})
 		if err3 != nil || len(resp3.List) == 0 {
 			t.Fatalf("unexpected err=%v list=%v", err3, resp3.List)
 		}
 
 		// Status
-		_, err4 := svc.Status(context.Background(), &adminv1.IDRequest{Id: 1})
+		_, err4 := svc.Status(context.Background(), &adminv1.UserStatusRequest{Id: 1})
 		if err4 != nil {
 			t.Fatalf("unexpected err=%v", err4)
 		}
-		_, err5 := svc.Status(context.Background(), &adminv1.IDRequest{})
+		_, err5 := svc.Status(context.Background(), &adminv1.UserStatusRequest{})
 		if err5 == nil {
 			t.Fatalf("expected validation error")
 		}

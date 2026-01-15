@@ -7,6 +7,7 @@ import (
 	adminv1 "app/proto/gen/admin/v1"
 	"app/store"
 	"app/testutil"
+
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/goapt/dbunit"
@@ -24,7 +25,7 @@ func TestAdminLink_ListCreateDelete(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected err=%v", err)
 		}
-		_, err2 := svc.Delete(context.Background(), &adminv1.IDRequest{Id: 3})
+		_, err2 := svc.Delete(context.Background(), &adminv1.LinkDeleteRequest{Id: 3})
 		if err2 != nil {
 			t.Fatalf("unexpected err=%v", err2)
 		}

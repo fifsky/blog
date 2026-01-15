@@ -1,37 +1,45 @@
 syntax = "proto3";
 package fifsky.blog.admin.v1;
 
-import "admin/v1/common.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
+import "types/common.proto";
 
 option go_package = "gen/admin/v1";
 
 // MoodService 提供心情相关的接口
 service MoodService {
   // Create 创建心情
-  rpc Create(MoodCreateRequest) returns (IDResponse) {
+  rpc Create(MoodCreateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/mood/create"
       body: "*"
     };
   }
   // Update 更新心情
-  rpc Update(MoodUpdateRequest) returns (IDResponse) {
+  rpc Update(MoodUpdateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/mood/update"
       body: "*"
     };
   }
   // Delete 删除心情
-  rpc Delete(IDRequest) returns (google.protobuf.Empty) {
+  rpc Delete(MoodDeleteRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/admin/mood/delete"
       body: "*"
     };
   }
+}
+
+// MoodDeleteRequest 删除心情请求
+message MoodDeleteRequest {
+  int32 id = 1 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
 }
 
 message MoodCreateRequest {

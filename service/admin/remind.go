@@ -6,6 +6,7 @@ import (
 
 	"app/model"
 	adminv1 "app/proto/gen/admin/v1"
+	"app/proto/gen/types"
 	"app/store"
 
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -22,7 +23,7 @@ func NewRemind(s *store.Store) *Remind {
 	return &Remind{store: s}
 }
 
-func (r *Remind) List(ctx context.Context, req *adminv1.PageRequest) (*adminv1.RemindListResponse, error) {
+func (r *Remind) List(ctx context.Context, req *adminv1.RemindListRequest) (*adminv1.RemindListResponse, error) {
 	num := 10
 	reminds, err := r.store.ListRemind(ctx, int(req.Page), num)
 	if err != nil {
@@ -54,7 +55,7 @@ func (r *Remind) List(ctx context.Context, req *adminv1.PageRequest) (*adminv1.R
 	}, nil
 }
 
-func (r *Remind) Create(ctx context.Context, req *adminv1.RemindCreateRequest) (*adminv1.IDResponse, error) {
+func (r *Remind) Create(ctx context.Context, req *adminv1.RemindCreateRequest) (*types.IDResponse, error) {
 	c := &model.Remind{
 		Type:      int(req.Type),
 		Content:   req.Content,
@@ -70,10 +71,10 @@ func (r *Remind) Create(ctx context.Context, req *adminv1.RemindCreateRequest) (
 	if err != nil {
 		return nil, err
 	}
-	return &adminv1.IDResponse{Id: int32(lastId)}, nil
+	return &types.IDResponse{Id: int32(lastId)}, nil
 }
 
-func (r *Remind) Update(ctx context.Context, req *adminv1.RemindUpdateRequest) (*adminv1.IDResponse, error) {
+func (r *Remind) Update(ctx context.Context, req *adminv1.RemindUpdateRequest) (*types.IDResponse, error) {
 	u := &model.UpdateRemind{Id: int(req.Id)}
 	if req.Type > 0 {
 		v := int(req.Type)
@@ -106,10 +107,10 @@ func (r *Remind) Update(ctx context.Context, req *adminv1.RemindUpdateRequest) (
 	if err := r.store.UpdateRemind(ctx, u); err != nil {
 		return nil, err
 	}
-	return &adminv1.IDResponse{Id: int32(req.Id)}, nil
+	return &types.IDResponse{Id: int32(req.Id)}, nil
 }
 
-func (r *Remind) Delete(ctx context.Context, req *adminv1.IDRequest) (*emptypb.Empty, error) {
+func (r *Remind) Delete(ctx context.Context, req *adminv1.RemindDeleteRequest) (*emptypb.Empty, error) {
 	if err := r.store.DeleteRemind(ctx, int(req.Id)); err != nil {
 		return nil, err
 	}

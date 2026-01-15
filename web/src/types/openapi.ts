@@ -1,4 +1,8 @@
-export type IDRequest = { id?: number; ids?: number[] };
+// Article 批量操作
+export type ArticleDeleteRequest = { ids: number[] };
+export type ArticleRestoreRequest = { ids: number[] };
+
+// 通用响应
 export type IDResponse = { id: number };
 
 export type LoginRequest = { user_name: string; password: string };
@@ -26,7 +30,15 @@ export type User = {
   updated_at: string;
 };
 
-export type PageRequest = { page?: number };
+// 各模块独立的请求类型
+export type UserListRequest = { page?: number };
+export type UserStatusRequest = { id: number };
+export type RemindListRequest = { page?: number };
+export type RemindDeleteRequest = { id: number };
+export type MoodListRequest = { page?: number };
+export type MoodDeleteRequest = { id: number };
+export type CateDeleteRequest = { id: number };
+export type LinkDeleteRequest = { id: number };
 
 export type UserUpdateRequest = {
   id: number;

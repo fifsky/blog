@@ -35,13 +35,13 @@ paths:
         post:
             tags:
                 - ArticleService
-            description: Delete 删除文章
+            description: Delete 删除文章（支持批量）
             operationId: ArticleService_Delete
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/IDRequest'
+                            $ref: '#/components/schemas/ArticleDeleteRequest'
                 required: true
             responses:
                 "200":
@@ -82,13 +82,13 @@ paths:
         post:
             tags:
                 - ArticleService
-            description: Restore 恢复已删除文章
+            description: Restore 恢复已删除文章（支持批量）
             operationId: ArticleService_Restore
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/IDRequest'
+                            $ref: '#/components/schemas/ArticleRestoreRequest'
                 required: true
             responses:
                 "200":
@@ -163,7 +163,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/IDRequest'
+                            $ref: '#/components/schemas/CateDeleteRequest'
                 required: true
             responses:
                 "200":
@@ -258,7 +258,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/IDRequest'
+                            $ref: '#/components/schemas/LinkDeleteRequest'
                 required: true
             responses:
                 "200":
@@ -376,7 +376,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/IDRequest'
+                            $ref: '#/components/schemas/MoodDeleteRequest'
                 required: true
             responses:
                 "200":
@@ -448,7 +448,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/IDRequest'
+                            $ref: '#/components/schemas/RemindDeleteRequest'
                 required: true
             responses:
                 "200":
@@ -470,7 +470,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/PageRequest'
+                            $ref: '#/components/schemas/RemindListRequest'
                 required: true
             responses:
                 "200":
@@ -595,7 +595,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/PageRequest'
+                            $ref: '#/components/schemas/UserListRequest'
                 required: true
             responses:
                 "200":
@@ -620,7 +620,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/IDRequest'
+                            $ref: '#/components/schemas/UserStatusRequest'
                 required: true
             responses:
                 "200":
@@ -836,7 +836,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/PageRequest'
+                            $ref: '#/components/schemas/MoodListRequest'
                 required: true
             responses:
                 "200":
@@ -996,6 +996,15 @@ components:
                 status:
                     type: integer
                     format: int32
+        ArticleDeleteRequest:
+            type: object
+            properties:
+                ids:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+            description: ArticleDeleteRequest 删除文章请求（支持批量）
         ArticleDetailRequest:
             type: object
             properties:
@@ -1058,6 +1067,15 @@ components:
                 total:
                     type: integer
                     format: int32
+        ArticleRestoreRequest:
+            type: object
+            properties:
+                ids:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+            description: ArticleRestoreRequest 恢复文章请求（支持批量）
         ArticleUpdateRequest:
             required:
                 - id
@@ -1093,6 +1111,15 @@ components:
                     type: string
                 domain:
                     type: string
+        CateDeleteRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+            description: CateDeleteRequest 删除分类请求
         CateListItem:
             type: object
             properties:
@@ -1183,17 +1210,6 @@ components:
                     description: The type of the serialized message.
             additionalProperties: true
             description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
-        IDRequest:
-            type: object
-            properties:
-                id:
-                    type: integer
-                    format: int32
-                ids:
-                    type: array
-                    items:
-                        type: integer
-                        format: int32
         IDResponse:
             type: object
             properties:
@@ -1212,6 +1228,15 @@ components:
                     type: string
                 desc:
                     type: string
+        LinkDeleteRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+            description: LinkDeleteRequest 删除链接请求
         LinkItem:
             type: object
             properties:
@@ -1311,6 +1336,15 @@ components:
             properties:
                 content:
                     type: string
+        MoodDeleteRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+            description: MoodDeleteRequest 删除心情请求
         MoodItem:
             type: object
             properties:
@@ -1323,6 +1357,13 @@ components:
                     $ref: '#/components/schemas/UserSummary'
                 createdAt:
                     type: string
+        MoodListRequest:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    format: int32
+            description: MoodListRequest 心情列表分页请求
         MoodListResponse:
             type: object
             properties:
@@ -1350,12 +1391,6 @@ components:
                     type: object
                     additionalProperties:
                         type: string
-        PageRequest:
-            type: object
-            properties:
-                page:
-                    type: integer
-                    format: int32
         PrevNextItem:
             type: object
             properties:
@@ -1404,6 +1439,15 @@ components:
                 minute:
                     type: integer
                     format: int32
+        RemindDeleteRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+            description: RemindDeleteRequest 删除提醒请求
         RemindItem:
             type: object
             properties:
@@ -1437,6 +1481,13 @@ components:
                     type: string
                 createdAt:
                     type: string
+        RemindListRequest:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    format: int32
+            description: RemindListRequest 分页请求
         RemindListResponse:
             type: object
             properties:
@@ -1559,6 +1610,13 @@ components:
                     type: string
                 updatedAt:
                     type: string
+        UserListRequest:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    format: int32
+            description: UserListRequest 分页请求
         UserListResponse:
             type: object
             properties:
@@ -1569,6 +1627,15 @@ components:
                 total:
                     type: integer
                     format: int32
+        UserStatusRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+            description: UserStatusRequest 用户状态切换请求
         UserSummary:
             type: object
             properties:

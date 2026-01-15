@@ -8,7 +8,9 @@ import (
 
 	"app/config"
 	"app/model"
+	"app/pkg/errors"
 	apiv1 "app/proto/gen/api/v1"
+	"app/proto/gen/types"
 	"app/store"
 
 	"google.golang.org/genproto/googleapis/api/httpbody"
@@ -105,10 +107,10 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 			UpdatedAt: p.UpdatedAt.Format(time.DateTime),
 		}
 		if u, ok := um[p.UserId]; ok {
-			item.User = &apiv1.UserSummary{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}
+			item.User = &types.UserSummary{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}
 		}
 		if c, ok := cm[p.CateId]; ok {
-			item.Cate = &apiv1.CateSummary{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}
+			item.Cate = &types.CateSummary{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}
 		}
 		items = append(items, item)
 	}
@@ -139,7 +141,9 @@ func (a *Article) Detail(ctx context.Context, req *apiv1.ArticleDetailRequest) (
 		return nil, err
 	}
 
-	
+	if post.Status != 1 {
+		return nil, errors.BadRequest("ARTICLE_NOT_FOUND", "文章不存在")
+	}
 
 	item := &apiv1.ArticleItem{
 		Id:        int32(post.Id),
@@ -155,11 +159,11 @@ func (a *Article) Detail(ctx context.Context, req *apiv1.ArticleDetailRequest) (
 	}
 	u, err := a.store.GetUser(ctx, post.UserId)
 	if err == nil {
-		item.User = &apiv1.UserSummary{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}
+		item.User = &types.UserSummary{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}
 	}
 	c, err := a.store.GetCate(ctx, post.CateId)
 	if err == nil {
-		item.Cate = &apiv1.CateSummary{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}
+		item.Cate = &types.CateSummary{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}
 	}
 	return item, nil
 }

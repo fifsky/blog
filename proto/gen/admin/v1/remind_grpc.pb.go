@@ -7,6 +7,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -33,13 +34,13 @@ const (
 // RemindService 提供提醒相关的接口
 type RemindServiceClient interface {
 	// List 获取提醒列表
-	List(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*RemindListResponse, error)
+	List(ctx context.Context, in *RemindListRequest, opts ...grpc.CallOption) (*RemindListResponse, error)
 	// Create 创建提醒
-	Create(ctx context.Context, in *RemindCreateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	Create(ctx context.Context, in *RemindCreateRequest, opts ...grpc.CallOption) (*types.IDResponse, error)
 	// Update 更新提醒
-	Update(ctx context.Context, in *RemindUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	Update(ctx context.Context, in *RemindUpdateRequest, opts ...grpc.CallOption) (*types.IDResponse, error)
 	// Delete 删除提醒
-	Delete(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Delete(ctx context.Context, in *RemindDeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type remindServiceClient struct {
@@ -50,7 +51,7 @@ func NewRemindServiceClient(cc grpc.ClientConnInterface) RemindServiceClient {
 	return &remindServiceClient{cc}
 }
 
-func (c *remindServiceClient) List(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*RemindListResponse, error) {
+func (c *remindServiceClient) List(ctx context.Context, in *RemindListRequest, opts ...grpc.CallOption) (*RemindListResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RemindListResponse)
 	err := c.cc.Invoke(ctx, RemindService_List_FullMethodName, in, out, cOpts...)
@@ -60,9 +61,9 @@ func (c *remindServiceClient) List(ctx context.Context, in *PageRequest, opts ..
 	return out, nil
 }
 
-func (c *remindServiceClient) Create(ctx context.Context, in *RemindCreateRequest, opts ...grpc.CallOption) (*IDResponse, error) {
+func (c *remindServiceClient) Create(ctx context.Context, in *RemindCreateRequest, opts ...grpc.CallOption) (*types.IDResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(IDResponse)
+	out := new(types.IDResponse)
 	err := c.cc.Invoke(ctx, RemindService_Create_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -70,9 +71,9 @@ func (c *remindServiceClient) Create(ctx context.Context, in *RemindCreateReques
 	return out, nil
 }
 
-func (c *remindServiceClient) Update(ctx context.Context, in *RemindUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error) {
+func (c *remindServiceClient) Update(ctx context.Context, in *RemindUpdateRequest, opts ...grpc.CallOption) (*types.IDResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(IDResponse)
+	out := new(types.IDResponse)
 	err := c.cc.Invoke(ctx, RemindService_Update_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -80,7 +81,7 @@ func (c *remindServiceClient) Update(ctx context.Context, in *RemindUpdateReques
 	return out, nil
 }
 
-func (c *remindServiceClient) Delete(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *remindServiceClient) Delete(ctx context.Context, in *RemindDeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, RemindService_Delete_FullMethodName, in, out, cOpts...)
@@ -97,13 +98,13 @@ func (c *remindServiceClient) Delete(ctx context.Context, in *IDRequest, opts ..
 // RemindService 提供提醒相关的接口
 type RemindServiceServer interface {
 	// List 获取提醒列表
-	List(context.Context, *PageRequest) (*RemindListResponse, error)
+	List(context.Context, *RemindListRequest) (*RemindListResponse, error)
 	// Create 创建提醒
-	Create(context.Context, *RemindCreateRequest) (*IDResponse, error)
+	Create(context.Context, *RemindCreateRequest) (*types.IDResponse, error)
 	// Update 更新提醒
-	Update(context.Context, *RemindUpdateRequest) (*IDResponse, error)
+	Update(context.Context, *RemindUpdateRequest) (*types.IDResponse, error)
 	// Delete 删除提醒
-	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	Delete(context.Context, *RemindDeleteRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedRemindServiceServer()
 }
 
@@ -114,16 +115,16 @@ type RemindServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedRemindServiceServer struct{}
 
-func (UnimplementedRemindServiceServer) List(context.Context, *PageRequest) (*RemindListResponse, error) {
+func (UnimplementedRemindServiceServer) List(context.Context, *RemindListRequest) (*RemindListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedRemindServiceServer) Create(context.Context, *RemindCreateRequest) (*IDResponse, error) {
+func (UnimplementedRemindServiceServer) Create(context.Context, *RemindCreateRequest) (*types.IDResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Create not implemented")
 }
-func (UnimplementedRemindServiceServer) Update(context.Context, *RemindUpdateRequest) (*IDResponse, error) {
+func (UnimplementedRemindServiceServer) Update(context.Context, *RemindUpdateRequest) (*types.IDResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedRemindServiceServer) Delete(context.Context, *IDRequest) (*emptypb.Empty, error) {
+func (UnimplementedRemindServiceServer) Delete(context.Context, *RemindDeleteRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method Delete not implemented")
 }
 func (UnimplementedRemindServiceServer) mustEmbedUnimplementedRemindServiceServer() {}
@@ -148,7 +149,7 @@ func RegisterRemindServiceServer(s grpc.ServiceRegistrar, srv RemindServiceServe
 }
 
 func _RemindService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PageRequest)
+	in := new(RemindListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -160,7 +161,7 @@ func _RemindService_List_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: RemindService_List_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RemindServiceServer).List(ctx, req.(*PageRequest))
+		return srv.(RemindServiceServer).List(ctx, req.(*RemindListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -202,7 +203,7 @@ func _RemindService_Update_Handler(srv interface{}, ctx context.Context, dec fun
 }
 
 func _RemindService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IDRequest)
+	in := new(RemindDeleteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -214,7 +215,7 @@ func _RemindService_Delete_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: RemindService_Delete_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RemindServiceServer).Delete(ctx, req.(*IDRequest))
+		return srv.(RemindServiceServer).Delete(ctx, req.(*RemindDeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

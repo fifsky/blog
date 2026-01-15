@@ -5,6 +5,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	context "context"
 	contract "github.com/goapt/grpc-http/contract"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -18,15 +19,15 @@ import (
 // ArticleService 提供文章相关的接口
 type ArticleServiceHTTPServer interface {
 	// Create 创建文章
-	Create(context.Context, *ArticleCreateRequest) (*IDResponse, error)
-	// Delete 删除文章
-	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	Create(context.Context, *ArticleCreateRequest) (*types.IDResponse, error)
+	// Delete 删除文章（支持批量）
+	Delete(context.Context, *ArticleDeleteRequest) (*emptypb.Empty, error)
 	// List 获取文章列表
 	List(context.Context, *ArticleListRequest) (*ArticleListResponse, error)
-	// Restore 恢复已删除文章
-	Restore(context.Context, *IDRequest) (*IDResponse, error)
+	// Restore 恢复已删除文章（支持批量）
+	Restore(context.Context, *ArticleRestoreRequest) (*types.IDResponse, error)
 	// Update 更新文章
-	Update(context.Context, *ArticleUpdateRequest) (*IDResponse, error)
+	Update(context.Context, *ArticleUpdateRequest) (*types.IDResponse, error)
 }
 
 type ArticleService struct {
@@ -95,7 +96,7 @@ func (s *ArticleService) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *ArticleService) Delete(w http.ResponseWriter, r *http.Request) {
-	var in IDRequest
+	var in ArticleDeleteRequest
 	if err := s.codec.Decode(r, &in); err != nil {
 		s.codec.Encode(w, r, err)
 		return
@@ -136,7 +137,7 @@ func (s *ArticleService) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *ArticleService) Restore(w http.ResponseWriter, r *http.Request) {
-	var in IDRequest
+	var in ArticleRestoreRequest
 	if err := s.codec.Decode(r, &in); err != nil {
 		s.codec.Encode(w, r, err)
 		return

@@ -1,18 +1,18 @@
 syntax = "proto3";
 package fifsky.blog.api.v1;
 
-import "api/v1/common.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
+import "types/common.proto";
 
 option go_package = "gen/api/v1";
 
 // MoodService 提供心情相关的接口
 service MoodService {
   // List 获取心情列表
-  rpc List(PageRequest) returns (MoodListResponse) {
+  rpc List(MoodListRequest) returns (MoodListResponse) {
     option (google.api.http) = {
       post: "/api/mood/list"
       body: "*"
@@ -20,10 +20,15 @@ service MoodService {
   }
 }
 
+// MoodListRequest 心情列表分页请求
+message MoodListRequest {
+  int32 page = 1 [(buf.validate.field).int32.gt = 0];
+}
+
 message MoodItem {
   int32 id = 1;
   string content = 2;
-  UserSummary user = 3;
+  fifsky.blog.types.UserSummary user = 3;
   string created_at = 4;
 }
 

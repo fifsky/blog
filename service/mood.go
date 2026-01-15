@@ -6,6 +6,7 @@ import (
 
 	"app/model"
 	apiv1 "app/proto/gen/api/v1"
+	"app/proto/gen/types"
 	"app/store"
 
 	"github.com/samber/lo"
@@ -22,7 +23,7 @@ func NewMood(s *store.Store) *Mood {
 	return &Mood{store: s}
 }
 
-func (m *Mood) List(ctx context.Context, req *apiv1.PageRequest) (*apiv1.MoodListResponse, error) {
+func (m *Mood) List(ctx context.Context, req *apiv1.MoodListRequest) (*apiv1.MoodListResponse, error) {
 	num := 10
 	moods, err := m.store.ListMood(ctx, int(req.Page), num)
 	if err != nil {
@@ -39,7 +40,7 @@ func (m *Mood) List(ctx context.Context, req *apiv1.PageRequest) (*apiv1.MoodLis
 			CreatedAt: md.CreatedAt.Format(time.DateTime),
 		}
 		if u, ok := um[md.UserId]; ok {
-			item.User = &apiv1.UserSummary{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}
+			item.User = &types.UserSummary{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}
 		}
 		items = append(items, item)
 	}

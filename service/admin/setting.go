@@ -4,6 +4,7 @@ import (
 	"context"
 
 	adminv1 "app/proto/gen/admin/v1"
+	"app/proto/gen/types"
 	"app/store"
 )
 
@@ -18,10 +19,10 @@ func NewSetting(s *store.Store) *Setting {
 	return &Setting{store: s}
 }
 
-func (s *Setting) Update(ctx context.Context, req *adminv1.Options) (*adminv1.Options, error) {
+func (s *Setting) Update(ctx context.Context, req *types.Options) (*types.Options, error) {
 	m, err := s.store.UpdateOptions(ctx, req.Kv)
 	if err != nil {
 		return nil, err
 	}
-	return &adminv1.Options{Kv: m}, nil
+	return &types.Options{Kv: m}, nil
 }

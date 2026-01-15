@@ -7,6 +7,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -35,11 +36,11 @@ type CateServiceClient interface {
 	// List 获取分类列表
 	List(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CateListResponse, error)
 	// Create 创建分类
-	Create(ctx context.Context, in *CateCreateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	Create(ctx context.Context, in *CateCreateRequest, opts ...grpc.CallOption) (*types.IDResponse, error)
 	// Update 更新分类
-	Update(ctx context.Context, in *CateUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	Update(ctx context.Context, in *CateUpdateRequest, opts ...grpc.CallOption) (*types.IDResponse, error)
 	// Delete 删除分类
-	Delete(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Delete(ctx context.Context, in *CateDeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type cateServiceClient struct {
@@ -60,9 +61,9 @@ func (c *cateServiceClient) List(ctx context.Context, in *emptypb.Empty, opts ..
 	return out, nil
 }
 
-func (c *cateServiceClient) Create(ctx context.Context, in *CateCreateRequest, opts ...grpc.CallOption) (*IDResponse, error) {
+func (c *cateServiceClient) Create(ctx context.Context, in *CateCreateRequest, opts ...grpc.CallOption) (*types.IDResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(IDResponse)
+	out := new(types.IDResponse)
 	err := c.cc.Invoke(ctx, CateService_Create_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -70,9 +71,9 @@ func (c *cateServiceClient) Create(ctx context.Context, in *CateCreateRequest, o
 	return out, nil
 }
 
-func (c *cateServiceClient) Update(ctx context.Context, in *CateUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error) {
+func (c *cateServiceClient) Update(ctx context.Context, in *CateUpdateRequest, opts ...grpc.CallOption) (*types.IDResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(IDResponse)
+	out := new(types.IDResponse)
 	err := c.cc.Invoke(ctx, CateService_Update_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -80,7 +81,7 @@ func (c *cateServiceClient) Update(ctx context.Context, in *CateUpdateRequest, o
 	return out, nil
 }
 
-func (c *cateServiceClient) Delete(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *cateServiceClient) Delete(ctx context.Context, in *CateDeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, CateService_Delete_FullMethodName, in, out, cOpts...)
@@ -99,11 +100,11 @@ type CateServiceServer interface {
 	// List 获取分类列表
 	List(context.Context, *emptypb.Empty) (*CateListResponse, error)
 	// Create 创建分类
-	Create(context.Context, *CateCreateRequest) (*IDResponse, error)
+	Create(context.Context, *CateCreateRequest) (*types.IDResponse, error)
 	// Update 更新分类
-	Update(context.Context, *CateUpdateRequest) (*IDResponse, error)
+	Update(context.Context, *CateUpdateRequest) (*types.IDResponse, error)
 	// Delete 删除分类
-	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	Delete(context.Context, *CateDeleteRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedCateServiceServer()
 }
 
@@ -117,13 +118,13 @@ type UnimplementedCateServiceServer struct{}
 func (UnimplementedCateServiceServer) List(context.Context, *emptypb.Empty) (*CateListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedCateServiceServer) Create(context.Context, *CateCreateRequest) (*IDResponse, error) {
+func (UnimplementedCateServiceServer) Create(context.Context, *CateCreateRequest) (*types.IDResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Create not implemented")
 }
-func (UnimplementedCateServiceServer) Update(context.Context, *CateUpdateRequest) (*IDResponse, error) {
+func (UnimplementedCateServiceServer) Update(context.Context, *CateUpdateRequest) (*types.IDResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedCateServiceServer) Delete(context.Context, *IDRequest) (*emptypb.Empty, error) {
+func (UnimplementedCateServiceServer) Delete(context.Context, *CateDeleteRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method Delete not implemented")
 }
 func (UnimplementedCateServiceServer) mustEmbedUnimplementedCateServiceServer() {}
@@ -202,7 +203,7 @@ func _CateService_Update_Handler(srv interface{}, ctx context.Context, dec func(
 }
 
 func _CateService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IDRequest)
+	in := new(CateDeleteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -214,7 +215,7 @@ func _CateService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: CateService_Delete_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CateServiceServer).Delete(ctx, req.(*IDRequest))
+		return srv.(CateServiceServer).Delete(ctx, req.(*CateDeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

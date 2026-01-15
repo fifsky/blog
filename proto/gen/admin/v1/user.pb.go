@@ -7,6 +7,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -68,6 +69,96 @@ func (x *GetUserRequest) GetId() int32 {
 	return 0
 }
 
+// UserListRequest 分页请求
+type UserListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserListRequest) Reset() {
+	*x = UserListRequest{}
+	mi := &file_admin_v1_user_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserListRequest) ProtoMessage() {}
+
+func (x *UserListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_user_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserListRequest.ProtoReflect.Descriptor instead.
+func (*UserListRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *UserListRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+// UserStatusRequest 用户状态切换请求
+type UserStatusRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserStatusRequest) Reset() {
+	*x = UserStatusRequest{}
+	mi := &file_admin_v1_user_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserStatusRequest) ProtoMessage() {}
+
+func (x *UserStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_user_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserStatusRequest.ProtoReflect.Descriptor instead.
+func (*UserStatusRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *UserStatusRequest) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 type User struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -84,7 +175,7 @@ type User struct {
 
 func (x *User) Reset() {
 	*x = User{}
-	mi := &file_admin_v1_user_proto_msgTypes[1]
+	mi := &file_admin_v1_user_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -96,7 +187,7 @@ func (x *User) String() string {
 func (*User) ProtoMessage() {}
 
 func (x *User) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_user_proto_msgTypes[1]
+	mi := &file_admin_v1_user_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -109,7 +200,7 @@ func (x *User) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use User.ProtoReflect.Descriptor instead.
 func (*User) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{1}
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *User) GetId() int32 {
@@ -181,7 +272,7 @@ type UserCreateRequest struct {
 
 func (x *UserCreateRequest) Reset() {
 	*x = UserCreateRequest{}
-	mi := &file_admin_v1_user_proto_msgTypes[2]
+	mi := &file_admin_v1_user_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -193,7 +284,7 @@ func (x *UserCreateRequest) String() string {
 func (*UserCreateRequest) ProtoMessage() {}
 
 func (x *UserCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_user_proto_msgTypes[2]
+	mi := &file_admin_v1_user_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -206,7 +297,7 @@ func (x *UserCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserCreateRequest.ProtoReflect.Descriptor instead.
 func (*UserCreateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{2}
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *UserCreateRequest) GetName() string {
@@ -258,7 +349,7 @@ type UserUpdateRequest struct {
 
 func (x *UserUpdateRequest) Reset() {
 	*x = UserUpdateRequest{}
-	mi := &file_admin_v1_user_proto_msgTypes[3]
+	mi := &file_admin_v1_user_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -270,7 +361,7 @@ func (x *UserUpdateRequest) String() string {
 func (*UserUpdateRequest) ProtoMessage() {}
 
 func (x *UserUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_user_proto_msgTypes[3]
+	mi := &file_admin_v1_user_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -283,7 +374,7 @@ func (x *UserUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserUpdateRequest.ProtoReflect.Descriptor instead.
 func (*UserUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{3}
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *UserUpdateRequest) GetId() int32 {
@@ -344,7 +435,7 @@ type UserItem struct {
 
 func (x *UserItem) Reset() {
 	*x = UserItem{}
-	mi := &file_admin_v1_user_proto_msgTypes[4]
+	mi := &file_admin_v1_user_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -356,7 +447,7 @@ func (x *UserItem) String() string {
 func (*UserItem) ProtoMessage() {}
 
 func (x *UserItem) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_user_proto_msgTypes[4]
+	mi := &file_admin_v1_user_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -369,7 +460,7 @@ func (x *UserItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserItem.ProtoReflect.Descriptor instead.
 func (*UserItem) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{4}
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UserItem) GetId() int32 {
@@ -438,7 +529,7 @@ type UserListResponse struct {
 
 func (x *UserListResponse) Reset() {
 	*x = UserListResponse{}
-	mi := &file_admin_v1_user_proto_msgTypes[5]
+	mi := &file_admin_v1_user_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -450,7 +541,7 @@ func (x *UserListResponse) String() string {
 func (*UserListResponse) ProtoMessage() {}
 
 func (x *UserListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_user_proto_msgTypes[5]
+	mi := &file_admin_v1_user_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -463,7 +554,7 @@ func (x *UserListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserListResponse.ProtoReflect.Descriptor instead.
 func (*UserListResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{5}
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UserListResponse) GetList() []*UserItem {
@@ -484,8 +575,13 @@ var File_admin_v1_user_proto protoreflect.FileDescriptor
 
 const file_admin_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x13admin/v1/user.proto\x12\x14fifsky.blog.admin.v1\x1a\x15admin/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\",\n" +
+	"\x13admin/v1/user.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\",\n" +
 	"\x0eGetUserRequest\x12\x1a\n" +
+	"\x02id\x18\x01 \x01(\x05B\n" +
+	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\".\n" +
+	"\x0fUserListRequest\x12\x1b\n" +
+	"\x04page\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02 \x00R\x04page\"/\n" +
+	"\x11UserStatusRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"\xc7\x01\n" +
 	"\x04User\x12\x0e\n" +
@@ -527,13 +623,13 @@ const file_admin_v1_user_proto_rawDesc = "" +
 	"updated_at\x18\b \x01(\tR\tupdatedAt\"\\\n" +
 	"\x10UserListResponse\x122\n" +
 	"\x04list\x18\x01 \x03(\v2\x1e.fifsky.blog.admin.v1.UserItemR\x04list\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total2\xa2\x05\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total2\xa8\x05\n" +
 	"\vUserService\x12g\n" +
-	"\x03Get\x12$.fifsky.blog.admin.v1.GetUserRequest\x1a\x1a.fifsky.blog.admin.v1.User\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/admin/user/get\x12v\n" +
-	"\x06Create\x12'.fifsky.blog.admin.v1.UserCreateRequest\x1a .fifsky.blog.admin.v1.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/user/create\x12v\n" +
-	"\x06Update\x12'.fifsky.blog.admin.v1.UserUpdateRequest\x1a .fifsky.blog.admin.v1.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/user/update\x12r\n" +
-	"\x04List\x12!.fifsky.blog.admin.v1.PageRequest\x1a&.fifsky.blog.admin.v1.UserListResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/admin/user/list\x12d\n" +
-	"\x06Status\x12\x1f.fifsky.blog.admin.v1.IDRequest\x1a\x16.google.protobuf.Empty\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/user/status\x12`\n" +
+	"\x03Get\x12$.fifsky.blog.admin.v1.GetUserRequest\x1a\x1a.fifsky.blog.admin.v1.User\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/admin/user/get\x12s\n" +
+	"\x06Create\x12'.fifsky.blog.admin.v1.UserCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/user/create\x12s\n" +
+	"\x06Update\x12'.fifsky.blog.admin.v1.UserUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/user/update\x12v\n" +
+	"\x04List\x12%.fifsky.blog.admin.v1.UserListRequest\x1a&.fifsky.blog.admin.v1.UserListResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/admin/user/list\x12l\n" +
+	"\x06Status\x12'.fifsky.blog.admin.v1.UserStatusRequest\x1a\x16.google.protobuf.Empty\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/user/status\x12`\n" +
 	"\tLoginUser\x12\x16.google.protobuf.Empty\x1a\x1a.fifsky.blog.admin.v1.User\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/admin/loginuserB\xb8\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\tUserProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
@@ -549,33 +645,33 @@ func file_admin_v1_user_proto_rawDescGZIP() []byte {
 	return file_admin_v1_user_proto_rawDescData
 }
 
-var file_admin_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_admin_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_admin_v1_user_proto_goTypes = []any{
 	(*GetUserRequest)(nil),    // 0: fifsky.blog.admin.v1.GetUserRequest
-	(*User)(nil),              // 1: fifsky.blog.admin.v1.User
-	(*UserCreateRequest)(nil), // 2: fifsky.blog.admin.v1.UserCreateRequest
-	(*UserUpdateRequest)(nil), // 3: fifsky.blog.admin.v1.UserUpdateRequest
-	(*UserItem)(nil),          // 4: fifsky.blog.admin.v1.UserItem
-	(*UserListResponse)(nil),  // 5: fifsky.blog.admin.v1.UserListResponse
-	(*PageRequest)(nil),       // 6: fifsky.blog.admin.v1.PageRequest
-	(*IDRequest)(nil),         // 7: fifsky.blog.admin.v1.IDRequest
+	(*UserListRequest)(nil),   // 1: fifsky.blog.admin.v1.UserListRequest
+	(*UserStatusRequest)(nil), // 2: fifsky.blog.admin.v1.UserStatusRequest
+	(*User)(nil),              // 3: fifsky.blog.admin.v1.User
+	(*UserCreateRequest)(nil), // 4: fifsky.blog.admin.v1.UserCreateRequest
+	(*UserUpdateRequest)(nil), // 5: fifsky.blog.admin.v1.UserUpdateRequest
+	(*UserItem)(nil),          // 6: fifsky.blog.admin.v1.UserItem
+	(*UserListResponse)(nil),  // 7: fifsky.blog.admin.v1.UserListResponse
 	(*emptypb.Empty)(nil),     // 8: google.protobuf.Empty
-	(*IDResponse)(nil),        // 9: fifsky.blog.admin.v1.IDResponse
+	(*types.IDResponse)(nil),  // 9: fifsky.blog.types.IDResponse
 }
 var file_admin_v1_user_proto_depIdxs = []int32{
-	4, // 0: fifsky.blog.admin.v1.UserListResponse.list:type_name -> fifsky.blog.admin.v1.UserItem
+	6, // 0: fifsky.blog.admin.v1.UserListResponse.list:type_name -> fifsky.blog.admin.v1.UserItem
 	0, // 1: fifsky.blog.admin.v1.UserService.Get:input_type -> fifsky.blog.admin.v1.GetUserRequest
-	2, // 2: fifsky.blog.admin.v1.UserService.Create:input_type -> fifsky.blog.admin.v1.UserCreateRequest
-	3, // 3: fifsky.blog.admin.v1.UserService.Update:input_type -> fifsky.blog.admin.v1.UserUpdateRequest
-	6, // 4: fifsky.blog.admin.v1.UserService.List:input_type -> fifsky.blog.admin.v1.PageRequest
-	7, // 5: fifsky.blog.admin.v1.UserService.Status:input_type -> fifsky.blog.admin.v1.IDRequest
+	4, // 2: fifsky.blog.admin.v1.UserService.Create:input_type -> fifsky.blog.admin.v1.UserCreateRequest
+	5, // 3: fifsky.blog.admin.v1.UserService.Update:input_type -> fifsky.blog.admin.v1.UserUpdateRequest
+	1, // 4: fifsky.blog.admin.v1.UserService.List:input_type -> fifsky.blog.admin.v1.UserListRequest
+	2, // 5: fifsky.blog.admin.v1.UserService.Status:input_type -> fifsky.blog.admin.v1.UserStatusRequest
 	8, // 6: fifsky.blog.admin.v1.UserService.LoginUser:input_type -> google.protobuf.Empty
-	1, // 7: fifsky.blog.admin.v1.UserService.Get:output_type -> fifsky.blog.admin.v1.User
-	9, // 8: fifsky.blog.admin.v1.UserService.Create:output_type -> fifsky.blog.admin.v1.IDResponse
-	9, // 9: fifsky.blog.admin.v1.UserService.Update:output_type -> fifsky.blog.admin.v1.IDResponse
-	5, // 10: fifsky.blog.admin.v1.UserService.List:output_type -> fifsky.blog.admin.v1.UserListResponse
+	3, // 7: fifsky.blog.admin.v1.UserService.Get:output_type -> fifsky.blog.admin.v1.User
+	9, // 8: fifsky.blog.admin.v1.UserService.Create:output_type -> fifsky.blog.types.IDResponse
+	9, // 9: fifsky.blog.admin.v1.UserService.Update:output_type -> fifsky.blog.types.IDResponse
+	7, // 10: fifsky.blog.admin.v1.UserService.List:output_type -> fifsky.blog.admin.v1.UserListResponse
 	8, // 11: fifsky.blog.admin.v1.UserService.Status:output_type -> google.protobuf.Empty
-	1, // 12: fifsky.blog.admin.v1.UserService.LoginUser:output_type -> fifsky.blog.admin.v1.User
+	3, // 12: fifsky.blog.admin.v1.UserService.LoginUser:output_type -> fifsky.blog.admin.v1.User
 	7, // [7:13] is the sub-list for method output_type
 	1, // [1:7] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -588,14 +684,13 @@ func file_admin_v1_user_proto_init() {
 	if File_admin_v1_user_proto != nil {
 		return
 	}
-	file_admin_v1_common_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_user_proto_rawDesc), len(file_admin_v1_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

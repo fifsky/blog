@@ -5,6 +5,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	context "context"
 	contract "github.com/goapt/grpc-http/contract"
 	http "net/http"
@@ -17,7 +18,7 @@ import (
 // SettingService 提供设置相关的接口
 type SettingServiceHTTPServer interface {
 	// Update 更新设置
-	Update(context.Context, *Options) (*Options, error)
+	Update(context.Context, *types.Options) (*types.Options, error)
 }
 
 type SettingService struct {
@@ -40,7 +41,7 @@ func RegisterSettingServiceHTTPServer(mux contract.ServeMux, codec contract.Code
 }
 
 func (s *SettingService) Update(w http.ResponseWriter, r *http.Request) {
-	var in Options
+	var in types.Options
 	if err := s.codec.Decode(r, &in); err != nil {
 		s.codec.Encode(w, r, err)
 		return

@@ -7,6 +7,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -148,6 +149,96 @@ func (x *RemindItem) GetCreatedAt() string {
 	return ""
 }
 
+// RemindListRequest 分页请求
+type RemindListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RemindListRequest) Reset() {
+	*x = RemindListRequest{}
+	mi := &file_admin_v1_remind_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemindListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemindListRequest) ProtoMessage() {}
+
+func (x *RemindListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_remind_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemindListRequest.ProtoReflect.Descriptor instead.
+func (*RemindListRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_remind_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *RemindListRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+// RemindDeleteRequest 删除提醒请求
+type RemindDeleteRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RemindDeleteRequest) Reset() {
+	*x = RemindDeleteRequest{}
+	mi := &file_admin_v1_remind_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemindDeleteRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemindDeleteRequest) ProtoMessage() {}
+
+func (x *RemindDeleteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_remind_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemindDeleteRequest.ProtoReflect.Descriptor instead.
+func (*RemindDeleteRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_remind_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *RemindDeleteRequest) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 type RemindListResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	List          []*RemindItem          `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
@@ -158,7 +249,7 @@ type RemindListResponse struct {
 
 func (x *RemindListResponse) Reset() {
 	*x = RemindListResponse{}
-	mi := &file_admin_v1_remind_proto_msgTypes[1]
+	mi := &file_admin_v1_remind_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -170,7 +261,7 @@ func (x *RemindListResponse) String() string {
 func (*RemindListResponse) ProtoMessage() {}
 
 func (x *RemindListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_remind_proto_msgTypes[1]
+	mi := &file_admin_v1_remind_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -183,7 +274,7 @@ func (x *RemindListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemindListResponse.ProtoReflect.Descriptor instead.
 func (*RemindListResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_remind_proto_rawDescGZIP(), []int{1}
+	return file_admin_v1_remind_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *RemindListResponse) GetList() []*RemindItem {
@@ -215,7 +306,7 @@ type RemindCreateRequest struct {
 
 func (x *RemindCreateRequest) Reset() {
 	*x = RemindCreateRequest{}
-	mi := &file_admin_v1_remind_proto_msgTypes[2]
+	mi := &file_admin_v1_remind_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -227,7 +318,7 @@ func (x *RemindCreateRequest) String() string {
 func (*RemindCreateRequest) ProtoMessage() {}
 
 func (x *RemindCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_remind_proto_msgTypes[2]
+	mi := &file_admin_v1_remind_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -240,7 +331,7 @@ func (x *RemindCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemindCreateRequest.ProtoReflect.Descriptor instead.
 func (*RemindCreateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_remind_proto_rawDescGZIP(), []int{2}
+	return file_admin_v1_remind_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *RemindCreateRequest) GetType() int32 {
@@ -308,7 +399,7 @@ type RemindUpdateRequest struct {
 
 func (x *RemindUpdateRequest) Reset() {
 	*x = RemindUpdateRequest{}
-	mi := &file_admin_v1_remind_proto_msgTypes[3]
+	mi := &file_admin_v1_remind_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -320,7 +411,7 @@ func (x *RemindUpdateRequest) String() string {
 func (*RemindUpdateRequest) ProtoMessage() {}
 
 func (x *RemindUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_remind_proto_msgTypes[3]
+	mi := &file_admin_v1_remind_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -333,7 +424,7 @@ func (x *RemindUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemindUpdateRequest.ProtoReflect.Descriptor instead.
 func (*RemindUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_remind_proto_rawDescGZIP(), []int{3}
+	return file_admin_v1_remind_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *RemindUpdateRequest) GetId() int32 {
@@ -396,7 +487,7 @@ var File_admin_v1_remind_proto protoreflect.FileDescriptor
 
 const file_admin_v1_remind_proto_rawDesc = "" +
 	"\n" +
-	"\x15admin/v1/remind.proto\x12\x14fifsky.blog.admin.v1\x1a\x15admin/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\"\x86\x02\n" +
+	"\x15admin/v1/remind.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"\x86\x02\n" +
 	"\n" +
 	"RemindItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
@@ -411,7 +502,12 @@ const file_admin_v1_remind_proto_rawDesc = "" +
 	"\tnext_time\x18\n" +
 	" \x01(\tR\bnextTime\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\v \x01(\tR\tcreatedAt\"`\n" +
+	"created_at\x18\v \x01(\tR\tcreatedAt\"0\n" +
+	"\x11RemindListRequest\x12\x1b\n" +
+	"\x04page\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02 \x00R\x04page\"1\n" +
+	"\x13RemindDeleteRequest\x12\x1a\n" +
+	"\x02id\x18\x01 \x01(\x05B\n" +
+	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"`\n" +
 	"\x12RemindListResponse\x124\n" +
 	"\x04list\x18\x01 \x03(\v2 .fifsky.blog.admin.v1.RemindItemR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\"\xb6\x01\n" +
@@ -432,12 +528,12 @@ const file_admin_v1_remind_proto_rawDesc = "" +
 	"\x04week\x18\x05 \x01(\x05R\x04week\x12\x10\n" +
 	"\x03day\x18\x06 \x01(\x05R\x03day\x12\x12\n" +
 	"\x04hour\x18\a \x01(\x05R\x04hour\x12\x16\n" +
-	"\x06minute\x18\b \x01(\x05R\x06minute2\xe7\x03\n" +
-	"\rRemindService\x12v\n" +
-	"\x04List\x12!.fifsky.blog.admin.v1.PageRequest\x1a(.fifsky.blog.admin.v1.RemindListResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/remind/list\x12z\n" +
-	"\x06Create\x12).fifsky.blog.admin.v1.RemindCreateRequest\x1a .fifsky.blog.admin.v1.IDResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/admin/remind/create\x12z\n" +
-	"\x06Update\x12).fifsky.blog.admin.v1.RemindUpdateRequest\x1a .fifsky.blog.admin.v1.IDResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/admin/remind/update\x12f\n" +
-	"\x06Delete\x12\x1f.fifsky.blog.admin.v1.IDRequest\x1a\x16.google.protobuf.Empty\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/admin/remind/deleteB\xba\x01\n" +
+	"\x06minute\x18\b \x01(\x05R\x06minute2\xf1\x03\n" +
+	"\rRemindService\x12|\n" +
+	"\x04List\x12'.fifsky.blog.admin.v1.RemindListRequest\x1a(.fifsky.blog.admin.v1.RemindListResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/remind/list\x12w\n" +
+	"\x06Create\x12).fifsky.blog.admin.v1.RemindCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/admin/remind/create\x12w\n" +
+	"\x06Update\x12).fifsky.blog.admin.v1.RemindUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/admin/remind/update\x12p\n" +
+	"\x06Delete\x12).fifsky.blog.admin.v1.RemindDeleteRequest\x1a\x16.google.protobuf.Empty\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/admin/remind/deleteB\xba\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\vRemindProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var (
@@ -452,26 +548,26 @@ func file_admin_v1_remind_proto_rawDescGZIP() []byte {
 	return file_admin_v1_remind_proto_rawDescData
 }
 
-var file_admin_v1_remind_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_admin_v1_remind_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_admin_v1_remind_proto_goTypes = []any{
 	(*RemindItem)(nil),          // 0: fifsky.blog.admin.v1.RemindItem
-	(*RemindListResponse)(nil),  // 1: fifsky.blog.admin.v1.RemindListResponse
-	(*RemindCreateRequest)(nil), // 2: fifsky.blog.admin.v1.RemindCreateRequest
-	(*RemindUpdateRequest)(nil), // 3: fifsky.blog.admin.v1.RemindUpdateRequest
-	(*PageRequest)(nil),         // 4: fifsky.blog.admin.v1.PageRequest
-	(*IDRequest)(nil),           // 5: fifsky.blog.admin.v1.IDRequest
-	(*IDResponse)(nil),          // 6: fifsky.blog.admin.v1.IDResponse
+	(*RemindListRequest)(nil),   // 1: fifsky.blog.admin.v1.RemindListRequest
+	(*RemindDeleteRequest)(nil), // 2: fifsky.blog.admin.v1.RemindDeleteRequest
+	(*RemindListResponse)(nil),  // 3: fifsky.blog.admin.v1.RemindListResponse
+	(*RemindCreateRequest)(nil), // 4: fifsky.blog.admin.v1.RemindCreateRequest
+	(*RemindUpdateRequest)(nil), // 5: fifsky.blog.admin.v1.RemindUpdateRequest
+	(*types.IDResponse)(nil),    // 6: fifsky.blog.types.IDResponse
 	(*emptypb.Empty)(nil),       // 7: google.protobuf.Empty
 }
 var file_admin_v1_remind_proto_depIdxs = []int32{
 	0, // 0: fifsky.blog.admin.v1.RemindListResponse.list:type_name -> fifsky.blog.admin.v1.RemindItem
-	4, // 1: fifsky.blog.admin.v1.RemindService.List:input_type -> fifsky.blog.admin.v1.PageRequest
-	2, // 2: fifsky.blog.admin.v1.RemindService.Create:input_type -> fifsky.blog.admin.v1.RemindCreateRequest
-	3, // 3: fifsky.blog.admin.v1.RemindService.Update:input_type -> fifsky.blog.admin.v1.RemindUpdateRequest
-	5, // 4: fifsky.blog.admin.v1.RemindService.Delete:input_type -> fifsky.blog.admin.v1.IDRequest
-	1, // 5: fifsky.blog.admin.v1.RemindService.List:output_type -> fifsky.blog.admin.v1.RemindListResponse
-	6, // 6: fifsky.blog.admin.v1.RemindService.Create:output_type -> fifsky.blog.admin.v1.IDResponse
-	6, // 7: fifsky.blog.admin.v1.RemindService.Update:output_type -> fifsky.blog.admin.v1.IDResponse
+	1, // 1: fifsky.blog.admin.v1.RemindService.List:input_type -> fifsky.blog.admin.v1.RemindListRequest
+	4, // 2: fifsky.blog.admin.v1.RemindService.Create:input_type -> fifsky.blog.admin.v1.RemindCreateRequest
+	5, // 3: fifsky.blog.admin.v1.RemindService.Update:input_type -> fifsky.blog.admin.v1.RemindUpdateRequest
+	2, // 4: fifsky.blog.admin.v1.RemindService.Delete:input_type -> fifsky.blog.admin.v1.RemindDeleteRequest
+	3, // 5: fifsky.blog.admin.v1.RemindService.List:output_type -> fifsky.blog.admin.v1.RemindListResponse
+	6, // 6: fifsky.blog.admin.v1.RemindService.Create:output_type -> fifsky.blog.types.IDResponse
+	6, // 7: fifsky.blog.admin.v1.RemindService.Update:output_type -> fifsky.blog.types.IDResponse
 	7, // 8: fifsky.blog.admin.v1.RemindService.Delete:output_type -> google.protobuf.Empty
 	5, // [5:9] is the sub-list for method output_type
 	1, // [1:5] is the sub-list for method input_type
@@ -485,14 +581,13 @@ func file_admin_v1_remind_proto_init() {
 	if File_admin_v1_remind_proto != nil {
 		return
 	}
-	file_admin_v1_common_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_remind_proto_rawDesc), len(file_admin_v1_remind_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

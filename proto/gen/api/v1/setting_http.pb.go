@@ -5,6 +5,7 @@
 package apiv1
 
 import (
+	types "app/proto/gen/types"
 	context "context"
 	contract "github.com/goapt/grpc-http/contract"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -18,7 +19,7 @@ import (
 // SettingService 提供设置相关的接口
 type SettingServiceHTTPServer interface {
 	// Get 获取设置
-	Get(context.Context, *emptypb.Empty) (*Options, error)
+	Get(context.Context, *emptypb.Empty) (*types.Options, error)
 }
 
 type SettingService struct {

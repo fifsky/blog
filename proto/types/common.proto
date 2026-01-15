@@ -1,26 +1,12 @@
 syntax = "proto3";
-package fifsky.blog.api.v1;
+package fifsky.blog.types;
 
-import "google/api/field_behavior.proto";
 import "buf/validate/validate.proto";
 
-option go_package = "gen/api/v1";
-
-message IDRequest {
-  int32 id = 1[
-    (buf.validate.field).int32.gt = 0,
-    (google.api.field_behavior) = REQUIRED
-  ];
-}
+option go_package = "gen/types";
 
 message IDResponse {
   int32 id = 1;
-}
-
-message PageRequest {
-  int32 page = 1[
-    (buf.validate.field).int32.gt = 0
-  ];
 }
 
 message Options {

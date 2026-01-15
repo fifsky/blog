@@ -7,6 +7,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -29,7 +30,7 @@ const (
 // SettingService 提供设置相关的接口
 type SettingServiceClient interface {
 	// Update 更新设置
-	Update(ctx context.Context, in *Options, opts ...grpc.CallOption) (*Options, error)
+	Update(ctx context.Context, in *types.Options, opts ...grpc.CallOption) (*types.Options, error)
 }
 
 type settingServiceClient struct {
@@ -40,9 +41,9 @@ func NewSettingServiceClient(cc grpc.ClientConnInterface) SettingServiceClient {
 	return &settingServiceClient{cc}
 }
 
-func (c *settingServiceClient) Update(ctx context.Context, in *Options, opts ...grpc.CallOption) (*Options, error) {
+func (c *settingServiceClient) Update(ctx context.Context, in *types.Options, opts ...grpc.CallOption) (*types.Options, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Options)
+	out := new(types.Options)
 	err := c.cc.Invoke(ctx, SettingService_Update_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -57,7 +58,7 @@ func (c *settingServiceClient) Update(ctx context.Context, in *Options, opts ...
 // SettingService 提供设置相关的接口
 type SettingServiceServer interface {
 	// Update 更新设置
-	Update(context.Context, *Options) (*Options, error)
+	Update(context.Context, *types.Options) (*types.Options, error)
 	mustEmbedUnimplementedSettingServiceServer()
 }
 
@@ -68,7 +69,7 @@ type SettingServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedSettingServiceServer struct{}
 
-func (UnimplementedSettingServiceServer) Update(context.Context, *Options) (*Options, error) {
+func (UnimplementedSettingServiceServer) Update(context.Context, *types.Options) (*types.Options, error) {
 	return nil, status.Error(codes.Unimplemented, "method Update not implemented")
 }
 func (UnimplementedSettingServiceServer) mustEmbedUnimplementedSettingServiceServer() {}
@@ -93,7 +94,7 @@ func RegisterSettingServiceServer(s grpc.ServiceRegistrar, srv SettingServiceSer
 }
 
 func _SettingService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Options)
+	in := new(types.Options)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -105,7 +106,7 @@ func _SettingService_Update_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: SettingService_Update_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SettingServiceServer).Update(ctx, req.(*Options))
+		return srv.(SettingServiceServer).Update(ctx, req.(*types.Options))
 	}
 	return interceptor(ctx, in, info, handler)
 }

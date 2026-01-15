@@ -1,11 +1,11 @@
 syntax = "proto3";
 package fifsky.blog.admin.v1;
 
-import "admin/v1/common.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
+import "types/common.proto";
 
 option go_package = "gen/admin/v1";
 
@@ -19,26 +19,34 @@ service CateService {
     };
   }
   // Create 创建分类
-  rpc Create(CateCreateRequest) returns (IDResponse) {
+  rpc Create(CateCreateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/cate/create"
       body: "*"
     };
   }
   // Update 更新分类
-  rpc Update(CateUpdateRequest) returns (IDResponse) {
+  rpc Update(CateUpdateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/cate/update"
       body: "*"
     };
   }
   // Delete 删除分类
-  rpc Delete(IDRequest) returns (google.protobuf.Empty) {
+  rpc Delete(CateDeleteRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/admin/cate/delete"
       body: "*"
     };
   }
+}
+
+// CateDeleteRequest 删除分类请求
+message CateDeleteRequest {
+  int32 id = 1 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
 }
 
 message CateListItem {

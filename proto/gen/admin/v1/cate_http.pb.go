@@ -5,6 +5,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	context "context"
 	contract "github.com/goapt/grpc-http/contract"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -18,13 +19,13 @@ import (
 // CateService 提供分类相关的接口
 type CateServiceHTTPServer interface {
 	// Create 创建分类
-	Create(context.Context, *CateCreateRequest) (*IDResponse, error)
+	Create(context.Context, *CateCreateRequest) (*types.IDResponse, error)
 	// Delete 删除分类
-	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	Delete(context.Context, *CateDeleteRequest) (*emptypb.Empty, error)
 	// List 获取分类列表
 	List(context.Context, *emptypb.Empty) (*CateListResponse, error)
 	// Update 更新分类
-	Update(context.Context, *CateUpdateRequest) (*IDResponse, error)
+	Update(context.Context, *CateUpdateRequest) (*types.IDResponse, error)
 }
 
 type CateService struct {
@@ -104,7 +105,7 @@ func (s *CateService) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *CateService) Delete(w http.ResponseWriter, r *http.Request) {
-	var in IDRequest
+	var in CateDeleteRequest
 	if err := s.codec.Decode(r, &in); err != nil {
 		s.codec.Encode(w, r, err)
 		return

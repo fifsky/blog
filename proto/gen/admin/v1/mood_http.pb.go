@@ -5,6 +5,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	context "context"
 	contract "github.com/goapt/grpc-http/contract"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -18,11 +19,11 @@ import (
 // MoodService 提供心情相关的接口
 type MoodServiceHTTPServer interface {
 	// Create 创建心情
-	Create(context.Context, *MoodCreateRequest) (*IDResponse, error)
+	Create(context.Context, *MoodCreateRequest) (*types.IDResponse, error)
 	// Delete 删除心情
-	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	Delete(context.Context, *MoodDeleteRequest) (*emptypb.Empty, error)
 	// Update 更新心情
-	Update(context.Context, *MoodUpdateRequest) (*IDResponse, error)
+	Update(context.Context, *MoodUpdateRequest) (*types.IDResponse, error)
 }
 
 type MoodService struct {
@@ -89,7 +90,7 @@ func (s *MoodService) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *MoodService) Delete(w http.ResponseWriter, r *http.Request) {
-	var in IDRequest
+	var in MoodDeleteRequest
 	if err := s.codec.Decode(r, &in); err != nil {
 		s.codec.Encode(w, r, err)
 		return

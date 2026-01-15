@@ -7,6 +7,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -24,6 +25,51 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// MoodDeleteRequest 删除心情请求
+type MoodDeleteRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MoodDeleteRequest) Reset() {
+	*x = MoodDeleteRequest{}
+	mi := &file_admin_v1_mood_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MoodDeleteRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MoodDeleteRequest) ProtoMessage() {}
+
+func (x *MoodDeleteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_mood_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MoodDeleteRequest.ProtoReflect.Descriptor instead.
+func (*MoodDeleteRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_mood_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *MoodDeleteRequest) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 type MoodCreateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Content       string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
@@ -33,7 +79,7 @@ type MoodCreateRequest struct {
 
 func (x *MoodCreateRequest) Reset() {
 	*x = MoodCreateRequest{}
-	mi := &file_admin_v1_mood_proto_msgTypes[0]
+	mi := &file_admin_v1_mood_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +91,7 @@ func (x *MoodCreateRequest) String() string {
 func (*MoodCreateRequest) ProtoMessage() {}
 
 func (x *MoodCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_mood_proto_msgTypes[0]
+	mi := &file_admin_v1_mood_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +104,7 @@ func (x *MoodCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MoodCreateRequest.ProtoReflect.Descriptor instead.
 func (*MoodCreateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_mood_proto_rawDescGZIP(), []int{0}
+	return file_admin_v1_mood_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *MoodCreateRequest) GetContent() string {
@@ -78,7 +124,7 @@ type MoodUpdateRequest struct {
 
 func (x *MoodUpdateRequest) Reset() {
 	*x = MoodUpdateRequest{}
-	mi := &file_admin_v1_mood_proto_msgTypes[1]
+	mi := &file_admin_v1_mood_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -90,7 +136,7 @@ func (x *MoodUpdateRequest) String() string {
 func (*MoodUpdateRequest) ProtoMessage() {}
 
 func (x *MoodUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_mood_proto_msgTypes[1]
+	mi := &file_admin_v1_mood_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -103,7 +149,7 @@ func (x *MoodUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MoodUpdateRequest.ProtoReflect.Descriptor instead.
 func (*MoodUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_mood_proto_rawDescGZIP(), []int{1}
+	return file_admin_v1_mood_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *MoodUpdateRequest) GetId() int32 {
@@ -124,17 +170,20 @@ var File_admin_v1_mood_proto protoreflect.FileDescriptor
 
 const file_admin_v1_mood_proto_rawDesc = "" +
 	"\n" +
-	"\x13admin/v1/mood.proto\x12\x14fifsky.blog.admin.v1\x1a\x15admin/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\"8\n" +
+	"\x13admin/v1/mood.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"/\n" +
+	"\x11MoodDeleteRequest\x12\x1a\n" +
+	"\x02id\x18\x01 \x01(\x05B\n" +
+	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"8\n" +
 	"\x11MoodCreateRequest\x12#\n" +
 	"\acontent\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\acontent\"I\n" +
 	"\x11MoodUpdateRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent2\xe3\x02\n" +
-	"\vMoodService\x12v\n" +
-	"\x06Create\x12'.fifsky.blog.admin.v1.MoodCreateRequest\x1a .fifsky.blog.admin.v1.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/mood/create\x12v\n" +
-	"\x06Update\x12'.fifsky.blog.admin.v1.MoodUpdateRequest\x1a .fifsky.blog.admin.v1.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/mood/update\x12d\n" +
-	"\x06Delete\x12\x1f.fifsky.blog.admin.v1.IDRequest\x1a\x16.google.protobuf.Empty\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/mood/deleteB\xb8\x01\n" +
+	"\acontent\x18\x02 \x01(\tR\acontent2\xe5\x02\n" +
+	"\vMoodService\x12s\n" +
+	"\x06Create\x12'.fifsky.blog.admin.v1.MoodCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/mood/create\x12s\n" +
+	"\x06Update\x12'.fifsky.blog.admin.v1.MoodUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/mood/update\x12l\n" +
+	"\x06Delete\x12'.fifsky.blog.admin.v1.MoodDeleteRequest\x1a\x16.google.protobuf.Empty\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/mood/deleteB\xb8\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\tMoodProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var (
@@ -149,20 +198,20 @@ func file_admin_v1_mood_proto_rawDescGZIP() []byte {
 	return file_admin_v1_mood_proto_rawDescData
 }
 
-var file_admin_v1_mood_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_admin_v1_mood_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_admin_v1_mood_proto_goTypes = []any{
-	(*MoodCreateRequest)(nil), // 0: fifsky.blog.admin.v1.MoodCreateRequest
-	(*MoodUpdateRequest)(nil), // 1: fifsky.blog.admin.v1.MoodUpdateRequest
-	(*IDRequest)(nil),         // 2: fifsky.blog.admin.v1.IDRequest
-	(*IDResponse)(nil),        // 3: fifsky.blog.admin.v1.IDResponse
+	(*MoodDeleteRequest)(nil), // 0: fifsky.blog.admin.v1.MoodDeleteRequest
+	(*MoodCreateRequest)(nil), // 1: fifsky.blog.admin.v1.MoodCreateRequest
+	(*MoodUpdateRequest)(nil), // 2: fifsky.blog.admin.v1.MoodUpdateRequest
+	(*types.IDResponse)(nil),  // 3: fifsky.blog.types.IDResponse
 	(*emptypb.Empty)(nil),     // 4: google.protobuf.Empty
 }
 var file_admin_v1_mood_proto_depIdxs = []int32{
-	0, // 0: fifsky.blog.admin.v1.MoodService.Create:input_type -> fifsky.blog.admin.v1.MoodCreateRequest
-	1, // 1: fifsky.blog.admin.v1.MoodService.Update:input_type -> fifsky.blog.admin.v1.MoodUpdateRequest
-	2, // 2: fifsky.blog.admin.v1.MoodService.Delete:input_type -> fifsky.blog.admin.v1.IDRequest
-	3, // 3: fifsky.blog.admin.v1.MoodService.Create:output_type -> fifsky.blog.admin.v1.IDResponse
-	3, // 4: fifsky.blog.admin.v1.MoodService.Update:output_type -> fifsky.blog.admin.v1.IDResponse
+	1, // 0: fifsky.blog.admin.v1.MoodService.Create:input_type -> fifsky.blog.admin.v1.MoodCreateRequest
+	2, // 1: fifsky.blog.admin.v1.MoodService.Update:input_type -> fifsky.blog.admin.v1.MoodUpdateRequest
+	0, // 2: fifsky.blog.admin.v1.MoodService.Delete:input_type -> fifsky.blog.admin.v1.MoodDeleteRequest
+	3, // 3: fifsky.blog.admin.v1.MoodService.Create:output_type -> fifsky.blog.types.IDResponse
+	3, // 4: fifsky.blog.admin.v1.MoodService.Update:output_type -> fifsky.blog.types.IDResponse
 	4, // 5: fifsky.blog.admin.v1.MoodService.Delete:output_type -> google.protobuf.Empty
 	3, // [3:6] is the sub-list for method output_type
 	0, // [0:3] is the sub-list for method input_type
@@ -176,14 +225,13 @@ func file_admin_v1_mood_proto_init() {
 	if File_admin_v1_mood_proto != nil {
 		return
 	}
-	file_admin_v1_common_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_mood_proto_rawDesc), len(file_admin_v1_mood_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

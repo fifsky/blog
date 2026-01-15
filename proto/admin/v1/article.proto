@@ -1,32 +1,32 @@
 syntax = "proto3";
 package fifsky.blog.admin.v1;
 
-import "admin/v1/common.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
+import "types/common.proto";
 
 option go_package = "gen/admin/v1";
 
 // ArticleService 提供文章相关的接口
 service ArticleService {
   // Create 创建文章
-  rpc Create(ArticleCreateRequest) returns (IDResponse) {
+  rpc Create(ArticleCreateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/article/create"
       body: "*"
     };
   }
   // Update 更新文章
-  rpc Update(ArticleUpdateRequest) returns (IDResponse) {
+  rpc Update(ArticleUpdateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/article/update"
       body: "*"
     };
   }
-  // Delete 删除文章
-  rpc Delete(IDRequest) returns (google.protobuf.Empty) {
+  // Delete 删除文章（支持批量）
+  rpc Delete(ArticleDeleteRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/admin/article/delete"
       body: "*"
@@ -39,13 +39,23 @@ service ArticleService {
       body: "*"
     };
   }
-  // Restore 恢复已删除文章
-  rpc Restore(IDRequest) returns (IDResponse) {
+  // Restore 恢复已删除文章（支持批量）
+  rpc Restore(ArticleRestoreRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/article/restore"
       body: "*"
     };
   }
+}
+
+// ArticleDeleteRequest 删除文章请求（支持批量）
+message ArticleDeleteRequest {
+  repeated int32 ids = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+// ArticleRestoreRequest 恢复文章请求（支持批量）
+message ArticleRestoreRequest {
+  repeated int32 ids = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 
 message ArticleCreateRequest {
@@ -104,6 +114,6 @@ message ArticleItem {
   int32 status = 8;
   string created_at = 9;
   string updated_at = 10;
-  UserSummary user = 11;
-  CateSummary cate = 12;
+  fifsky.blog.types.UserSummary user = 11;
+  fifsky.blog.types.CateSummary cate = 12;
 }

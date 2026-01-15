@@ -9,6 +9,7 @@ import (
 	"app/config"
 	"app/model"
 	adminv1 "app/proto/gen/admin/v1"
+	"app/proto/gen/types"
 	"app/store"
 
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -47,7 +48,7 @@ func (u *User) Get(ctx context.Context, request *adminv1.GetUserRequest) (*admin
 	}, nil
 }
 
-func (u *User) Create(ctx context.Context, in *adminv1.UserCreateRequest) (*adminv1.IDResponse, error) {
+func (u *User) Create(ctx context.Context, in *adminv1.UserCreateRequest) (*types.IDResponse, error) {
 	if in.Password == "" {
 		return nil, fmt.Errorf("密码不能为空")
 	}
@@ -67,10 +68,10 @@ func (u *User) Create(ctx context.Context, in *adminv1.UserCreateRequest) (*admi
 	if err != nil {
 		return nil, err
 	}
-	return &adminv1.IDResponse{Id: int32(lastId)}, nil
+	return &types.IDResponse{Id: int32(lastId)}, nil
 }
 
-func (u *User) Update(ctx context.Context, in *adminv1.UserUpdateRequest) (*adminv1.IDResponse, error) {
+func (u *User) Update(ctx context.Context, in *adminv1.UserUpdateRequest) (*types.IDResponse, error) {
 	hashed := fmt.Sprintf("%x", md5.Sum([]byte(in.Password)))
 	now := time.Now()
 	uReq := &model.UpdateUser{
@@ -100,10 +101,10 @@ func (u *User) Update(ctx context.Context, in *adminv1.UserUpdateRequest) (*admi
 	if err := u.store.UpdateUser(ctx, uReq); err != nil {
 		return nil, err
 	}
-	return &adminv1.IDResponse{Id: int32(in.Id)}, nil
+	return &types.IDResponse{Id: int32(in.Id)}, nil
 }
 
-func (u *User) List(ctx context.Context, req *adminv1.PageRequest) (*adminv1.UserListResponse, error) {
+func (u *User) List(ctx context.Context, req *adminv1.UserListRequest) (*adminv1.UserListResponse, error) {
 	num := 10
 	users, err := u.store.ListUser(ctx, int(req.Page), num)
 	if err != nil {
@@ -132,7 +133,7 @@ func (u *User) List(ctx context.Context, req *adminv1.PageRequest) (*adminv1.Use
 	}, nil
 }
 
-func (u *User) Status(ctx context.Context, req *adminv1.IDRequest) (*emptypb.Empty, error) {
+func (u *User) Status(ctx context.Context, req *adminv1.UserStatusRequest) (*emptypb.Empty, error) {
 	user, err := u.store.GetUser(ctx, int(req.Id))
 	if err != nil {
 		return nil, err

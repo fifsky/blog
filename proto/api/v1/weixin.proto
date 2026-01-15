@@ -1,7 +1,7 @@
 syntax = "proto3";
 package fifsky.blog.api.v1;
 
-import "api/v1/common.proto";
+import "types/common.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
@@ -43,5 +43,4 @@ message MessageRequest {
   ];
 }
 
-message WeixinResponse {
-}
+message WeixinResponse {}

@@ -6,7 +6,9 @@ import (
 
 	"app/model"
 	adminv1 "app/proto/gen/admin/v1"
+	"app/proto/gen/types"
 	"app/store"
+
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -21,7 +23,7 @@ func NewMood(s *store.Store) *Mood {
 	return &Mood{store: s}
 }
 
-func (m *Mood) Create(ctx context.Context, req *adminv1.MoodCreateRequest) (*adminv1.IDResponse, error) {
+func (m *Mood) Create(ctx context.Context, req *adminv1.MoodCreateRequest) (*types.IDResponse, error) {
 	loginUser := GetLoginUser(ctx)
 	c := &model.Mood{
 		Content:   req.Content,
@@ -32,10 +34,10 @@ func (m *Mood) Create(ctx context.Context, req *adminv1.MoodCreateRequest) (*adm
 	if err != nil {
 		return nil, err
 	}
-	return &adminv1.IDResponse{Id: int32(lastId)}, nil
+	return &types.IDResponse{Id: int32(lastId)}, nil
 }
 
-func (m *Mood) Update(ctx context.Context, req *adminv1.MoodUpdateRequest) (*adminv1.IDResponse, error) {
+func (m *Mood) Update(ctx context.Context, req *adminv1.MoodUpdateRequest) (*types.IDResponse, error) {
 	u := &model.UpdateMood{Id: int(req.Id)}
 	if req.Content != "" {
 		v := req.Content
@@ -44,10 +46,10 @@ func (m *Mood) Update(ctx context.Context, req *adminv1.MoodUpdateRequest) (*adm
 	if err := m.store.UpdateMood(ctx, u); err != nil {
 		return nil, err
 	}
-	return &adminv1.IDResponse{Id: int32(req.Id)}, nil
+	return &types.IDResponse{Id: int32(req.Id)}, nil
 }
 
-func (m *Mood) Delete(ctx context.Context, req *adminv1.IDRequest) (*emptypb.Empty, error) {
+func (m *Mood) Delete(ctx context.Context, req *adminv1.MoodDeleteRequest) (*emptypb.Empty, error) {
 	if err := m.store.DeleteMood(ctx, int(req.Id)); err != nil {
 		return nil, err
 	}

@@ -29,7 +29,7 @@ const (
 // MoodService 提供心情相关的接口
 type MoodServiceClient interface {
 	// List 获取心情列表
-	List(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*MoodListResponse, error)
+	List(ctx context.Context, in *MoodListRequest, opts ...grpc.CallOption) (*MoodListResponse, error)
 }
 
 type moodServiceClient struct {
@@ -40,7 +40,7 @@ func NewMoodServiceClient(cc grpc.ClientConnInterface) MoodServiceClient {
 	return &moodServiceClient{cc}
 }
 
-func (c *moodServiceClient) List(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*MoodListResponse, error) {
+func (c *moodServiceClient) List(ctx context.Context, in *MoodListRequest, opts ...grpc.CallOption) (*MoodListResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MoodListResponse)
 	err := c.cc.Invoke(ctx, MoodService_List_FullMethodName, in, out, cOpts...)
@@ -57,7 +57,7 @@ func (c *moodServiceClient) List(ctx context.Context, in *PageRequest, opts ...g
 // MoodService 提供心情相关的接口
 type MoodServiceServer interface {
 	// List 获取心情列表
-	List(context.Context, *PageRequest) (*MoodListResponse, error)
+	List(context.Context, *MoodListRequest) (*MoodListResponse, error)
 	mustEmbedUnimplementedMoodServiceServer()
 }
 
@@ -68,7 +68,7 @@ type MoodServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedMoodServiceServer struct{}
 
-func (UnimplementedMoodServiceServer) List(context.Context, *PageRequest) (*MoodListResponse, error) {
+func (UnimplementedMoodServiceServer) List(context.Context, *MoodListRequest) (*MoodListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method List not implemented")
 }
 func (UnimplementedMoodServiceServer) mustEmbedUnimplementedMoodServiceServer() {}
@@ -93,7 +93,7 @@ func RegisterMoodServiceServer(s grpc.ServiceRegistrar, srv MoodServiceServer) {
 }
 
 func _MoodService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PageRequest)
+	in := new(MoodListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func _MoodService_List_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: MoodService_List_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MoodServiceServer).List(ctx, req.(*PageRequest))
+		return srv.(MoodServiceServer).List(ctx, req.(*MoodListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

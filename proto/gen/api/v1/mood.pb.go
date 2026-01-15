@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	types "app/proto/gen/types"
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -24,11 +25,56 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// MoodListRequest 心情列表分页请求
+type MoodListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MoodListRequest) Reset() {
+	*x = MoodListRequest{}
+	mi := &file_api_v1_mood_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MoodListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MoodListRequest) ProtoMessage() {}
+
+func (x *MoodListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_mood_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MoodListRequest.ProtoReflect.Descriptor instead.
+func (*MoodListRequest) Descriptor() ([]byte, []int) {
+	return file_api_v1_mood_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *MoodListRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
 type MoodItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	User          *UserSummary           `protobuf:"bytes,3,opt,name=user,proto3" json:"user,omitempty"`
+	User          *types.UserSummary     `protobuf:"bytes,3,opt,name=user,proto3" json:"user,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -36,7 +82,7 @@ type MoodItem struct {
 
 func (x *MoodItem) Reset() {
 	*x = MoodItem{}
-	mi := &file_api_v1_mood_proto_msgTypes[0]
+	mi := &file_api_v1_mood_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -48,7 +94,7 @@ func (x *MoodItem) String() string {
 func (*MoodItem) ProtoMessage() {}
 
 func (x *MoodItem) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_mood_proto_msgTypes[0]
+	mi := &file_api_v1_mood_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -61,7 +107,7 @@ func (x *MoodItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MoodItem.ProtoReflect.Descriptor instead.
 func (*MoodItem) Descriptor() ([]byte, []int) {
-	return file_api_v1_mood_proto_rawDescGZIP(), []int{0}
+	return file_api_v1_mood_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *MoodItem) GetId() int32 {
@@ -78,7 +124,7 @@ func (x *MoodItem) GetContent() string {
 	return ""
 }
 
-func (x *MoodItem) GetUser() *UserSummary {
+func (x *MoodItem) GetUser() *types.UserSummary {
 	if x != nil {
 		return x.User
 	}
@@ -102,7 +148,7 @@ type MoodListResponse struct {
 
 func (x *MoodListResponse) Reset() {
 	*x = MoodListResponse{}
-	mi := &file_api_v1_mood_proto_msgTypes[1]
+	mi := &file_api_v1_mood_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -114,7 +160,7 @@ func (x *MoodListResponse) String() string {
 func (*MoodListResponse) ProtoMessage() {}
 
 func (x *MoodListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_mood_proto_msgTypes[1]
+	mi := &file_api_v1_mood_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -127,7 +173,7 @@ func (x *MoodListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MoodListResponse.ProtoReflect.Descriptor instead.
 func (*MoodListResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_mood_proto_rawDescGZIP(), []int{1}
+	return file_api_v1_mood_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *MoodListResponse) GetList() []*MoodItem {
@@ -148,18 +194,20 @@ var File_api_v1_mood_proto protoreflect.FileDescriptor
 
 const file_api_v1_mood_proto_rawDesc = "" +
 	"\n" +
-	"\x11api/v1/mood.proto\x12\x12fifsky.blog.api.v1\x1a\x13api/v1/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\"\x88\x01\n" +
+	"\x11api/v1/mood.proto\x12\x12fifsky.blog.api.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\".\n" +
+	"\x0fMoodListRequest\x12\x1b\n" +
+	"\x04page\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02 \x00R\x04page\"\x87\x01\n" +
 	"\bMoodItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\x123\n" +
-	"\x04user\x18\x03 \x01(\v2\x1f.fifsky.blog.api.v1.UserSummaryR\x04user\x12\x1d\n" +
+	"\acontent\x18\x02 \x01(\tR\acontent\x122\n" +
+	"\x04user\x18\x03 \x01(\v2\x1e.fifsky.blog.types.UserSummaryR\x04user\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\x04 \x01(\tR\tcreatedAt\"Z\n" +
 	"\x10MoodListResponse\x120\n" +
 	"\x04list\x18\x01 \x03(\v2\x1c.fifsky.blog.api.v1.MoodItemR\x04list\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total2w\n" +
-	"\vMoodService\x12h\n" +
-	"\x04List\x12\x1f.fifsky.blog.api.v1.PageRequest\x1a$.fifsky.blog.api.v1.MoodListResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/api/mood/listB\xaa\x01\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total2{\n" +
+	"\vMoodService\x12l\n" +
+	"\x04List\x12#.fifsky.blog.api.v1.MoodListRequest\x1a$.fifsky.blog.api.v1.MoodListResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/api/mood/listB\xaa\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\tMoodProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
 
 var (
@@ -174,18 +222,18 @@ func file_api_v1_mood_proto_rawDescGZIP() []byte {
 	return file_api_v1_mood_proto_rawDescData
 }
 
-var file_api_v1_mood_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_api_v1_mood_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_api_v1_mood_proto_goTypes = []any{
-	(*MoodItem)(nil),         // 0: fifsky.blog.api.v1.MoodItem
-	(*MoodListResponse)(nil), // 1: fifsky.blog.api.v1.MoodListResponse
-	(*UserSummary)(nil),      // 2: fifsky.blog.api.v1.UserSummary
-	(*PageRequest)(nil),      // 3: fifsky.blog.api.v1.PageRequest
+	(*MoodListRequest)(nil),   // 0: fifsky.blog.api.v1.MoodListRequest
+	(*MoodItem)(nil),          // 1: fifsky.blog.api.v1.MoodItem
+	(*MoodListResponse)(nil),  // 2: fifsky.blog.api.v1.MoodListResponse
+	(*types.UserSummary)(nil), // 3: fifsky.blog.types.UserSummary
 }
 var file_api_v1_mood_proto_depIdxs = []int32{
-	2, // 0: fifsky.blog.api.v1.MoodItem.user:type_name -> fifsky.blog.api.v1.UserSummary
-	0, // 1: fifsky.blog.api.v1.MoodListResponse.list:type_name -> fifsky.blog.api.v1.MoodItem
-	3, // 2: fifsky.blog.api.v1.MoodService.List:input_type -> fifsky.blog.api.v1.PageRequest
-	1, // 3: fifsky.blog.api.v1.MoodService.List:output_type -> fifsky.blog.api.v1.MoodListResponse
+	3, // 0: fifsky.blog.api.v1.MoodItem.user:type_name -> fifsky.blog.types.UserSummary
+	1, // 1: fifsky.blog.api.v1.MoodListResponse.list:type_name -> fifsky.blog.api.v1.MoodItem
+	0, // 2: fifsky.blog.api.v1.MoodService.List:input_type -> fifsky.blog.api.v1.MoodListRequest
+	2, // 3: fifsky.blog.api.v1.MoodService.List:output_type -> fifsky.blog.api.v1.MoodListResponse
 	3, // [3:4] is the sub-list for method output_type
 	2, // [2:3] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -198,14 +246,13 @@ func file_api_v1_mood_proto_init() {
 	if File_api_v1_mood_proto != nil {
 		return
 	}
-	file_api_v1_common_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_v1_mood_proto_rawDesc), len(file_api_v1_mood_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

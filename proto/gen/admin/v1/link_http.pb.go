@@ -5,6 +5,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	context "context"
 	contract "github.com/goapt/grpc-http/contract"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -18,13 +19,13 @@ import (
 // LinkService 提供链接相关的接口
 type LinkServiceHTTPServer interface {
 	// Create 创建链接
-	Create(context.Context, *LinkCreateRequest) (*IDResponse, error)
+	Create(context.Context, *LinkCreateRequest) (*types.IDResponse, error)
 	// Delete 删除链接
-	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	Delete(context.Context, *LinkDeleteRequest) (*emptypb.Empty, error)
 	// List 获取链接列表
 	List(context.Context, *emptypb.Empty) (*LinkListResponse, error)
 	// Update 更新链接
-	Update(context.Context, *LinkUpdateRequest) (*IDResponse, error)
+	Update(context.Context, *LinkUpdateRequest) (*types.IDResponse, error)
 }
 
 type LinkService struct {
@@ -104,7 +105,7 @@ func (s *LinkService) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *LinkService) Delete(w http.ResponseWriter, r *http.Request) {
-	var in IDRequest
+	var in LinkDeleteRequest
 	if err := s.codec.Decode(r, &in); err != nil {
 		s.codec.Encode(w, r, err)
 		return

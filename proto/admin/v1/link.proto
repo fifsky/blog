@@ -1,11 +1,11 @@
 syntax = "proto3";
 package fifsky.blog.admin.v1;
 
-import "admin/v1/common.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
+import "types/common.proto";
 
 option go_package = "gen/admin/v1";
 
@@ -19,26 +19,34 @@ service LinkService {
     };
   }
   // Create 创建链接
-  rpc Create(LinkCreateRequest) returns (IDResponse) {
+  rpc Create(LinkCreateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/link/create"
       body: "*"
     };
   }
   // Update 更新链接
-  rpc Update(LinkUpdateRequest) returns (IDResponse) {
+  rpc Update(LinkUpdateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/link/update"
       body: "*"
     };
   }
   // Delete 删除链接
-  rpc Delete(IDRequest) returns (google.protobuf.Empty) {
+  rpc Delete(LinkDeleteRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/admin/link/delete"
       body: "*"
     };
   }
+}
+
+// LinkDeleteRequest 删除链接请求
+message LinkDeleteRequest {
+  int32 id = 1 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
 }
 
 message LinkItem {

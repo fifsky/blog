@@ -7,6 +7,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -37,13 +38,13 @@ type UserServiceClient interface {
 	// Get 获取用户详情
 	Get(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error)
 	// Create 创建用户
-	Create(ctx context.Context, in *UserCreateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	Create(ctx context.Context, in *UserCreateRequest, opts ...grpc.CallOption) (*types.IDResponse, error)
 	// Update 更新用户
-	Update(ctx context.Context, in *UserUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	Update(ctx context.Context, in *UserUpdateRequest, opts ...grpc.CallOption) (*types.IDResponse, error)
 	// List 获取用户列表
-	List(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*UserListResponse, error)
+	List(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListResponse, error)
 	// Status 更新用户状态
-	Status(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Status(ctx context.Context, in *UserStatusRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// LoginUser 获取登录用户详情
 	LoginUser(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*User, error)
 }
@@ -66,9 +67,9 @@ func (c *userServiceClient) Get(ctx context.Context, in *GetUserRequest, opts ..
 	return out, nil
 }
 
-func (c *userServiceClient) Create(ctx context.Context, in *UserCreateRequest, opts ...grpc.CallOption) (*IDResponse, error) {
+func (c *userServiceClient) Create(ctx context.Context, in *UserCreateRequest, opts ...grpc.CallOption) (*types.IDResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(IDResponse)
+	out := new(types.IDResponse)
 	err := c.cc.Invoke(ctx, UserService_Create_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -76,9 +77,9 @@ func (c *userServiceClient) Create(ctx context.Context, in *UserCreateRequest, o
 	return out, nil
 }
 
-func (c *userServiceClient) Update(ctx context.Context, in *UserUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error) {
+func (c *userServiceClient) Update(ctx context.Context, in *UserUpdateRequest, opts ...grpc.CallOption) (*types.IDResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(IDResponse)
+	out := new(types.IDResponse)
 	err := c.cc.Invoke(ctx, UserService_Update_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -86,7 +87,7 @@ func (c *userServiceClient) Update(ctx context.Context, in *UserUpdateRequest, o
 	return out, nil
 }
 
-func (c *userServiceClient) List(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*UserListResponse, error) {
+func (c *userServiceClient) List(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserListResponse)
 	err := c.cc.Invoke(ctx, UserService_List_FullMethodName, in, out, cOpts...)
@@ -96,7 +97,7 @@ func (c *userServiceClient) List(ctx context.Context, in *PageRequest, opts ...g
 	return out, nil
 }
 
-func (c *userServiceClient) Status(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *userServiceClient) Status(ctx context.Context, in *UserStatusRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, UserService_Status_FullMethodName, in, out, cOpts...)
@@ -125,13 +126,13 @@ type UserServiceServer interface {
 	// Get 获取用户详情
 	Get(context.Context, *GetUserRequest) (*User, error)
 	// Create 创建用户
-	Create(context.Context, *UserCreateRequest) (*IDResponse, error)
+	Create(context.Context, *UserCreateRequest) (*types.IDResponse, error)
 	// Update 更新用户
-	Update(context.Context, *UserUpdateRequest) (*IDResponse, error)
+	Update(context.Context, *UserUpdateRequest) (*types.IDResponse, error)
 	// List 获取用户列表
-	List(context.Context, *PageRequest) (*UserListResponse, error)
+	List(context.Context, *UserListRequest) (*UserListResponse, error)
 	// Status 更新用户状态
-	Status(context.Context, *IDRequest) (*emptypb.Empty, error)
+	Status(context.Context, *UserStatusRequest) (*emptypb.Empty, error)
 	// LoginUser 获取登录用户详情
 	LoginUser(context.Context, *emptypb.Empty) (*User, error)
 	mustEmbedUnimplementedUserServiceServer()
@@ -147,16 +148,16 @@ type UnimplementedUserServiceServer struct{}
 func (UnimplementedUserServiceServer) Get(context.Context, *GetUserRequest) (*User, error) {
 	return nil, status.Error(codes.Unimplemented, "method Get not implemented")
 }
-func (UnimplementedUserServiceServer) Create(context.Context, *UserCreateRequest) (*IDResponse, error) {
+func (UnimplementedUserServiceServer) Create(context.Context, *UserCreateRequest) (*types.IDResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Create not implemented")
 }
-func (UnimplementedUserServiceServer) Update(context.Context, *UserUpdateRequest) (*IDResponse, error) {
+func (UnimplementedUserServiceServer) Update(context.Context, *UserUpdateRequest) (*types.IDResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedUserServiceServer) List(context.Context, *PageRequest) (*UserListResponse, error) {
+func (UnimplementedUserServiceServer) List(context.Context, *UserListRequest) (*UserListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedUserServiceServer) Status(context.Context, *IDRequest) (*emptypb.Empty, error) {
+func (UnimplementedUserServiceServer) Status(context.Context, *UserStatusRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method Status not implemented")
 }
 func (UnimplementedUserServiceServer) LoginUser(context.Context, *emptypb.Empty) (*User, error) {
@@ -238,7 +239,7 @@ func _UserService_Update_Handler(srv interface{}, ctx context.Context, dec func(
 }
 
 func _UserService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PageRequest)
+	in := new(UserListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -250,13 +251,13 @@ func _UserService_List_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: UserService_List_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).List(ctx, req.(*PageRequest))
+		return srv.(UserServiceServer).List(ctx, req.(*UserListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _UserService_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IDRequest)
+	in := new(UserStatusRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -268,7 +269,7 @@ func _UserService_Status_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: UserService_Status_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).Status(ctx, req.(*IDRequest))
+		return srv.(UserServiceServer).Status(ctx, req.(*UserStatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

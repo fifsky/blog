@@ -40,13 +40,13 @@ export default function AdminArticle() {
   };
   const deleteItem = async (id: number) => {
     if (confirm("确认要删除？")) {
-      await articleDeleteApi({ id });
+      await articleDeleteApi({ ids: [id] });
       loadList();
     }
   };
   const restoreItem = async (id: number) => {
     if (confirm("确认要恢复为草稿？")) {
-      await articleRestoreApi({ id });
+      await articleRestoreApi({ ids: [id] });
       loadList();
     }
   };

@@ -1,11 +1,11 @@
 syntax = "proto3";
 package fifsky.blog.admin.v1;
 
-import "admin/v1/common.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
+import "types/common.proto";
 
 option go_package = "gen/admin/v1";
 
@@ -19,28 +19,28 @@ service UserService {
     };
   }
   // Create 创建用户
-  rpc Create(UserCreateRequest) returns (IDResponse) {
+  rpc Create(UserCreateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/user/create"
       body: "*"
     };
   }
   // Update 更新用户
-  rpc Update(UserUpdateRequest) returns (IDResponse) {
+  rpc Update(UserUpdateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
       post: "/api/admin/user/update"
       body: "*"
     };
   }
   // List 获取用户列表
-  rpc List(PageRequest) returns (UserListResponse) {
+  rpc List(UserListRequest) returns (UserListResponse) {
     option (google.api.http) = {
       post: "/api/admin/user/list"
       body: "*"
     };
   }
   // Status 更新用户状态
-  rpc Status(IDRequest) returns (google.protobuf.Empty) {
+  rpc Status(UserStatusRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/admin/user/status"
       body: "*"
@@ -56,6 +56,19 @@ service UserService {
 }
 
 message GetUserRequest {
+  int32 id = 1 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// UserListRequest 分页请求
+message UserListRequest {
+  int32 page = 1 [(buf.validate.field).int32.gt = 0];
+}
+
+// UserStatusRequest 用户状态切换请求
+message UserStatusRequest {
   int32 id = 1 [
     (buf.validate.field).int32.gt = 0,
     (google.api.field_behavior) = REQUIRED

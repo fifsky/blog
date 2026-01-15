@@ -5,6 +5,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	context "context"
 	contract "github.com/goapt/grpc-http/contract"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -18,13 +19,13 @@ import (
 // RemindService 提供提醒相关的接口
 type RemindServiceHTTPServer interface {
 	// Create 创建提醒
-	Create(context.Context, *RemindCreateRequest) (*IDResponse, error)
+	Create(context.Context, *RemindCreateRequest) (*types.IDResponse, error)
 	// Delete 删除提醒
-	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	Delete(context.Context, *RemindDeleteRequest) (*emptypb.Empty, error)
 	// List 获取提醒列表
-	List(context.Context, *PageRequest) (*RemindListResponse, error)
+	List(context.Context, *RemindListRequest) (*RemindListResponse, error)
 	// Update 更新提醒
-	Update(context.Context, *RemindUpdateRequest) (*IDResponse, error)
+	Update(context.Context, *RemindUpdateRequest) (*types.IDResponse, error)
 }
 
 type RemindService struct {
@@ -50,7 +51,7 @@ func RegisterRemindServiceHTTPServer(mux contract.ServeMux, codec contract.Codec
 }
 
 func (s *RemindService) List(w http.ResponseWriter, r *http.Request) {
-	var in PageRequest
+	var in RemindListRequest
 	if err := s.codec.Decode(r, &in); err != nil {
 		s.codec.Encode(w, r, err)
 		return
@@ -113,7 +114,7 @@ func (s *RemindService) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *RemindService) Delete(w http.ResponseWriter, r *http.Request) {
-	var in IDRequest
+	var in RemindDeleteRequest
 	if err := s.codec.Decode(r, &in); err != nil {
 		s.codec.Encode(w, r, err)
 		return

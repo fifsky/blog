@@ -7,6 +7,7 @@ import (
 
 	"app/model"
 	adminv1 "app/proto/gen/admin/v1"
+	"app/proto/gen/types"
 	"app/store"
 
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -46,7 +47,7 @@ func (c *Cate) List(ctx context.Context, _ *emptypb.Empty) (*adminv1.CateListRes
 	}, nil
 }
 
-func (c *Cate) Create(ctx context.Context, req *adminv1.CateCreateRequest) (*adminv1.IDResponse, error) {
+func (c *Cate) Create(ctx context.Context, req *adminv1.CateCreateRequest) (*types.IDResponse, error) {
 	now := time.Now()
 	m := &model.Cate{
 		Name:      req.Name,
@@ -59,10 +60,10 @@ func (c *Cate) Create(ctx context.Context, req *adminv1.CateCreateRequest) (*adm
 	if err != nil {
 		return nil, err
 	}
-	return &adminv1.IDResponse{Id: int32(lastId)}, nil
+	return &types.IDResponse{Id: int32(lastId)}, nil
 }
 
-func (c *Cate) Update(ctx context.Context, req *adminv1.CateUpdateRequest) (*adminv1.IDResponse, error) {
+func (c *Cate) Update(ctx context.Context, req *adminv1.CateUpdateRequest) (*types.IDResponse, error) {
 	now := time.Now()
 	u := &model.UpdateCate{Id: int(req.Id)}
 	if req.Name != "" {
@@ -81,10 +82,10 @@ func (c *Cate) Update(ctx context.Context, req *adminv1.CateUpdateRequest) (*adm
 	if err := c.store.UpdateCate(ctx, u); err != nil {
 		return nil, err
 	}
-	return &adminv1.IDResponse{Id: int32(req.Id)}, nil
+	return &types.IDResponse{Id: int32(req.Id)}, nil
 }
 
-func (c *Cate) Delete(ctx context.Context, req *adminv1.IDRequest) (*emptypb.Empty, error) {
+func (c *Cate) Delete(ctx context.Context, req *adminv1.CateDeleteRequest) (*emptypb.Empty, error) {
 	total, _ := c.store.PostsCount(ctx, int(req.Id))
 	if total > 0 {
 		return nil, fmt.Errorf("该分类下面还有文章，不能删除")

@@ -6,6 +6,7 @@ import (
 
 	"app/model"
 	adminv1 "app/proto/gen/admin/v1"
+	"app/proto/gen/types"
 	"app/store"
 
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -43,7 +44,7 @@ func (l *Link) List(ctx context.Context, _ *emptypb.Empty) (*adminv1.LinkListRes
 	}, nil
 }
 
-func (l *Link) Create(ctx context.Context, req *adminv1.LinkCreateRequest) (*adminv1.IDResponse, error) {
+func (l *Link) Create(ctx context.Context, req *adminv1.LinkCreateRequest) (*types.IDResponse, error) {
 	m := &model.Link{
 		Name:      req.Name,
 		Url:       req.Url,
@@ -54,10 +55,10 @@ func (l *Link) Create(ctx context.Context, req *adminv1.LinkCreateRequest) (*adm
 	if err != nil {
 		return nil, err
 	}
-	return &adminv1.IDResponse{Id: int32(lastId)}, nil
+	return &types.IDResponse{Id: int32(lastId)}, nil
 }
 
-func (l *Link) Update(ctx context.Context, req *adminv1.LinkUpdateRequest) (*adminv1.IDResponse, error) {
+func (l *Link) Update(ctx context.Context, req *adminv1.LinkUpdateRequest) (*types.IDResponse, error) {
 	u := &model.UpdateLink{Id: int(req.Id)}
 	if req.Name != "" {
 		v := req.Name
@@ -74,10 +75,10 @@ func (l *Link) Update(ctx context.Context, req *adminv1.LinkUpdateRequest) (*adm
 	if err := l.store.UpdateLink(ctx, u); err != nil {
 		return nil, err
 	}
-	return &adminv1.IDResponse{Id: req.Id}, nil
+	return &types.IDResponse{Id: req.Id}, nil
 }
 
-func (l *Link) Delete(ctx context.Context, req *adminv1.IDRequest) (*emptypb.Empty, error) {
+func (l *Link) Delete(ctx context.Context, req *adminv1.LinkDeleteRequest) (*emptypb.Empty, error) {
 	if err := l.store.DeleteLink(ctx, int(req.Id)); err != nil {
 		return nil, err
 	}

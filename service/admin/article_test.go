@@ -40,7 +40,7 @@ func TestAdminArticle_CreateDeleteUpload(t *testing.T) {
 		}
 
 		// Delete
-		_, err = svc.Delete(context.Background(), &adminv1.IDRequest{Id: 4})
+		_, err = svc.Delete(context.Background(), &adminv1.ArticleDeleteRequest{Ids: []int32{4}})
 		if err != nil {
 			t.Fatalf("unexpected err=%v", err)
 		}

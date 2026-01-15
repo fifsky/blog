@@ -7,6 +7,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -32,11 +33,11 @@ const (
 // MoodService 提供心情相关的接口
 type MoodServiceClient interface {
 	// Create 创建心情
-	Create(ctx context.Context, in *MoodCreateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	Create(ctx context.Context, in *MoodCreateRequest, opts ...grpc.CallOption) (*types.IDResponse, error)
 	// Update 更新心情
-	Update(ctx context.Context, in *MoodUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	Update(ctx context.Context, in *MoodUpdateRequest, opts ...grpc.CallOption) (*types.IDResponse, error)
 	// Delete 删除心情
-	Delete(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Delete(ctx context.Context, in *MoodDeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type moodServiceClient struct {
@@ -47,9 +48,9 @@ func NewMoodServiceClient(cc grpc.ClientConnInterface) MoodServiceClient {
 	return &moodServiceClient{cc}
 }
 
-func (c *moodServiceClient) Create(ctx context.Context, in *MoodCreateRequest, opts ...grpc.CallOption) (*IDResponse, error) {
+func (c *moodServiceClient) Create(ctx context.Context, in *MoodCreateRequest, opts ...grpc.CallOption) (*types.IDResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(IDResponse)
+	out := new(types.IDResponse)
 	err := c.cc.Invoke(ctx, MoodService_Create_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -57,9 +58,9 @@ func (c *moodServiceClient) Create(ctx context.Context, in *MoodCreateRequest, o
 	return out, nil
 }
 
-func (c *moodServiceClient) Update(ctx context.Context, in *MoodUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error) {
+func (c *moodServiceClient) Update(ctx context.Context, in *MoodUpdateRequest, opts ...grpc.CallOption) (*types.IDResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(IDResponse)
+	out := new(types.IDResponse)
 	err := c.cc.Invoke(ctx, MoodService_Update_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -67,7 +68,7 @@ func (c *moodServiceClient) Update(ctx context.Context, in *MoodUpdateRequest, o
 	return out, nil
 }
 
-func (c *moodServiceClient) Delete(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *moodServiceClient) Delete(ctx context.Context, in *MoodDeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, MoodService_Delete_FullMethodName, in, out, cOpts...)
@@ -84,11 +85,11 @@ func (c *moodServiceClient) Delete(ctx context.Context, in *IDRequest, opts ...g
 // MoodService 提供心情相关的接口
 type MoodServiceServer interface {
 	// Create 创建心情
-	Create(context.Context, *MoodCreateRequest) (*IDResponse, error)
+	Create(context.Context, *MoodCreateRequest) (*types.IDResponse, error)
 	// Update 更新心情
-	Update(context.Context, *MoodUpdateRequest) (*IDResponse, error)
+	Update(context.Context, *MoodUpdateRequest) (*types.IDResponse, error)
 	// Delete 删除心情
-	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	Delete(context.Context, *MoodDeleteRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedMoodServiceServer()
 }
 
@@ -99,13 +100,13 @@ type MoodServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedMoodServiceServer struct{}
 
-func (UnimplementedMoodServiceServer) Create(context.Context, *MoodCreateRequest) (*IDResponse, error) {
+func (UnimplementedMoodServiceServer) Create(context.Context, *MoodCreateRequest) (*types.IDResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Create not implemented")
 }
-func (UnimplementedMoodServiceServer) Update(context.Context, *MoodUpdateRequest) (*IDResponse, error) {
+func (UnimplementedMoodServiceServer) Update(context.Context, *MoodUpdateRequest) (*types.IDResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedMoodServiceServer) Delete(context.Context, *IDRequest) (*emptypb.Empty, error) {
+func (UnimplementedMoodServiceServer) Delete(context.Context, *MoodDeleteRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method Delete not implemented")
 }
 func (UnimplementedMoodServiceServer) mustEmbedUnimplementedMoodServiceServer() {}
@@ -166,7 +167,7 @@ func _MoodService_Update_Handler(srv interface{}, ctx context.Context, dec func(
 }
 
 func _MoodService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IDRequest)
+	in := new(MoodDeleteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -178,7 +179,7 @@ func _MoodService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: MoodService_Delete_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MoodServiceServer).Delete(ctx, req.(*IDRequest))
+		return srv.(MoodServiceServer).Delete(ctx, req.(*MoodDeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

@@ -17,7 +17,7 @@ import (
 // MoodService 提供心情相关的接口
 type MoodServiceHTTPServer interface {
 	// List 获取心情列表
-	List(context.Context, *PageRequest) (*MoodListResponse, error)
+	List(context.Context, *MoodListRequest) (*MoodListResponse, error)
 }
 
 type MoodService struct {
@@ -40,7 +40,7 @@ func RegisterMoodServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, 
 }
 
 func (s *MoodService) List(w http.ResponseWriter, r *http.Request) {
-	var in PageRequest
+	var in MoodListRequest
 	if err := s.codec.Decode(r, &in); err != nil {
 		s.codec.Encode(w, r, err)
 		return

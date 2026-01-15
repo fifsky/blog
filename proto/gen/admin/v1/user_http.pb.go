@@ -5,6 +5,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	context "context"
 	contract "github.com/goapt/grpc-http/contract"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -18,17 +19,17 @@ import (
 // UserService 提供用户相关的接口
 type UserServiceHTTPServer interface {
 	// Create 创建用户
-	Create(context.Context, *UserCreateRequest) (*IDResponse, error)
+	Create(context.Context, *UserCreateRequest) (*types.IDResponse, error)
 	// Get 获取用户详情
 	Get(context.Context, *GetUserRequest) (*User, error)
 	// List 获取用户列表
-	List(context.Context, *PageRequest) (*UserListResponse, error)
+	List(context.Context, *UserListRequest) (*UserListResponse, error)
 	// LoginUser 获取登录用户详情
 	LoginUser(context.Context, *emptypb.Empty) (*User, error)
 	// Status 更新用户状态
-	Status(context.Context, *IDRequest) (*emptypb.Empty, error)
+	Status(context.Context, *UserStatusRequest) (*emptypb.Empty, error)
 	// Update 更新用户
-	Update(context.Context, *UserUpdateRequest) (*IDResponse, error)
+	Update(context.Context, *UserUpdateRequest) (*types.IDResponse, error)
 }
 
 type UserService struct {
@@ -119,7 +120,7 @@ func (s *UserService) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *UserService) List(w http.ResponseWriter, r *http.Request) {
-	var in PageRequest
+	var in UserListRequest
 	if err := s.codec.Decode(r, &in); err != nil {
 		s.codec.Encode(w, r, err)
 		return
@@ -140,7 +141,7 @@ func (s *UserService) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *UserService) Status(w http.ResponseWriter, r *http.Request) {
-	var in IDRequest
+	var in UserStatusRequest
 	if err := s.codec.Decode(r, &in); err != nil {
 		s.codec.Encode(w, r, err)
 		return

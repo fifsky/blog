@@ -13,6 +13,7 @@ import (
 	"app/model"
 	"app/pkg/ossutil"
 	adminv1 "app/proto/gen/admin/v1"
+	"app/proto/gen/types"
 	"app/response"
 	"app/store"
 
@@ -38,7 +39,7 @@ func NewArticle(s *store.Store, conf *config.Config) *Article {
 	}
 }
 
-func (a *Article) Create(ctx context.Context, req *adminv1.ArticleCreateRequest) (*adminv1.IDResponse, error) {
+func (a *Article) Create(ctx context.Context, req *adminv1.ArticleCreateRequest) (*types.IDResponse, error) {
 	loginUser := GetLoginUser(ctx)
 	now := time.Now()
 	status := int32(1)
@@ -60,10 +61,10 @@ func (a *Article) Create(ctx context.Context, req *adminv1.ArticleCreateRequest)
 	if err != nil {
 		return nil, err
 	}
-	return &adminv1.IDResponse{Id: int32(lastId)}, nil
+	return &types.IDResponse{Id: int32(lastId)}, nil
 }
 
-func (a *Article) Update(ctx context.Context, req *adminv1.ArticleUpdateRequest) (*adminv1.IDResponse, error) {
+func (a *Article) Update(ctx context.Context, req *adminv1.ArticleUpdateRequest) (*types.IDResponse, error) {
 	now := time.Now()
 	u := &model.UpdatePost{Id: int(req.Id)}
 	if req.CateId > 0 {
@@ -90,14 +91,11 @@ func (a *Article) Update(ctx context.Context, req *adminv1.ArticleUpdateRequest)
 	if err := a.store.UpdatePost(ctx, u); err != nil {
 		return nil, err
 	}
-	return &adminv1.IDResponse{Id: req.Id}, nil
+	return &types.IDResponse{Id: req.Id}, nil
 }
 
-func (a *Article) Delete(ctx context.Context, req *adminv1.IDRequest) (*emptypb.Empty, error) {
-	ids := make([]int, 0)
-	if req.Id > 0 {
-		ids = append(ids, int(req.Id))
-	}
+func (a *Article) Delete(ctx context.Context, req *adminv1.ArticleDeleteRequest) (*emptypb.Empty, error) {
+	ids := make([]int, 0, len(req.Ids))
 	for _, id := range req.Ids {
 		if id > 0 {
 			ids = append(ids, int(id))
@@ -112,12 +110,23 @@ func (a *Article) Delete(ctx context.Context, req *adminv1.IDRequest) (*emptypb.
 	return &emptypb.Empty{}, nil
 }
 
-func (a *Article) Restore(ctx context.Context, req *adminv1.IDRequest) (*adminv1.IDResponse, error) {
-	err := a.store.RestorePost(ctx, int(req.Id))
-	if err != nil {
-		return nil, err
+func (a *Article) Restore(ctx context.Context, req *adminv1.ArticleRestoreRequest) (*types.IDResponse, error) {
+	ids := make([]int, 0, len(req.Ids))
+	for _, id := range req.Ids {
+		if id > 0 {
+			ids = append(ids, int(id))
+		}
 	}
-	return &adminv1.IDResponse{Id: req.Id}, nil
+	if len(ids) == 0 {
+		return &types.IDResponse{}, nil
+	}
+	// 批量恢复，逐个执行
+	for _, id := range ids {
+		if err := a.store.RestorePost(ctx, id); err != nil {
+			return nil, err
+		}
+	}
+	return &types.IDResponse{Id: int32(ids[0])}, nil
 }
 
 func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*adminv1.ArticleListResponse, error) {
@@ -162,10 +171,10 @@ func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*a
 			UpdatedAt: p.UpdatedAt.Format(time.DateTime),
 		}
 		if u, ok := um[p.UserId]; ok {
-			item.User = &adminv1.UserSummary{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}
+			item.User = &types.UserSummary{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}
 		}
 		if c, ok := cm[p.CateId]; ok {
-			item.Cate = &adminv1.CateSummary{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}
+			item.Cate = &types.CateSummary{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}
 		}
 		items = append(items, item)
 	}

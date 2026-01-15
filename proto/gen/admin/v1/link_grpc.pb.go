@@ -7,6 +7,7 @@
 package adminv1
 
 import (
+	types "app/proto/gen/types"
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -35,11 +36,11 @@ type LinkServiceClient interface {
 	// List 获取链接列表
 	List(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*LinkListResponse, error)
 	// Create 创建链接
-	Create(ctx context.Context, in *LinkCreateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	Create(ctx context.Context, in *LinkCreateRequest, opts ...grpc.CallOption) (*types.IDResponse, error)
 	// Update 更新链接
-	Update(ctx context.Context, in *LinkUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error)
+	Update(ctx context.Context, in *LinkUpdateRequest, opts ...grpc.CallOption) (*types.IDResponse, error)
 	// Delete 删除链接
-	Delete(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Delete(ctx context.Context, in *LinkDeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type linkServiceClient struct {
@@ -60,9 +61,9 @@ func (c *linkServiceClient) List(ctx context.Context, in *emptypb.Empty, opts ..
 	return out, nil
 }
 
-func (c *linkServiceClient) Create(ctx context.Context, in *LinkCreateRequest, opts ...grpc.CallOption) (*IDResponse, error) {
+func (c *linkServiceClient) Create(ctx context.Context, in *LinkCreateRequest, opts ...grpc.CallOption) (*types.IDResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(IDResponse)
+	out := new(types.IDResponse)
 	err := c.cc.Invoke(ctx, LinkService_Create_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -70,9 +71,9 @@ func (c *linkServiceClient) Create(ctx context.Context, in *LinkCreateRequest, o
 	return out, nil
 }
 
-func (c *linkServiceClient) Update(ctx context.Context, in *LinkUpdateRequest, opts ...grpc.CallOption) (*IDResponse, error) {
+func (c *linkServiceClient) Update(ctx context.Context, in *LinkUpdateRequest, opts ...grpc.CallOption) (*types.IDResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(IDResponse)
+	out := new(types.IDResponse)
 	err := c.cc.Invoke(ctx, LinkService_Update_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -80,7 +81,7 @@ func (c *linkServiceClient) Update(ctx context.Context, in *LinkUpdateRequest, o
 	return out, nil
 }
 
-func (c *linkServiceClient) Delete(ctx context.Context, in *IDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *linkServiceClient) Delete(ctx context.Context, in *LinkDeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, LinkService_Delete_FullMethodName, in, out, cOpts...)
@@ -99,11 +100,11 @@ type LinkServiceServer interface {
 	// List 获取链接列表
 	List(context.Context, *emptypb.Empty) (*LinkListResponse, error)
 	// Create 创建链接
-	Create(context.Context, *LinkCreateRequest) (*IDResponse, error)
+	Create(context.Context, *LinkCreateRequest) (*types.IDResponse, error)
 	// Update 更新链接
-	Update(context.Context, *LinkUpdateRequest) (*IDResponse, error)
+	Update(context.Context, *LinkUpdateRequest) (*types.IDResponse, error)
 	// Delete 删除链接
-	Delete(context.Context, *IDRequest) (*emptypb.Empty, error)
+	Delete(context.Context, *LinkDeleteRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedLinkServiceServer()
 }
 
@@ -117,13 +118,13 @@ type UnimplementedLinkServiceServer struct{}
 func (UnimplementedLinkServiceServer) List(context.Context, *emptypb.Empty) (*LinkListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedLinkServiceServer) Create(context.Context, *LinkCreateRequest) (*IDResponse, error) {
+func (UnimplementedLinkServiceServer) Create(context.Context, *LinkCreateRequest) (*types.IDResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Create not implemented")
 }
-func (UnimplementedLinkServiceServer) Update(context.Context, *LinkUpdateRequest) (*IDResponse, error) {
+func (UnimplementedLinkServiceServer) Update(context.Context, *LinkUpdateRequest) (*types.IDResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedLinkServiceServer) Delete(context.Context, *IDRequest) (*emptypb.Empty, error) {
+func (UnimplementedLinkServiceServer) Delete(context.Context, *LinkDeleteRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method Delete not implemented")
 }
 func (UnimplementedLinkServiceServer) mustEmbedUnimplementedLinkServiceServer() {}
@@ -202,7 +203,7 @@ func _LinkService_Update_Handler(srv interface{}, ctx context.Context, dec func(
 }
 
 func _LinkService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IDRequest)
+	in := new(LinkDeleteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -214,7 +215,7 @@ func _LinkService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: LinkService_Delete_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LinkServiceServer).Delete(ctx, req.(*IDRequest))
+		return srv.(LinkServiceServer).Delete(ctx, req.(*LinkDeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

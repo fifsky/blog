@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	types "app/proto/gen/types"
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -30,7 +31,7 @@ const (
 // SettingService 提供设置相关的接口
 type SettingServiceClient interface {
 	// Get 获取设置
-	Get(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Options, error)
+	Get(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*types.Options, error)
 }
 
 type settingServiceClient struct {
@@ -41,9 +42,9 @@ func NewSettingServiceClient(cc grpc.ClientConnInterface) SettingServiceClient {
 	return &settingServiceClient{cc}
 }
 
-func (c *settingServiceClient) Get(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Options, error) {
+func (c *settingServiceClient) Get(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*types.Options, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Options)
+	out := new(types.Options)
 	err := c.cc.Invoke(ctx, SettingService_Get_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -58,7 +59,7 @@ func (c *settingServiceClient) Get(ctx context.Context, in *emptypb.Empty, opts 
 // SettingService 提供设置相关的接口
 type SettingServiceServer interface {
 	// Get 获取设置
-	Get(context.Context, *emptypb.Empty) (*Options, error)
+	Get(context.Context, *emptypb.Empty) (*types.Options, error)
 	mustEmbedUnimplementedSettingServiceServer()
 }
 
@@ -69,7 +70,7 @@ type SettingServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedSettingServiceServer struct{}
 
-func (UnimplementedSettingServiceServer) Get(context.Context, *emptypb.Empty) (*Options, error) {
+func (UnimplementedSettingServiceServer) Get(context.Context, *emptypb.Empty) (*types.Options, error) {
 	return nil, status.Error(codes.Unimplemented, "method Get not implemented")
 }
 func (UnimplementedSettingServiceServer) mustEmbedUnimplementedSettingServiceServer() {}
