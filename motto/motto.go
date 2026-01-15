@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"sync"
 	"time"
 
 	"app/config"
@@ -24,8 +25,10 @@ type AIProvider interface {
 }
 
 type OpenAIProvider struct {
-	client *openai.Client
-	model  string
+	client  *openai.Client
+	model   string
+	history []openai.ChatCompletionMessageParamUnion
+	mu      sync.Mutex
 }
 
 func NewOpenAIProvider(token, endpoint, model string) *OpenAIProvider {
@@ -40,12 +43,19 @@ func NewOpenAIProvider(token, endpoint, model string) *OpenAIProvider {
 }
 
 func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (string, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	// 构造消息上下文：系统提示词 + 历史记录 + 当前用户输入
+	messages := []openai.ChatCompletionMessageParamUnion{
+		openai.SystemMessage(prompt),
+	}
+	messages = append(messages, p.history...)
+	messages = append(messages, openai.UserMessage(content))
+
 	completion, err := p.client.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
-		Messages: []openai.ChatCompletionMessageParamUnion{
-			openai.SystemMessage(prompt),
-			openai.UserMessage(content),
-		},
-		Model: shared.ChatModel(p.model),
+		Messages: messages,
+		Model:    shared.ChatModel(p.model),
 	})
 
 	if err != nil {
@@ -53,7 +63,11 @@ func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (
 	}
 
 	if len(completion.Choices) > 0 {
-		return completion.Choices[0].Message.Content, nil
+		response := completion.Choices[0].Message.Content
+		// 记录历史消息：用户输入和AI输出
+		p.history = append(p.history, openai.UserMessage(content))
+		p.history = append(p.history, openai.AssistantMessage(response))
+		return response, nil
 	}
 	return "", nil
 }
