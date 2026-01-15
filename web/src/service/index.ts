@@ -95,6 +95,8 @@ export const articleListAdminApi = (
   data: AdminArticleListRequest,
   errorHandler?: (e: AppError) => void,
 ) => createApi<AdminArticleListResponse>("/api/admin/article/list", data, errorHandler);
+export const adminArticleDetailApi = (data: { id: number }, errorHandler?: (e: AppError) => void) =>
+  createApi<ArticleItem>("/api/admin/article/detail", data, errorHandler);
 export const uploadApi = (data: any, errorHandler?: (e: AppError) => void) =>
   createApi("/api/admin/upload", data, errorHandler);
 export const commentAdminListApi = (data: UserListRequest, errorHandler?: (e: AppError) => void) =>

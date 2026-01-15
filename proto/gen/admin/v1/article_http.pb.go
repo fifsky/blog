@@ -22,6 +22,8 @@ type ArticleServiceHTTPServer interface {
 	Create(context.Context, *ArticleCreateRequest) (*types.IDResponse, error)
 	// Delete 删除文章（支持批量）
 	Delete(context.Context, *ArticleDeleteRequest) (*emptypb.Empty, error)
+	// Detail 获取文章详情（不限制文章状态）
+	Detail(context.Context, *ArticleDetailRequest) (*ArticleItem, error)
 	// List 获取文章列表
 	List(context.Context, *ArticleListRequest) (*ArticleListResponse, error)
 	// Restore 恢复已删除文章（支持批量）
@@ -42,6 +44,7 @@ func (s *ArticleService) RegisterService() {
 	s.mux.HandleFunc("POST /api/admin/article/delete", s.Delete)
 	s.mux.HandleFunc("POST /api/admin/article/list", s.List)
 	s.mux.HandleFunc("POST /api/admin/article/restore", s.Restore)
+	s.mux.HandleFunc("POST /api/admin/article/detail", s.Detail)
 }
 
 func RegisterArticleServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv ArticleServiceHTTPServer) {
@@ -149,6 +152,27 @@ func (s *ArticleService) Restore(w http.ResponseWriter, r *http.Request) {
 	}
 
 	out, err := s.server.Restore(r.Context(), &in)
+	if err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+	s.codec.Encode(w, r, out)
+	return
+}
+
+func (s *ArticleService) Detail(w http.ResponseWriter, r *http.Request) {
+	var in ArticleDetailRequest
+	if err := s.codec.Decode(r, &in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	if err := s.codec.Validate(&in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	out, err := s.server.Detail(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
 		return

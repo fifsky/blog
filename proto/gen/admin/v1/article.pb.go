@@ -25,6 +25,51 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// ArticleDetailRequest 获取文章详情请求
+type ArticleDetailRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ArticleDetailRequest) Reset() {
+	*x = ArticleDetailRequest{}
+	mi := &file_admin_v1_article_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ArticleDetailRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ArticleDetailRequest) ProtoMessage() {}
+
+func (x *ArticleDetailRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_article_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ArticleDetailRequest.ProtoReflect.Descriptor instead.
+func (*ArticleDetailRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_article_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *ArticleDetailRequest) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 // ArticleDeleteRequest 删除文章请求（支持批量）
 type ArticleDeleteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -35,7 +80,7 @@ type ArticleDeleteRequest struct {
 
 func (x *ArticleDeleteRequest) Reset() {
 	*x = ArticleDeleteRequest{}
-	mi := &file_admin_v1_article_proto_msgTypes[0]
+	mi := &file_admin_v1_article_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -47,7 +92,7 @@ func (x *ArticleDeleteRequest) String() string {
 func (*ArticleDeleteRequest) ProtoMessage() {}
 
 func (x *ArticleDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_article_proto_msgTypes[0]
+	mi := &file_admin_v1_article_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -60,7 +105,7 @@ func (x *ArticleDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArticleDeleteRequest.ProtoReflect.Descriptor instead.
 func (*ArticleDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{0}
+	return file_admin_v1_article_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ArticleDeleteRequest) GetIds() []int32 {
@@ -80,7 +125,7 @@ type ArticleRestoreRequest struct {
 
 func (x *ArticleRestoreRequest) Reset() {
 	*x = ArticleRestoreRequest{}
-	mi := &file_admin_v1_article_proto_msgTypes[1]
+	mi := &file_admin_v1_article_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -92,7 +137,7 @@ func (x *ArticleRestoreRequest) String() string {
 func (*ArticleRestoreRequest) ProtoMessage() {}
 
 func (x *ArticleRestoreRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_article_proto_msgTypes[1]
+	mi := &file_admin_v1_article_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -105,7 +150,7 @@ func (x *ArticleRestoreRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArticleRestoreRequest.ProtoReflect.Descriptor instead.
 func (*ArticleRestoreRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{1}
+	return file_admin_v1_article_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ArticleRestoreRequest) GetIds() []int32 {
@@ -129,7 +174,7 @@ type ArticleCreateRequest struct {
 
 func (x *ArticleCreateRequest) Reset() {
 	*x = ArticleCreateRequest{}
-	mi := &file_admin_v1_article_proto_msgTypes[2]
+	mi := &file_admin_v1_article_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -141,7 +186,7 @@ func (x *ArticleCreateRequest) String() string {
 func (*ArticleCreateRequest) ProtoMessage() {}
 
 func (x *ArticleCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_article_proto_msgTypes[2]
+	mi := &file_admin_v1_article_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -154,7 +199,7 @@ func (x *ArticleCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArticleCreateRequest.ProtoReflect.Descriptor instead.
 func (*ArticleCreateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{2}
+	return file_admin_v1_article_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ArticleCreateRequest) GetCateId() int32 {
@@ -214,7 +259,7 @@ type ArticleUpdateRequest struct {
 
 func (x *ArticleUpdateRequest) Reset() {
 	*x = ArticleUpdateRequest{}
-	mi := &file_admin_v1_article_proto_msgTypes[3]
+	mi := &file_admin_v1_article_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -226,7 +271,7 @@ func (x *ArticleUpdateRequest) String() string {
 func (*ArticleUpdateRequest) ProtoMessage() {}
 
 func (x *ArticleUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_article_proto_msgTypes[3]
+	mi := &file_admin_v1_article_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -239,7 +284,7 @@ func (x *ArticleUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArticleUpdateRequest.ProtoReflect.Descriptor instead.
 func (*ArticleUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{3}
+	return file_admin_v1_article_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ArticleUpdateRequest) GetId() int32 {
@@ -302,7 +347,7 @@ type ArticleListRequest struct {
 
 func (x *ArticleListRequest) Reset() {
 	*x = ArticleListRequest{}
-	mi := &file_admin_v1_article_proto_msgTypes[4]
+	mi := &file_admin_v1_article_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -314,7 +359,7 @@ func (x *ArticleListRequest) String() string {
 func (*ArticleListRequest) ProtoMessage() {}
 
 func (x *ArticleListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_article_proto_msgTypes[4]
+	mi := &file_admin_v1_article_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -327,7 +372,7 @@ func (x *ArticleListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArticleListRequest.ProtoReflect.Descriptor instead.
 func (*ArticleListRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{4}
+	return file_admin_v1_article_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ArticleListRequest) GetPage() int32 {
@@ -361,7 +406,7 @@ type ArticleListResponse struct {
 
 func (x *ArticleListResponse) Reset() {
 	*x = ArticleListResponse{}
-	mi := &file_admin_v1_article_proto_msgTypes[5]
+	mi := &file_admin_v1_article_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -373,7 +418,7 @@ func (x *ArticleListResponse) String() string {
 func (*ArticleListResponse) ProtoMessage() {}
 
 func (x *ArticleListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_article_proto_msgTypes[5]
+	mi := &file_admin_v1_article_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -386,7 +431,7 @@ func (x *ArticleListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArticleListResponse.ProtoReflect.Descriptor instead.
 func (*ArticleListResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{5}
+	return file_admin_v1_article_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ArticleListResponse) GetList() []*ArticleItem {
@@ -423,7 +468,7 @@ type ArticleItem struct {
 
 func (x *ArticleItem) Reset() {
 	*x = ArticleItem{}
-	mi := &file_admin_v1_article_proto_msgTypes[6]
+	mi := &file_admin_v1_article_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -435,7 +480,7 @@ func (x *ArticleItem) String() string {
 func (*ArticleItem) ProtoMessage() {}
 
 func (x *ArticleItem) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_article_proto_msgTypes[6]
+	mi := &file_admin_v1_article_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -448,7 +493,7 @@ func (x *ArticleItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArticleItem.ProtoReflect.Descriptor instead.
 func (*ArticleItem) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{6}
+	return file_admin_v1_article_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ArticleItem) GetId() int32 {
@@ -540,6 +585,9 @@ var File_admin_v1_article_proto protoreflect.FileDescriptor
 const file_admin_v1_article_proto_rawDesc = "" +
 	"\n" +
 	"\x16admin/v1/article.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"2\n" +
+	"\x14ArticleDetailRequest\x12\x1a\n" +
+	"\x02id\x18\x01 \x01(\x05B\n" +
+	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"2\n" +
 	"\x14ArticleDeleteRequest\x12\x1a\n" +
 	"\x03ids\x18\x01 \x03(\x05B\b\xbaH\x05\x92\x01\x02\b\x01R\x03ids\"3\n" +
 	"\x15ArticleRestoreRequest\x12\x1a\n" +
@@ -584,13 +632,14 @@ const file_admin_v1_article_proto_rawDesc = "" +
 	"updated_at\x18\n" +
 	" \x01(\tR\tupdatedAt\x122\n" +
 	"\x04user\x18\v \x01(\v2\x1e.fifsky.blog.types.UserSummaryR\x04user\x122\n" +
-	"\x04cate\x18\f \x01(\v2\x1e.fifsky.blog.types.CateSummaryR\x04cate2\xf9\x04\n" +
+	"\x04cate\x18\f \x01(\v2\x1e.fifsky.blog.types.CateSummaryR\x04cate2\xf8\x05\n" +
 	"\x0eArticleService\x12y\n" +
 	"\x06Create\x12*.fifsky.blog.admin.v1.ArticleCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/article/create\x12y\n" +
 	"\x06Update\x12*.fifsky.blog.admin.v1.ArticleUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/article/update\x12r\n" +
 	"\x06Delete\x12*.fifsky.blog.admin.v1.ArticleDeleteRequest\x1a\x16.google.protobuf.Empty\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/article/delete\x12\x7f\n" +
 	"\x04List\x12(.fifsky.blog.admin.v1.ArticleListRequest\x1a).fifsky.blog.admin.v1.ArticleListResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/api/admin/article/list\x12|\n" +
-	"\aRestore\x12+.fifsky.blog.admin.v1.ArticleRestoreRequest\x1a\x1d.fifsky.blog.types.IDResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/admin/article/restoreB\xbb\x01\n" +
+	"\aRestore\x12+.fifsky.blog.admin.v1.ArticleRestoreRequest\x1a\x1d.fifsky.blog.types.IDResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/admin/article/restore\x12}\n" +
+	"\x06Detail\x12*.fifsky.blog.admin.v1.ArticleDetailRequest\x1a!.fifsky.blog.admin.v1.ArticleItem\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/article/detailB\xbb\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\fArticleProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var (
@@ -605,36 +654,39 @@ func file_admin_v1_article_proto_rawDescGZIP() []byte {
 	return file_admin_v1_article_proto_rawDescData
 }
 
-var file_admin_v1_article_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_admin_v1_article_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_admin_v1_article_proto_goTypes = []any{
-	(*ArticleDeleteRequest)(nil),  // 0: fifsky.blog.admin.v1.ArticleDeleteRequest
-	(*ArticleRestoreRequest)(nil), // 1: fifsky.blog.admin.v1.ArticleRestoreRequest
-	(*ArticleCreateRequest)(nil),  // 2: fifsky.blog.admin.v1.ArticleCreateRequest
-	(*ArticleUpdateRequest)(nil),  // 3: fifsky.blog.admin.v1.ArticleUpdateRequest
-	(*ArticleListRequest)(nil),    // 4: fifsky.blog.admin.v1.ArticleListRequest
-	(*ArticleListResponse)(nil),   // 5: fifsky.blog.admin.v1.ArticleListResponse
-	(*ArticleItem)(nil),           // 6: fifsky.blog.admin.v1.ArticleItem
-	(*types.UserSummary)(nil),     // 7: fifsky.blog.types.UserSummary
-	(*types.CateSummary)(nil),     // 8: fifsky.blog.types.CateSummary
-	(*types.IDResponse)(nil),      // 9: fifsky.blog.types.IDResponse
-	(*emptypb.Empty)(nil),         // 10: google.protobuf.Empty
+	(*ArticleDetailRequest)(nil),  // 0: fifsky.blog.admin.v1.ArticleDetailRequest
+	(*ArticleDeleteRequest)(nil),  // 1: fifsky.blog.admin.v1.ArticleDeleteRequest
+	(*ArticleRestoreRequest)(nil), // 2: fifsky.blog.admin.v1.ArticleRestoreRequest
+	(*ArticleCreateRequest)(nil),  // 3: fifsky.blog.admin.v1.ArticleCreateRequest
+	(*ArticleUpdateRequest)(nil),  // 4: fifsky.blog.admin.v1.ArticleUpdateRequest
+	(*ArticleListRequest)(nil),    // 5: fifsky.blog.admin.v1.ArticleListRequest
+	(*ArticleListResponse)(nil),   // 6: fifsky.blog.admin.v1.ArticleListResponse
+	(*ArticleItem)(nil),           // 7: fifsky.blog.admin.v1.ArticleItem
+	(*types.UserSummary)(nil),     // 8: fifsky.blog.types.UserSummary
+	(*types.CateSummary)(nil),     // 9: fifsky.blog.types.CateSummary
+	(*types.IDResponse)(nil),      // 10: fifsky.blog.types.IDResponse
+	(*emptypb.Empty)(nil),         // 11: google.protobuf.Empty
 }
 var file_admin_v1_article_proto_depIdxs = []int32{
-	6,  // 0: fifsky.blog.admin.v1.ArticleListResponse.list:type_name -> fifsky.blog.admin.v1.ArticleItem
-	7,  // 1: fifsky.blog.admin.v1.ArticleItem.user:type_name -> fifsky.blog.types.UserSummary
-	8,  // 2: fifsky.blog.admin.v1.ArticleItem.cate:type_name -> fifsky.blog.types.CateSummary
-	2,  // 3: fifsky.blog.admin.v1.ArticleService.Create:input_type -> fifsky.blog.admin.v1.ArticleCreateRequest
-	3,  // 4: fifsky.blog.admin.v1.ArticleService.Update:input_type -> fifsky.blog.admin.v1.ArticleUpdateRequest
-	0,  // 5: fifsky.blog.admin.v1.ArticleService.Delete:input_type -> fifsky.blog.admin.v1.ArticleDeleteRequest
-	4,  // 6: fifsky.blog.admin.v1.ArticleService.List:input_type -> fifsky.blog.admin.v1.ArticleListRequest
-	1,  // 7: fifsky.blog.admin.v1.ArticleService.Restore:input_type -> fifsky.blog.admin.v1.ArticleRestoreRequest
-	9,  // 8: fifsky.blog.admin.v1.ArticleService.Create:output_type -> fifsky.blog.types.IDResponse
-	9,  // 9: fifsky.blog.admin.v1.ArticleService.Update:output_type -> fifsky.blog.types.IDResponse
-	10, // 10: fifsky.blog.admin.v1.ArticleService.Delete:output_type -> google.protobuf.Empty
-	5,  // 11: fifsky.blog.admin.v1.ArticleService.List:output_type -> fifsky.blog.admin.v1.ArticleListResponse
-	9,  // 12: fifsky.blog.admin.v1.ArticleService.Restore:output_type -> fifsky.blog.types.IDResponse
-	8,  // [8:13] is the sub-list for method output_type
-	3,  // [3:8] is the sub-list for method input_type
+	7,  // 0: fifsky.blog.admin.v1.ArticleListResponse.list:type_name -> fifsky.blog.admin.v1.ArticleItem
+	8,  // 1: fifsky.blog.admin.v1.ArticleItem.user:type_name -> fifsky.blog.types.UserSummary
+	9,  // 2: fifsky.blog.admin.v1.ArticleItem.cate:type_name -> fifsky.blog.types.CateSummary
+	3,  // 3: fifsky.blog.admin.v1.ArticleService.Create:input_type -> fifsky.blog.admin.v1.ArticleCreateRequest
+	4,  // 4: fifsky.blog.admin.v1.ArticleService.Update:input_type -> fifsky.blog.admin.v1.ArticleUpdateRequest
+	1,  // 5: fifsky.blog.admin.v1.ArticleService.Delete:input_type -> fifsky.blog.admin.v1.ArticleDeleteRequest
+	5,  // 6: fifsky.blog.admin.v1.ArticleService.List:input_type -> fifsky.blog.admin.v1.ArticleListRequest
+	2,  // 7: fifsky.blog.admin.v1.ArticleService.Restore:input_type -> fifsky.blog.admin.v1.ArticleRestoreRequest
+	0,  // 8: fifsky.blog.admin.v1.ArticleService.Detail:input_type -> fifsky.blog.admin.v1.ArticleDetailRequest
+	10, // 9: fifsky.blog.admin.v1.ArticleService.Create:output_type -> fifsky.blog.types.IDResponse
+	10, // 10: fifsky.blog.admin.v1.ArticleService.Update:output_type -> fifsky.blog.types.IDResponse
+	11, // 11: fifsky.blog.admin.v1.ArticleService.Delete:output_type -> google.protobuf.Empty
+	6,  // 12: fifsky.blog.admin.v1.ArticleService.List:output_type -> fifsky.blog.admin.v1.ArticleListResponse
+	10, // 13: fifsky.blog.admin.v1.ArticleService.Restore:output_type -> fifsky.blog.types.IDResponse
+	7,  // 14: fifsky.blog.admin.v1.ArticleService.Detail:output_type -> fifsky.blog.admin.v1.ArticleItem
+	9,  // [9:15] is the sub-list for method output_type
+	3,  // [3:9] is the sub-list for method input_type
 	3,  // [3:3] is the sub-list for extension type_name
 	3,  // [3:3] is the sub-list for extension extendee
 	0,  // [0:3] is the sub-list for field type_name
@@ -651,7 +703,7 @@ func file_admin_v1_article_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_article_proto_rawDesc), len(file_admin_v1_article_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

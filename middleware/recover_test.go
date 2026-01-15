@@ -18,8 +18,8 @@ func TestNewRecover_Panic(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handler.ServeHTTP(rr, req)
 
-	assert.Equal(t, http.StatusBadRequest, rr.Code)
-	assert.JSONEq(t, `{"code":"500","message":"服务器内部错误","details":{}}`, rr.Body.String())
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	assert.JSONEq(t, `{"code":"SYSTEM_ERROR","message":"系统错误","details":{"cause":"boom"}}`, rr.Body.String())
 }
 
 func TestNewRecover_PassThrough(t *testing.T) {

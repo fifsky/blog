@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { articleDetailApi, articleCreateApi, articleUpdateApi, cateListApi } from "@/service";
+import { adminArticleDetailApi, articleCreateApi, articleUpdateApi, cateListApi } from "@/service";
 import { useLocation, useNavigate, Link } from "react-router";
 import { Editor, Toolbar } from "@wangeditor/editor-for-react";
 import type { IDomEditor, IEditorConfig, IToolbarConfig } from "@wangeditor/editor";
@@ -126,24 +126,24 @@ export default function PostArticle() {
   };
 
   useAsyncEffect(async () => {
-      // 先加载分类列表
-      const ret = await cateListApi({});
-      const categories = ret.list || [];
-      setCates(categories);
+    // 先加载分类列表
+    const ret = await cateListApi({});
+    const categories = ret.list || [];
+    setCates(categories);
 
-      // 然后处理文章详情
-      if (params.get("id")) {
-        const a = await articleDetailApi({ id: parseInt(params.get("id")!) });
-        form.reset({
-          id: a.id,
-          title: a.title || "",
-          cate_id: a.cate_id || 0,
-          url: a.url || "",
-          content: a.content || "",
-          type: a.type === 1 || a.type === 2 ? a.type : 1,
-          status: a.status,
-        });
-      }
+    // 然后处理文章详情
+    if (params.get("id")) {
+      const a = await adminArticleDetailApi({ id: parseInt(params.get("id")!) });
+      form.reset({
+        id: a.id,
+        title: a.title || "",
+        cate_id: a.cate_id || 0,
+        url: a.url || "",
+        content: a.content || "",
+        type: a.type === 1 || a.type === 2 ? a.type : 1,
+        status: a.status,
+      });
+    }
   }, []);
 
   // 在分类列表加载完成后设置默认分类

@@ -200,12 +200,7 @@ export default function AdminArticle() {
             <Button
               variant={"link"}
               className={cn("p-0 m-0 h-auto text-[13px]")}
-              onClick={async () => {
-                if (confirm("确认要恢复为草稿？")) {
-                  await restoreItem(record.id);
-                  loadList();
-                }
-              }}
+              onClick={() => restoreItem(record.id)}
             >
               恢复
             </Button>

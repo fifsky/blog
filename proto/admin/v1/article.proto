@@ -46,6 +46,21 @@ service ArticleService {
       body: "*"
     };
   }
+  // Detail 获取文章详情（不限制文章状态）
+  rpc Detail(ArticleDetailRequest) returns (ArticleItem) {
+    option (google.api.http) = {
+      post: "/api/admin/article/detail"
+      body: "*"
+    };
+  }
+}
+
+// ArticleDetailRequest 获取文章详情请求
+message ArticleDetailRequest {
+  int32 id = 1 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
 }
 
 // ArticleDeleteRequest 删除文章请求（支持批量）

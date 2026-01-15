@@ -129,6 +129,35 @@ func (a *Article) Restore(ctx context.Context, req *adminv1.ArticleRestoreReques
 	return &types.IDResponse{Id: int32(ids[0])}, nil
 }
 
+func (a *Article) Detail(ctx context.Context, req *adminv1.ArticleDetailRequest) (*adminv1.ArticleItem, error) {
+	post, err := a.store.GetPost(ctx, int(req.Id), "")
+	if err != nil {
+		return nil, err
+	}
+
+	item := &adminv1.ArticleItem{
+		Id:        int32(post.Id),
+		CateId:    int32(post.CateId),
+		Type:      int32(post.Type),
+		UserId:    int32(post.UserId),
+		Title:     post.Title,
+		Url:       post.Url,
+		Content:   post.Content,
+		Status:    int32(post.Status),
+		CreatedAt: post.CreatedAt.Format(time.DateTime),
+		UpdatedAt: post.UpdatedAt.Format(time.DateTime),
+	}
+	u, err := a.store.GetUser(ctx, post.UserId)
+	if err == nil {
+		item.User = &types.UserSummary{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}
+	}
+	c, err := a.store.GetCate(ctx, post.CateId)
+	if err == nil {
+		item.Cate = &types.CateSummary{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}
+	}
+	return item, nil
+}
+
 func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*adminv1.ArticleListResponse, error) {
 	page := 1
 	if req.Page > 0 {
