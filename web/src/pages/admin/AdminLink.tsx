@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { CTable, Column } from "@/components/CTable";
 import { LinkItem } from "@/types/openapi";
+import { dialog } from "@/utils/dialog";
 
 export default function AdminLink() {
   const [list, setList] = useState<LinkItem[]>([]);
@@ -46,11 +47,13 @@ export default function AdminLink() {
       desc: it?.desc || "",
     });
   };
-  const deleteItem = async (id: number) => {
-    if (confirm("确认要删除？")) {
-      await linkDeleteApi({ id });
-      loadList();
-    }
+  const deleteItem = (id: number) => {
+    dialog.confirm("确认要删除？", {
+      onOk: async () => {
+        await linkDeleteApi({ id });
+        loadList();
+      },
+    });
   };
   const cancel = () => {
     setItem(undefined);

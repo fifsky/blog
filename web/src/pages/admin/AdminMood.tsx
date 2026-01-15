@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { CTable, Column } from "@/components/CTable";
 import { MoodItem } from "@/types/openapi";
+import { dialog } from "@/utils/dialog";
 
 export default function AdminMood() {
   const [list, setList] = useState<MoodItem[]>([]);
@@ -36,11 +37,13 @@ export default function AdminMood() {
     setItem(it);
     form.reset({ content: it?.content || "" });
   };
-  const deleteItem = async (id: number) => {
-    if (confirm("确认要删除？")) {
-      await moodDeleteApi({ id });
-      loadList();
-    }
+  const deleteItem = (id: number) => {
+    dialog.confirm("确认要删除？", {
+      onOk: async () => {
+        await moodDeleteApi({ id });
+        loadList();
+      },
+    });
   };
   const cancel = () => {
     setItem(undefined);

@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CTable, Column } from "@/components/CTable";
 import { CateListItem } from "@/types/openapi";
+import { dialog } from "@/utils/dialog";
 
 export default function AdminCate() {
   const [list, setList] = useState<CateListItem[]>([]);
@@ -47,11 +48,13 @@ export default function AdminCate() {
       desc: it?.desc || "",
     });
   };
-  const deleteItem = async (id: number) => {
-    if (confirm("确认要删除？")) {
-      await cateDeleteApi({ id });
-      loadList();
-    }
+  const deleteItem = (id: number) => {
+    dialog.confirm("确认要删除？", {
+      onOk: async () => {
+        await cateDeleteApi({ id });
+        loadList();
+      },
+    });
   };
   const cancel = () => setItem({} as CateListItem);
   const submit = async (values: z.infer<typeof formSchema>) => {

@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { dialog } from "@/utils/dialog";
 
 const STATUS_MAP: Record<
   number,
@@ -38,32 +39,38 @@ export default function AdminArticle() {
     setList(ret.list || []);
     setTotal(ret.total || 0);
   };
-  const deleteItem = async (id: number) => {
-    if (confirm("确认要删除？")) {
-      await articleDeleteApi({ ids: [id] });
-      loadList();
-    }
+  const deleteItem = (id: number) => {
+    dialog.confirm("确认要删除？", {
+      onOk: async () => {
+        await articleDeleteApi({ ids: [id] });
+        loadList();
+      },
+    });
   };
-  const restoreItem = async (id: number) => {
-    if (confirm("确认要恢复为草稿？")) {
-      await articleRestoreApi({ ids: [id] });
-      loadList();
-    }
+  const restoreItem = (id: number) => {
+    dialog.confirm("确认要恢复为草稿？", {
+      onOk: async () => {
+        await articleRestoreApi({ ids: [id] });
+        loadList();
+      },
+    });
   };
 
   // 批量删除
-  const batchDelete = async () => {
+  const batchDelete = () => {
     if (selectedIds.size === 0) return;
-    if (!confirm(`确认要删除选中的 ${selectedIds.size} 篇文章？`)) return;
-
-    setBatchLoading(true);
-    try {
-      await articleDeleteApi({ ids: Array.from(selectedIds) });
-      setSelectedIds(new Set());
-      await loadList();
-    } finally {
-      setBatchLoading(false);
-    }
+    dialog.confirm(`确认要删除选中的 ${selectedIds.size} 篇文章？`, {
+      onOk: async () => {
+        setBatchLoading(true);
+        try {
+          await articleDeleteApi({ ids: Array.from(selectedIds) });
+          setSelectedIds(new Set());
+          await loadList();
+        } finally {
+          setBatchLoading(false);
+        }
+      },
+    });
   };
 
   // 批量操作处理

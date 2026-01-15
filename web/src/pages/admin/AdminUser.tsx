@@ -6,6 +6,8 @@ import { Pagination } from "@/components/Pagination";
 import { CTable, Column } from "@/components/CTable";
 import { Button } from "@/components/ui/button";
 import { UserItem } from "@/types/openapi";
+import { dialog } from "@/utils/dialog";
+
 export default function AdminUser() {
   const [list, setList] = useState<UserItem[]>([]);
   const [total, setTotal] = useState(0);
@@ -15,11 +17,13 @@ export default function AdminUser() {
     setList(ret.list || []);
     setTotal(ret.total || 0);
   };
-  const deleteItem = async (id: number) => {
-    if (confirm("确认要操作？")) {
-      await userStatusApi({ id });
-      loadList();
-    }
+  const deleteItem = (id: number) => {
+    dialog.confirm("确认要操作？", {
+      onOk: async () => {
+        await userStatusApi({ id });
+        loadList();
+      },
+    });
   };
   useEffect(() => {
     loadList();

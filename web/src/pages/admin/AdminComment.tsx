@@ -4,6 +4,7 @@ import { Pagination } from "@/components/Pagination";
 import { CTable, Column } from "@/components/CTable";
 import { Button } from "@/components/ui/button";
 import { CommentItem } from "@/types/openapi";
+import { dialog } from "@/utils/dialog";
 
 export default function AdminComment() {
   const [list, setList] = useState<CommentItem[]>([]);
@@ -14,12 +15,14 @@ export default function AdminComment() {
     setList([]);
     setTotal(0);
   };
-  const deleteItem = async (id: number) => {
-    if (confirm("确认要删除？")) {
-      // 暂未实现
-      console.log(id);
-      loadList();
-    }
+  const deleteItem = (id: number) => {
+    dialog.confirm("确认要删除？", {
+      onOk: async () => {
+        // 暂未实现
+        console.log(id);
+        loadList();
+      },
+    });
   };
   useEffect(() => {
     loadList();

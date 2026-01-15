@@ -9,6 +9,7 @@ import { remindTimeFormat, remindType } from "@/utils/remind_date";
 import { RemindItem } from "@/types/openapi";
 import { CTable, Column } from "@/components/CTable";
 import { cn } from "@/lib/utils";
+import { dialog } from "@/utils/dialog";
 
 export default function AdminRemind() {
   const [list, setList] = useState<RemindItem[]>([]);
@@ -27,11 +28,13 @@ export default function AdminRemind() {
     setItem(it);
     openDialog();
   };
-  const deleteItem = async (id: number) => {
-    if (confirm("确认要删除？")) {
-      await remindDeleteApi({ id });
-      loadList();
-    }
+  const deleteItem = (id: number) => {
+    dialog.confirm("确认要删除？", {
+      onOk: async () => {
+        await remindDeleteApi({ id });
+        loadList();
+      },
+    });
   };
 
   const handleSubmit = async (values: any) => {
