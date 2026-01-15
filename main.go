@@ -8,9 +8,12 @@ import (
 
 	"app/cmd"
 	"app/config"
+	"app/motto"
+	"app/pkg/bark"
 	"app/pkg/wechat"
 	"app/remind"
 	"app/store"
+
 	"github.com/goapt/httpx"
 	"github.com/goapt/logger"
 
@@ -32,12 +35,17 @@ func main() {
 
 	// httpClient
 	httpClient := httpx.NewClient(httpx.WithMiddleware(httpx.AccessLog(logger.Default())))
+	barkClient := bark.New(httpClient, conf.Common.NotifyUrl, conf.Common.NotifyToken)
 
 	robot := wechat.NewRobot(conf.Common.RobotToken)
 	// crontab setup
 	s := store.New(db)
-	r := remind.New(s, conf, robot)
+	r := remind.New(s, conf, robot, barkClient)
 	go r.Start()
+
+	ai := motto.NewOpenAIProvider(conf.Common.AIToken, conf.Common.AIEndpoint, "kimi-k2-turbo-preview")
+	m := motto.New(s, conf, barkClient, ai)
+	go m.Start("0 * * * *")
 
 	app := &cli.Command{
 		Name:  "blog",

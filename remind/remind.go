@@ -1,12 +1,9 @@
 package remind
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"log/slog"
-	"net/http"
 	"net/url"
 	"strconv"
 	"time"
@@ -14,22 +11,26 @@ import (
 	"app/config"
 	"app/model"
 	"app/pkg/aesutil"
+	"app/pkg/bark"
 	"app/pkg/wechat"
 	"app/store"
+
 	"github.com/goapt/logger"
 )
 
 type Remind struct {
-	store *store.Store
-	conf  *config.Config
-	robot *wechat.Robot
+	store      *store.Store
+	conf       *config.Config
+	robot      *wechat.Robot
+	barkClient *bark.Client
 }
 
-func New(s *store.Store, conf *config.Config, robot *wechat.Robot) *Remind {
+func New(s *store.Store, conf *config.Config, robot *wechat.Robot, barkClient *bark.Client) *Remind {
 	return &Remind{
-		store: s,
-		conf:  conf,
-		robot: robot,
+		store:      s,
+		conf:       conf,
+		robot:      robot,
+		barkClient: barkClient,
 	}
 }
 
@@ -48,14 +49,6 @@ func numFormat(n int) string {
 	return strconv.Itoa(n)
 }
 
-type barkRequest struct {
-	Body     string `json:"body,omitempty"`
-	Title    string `json:"title"`
-	Badge    int    `json:"badge"`
-	Url      string `json:"url,omitempty"`
-	Markdown string `json:"markdown"`
-}
-
 func (r *Remind) messageForBark(content string, v *model.Remind) {
 	token, _ := aesutil.AesEncode(r.conf.Common.TokenSecret, strconv.Itoa(v.Id))
 
@@ -65,28 +58,18 @@ func (r *Remind) messageForBark(content string, v *model.Remind) {
 [收到提醒](%s)  [稍后提醒](%s)
 `
 
-	body := barkRequest{
+	changeUrl := "https://api.fifsky.com/api/remind/change?token=" + url.QueryEscape(token)
+	delayUrl := "https://api.fifsky.com/api/remind/delay?token=" + url.QueryEscape(token)
+
+	msg := bark.Message{
 		Title:    "⏰重要提醒⏰",
 		Badge:    1,
-		Markdown: fmt.Sprintf(markdown, content, "https://api.fifsky.com/api/remind/change?token="+url.QueryEscape(token), "https://api.fifsky.com/api/remind/delay?token="+url.QueryEscape(token)),
+		Markdown: fmt.Sprintf(markdown, content, changeUrl, delayUrl),
 	}
 
-	reqBody, _ := json.Marshal(body)
-
-	req, err := http.NewRequest("POST", r.conf.Common.NotifyUrl, bytes.NewReader(reqBody))
-
-	if err != nil {
-		logger.Default().Error("remind request bark error", slog.String("err", err.Error()))
-		return
-	}
-	req.Header.Set("Content-Type", "application/json; charset=utf-8")
-	req.Header.Set("Authorization", "Basic "+r.conf.Common.NotifyToken)
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
+	if err := r.barkClient.Send(msg); err != nil {
 		logger.Default().Error("remind request bark error", slog.String("err", err.Error()))
 	}
-	defer resp.Body.Close()
 }
 
 func (r *Remind) message(content string, v *model.Remind) {

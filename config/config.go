@@ -14,6 +14,9 @@ type common struct {
 	TokenSecret string `yaml:"token_secret"`
 	NotifyUrl   string `yaml:"notify_url"`
 	NotifyToken string `yaml:"notify_token"`
+	AIToken     string `yaml:"ai_token"`
+	AIEndpoint  string `yaml:"ai_endpoint"`
+	AIModel     string `yaml:"ai_model"`
 }
 
 type ossConf struct {
