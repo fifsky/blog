@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
+import { useAsyncEffect } from "@/hooks";
 
 const articleSchema = z.object({
   id: z.number().optional(),
@@ -124,8 +125,7 @@ export default function PostArticle() {
     form.handleSubmit(submit)();
   };
 
-  useEffect(() => {
-    (async () => {
+  useAsyncEffect(async () => {
       // 先加载分类列表
       const ret = await cateListApi({});
       const categories = ret.list || [];
@@ -144,7 +144,6 @@ export default function PostArticle() {
           status: a.status,
         });
       }
-    })();
   }, []);
 
   // 在分类列表加载完成后设置默认分类

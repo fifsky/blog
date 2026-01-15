@@ -9,8 +9,9 @@ import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { settingApi } from "@/service";
+import { useAsyncEffect } from "@/hooks";
 
 export default function Login() {
   // 表单校验规则：用户名与密码为必填
@@ -33,11 +34,9 @@ export default function Login() {
   const loginAction = useStore((s) => s.loginAction);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    (async () => {
-      const s = await settingApi();
-      setSettings(s);
-    })();
+  useAsyncEffect(async () => {
+    const s = await settingApi();
+    setSettings(s);
   }, []);
 
   // 提交处理：通过 react-hook-form 的 handleSubmit 获取已校验的数据

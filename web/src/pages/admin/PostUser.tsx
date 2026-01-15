@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAsyncEffect } from "@/hooks";
 
 const userSchema = z
   .object({
@@ -79,21 +80,19 @@ export default function PostUser() {
     }
   };
 
-  useEffect(() => {
-    (async () => {
-      if (params.get("id")) {
-        const u = await userGetApi({ id: parseInt(params.get("id")!) });
-        form.reset({
-          id: u.id,
-          name: u.name || "",
-          email: u.email || "",
-          nick_name: u.nick_name || "",
-          type: u.type === 1 || u.type === 2 ? u.type : 1,
-          password1: "",
-          password2: "",
-        });
-      }
-    })();
+  useAsyncEffect(async () => {
+    if (params.get("id")) {
+      const u = await userGetApi({ id: parseInt(params.get("id")!) });
+      form.reset({
+        id: u.id,
+        name: u.name || "",
+        email: u.email || "",
+        nick_name: u.nick_name || "",
+        type: u.type === 1 || u.type === 2 ? u.type : 1,
+        password1: "",
+        password2: "",
+      });
+    }
   }, []);
 
   const isEditing = !!form.watch("id");

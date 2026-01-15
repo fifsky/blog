@@ -6,4 +6,4 @@ const useAsyncEffect = (effect: () => void | Promise<void>, deps?: DependencyLis
   }, deps);
 };
 
-export default useAsyncEffect;
+export { useAsyncEffect };

@@ -1,27 +1,26 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, Link } from "react-router";
 import { CArticle } from "@/components/CArticle";
 import { Comment } from "@/components/Comment";
 import { articleDetailApi, prevnextArticleApi, settingApi } from "@/service";
 import { ArticleItem, PrevNextItem, Options } from "@/types/openapi";
+import { useAsyncEffect } from "@/hooks";
 
 export default function ArticleDetail() {
   const [article, setArticle] = useState<ArticleItem>();
   const [data, setData] = useState<{ prev?: PrevNextItem; next?: PrevNextItem }>({});
   const [settings, setSettings] = useState<Options>();
   const params = useParams();
-  useEffect(() => {
-    (async () => {
-      const id = params.id ? parseInt(params.id) : undefined;
-      setArticle(undefined);
-      const [a, s] = await Promise.all([articleDetailApi({ id }), settingApi()]);
-      setArticle(a);
-      setSettings(s);
-      if (id) {
-        const pn = await prevnextArticleApi({ id });
-        setData(pn);
-      }
-    })();
+  useAsyncEffect(async () => {
+    const id = params.id ? parseInt(params.id) : undefined;
+    setArticle(undefined);
+    const [a, s] = await Promise.all([articleDetailApi({ id }), settingApi()]);
+    setArticle(a);
+    setSettings(s);
+    if (id) {
+      const pn = await prevnextArticleApi({ id });
+      setData(pn);
+    }
   }, [params.id]);
   const siteName = settings?.kv?.site_name || "無處告別";
   const pageTitle = `${article?.title ? article?.title + " - " : ""}${siteName}`;

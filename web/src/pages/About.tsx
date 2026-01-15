@@ -1,18 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CArticle } from "@/components/CArticle";
 import { Comment } from "@/components/Comment";
 import { articleDetailApi, settingApi } from "@/service";
 import { ArticleItem, Options } from "@/types/openapi";
+import { useAsyncEffect } from "@/hooks";
 
 export default function About() {
   const [article, setArticle] = useState<ArticleItem>();
   const [settings, setSettings] = useState<Options>();
-  useEffect(() => {
-    (async () => {
-      const [a, s] = await Promise.all([articleDetailApi({ url: "about" }), settingApi()]);
-      setArticle(a);
-      setSettings(s);
-    })();
+  useAsyncEffect(async () => {
+    const [a, s] = await Promise.all([articleDetailApi({ url: "about" }), settingApi()]);
+    setArticle(a);
+    setSettings(s);
   }, []);
   if (!article?.id) return null;
   const siteName = settings?.kv?.site_name || "無處告別";

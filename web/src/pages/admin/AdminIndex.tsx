@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { settingApi, settingUpdateApi } from "@/service";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
+import { useAsyncEffect } from "@/hooks";
 
 export default function AdminIndex() {
   const [loading, setLoading] = React.useState(false);
@@ -50,16 +51,14 @@ export default function AdminIndex() {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    (async () => {
-      const data = await settingApi();
-      form.reset({
-        site_name: data.kv?.site_name || "",
-        site_desc: data.kv?.site_desc || "",
-        site_keyword: data.kv?.site_keyword || "",
-        post_num: data.kv?.post_num || "",
-      });
-    })();
+  useAsyncEffect(async () => {
+    const data = await settingApi();
+    form.reset({
+      site_name: data.kv?.site_name || "",
+      site_desc: data.kv?.site_desc || "",
+      site_keyword: data.kv?.site_keyword || "",
+      post_num: data.kv?.post_num || "",
+    });
   }, [form]);
   return (
     <div>
