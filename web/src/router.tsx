@@ -63,6 +63,14 @@ const routesConfig: RouteObject[] = [
             ),
           },
           {
+            path: "date/:year/:month/:day",
+            element: (
+              <Suspense fallback={<SkeletonArticleList />}>
+                <ArticleList />
+              </Suspense>
+            ),
+          },
+          {
             path: "category/:domain",
             element: (
               <Suspense fallback={<SkeletonArticleList />}>

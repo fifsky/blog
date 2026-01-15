@@ -42,12 +42,18 @@ import type {
   MoodDeleteRequest,
   CateDeleteRequest,
   LinkDeleteRequest,
+  ArticleCalendarRequest,
+  ArticleCalendarResponse,
 } from "@/types/openapi";
 
 export const loginApi = (data: LoginRequest, errorHandler?: (e: AppError) => void) =>
   createApi<LoginResponse>("/api/login", data, errorHandler);
 export const articleListApi = (data: ArticleListRequest, errorHandler?: (e: AppError) => void) =>
   createApi<ArticleListResponse>("/api/article/list", data, errorHandler);
+export const articleCalendarApi = (
+  data: ArticleCalendarRequest,
+  errorHandler?: (e: AppError) => void,
+) => createApi<ArticleCalendarResponse>("/api/article/calendar", data, errorHandler);
 export const articleDetailApi = (
   data: { id?: number; url?: string },
   errorHandler?: (e: AppError) => void,

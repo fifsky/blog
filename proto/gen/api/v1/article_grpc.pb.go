@@ -26,6 +26,7 @@ const (
 	ArticleService_PrevNext_FullMethodName = "/fifsky.blog.api.v1.ArticleService/PrevNext"
 	ArticleService_Detail_FullMethodName   = "/fifsky.blog.api.v1.ArticleService/Detail"
 	ArticleService_Feed_FullMethodName     = "/fifsky.blog.api.v1.ArticleService/Feed"
+	ArticleService_Calendar_FullMethodName = "/fifsky.blog.api.v1.ArticleService/Calendar"
 )
 
 // ArticleServiceClient is the client API for ArticleService service.
@@ -44,6 +45,8 @@ type ArticleServiceClient interface {
 	Detail(ctx context.Context, in *ArticleDetailRequest, opts ...grpc.CallOption) (*ArticleItem, error)
 	// Feed 获取文章 RSS 订阅
 	Feed(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*httpbody.HttpBody, error)
+	// Calendar 获取日历文章日期
+	Calendar(ctx context.Context, in *ArticleCalendarRequest, opts ...grpc.CallOption) (*ArticleCalendarResponse, error)
 }
 
 type articleServiceClient struct {
@@ -104,6 +107,16 @@ func (c *articleServiceClient) Feed(ctx context.Context, in *emptypb.Empty, opts
 	return out, nil
 }
 
+func (c *articleServiceClient) Calendar(ctx context.Context, in *ArticleCalendarRequest, opts ...grpc.CallOption) (*ArticleCalendarResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ArticleCalendarResponse)
+	err := c.cc.Invoke(ctx, ArticleService_Calendar_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArticleServiceServer is the server API for ArticleService service.
 // All implementations must embed UnimplementedArticleServiceServer
 // for forward compatibility.
@@ -120,6 +133,8 @@ type ArticleServiceServer interface {
 	Detail(context.Context, *ArticleDetailRequest) (*ArticleItem, error)
 	// Feed 获取文章 RSS 订阅
 	Feed(context.Context, *emptypb.Empty) (*httpbody.HttpBody, error)
+	// Calendar 获取日历文章日期
+	Calendar(context.Context, *ArticleCalendarRequest) (*ArticleCalendarResponse, error)
 	mustEmbedUnimplementedArticleServiceServer()
 }
 
@@ -144,6 +159,9 @@ func (UnimplementedArticleServiceServer) Detail(context.Context, *ArticleDetailR
 }
 func (UnimplementedArticleServiceServer) Feed(context.Context, *emptypb.Empty) (*httpbody.HttpBody, error) {
 	return nil, status.Error(codes.Unimplemented, "method Feed not implemented")
+}
+func (UnimplementedArticleServiceServer) Calendar(context.Context, *ArticleCalendarRequest) (*ArticleCalendarResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Calendar not implemented")
 }
 func (UnimplementedArticleServiceServer) mustEmbedUnimplementedArticleServiceServer() {}
 func (UnimplementedArticleServiceServer) testEmbeddedByValue()                        {}
@@ -256,6 +274,24 @@ func _ArticleService_Feed_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArticleService_Calendar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ArticleCalendarRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArticleServiceServer).Calendar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArticleService_Calendar_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArticleServiceServer).Calendar(ctx, req.(*ArticleCalendarRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArticleService_ServiceDesc is the grpc.ServiceDesc for ArticleService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -282,6 +318,10 @@ var ArticleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Feed",
 			Handler:    _ArticleService_Feed_Handler,
+		},
+		{
+			MethodName: "Calendar",
+			Handler:    _ArticleService_Calendar_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

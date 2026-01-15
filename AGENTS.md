@@ -82,7 +82,7 @@ import (
 
 **Database:**
 
-- Always use `QueryContext(ctx, query, args...)` for queries
+- Always use `QueryContext(ctx, query, args...)` or `QueryRowContext(ctx, query, args...)` for queries
 - Always `defer rows.Close()` after creating rows
 - Use context throughout: `ctx context.Context` as first param
 - Return errors directly, don't panic
@@ -187,7 +187,7 @@ import { articleListApi } from "@/service";
 - No ORM - use raw SQL with `database/sql`
 - Always pass context through the call chain
 - Use `make fmt` before committing
-- Generated protobuf code is in `proto/gen/` (excluded from lint)
+- Generated protobuf code is in `proto/gen/` (excluded from lint),use `make proto` to generate
 
 ### Frontend
 
@@ -200,7 +200,7 @@ import { articleListApi } from "@/service";
 
 ### Testing
 
-- Backend: `go test -v ./...` runs all tests
+- Backend: `make test` runs all tests
 - Single test: `go test -v -run TestName ./path/to/package`
 - Use dbunit fixtures in `testdata/` directory
 - Linter configuration: `.golangci.yml`

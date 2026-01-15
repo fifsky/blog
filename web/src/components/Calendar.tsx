@@ -1,10 +1,33 @@
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
+import { Link } from "react-router";
+import { articleCalendarApi } from "@/service";
 
 export function Calendar() {
   const [currDay] = useState(dayjs().format("YYYY-MM-DD"));
   const [currMonth, setCurrMonth] = useState(dayjs().format("YYYY-MM"));
   const [items, setItems] = useState<string[][]>([]);
+  const [articleDays, setArticleDays] = useState<number[]>([]);
+
+  useEffect(() => {
+    const fetchArticleDays = async () => {
+      // 如果查询月份大于当前月份，不请求接口
+      if (dayjs(currMonth).isAfter(dayjs(), "month")) {
+        setArticleDays([]);
+        return;
+      }
+
+      const [year, month] = currMonth.split("-").map(Number);
+      try {
+        const res = await articleCalendarApi({ year, month });
+        setArticleDays(res.days || []);
+      } catch (e) {
+        console.error("Failed to fetch article calendar", e);
+      }
+    };
+    fetchArticleDays();
+  }, [currMonth]);
+
   const builder = () => {
     const days = dayjs(currMonth).daysInMonth();
     const startWeek = dayjs(currMonth + "-01").day();
@@ -19,6 +42,8 @@ export function Calendar() {
     setItems(result);
   };
   const isCurrDay = (d: string) => currMonth + "-" + d === currDay;
+  const hasArticle = (d: string) => d && articleDays.includes(Number(d));
+
   useEffect(builder, [currMonth]);
   return (
     <div className="mb-6">
@@ -90,7 +115,13 @@ export function Calendar() {
                     key={i}
                     className={`text-center ${isCurrDay(d) ? "bg-[#eeeeee] font-bold" : ""}`}
                   >
-                    {d}
+                    {hasArticle(d) ? (
+                      <Link to={`/date/${currMonth.replace("-", "/")}/${d.padStart(2, "0")}`}>
+                        {d}
+                      </Link>
+                    ) : (
+                      d
+                    )}
                   </td>
                 ))}
               </tr>

@@ -1,4 +1,13 @@
 // Article 批量操作
+export type ArticleCalendarRequest = {
+  year: number;
+  month: number;
+};
+
+export type ArticleCalendarResponse = {
+  days: number[];
+};
+
 export type ArticleDeleteRequest = { ids: number[] };
 export type ArticleRestoreRequest = { ids: number[] };
 

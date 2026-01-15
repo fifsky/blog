@@ -48,6 +48,16 @@ func (a *Article) Archive(ctx context.Context, _ *emptypb.Empty) (*apiv1.Archive
 	return resp, nil
 }
 
+func (a *Article) Calendar(ctx context.Context, req *apiv1.ArticleCalendarRequest) (*apiv1.ArticleCalendarResponse, error) {
+	days, err := a.store.GetPostDaysInMonth(ctx, int(req.Year), int(req.Month))
+	if err != nil {
+		return nil, err
+	}
+	return &apiv1.ArticleCalendarResponse{
+		Days: days,
+	}, nil
+}
+
 func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*apiv1.ArticleListResponse, error) {
 	options, err := a.store.GetOptions(ctx)
 	if err != nil {
@@ -70,6 +80,9 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 	artdate := ""
 	if req.Year != "" && req.Month != "" {
 		artdate = req.Year + "-" + req.Month
+		if req.Day != "" {
+			artdate += "-" + req.Day
+		}
 	}
 	page := max(int(req.Page), 1)
 	posts, err := a.store.ListPost(ctx, &model.Post{

@@ -23,6 +23,20 @@ func TestArticle_Archive(t *testing.T) {
 	})
 }
 
+func TestArticle_Calendar(t *testing.T) {
+	dbunit.New(t, func(d *dbunit.DBUnit) {
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
+		svc := NewArticle(store.New(db), nil)
+		resp, err := svc.Calendar(context.Background(), &apiv1.ArticleCalendarRequest{Year: 2012, Month: 9})
+		if err != nil {
+			t.Fatalf("unexpected err=%v", err)
+		}
+		if len(resp.Days) != 1 || resp.Days[0] != 10 {
+			t.Fatalf("unexpected days=%v", resp.Days)
+		}
+	})
+}
+
 func TestArticle_List(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates")...)
@@ -30,6 +44,17 @@ func TestArticle_List(t *testing.T) {
 		resp, err := svc.List(context.Background(), &apiv1.ArticleListRequest{Page: 1})
 		if err != nil || len(resp.List) == 0 {
 			t.Fatalf("unexpected err=%v list=%v", err, resp.List)
+		}
+	})
+}
+
+func TestArticle_List_Day(t *testing.T) {
+	dbunit.New(t, func(d *dbunit.DBUnit) {
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates")...)
+		svc := NewArticle(store.New(db), nil)
+		resp, err := svc.List(context.Background(), &apiv1.ArticleListRequest{Year: "2012", Month: "09", Day: "10", Page: 1})
+		if err != nil || len(resp.List) != 1 {
+			t.Fatalf("unexpected err=%v list_len=%d", err, len(resp.List))
 		}
 	})
 }

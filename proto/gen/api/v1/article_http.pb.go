@@ -20,6 +20,8 @@ import (
 type ArticleServiceHTTPServer interface {
 	// Archive 获取文章归档
 	Archive(context.Context, *emptypb.Empty) (*ArchiveResponse, error)
+	// Calendar 获取日历文章日期
+	Calendar(context.Context, *ArticleCalendarRequest) (*ArticleCalendarResponse, error)
 	// Detail 获取文章详情
 	Detail(context.Context, *ArticleDetailRequest) (*ArticleItem, error)
 	// Feed 获取文章 RSS 订阅
@@ -42,6 +44,7 @@ func (s *ArticleService) RegisterService() {
 	s.mux.HandleFunc("POST /api/article/prevnext", s.PrevNext)
 	s.mux.HandleFunc("POST /api/article/detail", s.Detail)
 	s.mux.HandleFunc("GET /feed.xml", s.Feed)
+	s.mux.HandleFunc("POST /api/article/calendar", s.Calendar)
 }
 
 func RegisterArticleServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv ArticleServiceHTTPServer) {
@@ -138,5 +141,26 @@ func (s *ArticleService) Feed(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", out.ContentType)
 	_, _ = w.Write(out.Data)
+	return
+}
+
+func (s *ArticleService) Calendar(w http.ResponseWriter, r *http.Request) {
+	var in ArticleCalendarRequest
+	if err := s.codec.Decode(r, &in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	if err := s.codec.Validate(&in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	out, err := s.server.Calendar(r.Context(), &in)
+	if err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+	s.codec.Encode(w, r, out)
 	return
 }

@@ -30,6 +30,25 @@ func (s *Store) GetPost(ctx context.Context, id int, url string) (*model.Post, e
 	return &p, nil
 }
 
+func (s *Store) GetPostDaysInMonth(ctx context.Context, year, month int) ([]int32, error) {
+	query := "select distinct DAY(created_at) from posts where type = 1 and status = 1 and YEAR(created_at) = ? and MONTH(created_at) = ?"
+	rows, err := s.db.QueryContext(ctx, query, year, month)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var days []int32
+	for rows.Next() {
+		var day int32
+		if err := rows.Scan(&day); err != nil {
+			return nil, err
+		}
+		days = append(days, day)
+	}
+	return days, nil
+}
+
 func (s *Store) PrevPost(ctx context.Context, id int) (*model.Post, error) {
 	var p model.Post
 	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where id < ? and status = 1 and type = 1 order by id desc limit 1", id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
@@ -84,7 +103,11 @@ func (s *Store) ListPost(ctx context.Context, p *model.Post, start int, num int,
 		args = append(args, p.Type)
 	}
 	if artdate != "" {
-		where += " and DATE_FORMAT(created_at,'%Y-%m') = ?"
+		if len(artdate) == 7 {
+			where += " and DATE_FORMAT(created_at,'%Y-%m') = ?"
+		} else {
+			where += " and DATE_FORMAT(created_at,'%Y-%m-%d') = ?"
+		}
 		args = append(args, artdate)
 	}
 	if keyword != "" {
@@ -122,7 +145,11 @@ func (s *Store) CountPosts(ctx context.Context, p *model.Post, artdate, keyword 
 		args = append(args, p.Type)
 	}
 	if artdate != "" {
-		where += " and DATE_FORMAT(created_at,'%Y-%m') = ?"
+		if len(artdate) == 7 {
+			where += " and DATE_FORMAT(created_at,'%Y-%m') = ?"
+		} else {
+			where += " and DATE_FORMAT(created_at,'%Y-%m-%d') = ?"
+		}
 		args = append(args, artdate)
 	}
 	if keyword != "" {

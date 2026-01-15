@@ -1,12 +1,12 @@
 syntax = "proto3";
 package fifsky.blog.api.v1;
 
-import "types/common.proto";
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/api/httpbody.proto";
 import "google/protobuf/empty.proto";
+import "types/common.proto";
 
 option go_package = "gen/api/v1";
 
@@ -44,6 +44,13 @@ service ArticleService {
   rpc Feed(google.protobuf.Empty) returns (google.api.HttpBody) {
     option (google.api.http) = {get: "/feed.xml"};
   }
+  // Calendar 获取日历文章日期
+  rpc Calendar(ArticleCalendarRequest) returns (ArticleCalendarResponse) {
+    option (google.api.http) = {
+      post: "/api/article/calendar"
+      body: "*"
+    };
+  }
 }
 
 message ArchiveResponse {
@@ -54,6 +61,15 @@ message DateArchiveItem {
   string content = 2;
 }
 
+message ArticleCalendarRequest {
+  int32 year = 1;
+  int32 month = 2;
+}
+
+message ArticleCalendarResponse {
+  repeated int32 days = 1;
+}
+
 message ArticleListRequest {
   string year = 1;
   string month = 2;
@@ -61,6 +77,7 @@ message ArticleListRequest {
   string keyword = 4;
   int32 page = 5;
   int32 type = 6;
+  string day = 7;
 }
 
 message ArticleItem {
