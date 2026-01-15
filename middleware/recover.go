@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"runtime"
 
+	"app/pkg/errors"
 	"app/response"
+
 	"github.com/goapt/logger"
 )
 
@@ -17,7 +19,7 @@ func NewRecover(next http.Handler) http.Handler {
 				buf = buf[:runtime.Stack(buf, false)]
 				fmt.Println(string(buf))
 				logger.Default().Error(fmt.Sprintf("%v", err), "stack", string(buf))
-				response.Fail(w, http.StatusInternalServerError, "服务器内部错误")
+				response.Fail(w, errors.ErrSystem.WithCause(fmt.Errorf("%v", err)))
 			}
 		}()
 		next.ServeHTTP(w, r)

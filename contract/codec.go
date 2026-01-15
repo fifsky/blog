@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"slices"
 
+	"app/pkg/errors"
 	"app/response"
 
 	"github.com/gorilla/schema"
@@ -38,8 +39,8 @@ func NewCodec() *Codec {
 var protodecoder = protojson.UnmarshalOptions{}
 
 func (c *Codec) Encode(w http.ResponseWriter, _ *http.Request, v any) {
-	if _, ok := v.(error); ok {
-		response.Fail(w, 400, v)
+	if err, ok := v.(error); ok {
+		response.Fail(w, errors.FromError(err))
 		return
 	}
 	response.Success(w, v)

@@ -43,11 +43,11 @@ export async function request<T = any>(
 
     if (isJSON && payload && typeof payload === "object") {
       const p: any = payload;
-      if (typeof p.code === "number" && typeof p.msg === "string") {
-        throw new AppError(p.code, p.msg);
+      if (typeof p.code === "string" && typeof p.message === "string") {
+        throw new AppError(p.code, p.message, p.details);
       }
     }
-    throw new AppError(resp.status, getErrorMessage(payload));
+    throw new AppError(String(resp.status), getErrorMessage(payload));
   } catch (e: any) {
     const err: AppError =
       e instanceof AppError ? e : new AppError(getErrorCode(e.code), getErrorMessage(e));
@@ -62,11 +62,14 @@ export async function request<T = any>(
   }
 }
 
-function getErrorCode(code: unknown) {
-  if (typeof code === "number") {
+function getErrorCode(code: unknown): string {
+  if (typeof code === "string") {
     return code;
   }
-  return 500;
+  if (typeof code === "number") {
+    return String(code);
+  }
+  return "UNKNOWN";
 }
 
 function getErrorMessage(error: unknown, fallback = "Unknown error"): string {

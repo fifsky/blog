@@ -138,11 +138,11 @@ func (a *Article) PrevNext(ctx context.Context, req *apiv1.PrevNextRequest) (*ap
 func (a *Article) Detail(ctx context.Context, req *apiv1.ArticleDetailRequest) (*apiv1.ArticleItem, error) {
 	post, err := a.store.GetPost(ctx, int(req.Id), req.Url)
 	if err != nil {
-		return nil, err
+		return nil, errors.ErrSystem.WithCause(err)
 	}
 
 	if post.Status != 1 {
-		return nil, errors.BadRequest("ARTICLE_NOT_FOUND", "文章不存在")
+		return nil, errors.ErrArticleNotFound
 	}
 
 	item := &apiv1.ArticleItem{

@@ -1,7 +1,7 @@
 package response
 
 import (
-	"errors"
+	"app/pkg/errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -23,33 +23,33 @@ func TestSuccess(t *testing.T) {
 func TestFail(t *testing.T) {
 	t.Run("msg", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		Fail(w, 201, "参数错误")
+		Fail(w, errors.BadRequest("INVALID_PARAM", "参数错误"))
 		if w.Code != http.StatusBadRequest {
 			t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusBadRequest)
 		}
-		want := `{"code":201,"msg":"参数错误"}`
+		want := `{"code":"INVALID_PARAM","message":"参数错误"}`
 		assert.JSONEq(t, want, w.Body.String())
 		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
 	})
 
 	t.Run("error", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		Fail(w, 500, errors.New("system error"))
-		if w.Code != http.StatusBadRequest {
-			t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusBadRequest)
+		Fail(w, errors.InternalServer("SYSTEM_ERROR", "system error"))
+		if w.Code != http.StatusInternalServerError {
+			t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusInternalServerError)
 		}
-		want := `{"code":500,"msg":"system error"}`
+		want := `{"code":"SYSTEM_ERROR","message":"system error"}`
 		assert.JSONEq(t, want, w.Body.String())
 		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
 	})
 
 	t.Run("other", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		Fail(w, 500, map[string]string{"error": "noterror"})
-		if w.Code != http.StatusBadRequest {
-			t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusBadRequest)
+		Fail(w, errors.InternalServer("SYSTEM_ERROR", "system error"))
+		if w.Code != http.StatusInternalServerError {
+			t.Fatalf("unexpected status code: got=%d want=%d", w.Code, http.StatusInternalServerError)
 		}
-		want := `{"code":500,"msg":"map[error:noterror]"}`
+		want := `{"code":"SYSTEM_ERROR","message":"system error"}`
 		assert.JSONEq(t, want, w.Body.String())
 		assert.Equal(t, "application/json; charset=utf-8", w.Header().Get("Content-Type"))
 	})

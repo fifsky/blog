@@ -45,15 +45,15 @@ func TestNewAuthLogin(t *testing.T) {
 			},
 			{
 				"",
-				`{"code":201,"msg":"登录过期，请重新登录"}`,
+				`{"code":"201","message":"登录过期，请重新登录","details":{}}`,
 			},
 			{
 				"789789",
-				`{"code":201,"msg":"登录过期，请重新登录"}`,
+				`{"code":"201","message":"登录过期，请重新登录","details":{}}`,
 			},
 			{
 				getUserTestToken(999, conf),
-				`{"code":202,"msg":"Access Token错误，用户不存在"}`,
+				`{"code":"202","message":"Access Token错误，用户不存在","details":{}}`,
 			},
 		}
 
