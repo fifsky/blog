@@ -35,18 +35,19 @@ func NewAuthLogin(s *store.Store, conf *config.Config) AuthLogin {
 				return
 			}
 
-			if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok && token.Valid {
-				user, err := s.GetUser(r.Context(), lo.Must(strconv.Atoi(claims.Issuer)))
-				if err != nil {
-					response.Fail(w, errors.ErrUnauthorized.WithMetadata(map[string]string{"user_id": claims.Issuer}))
-					return
-				}
-
-				r = r.WithContext(admin.SetLoginUser(r.Context(), user))
-			} else {
+			claims, ok := token.Claims.(*jwt.RegisteredClaims)
+			if !ok || !token.Valid {
 				response.Fail(w, errors.ErrUnauthorized)
 				return
 			}
+
+			user, err := s.GetUser(r.Context(), lo.Must(strconv.Atoi(claims.Issuer)))
+			if err != nil {
+				response.Fail(w, errors.ErrUnauthorized.WithMetadata(map[string]string{"user_id": claims.Issuer}))
+				return
+			}
+
+			r = r.WithContext(admin.SetLoginUser(r.Context(), user))
 
 			next.ServeHTTP(w, r)
 		})

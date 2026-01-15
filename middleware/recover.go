@@ -15,10 +15,15 @@ func NewRecover(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
+				// 获取堆栈信息
 				buf := make([]byte, 1024)
-				buf = buf[:runtime.Stack(buf, false)]
-				fmt.Println(string(buf))
-				logger.Default().Error(fmt.Sprintf("%v", err), "stack", string(buf))
+				n := runtime.Stack(buf, false)
+				stack := string(buf[:n])
+
+				// 记录错误日志
+				logger.Default().Error(fmt.Sprintf("%v", err), "stack", stack)
+
+				// 返回系统错误响应
 				response.Fail(w, errors.ErrSystem.WithCause(fmt.Errorf("%v", err)))
 			}
 		}()

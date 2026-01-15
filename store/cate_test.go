@@ -2,7 +2,6 @@ package store
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"app/pkg/jsonutil"
@@ -19,6 +18,6 @@ func TestCate_GetAllCates(t *testing.T) {
 		ret, err := s.GetAllCates(context.Background())
 		assert.NoError(t, err)
 		assert.NotNil(t, ret)
-		fmt.Println(jsonutil.Encode(ret))
+		t.Log(jsonutil.Encode(ret))
 	})
 }

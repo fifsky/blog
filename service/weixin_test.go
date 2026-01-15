@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/goapt/httpx"
+	"github.com/stretchr/testify/assert"
 )
 
 // TestVerifyWeixinSignature 验证签名校验流程是否符合微信官方要求
@@ -30,14 +31,10 @@ func TestVerifyWeixinSignature(t *testing.T) {
 	expected := fmt.Sprintf("%x", sha1.Sum([]byte(raw)))
 
 	// 正确签名应校验通过
-	if ok := verifyWeixinSignature(token, timestamp, nonce, expected); !ok {
-		t.Fatalf("expect signature valid, got invalid")
-	}
+	assert.True(t, verifyWeixinSignature(token, timestamp, nonce, expected), "expect signature valid, got invalid")
 
 	// 错误签名应校验失败
-	if ok := verifyWeixinSignature(token, timestamp, nonce, "wrong"); ok {
-		t.Fatalf("expect signature invalid, got valid")
-	}
+	assert.False(t, verifyWeixinSignature(token, timestamp, nonce, "wrong"), "expect signature invalid, got valid")
 }
 
 func newTestHttpClient(isMock bool, suites []httpx.MockSuite) *http.Client {
@@ -59,16 +56,10 @@ func TestWeixin_getAccessToken(t *testing.T) {
 		},
 	}))
 	resp, err := s.getAccessToken()
-	if err != nil {
-		t.Fatalf("getAccessToken failed: %v", err)
-	}
-	fmt.Println(resp.AccessToken)
-	if resp.AccessToken == "" {
-		t.Fatalf("expect access_token not empty, got empty")
-	}
-	if resp.ExpiresIn <= 0 {
-		t.Fatalf("expect expires_in > 0, got %d", resp.ExpiresIn)
-	}
+	assert.NoError(t, err)
+	t.Log(resp.AccessToken)
+	assert.NotEmpty(t, resp.AccessToken, "expect access_token not empty")
+	assert.Positive(t, resp.ExpiresIn, "expect expires_in > 0")
 }
 
 func TestWeixin_Message(t *testing.T) {
@@ -96,8 +87,6 @@ func TestWeixin_Message(t *testing.T) {
 	}
 
 	resp, err := s.Message(context.Background(), req)
-	if err != nil {
-		t.Fatalf("Message failed: %v", err)
-	}
-	fmt.Println(resp)
+	assert.NoError(t, err)
+	t.Log(resp)
 }

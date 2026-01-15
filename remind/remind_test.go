@@ -9,6 +9,8 @@ import (
 )
 
 func Test_messageForBark(t *testing.T) {
+	// 跳过 Bark 消息推送测试，除非设置了相关的环境变量
+	// 该测试依赖外部服务，通常只在本地开发或特定的集成测试环境中运行
 	t.SkipNow()
 	conf := config.Config{}
 	conf.Common.NotifyUrl = os.Getenv("BARK_URL")

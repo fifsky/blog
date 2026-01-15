@@ -14,6 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/goapt/dbunit"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAdminUser_LoginUserGetListStatusCreate(t *testing.T) {
@@ -21,50 +22,55 @@ func TestAdminUser_LoginUserGetListStatusCreate(t *testing.T) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users")...)
 		svc := NewUser(store.New(db), &config.Config{})
 
-		// LoginUser
-		user := &model.User{
-			Id:        1,
-			Name:      "test",
-			Password:  "test",
-			NickName:  "test",
-			Email:     "test@test.com",
-			Status:    1,
-			Type:      1,
-			CreatedAt: time.Time{},
-			UpdatedAt: time.Time{},
-		}
-		ctx := SetLoginUser(context.Background(), user)
-		resp, err := svc.LoginUser(ctx, &emptypb.Empty{})
-		if err != nil || resp.Id == 0 {
-			t.Fatalf("unexpected err=%v resp=%v", err, resp)
-		}
+		t.Run("获取当前登录用户", func(t *testing.T) {
+			user := &model.User{
+				Id:        1,
+				Name:      "test",
+				Password:  "test",
+				NickName:  "test",
+				Email:     "test@test.com",
+				Status:    1,
+				Type:      1,
+				CreatedAt: time.Time{},
+				UpdatedAt: time.Time{},
+			}
+			ctx := SetLoginUser(context.Background(), user)
+			resp, err := svc.LoginUser(ctx, &emptypb.Empty{})
+			assert.NoError(t, err)
+			assert.NotZero(t, resp.Id)
+		})
 
-		// Get
-		resp2, err2 := svc.Get(context.Background(), &adminv1.GetUserRequest{Id: 1})
-		if err2 != nil || resp2.Id == 0 {
-			t.Fatalf("unexpected err=%v resp=%v", err2, resp2)
-		}
+		t.Run("获取用户详情", func(t *testing.T) {
+			resp, err := svc.Get(context.Background(), &adminv1.GetUserRequest{Id: 1})
+			assert.NoError(t, err)
+			assert.NotZero(t, resp.Id)
+		})
 
-		// List
-		resp3, err3 := svc.List(context.Background(), &adminv1.UserListRequest{Page: 1})
-		if err3 != nil || len(resp3.List) == 0 {
-			t.Fatalf("unexpected err=%v list=%v", err3, resp3.List)
-		}
+		t.Run("获取用户列表", func(t *testing.T) {
+			resp, err := svc.List(context.Background(), &adminv1.UserListRequest{Page: 1})
+			assert.NoError(t, err)
+			assert.NotEmpty(t, resp.List)
+		})
 
-		// Status
-		_, err4 := svc.Status(context.Background(), &adminv1.UserStatusRequest{Id: 1})
-		if err4 != nil {
-			t.Fatalf("unexpected err=%v", err4)
-		}
-		_, err5 := svc.Status(context.Background(), &adminv1.UserStatusRequest{})
-		if err5 == nil {
-			t.Fatalf("expected validation error")
-		}
+		t.Run("更新用户状态", func(t *testing.T) {
+			// 正常更新
+			_, err := svc.Status(context.Background(), &adminv1.UserStatusRequest{Id: 1})
+			assert.NoError(t, err)
 
-		// Create
-		_, err6 := svc.Create(context.Background(), &adminv1.UserCreateRequest{Name: "demo", Password: "123", NickName: "demo", Email: "demo@123.com", Type: 1})
-		if err6 != nil {
-			t.Fatalf("unexpected err=%v", err6)
-		}
+			// 参数验证失败
+			_, err = svc.Status(context.Background(), &adminv1.UserStatusRequest{})
+			assert.Error(t, err)
+		})
+
+		t.Run("创建用户", func(t *testing.T) {
+			_, err := svc.Create(context.Background(), &adminv1.UserCreateRequest{
+				Name:     "demo",
+				Password: "123",
+				NickName: "demo",
+				Email:    "demo@123.com",
+				Type:     1,
+			})
+			assert.NoError(t, err)
+		})
 	})
 }

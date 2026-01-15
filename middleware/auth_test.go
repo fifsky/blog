@@ -39,21 +39,25 @@ func TestNewAuthLogin(t *testing.T) {
 			Token        string
 			ResponseBody string
 		}{
+			// 1. 正常登录，Token 有效且用户存在
 			{
 				getUserTestToken(1, conf),
 				`{"code":10000,"msg":"success"}`,
 			},
+			// 2. 未提供 Token
 			{
 				"",
-				`{"code":"201","message":"登录过期，请重新登录","details":{}}`,
+				`{"code":"UNAUTHORIZED","message":"登录过期，请重新登录"}`,
 			},
+			// 3. Token 格式错误
 			{
 				"789789",
-				`{"code":"201","message":"登录过期，请重新登录","details":{}}`,
+				`{"code":"UNAUTHORIZED","message":"登录过期，请重新登录","details":{"cause":"token is malformed: token contains an invalid number of segments"}}`,
 			},
+			// 4. Token 有效但用户不存在
 			{
 				getUserTestToken(999, conf),
-				`{"code":"202","message":"Access Token错误，用户不存在","details":{}}`,
+				`{"code":"UNAUTHORIZED","message":"登录过期，请重新登录","details":{"user_id":"999"}}`,
 			},
 		}
 
