@@ -42,7 +42,7 @@ service ArticleService {
   }
   // Feed 获取文章 RSS 订阅
   rpc Feed(google.protobuf.Empty) returns (google.api.HttpBody) {
-    option (google.api.http) = {get: "/feed.xml"};
+    option (google.api.http) = {get: "/blog/feed.xml"};
   }
   // Calendar 获取日历文章日期
   rpc Calendar(ArticleCalendarRequest) returns (ArticleCalendarResponse) {

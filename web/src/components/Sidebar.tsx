@@ -50,7 +50,7 @@ export function Sidebar() {
         <i className="iconfont icon-rss" style={{ color: "orange" }}></i>
         <a
           className="pl-[5px]"
-          href="https://api.fifsky.com/feed.xml"
+          href="https://api.fifsky.com/blog/feed.xml"
           target="_blank"
           rel="noreferrer"
         >
