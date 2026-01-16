@@ -13,4 +13,4 @@ FROM registry.cn-shanghai.aliyuncs.com/fifsky/alpine:3.23
 WORKDIR /app
 COPY --from=builder /build/app ./
 EXPOSE 80
-ENTRYPOINT ["/app/app", "openapi", "--addr=:80"]
+ENTRYPOINT ["/app/app", "http", "--addr=:80"]

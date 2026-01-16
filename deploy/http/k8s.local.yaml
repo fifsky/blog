@@ -34,14 +34,18 @@ spec:
           ports:
             - containerPort: 80
               name: http
-          secret:
-            - secretName: blog-config
           volumeMounts:
             - mountPath: /app/storage/logs
               name: log
+            - mountPath: /app/config.yml
+              name: config
+              subPath: config.yml
       volumes:
         - emptyDir: {}
           name: log
+        - name: config
+          secret:
+            secretName: blog-config
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -54,17 +58,17 @@ metadata:
     traefik.ingress.kubernetes.io/router.tls.certresolver: fifsky
 spec:
   tls:
-  - hosts:
-    - api.fifsky.com
-    secretName: api-fifsky-com-tls
+    - hosts:
+        - api.fifsky.com
+      secretName: api-fifsky-com-tls
   rules:
-  - host: api.fifsky.com
+    - host: api.fifsky.com
       http:
         paths:
-        - path: /blog
-          pathType: Prefix 
-          backend:
-            service:
-              name: fifsky-blog-http # 确保这里指向你正确的 Service 名称
-              port:
-                number: 80
+          - path: /blog
+            pathType: Prefix
+            backend:
+              service:
+                name: fifsky-blog-http # 确保这里指向你正确的 Service 名称
+                port:
+                  number: 80
