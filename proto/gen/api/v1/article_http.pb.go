@@ -43,7 +43,7 @@ func (s *ArticleService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/article/list", s.List)
 	s.mux.HandleFunc("POST /blog/article/prevnext", s.PrevNext)
 	s.mux.HandleFunc("POST /blog/article/detail", s.Detail)
-	s.mux.HandleFunc("GET /feed.xml", s.Feed)
+	s.mux.HandleFunc("GET /blog/feed.xml", s.Feed)
 	s.mux.HandleFunc("POST /blog/article/calendar", s.Calendar)
 }
 

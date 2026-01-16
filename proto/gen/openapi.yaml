@@ -624,6 +624,17 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CateMenuResponse'
+    /blog/feed.xml:
+        get:
+            tags:
+                - ArticleService
+            description: Feed 获取文章 RSS 订阅
+            operationId: ArticleService_Feed
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        '*/*': {}
     /blog/link/all:
         post:
             tags:
@@ -751,17 +762,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/WeixinResponse'
-    /feed.xml:
-        get:
-            tags:
-                - ArticleService
-            description: Feed 获取文章 RSS 订阅
-            operationId: ArticleService_Feed
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        '*/*': {}
 components:
     schemas:
         ArchiveResponse:
