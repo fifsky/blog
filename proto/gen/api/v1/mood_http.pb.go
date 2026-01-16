@@ -27,7 +27,7 @@ type MoodService struct {
 }
 
 func (s *MoodService) RegisterService() {
-	s.mux.HandleFunc("POST /api/mood/list", s.List)
+	s.mux.HandleFunc("POST /blog/mood/list", s.List)
 }
 
 func RegisterMoodServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv MoodServiceHTTPServer) {

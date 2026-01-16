@@ -14,42 +14,42 @@ service ArticleService {
   // Create 创建文章
   rpc Create(ArticleCreateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
-      post: "/api/admin/article/create"
+      post: "/blog/admin/article/create"
       body: "*"
     };
   }
   // Update 更新文章
   rpc Update(ArticleUpdateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
-      post: "/api/admin/article/update"
+      post: "/blog/admin/article/update"
       body: "*"
     };
   }
   // Delete 删除文章（支持批量）
   rpc Delete(ArticleDeleteRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/admin/article/delete"
+      post: "/blog/admin/article/delete"
       body: "*"
     };
   }
   // List 获取文章列表
   rpc List(ArticleListRequest) returns (ArticleListResponse) {
     option (google.api.http) = {
-      post: "/api/admin/article/list"
+      post: "/blog/admin/article/list"
       body: "*"
     };
   }
   // Restore 恢复已删除文章（支持批量）
   rpc Restore(ArticleRestoreRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
-      post: "/api/admin/article/restore"
+      post: "/blog/admin/article/restore"
       body: "*"
     };
   }
   // Detail 获取文章详情（不限制文章状态）
   rpc Detail(ArticleDetailRequest) returns (ArticleItem) {
     option (google.api.http) = {
-      post: "/api/admin/article/detail"
+      post: "/blog/admin/article/detail"
       body: "*"
     };
   }

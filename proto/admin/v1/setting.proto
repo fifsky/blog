@@ -12,7 +12,7 @@ service SettingService {
   // Update 更新设置
   rpc Update(fifsky.blog.types.Options) returns (fifsky.blog.types.Options) {
     option (google.api.http) = {
-      post: "/api/admin/setting/update"
+      post: "/blog/admin/setting/update"
       body: "*"
     };
   }

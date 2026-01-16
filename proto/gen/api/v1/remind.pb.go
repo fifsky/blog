@@ -315,10 +315,10 @@ const file_api_v1_remind_proto_rawDesc = "" +
 	"created_at\x18\v \x01(\tR\tcreatedAt\"^\n" +
 	"\x12RemindListResponse\x122\n" +
 	"\x04list\x18\x01 \x03(\v2\x1e.fifsky.blog.api.v1.RemindItemR\x04list\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total2\xef\x01\n" +
-	"\rRemindService\x12o\n" +
-	"\x06Change\x12'.fifsky.blog.api.v1.RemindActionRequest\x1a .fifsky.blog.api.v1.TextResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/remind/change\x12m\n" +
-	"\x05Delay\x12'.fifsky.blog.api.v1.RemindActionRequest\x1a .fifsky.blog.api.v1.TextResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/api/remind/delayB\xac\x01\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total2\xf1\x01\n" +
+	"\rRemindService\x12p\n" +
+	"\x06Change\x12'.fifsky.blog.api.v1.RemindActionRequest\x1a .fifsky.blog.api.v1.TextResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/blog/remind/change\x12n\n" +
+	"\x05Delay\x12'.fifsky.blog.api.v1.RemindActionRequest\x1a .fifsky.blog.api.v1.TextResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/blog/remind/delayB\xac\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\vRemindProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
 
 var (

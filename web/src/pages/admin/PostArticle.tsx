@@ -75,7 +75,7 @@ export default function PostArticle() {
     placeholder: "请输入内容...",
     MENU_CONF: {
       uploadImage: {
-        server: getApiUrl("/api/admin/upload"),
+        server: getApiUrl("/blog/admin/upload"),
         fieldName: "uploadFile",
         headers: { "Access-Token": getAccessToken() },
         withCredentials: false,

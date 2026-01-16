@@ -749,14 +749,14 @@ const file_api_v1_article_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02 \x00R\x02id\x12\x10\n" +
 	"\x03url\x18\x02 \x01(\tR\x03url:\x10\xbaH\r\"\v\n" +
 	"\x02id\n" +
-	"\x03url\x10\x012\xaf\x05\n" +
-	"\x0eArticleService\x12g\n" +
-	"\aArchive\x12\x16.google.protobuf.Empty\x1a#.fifsky.blog.api.v1.ArchiveResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/article/archive\x12u\n" +
-	"\x04List\x12&.fifsky.blog.api.v1.ArticleListRequest\x1a'.fifsky.blog.api.v1.ArticleListResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/api/article/list\x12w\n" +
-	"\bPrevNext\x12#.fifsky.blog.api.v1.PrevNextRequest\x1a$.fifsky.blog.api.v1.PrevNextResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/article/prevnext\x12s\n" +
-	"\x06Detail\x12(.fifsky.blog.api.v1.ArticleDetailRequest\x1a\x1f.fifsky.blog.api.v1.ArticleItem\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/article/detail\x12G\n" +
-	"\x04Feed\x12\x16.google.protobuf.Empty\x1a\x14.google.api.HttpBody\"\x11\x82\xd3\xe4\x93\x02\v\x12\t/feed.xml\x12\x85\x01\n" +
-	"\bCalendar\x12*.fifsky.blog.api.v1.ArticleCalendarRequest\x1a+.fifsky.blog.api.v1.ArticleCalendarResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/article/calendarB\xad\x01\n" +
+	"\x03url\x10\x012\xb4\x05\n" +
+	"\x0eArticleService\x12h\n" +
+	"\aArchive\x12\x16.google.protobuf.Empty\x1a#.fifsky.blog.api.v1.ArchiveResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/blog/article/archive\x12v\n" +
+	"\x04List\x12&.fifsky.blog.api.v1.ArticleListRequest\x1a'.fifsky.blog.api.v1.ArticleListResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/blog/article/list\x12x\n" +
+	"\bPrevNext\x12#.fifsky.blog.api.v1.PrevNextRequest\x1a$.fifsky.blog.api.v1.PrevNextResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/blog/article/prevnext\x12t\n" +
+	"\x06Detail\x12(.fifsky.blog.api.v1.ArticleDetailRequest\x1a\x1f.fifsky.blog.api.v1.ArticleItem\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/blog/article/detail\x12G\n" +
+	"\x04Feed\x12\x16.google.protobuf.Empty\x1a\x14.google.api.HttpBody\"\x11\x82\xd3\xe4\x93\x02\v\x12\t/feed.xml\x12\x86\x01\n" +
+	"\bCalendar\x12*.fifsky.blog.api.v1.ArticleCalendarRequest\x1a+.fifsky.blog.api.v1.ArticleCalendarResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/blog/article/calendarB\xad\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\fArticleProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
 
 var (

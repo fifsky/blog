@@ -14,21 +14,21 @@ service MoodService {
   // Create 创建心情
   rpc Create(MoodCreateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
-      post: "/api/admin/mood/create"
+      post: "/blog/admin/mood/create"
       body: "*"
     };
   }
   // Update 更新心情
   rpc Update(MoodUpdateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
-      post: "/api/admin/mood/update"
+      post: "/blog/admin/mood/update"
       body: "*"
     };
   }
   // Delete 删除心情
   rpc Delete(MoodDeleteRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/admin/mood/delete"
+      post: "/blog/admin/mood/delete"
       body: "*"
     };
   }

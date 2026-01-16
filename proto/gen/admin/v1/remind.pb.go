@@ -528,12 +528,12 @@ const file_admin_v1_remind_proto_rawDesc = "" +
 	"\x04week\x18\x05 \x01(\x05R\x04week\x12\x10\n" +
 	"\x03day\x18\x06 \x01(\x05R\x03day\x12\x12\n" +
 	"\x04hour\x18\a \x01(\x05R\x04hour\x12\x16\n" +
-	"\x06minute\x18\b \x01(\x05R\x06minute2\xf1\x03\n" +
-	"\rRemindService\x12|\n" +
-	"\x04List\x12'.fifsky.blog.admin.v1.RemindListRequest\x1a(.fifsky.blog.admin.v1.RemindListResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/remind/list\x12w\n" +
-	"\x06Create\x12).fifsky.blog.admin.v1.RemindCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/admin/remind/create\x12w\n" +
-	"\x06Update\x12).fifsky.blog.admin.v1.RemindUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/admin/remind/update\x12p\n" +
-	"\x06Delete\x12).fifsky.blog.admin.v1.RemindDeleteRequest\x1a\x16.google.protobuf.Empty\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/admin/remind/deleteB\xba\x01\n" +
+	"\x06minute\x18\b \x01(\x05R\x06minute2\xf5\x03\n" +
+	"\rRemindService\x12}\n" +
+	"\x04List\x12'.fifsky.blog.admin.v1.RemindListRequest\x1a(.fifsky.blog.admin.v1.RemindListResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/remind/list\x12x\n" +
+	"\x06Create\x12).fifsky.blog.admin.v1.RemindCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/blog/admin/remind/create\x12x\n" +
+	"\x06Update\x12).fifsky.blog.admin.v1.RemindUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/blog/admin/remind/update\x12q\n" +
+	"\x06Delete\x12).fifsky.blog.admin.v1.RemindDeleteRequest\x1a\x16.google.protobuf.Empty\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/blog/admin/remind/deleteB\xba\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\vRemindProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var (

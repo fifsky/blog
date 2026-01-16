@@ -12,7 +12,7 @@ service SettingService {
   // Get 获取设置
   rpc Get(google.protobuf.Empty) returns (fifsky.blog.types.Options) {
     option (google.api.http) = {
-      post: "/api/setting"
+      post: "/blog/setting"
       body: "*"
     };
   }

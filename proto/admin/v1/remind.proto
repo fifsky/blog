@@ -14,28 +14,28 @@ service RemindService {
   // List 获取提醒列表
   rpc List(RemindListRequest) returns (RemindListResponse) {
     option (google.api.http) = {
-      post: "/api/admin/remind/list"
+      post: "/blog/admin/remind/list"
       body: "*"
     };
   }
   // Create 创建提醒
   rpc Create(RemindCreateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
-      post: "/api/admin/remind/create"
+      post: "/blog/admin/remind/create"
       body: "*"
     };
   }
   // Update 更新提醒
   rpc Update(RemindUpdateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
-      post: "/api/admin/remind/update"
+      post: "/blog/admin/remind/update"
       body: "*"
     };
   }
   // Delete 删除提醒
   rpc Delete(RemindDeleteRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/admin/remind/delete"
+      post: "/blog/admin/remind/delete"
       body: "*"
     };
   }

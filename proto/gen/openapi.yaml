@@ -3,10 +3,10 @@
 
 openapi: 3.0.3
 info:
-    title: ""
+    title: API文档
     version: 0.0.1
 paths:
-    /api/admin/article/create:
+    /blog/admin/article/create:
         post:
             tags:
                 - ArticleService
@@ -25,13 +25,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/article/delete:
+    /blog/admin/article/delete:
         post:
             tags:
                 - ArticleService
@@ -47,13 +41,7 @@ paths:
                 "200":
                     description: OK
                     content: {}
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/article/detail:
+    /blog/admin/article/detail:
         post:
             tags:
                 - ArticleService
@@ -72,13 +60,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ArticleItem'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/article/list:
+    /blog/admin/article/list:
         post:
             tags:
                 - ArticleService
@@ -97,13 +79,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ArticleListResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/article/restore:
+    /blog/admin/article/restore:
         post:
             tags:
                 - ArticleService
@@ -122,13 +98,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/article/update:
+    /blog/admin/article/update:
         post:
             tags:
                 - ArticleService
@@ -147,13 +117,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/cate/create:
+    /blog/admin/cate/create:
         post:
             tags:
                 - CateService
@@ -172,13 +136,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/cate/delete:
+    /blog/admin/cate/delete:
         post:
             tags:
                 - CateService
@@ -194,13 +152,7 @@ paths:
                 "200":
                     description: OK
                     content: {}
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/cate/list:
+    /blog/admin/cate/list:
         post:
             tags:
                 - CateService
@@ -217,13 +169,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CateListResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/cate/update:
+    /blog/admin/cate/update:
         post:
             tags:
                 - CateService
@@ -242,13 +188,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/link/create:
+    /blog/admin/link/create:
         post:
             tags:
                 - LinkService
@@ -267,13 +207,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/link/delete:
+    /blog/admin/link/delete:
         post:
             tags:
                 - LinkService
@@ -289,13 +223,7 @@ paths:
                 "200":
                     description: OK
                     content: {}
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/link/list:
+    /blog/admin/link/list:
         post:
             tags:
                 - LinkService
@@ -312,13 +240,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LinkListResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/link/update:
+    /blog/admin/link/update:
         post:
             tags:
                 - LinkService
@@ -337,13 +259,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/loginuser:
+    /blog/admin/loginuser:
         post:
             tags:
                 - UserService
@@ -360,13 +276,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/User'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/mood/create:
+    /blog/admin/mood/create:
         post:
             tags:
                 - MoodService
@@ -385,13 +295,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/mood/delete:
+    /blog/admin/mood/delete:
         post:
             tags:
                 - MoodService
@@ -407,13 +311,7 @@ paths:
                 "200":
                     description: OK
                     content: {}
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/mood/update:
+    /blog/admin/mood/update:
         post:
             tags:
                 - MoodService
@@ -432,13 +330,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/remind/create:
+    /blog/admin/remind/create:
         post:
             tags:
                 - RemindService
@@ -457,13 +349,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/remind/delete:
+    /blog/admin/remind/delete:
         post:
             tags:
                 - RemindService
@@ -479,13 +365,7 @@ paths:
                 "200":
                     description: OK
                     content: {}
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/remind/list:
+    /blog/admin/remind/list:
         post:
             tags:
                 - RemindService
@@ -504,13 +384,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RemindListResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/remind/update:
+    /blog/admin/remind/update:
         post:
             tags:
                 - RemindService
@@ -529,13 +403,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/setting/update:
+    /blog/admin/setting/update:
         post:
             tags:
                 - SettingService
@@ -554,13 +422,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Options'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/user/create:
+    /blog/admin/user/create:
         post:
             tags:
                 - UserService
@@ -579,13 +441,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/user/get:
+    /blog/admin/user/get:
         post:
             tags:
                 - UserService
@@ -604,13 +460,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/User'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/user/list:
+    /blog/admin/user/list:
         post:
             tags:
                 - UserService
@@ -629,13 +479,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UserListResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/user/status:
+    /blog/admin/user/status:
         post:
             tags:
                 - UserService
@@ -651,13 +495,7 @@ paths:
                 "200":
                     description: OK
                     content: {}
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/admin/user/update:
+    /blog/admin/user/update:
         post:
             tags:
                 - UserService
@@ -676,13 +514,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/article/archive:
+    /blog/article/archive:
         post:
             tags:
                 - ArticleService
@@ -699,13 +531,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ArchiveResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/article/calendar:
+    /blog/article/calendar:
         post:
             tags:
                 - ArticleService
@@ -724,13 +550,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ArticleCalendarResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/article/detail:
+    /blog/article/detail:
         post:
             tags:
                 - ArticleService
@@ -749,13 +569,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ArticleItem'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/article/list:
+    /blog/article/list:
         post:
             tags:
                 - ArticleService
@@ -774,13 +588,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ArticleListResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/article/prevnext:
+    /blog/article/prevnext:
         post:
             tags:
                 - ArticleService
@@ -799,13 +607,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PrevNextResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/cate/all:
+    /blog/cate/all:
         post:
             tags:
                 - CateService
@@ -822,13 +624,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CateMenuResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/link/all:
+    /blog/link/all:
         post:
             tags:
                 - LinkService
@@ -845,13 +641,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LinkMenuResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/login:
+    /blog/login:
         post:
             tags:
                 - UserService
@@ -870,13 +660,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LoginResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/mood/list:
+    /blog/mood/list:
         post:
             tags:
                 - MoodService
@@ -895,13 +679,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/MoodListResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/remind/change:
+    /blog/remind/change:
         get:
             tags:
                 - RemindService
@@ -919,13 +697,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/TextResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/remind/delay:
+    /blog/remind/delay:
         get:
             tags:
                 - RemindService
@@ -943,13 +715,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/TextResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/setting:
+    /blog/setting:
         post:
             tags:
                 - SettingService
@@ -966,13 +732,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Options'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/weixin/message:
+    /blog/weixin/message:
         post:
             tags:
                 - WeixinService
@@ -991,12 +751,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/WeixinResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
     /feed.xml:
         get:
             tags:
@@ -1008,12 +762,6 @@ paths:
                     description: OK
                     content:
                         '*/*': {}
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
 components:
     schemas:
         ArchiveResponse:
@@ -1042,13 +790,13 @@ components:
                         format: int32
         ArticleCreateRequest:
             required:
-                - cateId
+                - cate_id
                 - type
                 - title
                 - content
             type: object
             properties:
-                cateId:
+                cate_id:
                     type: integer
                     format: int32
                 type:
@@ -1087,13 +835,13 @@ components:
                 id:
                     type: integer
                     format: int32
-                cateId:
+                cate_id:
                     type: integer
                     format: int32
                 type:
                     type: integer
                     format: int32
-                userId:
+                user_id:
                     type: integer
                     format: int32
                 title:
@@ -1105,9 +853,9 @@ components:
                 status:
                     type: integer
                     format: int32
-                createdAt:
+                created_at:
                     type: string
-                updatedAt:
+                updated_at:
                     type: string
                 user:
                     $ref: '#/components/schemas/UserSummary'
@@ -1152,7 +900,7 @@ components:
                 id:
                     type: integer
                     format: int32
-                cateId:
+                cate_id:
                     type: integer
                     format: int32
                 type:
@@ -1200,9 +948,9 @@ components:
                     type: string
                 domain:
                     type: string
-                createdAt:
+                created_at:
                     type: string
-                updatedAt:
+                updated_at:
                     type: string
                 num:
                     type: integer
@@ -1270,14 +1018,6 @@ components:
                 id:
                     type: integer
                     format: int32
-        GoogleProtobufAny:
-            type: object
-            properties:
-                '@type':
-                    type: string
-                    description: The type of the serialized message.
-            additionalProperties: true
-            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
         IDResponse:
             type: object
             properties:
@@ -1317,7 +1057,7 @@ components:
                     type: string
                 desc:
                     type: string
-                createdAt:
+                created_at:
                     type: string
         LinkListResponse:
             type: object
@@ -1359,32 +1099,32 @@ components:
                     type: string
         LoginRequest:
             required:
-                - userName
+                - user_name
                 - password
             type: object
             properties:
-                userName:
+                user_name:
                     type: string
                 password:
                     type: string
         LoginResponse:
             type: object
             properties:
-                accessToken:
+                access_token:
                     type: string
                 user:
                     $ref: '#/components/schemas/UserItem'
         MessageRequest:
             required:
                 - touser
-                - templateId
+                - template_id
                 - data
             type: object
             properties:
                 touser:
                     type: string
                     description: 接收人OpenID
-                templateId:
+                template_id:
                     type: string
                     description: 模板ID
                 data:
@@ -1423,7 +1163,7 @@ components:
                     type: string
                 user:
                     $ref: '#/components/schemas/UserSummary'
-                createdAt:
+                created_at:
                     type: string
         MoodListRequest:
             type: object
@@ -1545,9 +1285,9 @@ components:
                 status:
                     type: integer
                     format: int32
-                nextTime:
+                next_time:
                     type: string
-                createdAt:
+                created_at:
                     type: string
         RemindListRequest:
             type: object
@@ -1594,22 +1334,6 @@ components:
                 minute:
                     type: integer
                     format: int32
-        Status:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
-                    format: int32
-                message:
-                    type: string
-                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
-                details:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/GoogleProtobufAny'
-                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
-            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
         TextResponse:
             type: object
             properties:
@@ -1623,7 +1347,7 @@ components:
                     format: int32
                 name:
                     type: string
-                nickName:
+                nick_name:
                     type: string
                 email:
                     type: string
@@ -1633,15 +1357,15 @@ components:
                 type:
                     type: integer
                     format: int32
-                createdAt:
+                created_at:
                     type: string
-                updatedAt:
+                updated_at:
                     type: string
         UserCreateRequest:
             required:
                 - name
                 - password
-                - nickName
+                - nick_name
                 - type
             type: object
             properties:
@@ -1649,7 +1373,7 @@ components:
                     type: string
                 password:
                     type: string
-                nickName:
+                nick_name:
                     type: string
                 email:
                     type: string
@@ -1664,7 +1388,7 @@ components:
                     format: int32
                 name:
                     type: string
-                nickName:
+                nick_name:
                     type: string
                 email:
                     type: string
@@ -1674,9 +1398,9 @@ components:
                 type:
                     type: integer
                     format: int32
-                createdAt:
+                created_at:
                     type: string
-                updatedAt:
+                updated_at:
                     type: string
         UserListRequest:
             type: object
@@ -1712,7 +1436,7 @@ components:
                     format: int32
                 name:
                     type: string
-                nickName:
+                nick_name:
                     type: string
         UserUpdateRequest:
             required:
@@ -1726,7 +1450,7 @@ components:
                     type: string
                 password:
                     type: string
-                nickName:
+                nick_name:
                     type: string
                 email:
                     type: string

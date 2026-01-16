@@ -27,7 +27,7 @@ type WeixinService struct {
 }
 
 func (s *WeixinService) RegisterService() {
-	s.mux.HandleFunc("POST /api/weixin/message", s.Message)
+	s.mux.HandleFunc("POST /blog/weixin/message", s.Message)
 }
 
 func RegisterWeixinServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv WeixinServiceHTTPServer) {

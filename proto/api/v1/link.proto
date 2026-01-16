@@ -14,7 +14,7 @@ service LinkService {
   // All 获取所有链接
   rpc All(google.protobuf.Empty) returns (LinkMenuResponse) {
     option (google.api.http) = {
-      post: "/api/link/all"
+      post: "/blog/link/all"
       body: "*"
     };
   }

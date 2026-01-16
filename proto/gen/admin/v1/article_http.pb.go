@@ -39,12 +39,12 @@ type ArticleService struct {
 }
 
 func (s *ArticleService) RegisterService() {
-	s.mux.HandleFunc("POST /api/admin/article/create", s.Create)
-	s.mux.HandleFunc("POST /api/admin/article/update", s.Update)
-	s.mux.HandleFunc("POST /api/admin/article/delete", s.Delete)
-	s.mux.HandleFunc("POST /api/admin/article/list", s.List)
-	s.mux.HandleFunc("POST /api/admin/article/restore", s.Restore)
-	s.mux.HandleFunc("POST /api/admin/article/detail", s.Detail)
+	s.mux.HandleFunc("POST /blog/admin/article/create", s.Create)
+	s.mux.HandleFunc("POST /blog/admin/article/update", s.Update)
+	s.mux.HandleFunc("POST /blog/admin/article/delete", s.Delete)
+	s.mux.HandleFunc("POST /blog/admin/article/list", s.List)
+	s.mux.HandleFunc("POST /blog/admin/article/restore", s.Restore)
+	s.mux.HandleFunc("POST /blog/admin/article/detail", s.Detail)
 }
 
 func RegisterArticleServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv ArticleServiceHTTPServer) {

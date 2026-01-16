@@ -14,28 +14,28 @@ service CateService {
   // List 获取分类列表
   rpc List(google.protobuf.Empty) returns (CateListResponse) {
     option (google.api.http) = {
-      post: "/api/admin/cate/list"
+      post: "/blog/admin/cate/list"
       body: "*"
     };
   }
   // Create 创建分类
   rpc Create(CateCreateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
-      post: "/api/admin/cate/create"
+      post: "/blog/admin/cate/create"
       body: "*"
     };
   }
   // Update 更新分类
   rpc Update(CateUpdateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
-      post: "/api/admin/cate/update"
+      post: "/blog/admin/cate/update"
       body: "*"
     };
   }
   // Delete 删除分类
   rpc Delete(CateDeleteRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/admin/cate/delete"
+      post: "/blog/admin/cate/delete"
       body: "*"
     };
   }

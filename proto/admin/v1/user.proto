@@ -14,42 +14,42 @@ service UserService {
   // Get 获取用户详情
   rpc Get(GetUserRequest) returns (User) {
     option (google.api.http) = {
-      post: "/api/admin/user/get"
+      post: "/blog/admin/user/get"
       body: "*"
     };
   }
   // Create 创建用户
   rpc Create(UserCreateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
-      post: "/api/admin/user/create"
+      post: "/blog/admin/user/create"
       body: "*"
     };
   }
   // Update 更新用户
   rpc Update(UserUpdateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
-      post: "/api/admin/user/update"
+      post: "/blog/admin/user/update"
       body: "*"
     };
   }
   // List 获取用户列表
   rpc List(UserListRequest) returns (UserListResponse) {
     option (google.api.http) = {
-      post: "/api/admin/user/list"
+      post: "/blog/admin/user/list"
       body: "*"
     };
   }
   // Status 更新用户状态
   rpc Status(UserStatusRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/admin/user/status"
+      post: "/blog/admin/user/status"
       body: "*"
     };
   }
   // LoginUser 获取登录用户详情
   rpc LoginUser(google.protobuf.Empty) returns (User) {
     option (google.api.http) = {
-      post: "/api/admin/loginuser"
+      post: "/blog/admin/loginuser"
       body: "*"
     };
   }

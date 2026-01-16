@@ -35,10 +35,10 @@ type CateService struct {
 }
 
 func (s *CateService) RegisterService() {
-	s.mux.HandleFunc("POST /api/admin/cate/list", s.List)
-	s.mux.HandleFunc("POST /api/admin/cate/create", s.Create)
-	s.mux.HandleFunc("POST /api/admin/cate/update", s.Update)
-	s.mux.HandleFunc("POST /api/admin/cate/delete", s.Delete)
+	s.mux.HandleFunc("POST /blog/admin/cate/list", s.List)
+	s.mux.HandleFunc("POST /blog/admin/cate/create", s.Create)
+	s.mux.HandleFunc("POST /blog/admin/cate/update", s.Update)
+	s.mux.HandleFunc("POST /blog/admin/cate/delete", s.Delete)
 }
 
 func RegisterCateServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv CateServiceHTTPServer) {

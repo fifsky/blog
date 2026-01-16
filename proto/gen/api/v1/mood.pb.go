@@ -205,9 +205,9 @@ const file_api_v1_mood_proto_rawDesc = "" +
 	"created_at\x18\x04 \x01(\tR\tcreatedAt\"Z\n" +
 	"\x10MoodListResponse\x120\n" +
 	"\x04list\x18\x01 \x03(\v2\x1c.fifsky.blog.api.v1.MoodItemR\x04list\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total2{\n" +
-	"\vMoodService\x12l\n" +
-	"\x04List\x12#.fifsky.blog.api.v1.MoodListRequest\x1a$.fifsky.blog.api.v1.MoodListResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/api/mood/listB\xaa\x01\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total2|\n" +
+	"\vMoodService\x12m\n" +
+	"\x04List\x12#.fifsky.blog.api.v1.MoodListRequest\x1a$.fifsky.blog.api.v1.MoodListResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/blog/mood/listB\xaa\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\tMoodProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
 
 var (

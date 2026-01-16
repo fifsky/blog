@@ -13,11 +13,11 @@ option go_package = "gen/api/v1";
 service RemindService {
   // Change 切换提醒状态
   rpc Change(RemindActionRequest) returns (TextResponse) {
-    option (google.api.http) = {get: "/api/remind/change"};
+    option (google.api.http) = {get: "/blog/remind/change"};
   }
   // Delay 延迟提醒
   rpc Delay(RemindActionRequest) returns (TextResponse) {
-    option (google.api.http) = {get: "/api/remind/delay"};
+    option (google.api.http) = {get: "/blog/remind/delay"};
   }
 }
 

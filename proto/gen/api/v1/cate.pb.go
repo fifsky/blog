@@ -232,9 +232,9 @@ const file_api_v1_cate_proto_rawDesc = "" +
 	"created_at\x18\x05 \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
 	"updated_at\x18\x06 \x01(\tR\tupdatedAt\x12\x10\n" +
-	"\x03num\x18\a \x01(\x05R\x03num2l\n" +
-	"\vCateService\x12]\n" +
-	"\x03All\x12\x16.google.protobuf.Empty\x1a$.fifsky.blog.api.v1.CateMenuResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/cate/allB\xaa\x01\n" +
+	"\x03num\x18\a \x01(\x05R\x03num2m\n" +
+	"\vCateService\x12^\n" +
+	"\x03All\x12\x16.google.protobuf.Empty\x1a$.fifsky.blog.api.v1.CateMenuResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/blog/cate/allB\xaa\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\tCateProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
 
 var (

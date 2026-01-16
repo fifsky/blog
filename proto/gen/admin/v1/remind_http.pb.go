@@ -35,10 +35,10 @@ type RemindService struct {
 }
 
 func (s *RemindService) RegisterService() {
-	s.mux.HandleFunc("POST /api/admin/remind/list", s.List)
-	s.mux.HandleFunc("POST /api/admin/remind/create", s.Create)
-	s.mux.HandleFunc("POST /api/admin/remind/update", s.Update)
-	s.mux.HandleFunc("POST /api/admin/remind/delete", s.Delete)
+	s.mux.HandleFunc("POST /blog/admin/remind/list", s.List)
+	s.mux.HandleFunc("POST /blog/admin/remind/create", s.Create)
+	s.mux.HandleFunc("POST /blog/admin/remind/update", s.Update)
+	s.mux.HandleFunc("POST /blog/admin/remind/delete", s.Delete)
 }
 
 func RegisterRemindServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv RemindServiceHTTPServer) {

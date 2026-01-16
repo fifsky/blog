@@ -28,7 +28,7 @@ type LinkService struct {
 }
 
 func (s *LinkService) RegisterService() {
-	s.mux.HandleFunc("POST /api/link/all", s.All)
+	s.mux.HandleFunc("POST /blog/link/all", s.All)
 }
 
 func RegisterLinkServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv LinkServiceHTTPServer) {

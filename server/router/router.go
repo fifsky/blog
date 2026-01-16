@@ -61,7 +61,7 @@ func (r *Router) Handler() http.Handler {
 		WithResponseHeader: true,
 		// WithResponseBody: true,
 		Filters: []sloghttp.Filter{
-			sloghttp.IgnorePath("/api/admin/upload"),
+			sloghttp.IgnorePath("/blog/admin/upload"),
 		},
 	}
 
@@ -75,13 +75,13 @@ func (r *Router) Handler() http.Handler {
 	mux := NewServeMux()
 	api := mux.Use(middleware.NewRecover, sloghttp.NewMiddleware(log, conf), middleware.NewCors)
 
-	// 统一处理所有 /api/ 路径的预检请求，确保中间件设置CORS响应头
-	api.HandleFunc("OPTIONS /api/", func(w http.ResponseWriter, r *http.Request) {
+	// 统一处理所有 /blog/ 路径的预检请求，确保中间件设置CORS响应头
+	api.HandleFunc("OPTIONS /blog/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
 
-	api.HandleFunc("GET /api/weixin/notify", r.service.Weixin.Notify)
-	api.HandleFunc("POST /api/weixin/notify", r.service.Weixin.Notify)
+	api.HandleFunc("GET /blog/weixin/notify", r.service.Weixin.Notify)
+	api.HandleFunc("POST /blog/weixin/notify", r.service.Weixin.Notify)
 
 	codec := contract.NewCodec()
 	apiv1.RegisterArticleServiceHTTPServer(api, codec, r.service.Article)
@@ -94,7 +94,7 @@ func (r *Router) Handler() http.Handler {
 	apiv1.RegisterWeixinServiceHTTPServer(api, codec, r.service.Weixin)
 
 	adminAuth := api.Use(middleware.NewAuthLogin(r.store, r.conf))
-	adminAuth.HandleFunc("POST /api/admin/upload", r.admin.Article.Upload)
+	adminAuth.HandleFunc("POST /blog/admin/upload", r.admin.Article.Upload)
 	adminv1.RegisterArticleServiceHTTPServer(adminAuth, codec, r.admin.Article)
 	adminv1.RegisterMoodServiceHTTPServer(adminAuth, codec, r.admin.Mood)
 	adminv1.RegisterCateServiceHTTPServer(adminAuth, codec, r.admin.Cate)

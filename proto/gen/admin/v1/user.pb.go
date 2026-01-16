@@ -623,14 +623,14 @@ const file_admin_v1_user_proto_rawDesc = "" +
 	"updated_at\x18\b \x01(\tR\tupdatedAt\"\\\n" +
 	"\x10UserListResponse\x122\n" +
 	"\x04list\x18\x01 \x03(\v2\x1e.fifsky.blog.admin.v1.UserItemR\x04list\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total2\xa8\x05\n" +
-	"\vUserService\x12g\n" +
-	"\x03Get\x12$.fifsky.blog.admin.v1.GetUserRequest\x1a\x1a.fifsky.blog.admin.v1.User\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/admin/user/get\x12s\n" +
-	"\x06Create\x12'.fifsky.blog.admin.v1.UserCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/user/create\x12s\n" +
-	"\x06Update\x12'.fifsky.blog.admin.v1.UserUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/user/update\x12v\n" +
-	"\x04List\x12%.fifsky.blog.admin.v1.UserListRequest\x1a&.fifsky.blog.admin.v1.UserListResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/admin/user/list\x12l\n" +
-	"\x06Status\x12'.fifsky.blog.admin.v1.UserStatusRequest\x1a\x16.google.protobuf.Empty\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/user/status\x12`\n" +
-	"\tLoginUser\x12\x16.google.protobuf.Empty\x1a\x1a.fifsky.blog.admin.v1.User\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/admin/loginuserB\xb8\x01\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total2\xae\x05\n" +
+	"\vUserService\x12h\n" +
+	"\x03Get\x12$.fifsky.blog.admin.v1.GetUserRequest\x1a\x1a.fifsky.blog.admin.v1.User\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/blog/admin/user/get\x12t\n" +
+	"\x06Create\x12'.fifsky.blog.admin.v1.UserCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/user/create\x12t\n" +
+	"\x06Update\x12'.fifsky.blog.admin.v1.UserUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/user/update\x12w\n" +
+	"\x04List\x12%.fifsky.blog.admin.v1.UserListRequest\x1a&.fifsky.blog.admin.v1.UserListResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/blog/admin/user/list\x12m\n" +
+	"\x06Status\x12'.fifsky.blog.admin.v1.UserStatusRequest\x1a\x16.google.protobuf.Empty\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/user/status\x12a\n" +
+	"\tLoginUser\x12\x16.google.protobuf.Empty\x1a\x1a.fifsky.blog.admin.v1.User\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/blog/admin/loginuserB\xb8\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\tUserProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var (

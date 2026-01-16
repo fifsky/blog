@@ -39,12 +39,12 @@ type UserService struct {
 }
 
 func (s *UserService) RegisterService() {
-	s.mux.HandleFunc("POST /api/admin/user/get", s.Get)
-	s.mux.HandleFunc("POST /api/admin/user/create", s.Create)
-	s.mux.HandleFunc("POST /api/admin/user/update", s.Update)
-	s.mux.HandleFunc("POST /api/admin/user/list", s.List)
-	s.mux.HandleFunc("POST /api/admin/user/status", s.Status)
-	s.mux.HandleFunc("POST /api/admin/loginuser", s.LoginUser)
+	s.mux.HandleFunc("POST /blog/admin/user/get", s.Get)
+	s.mux.HandleFunc("POST /blog/admin/user/create", s.Create)
+	s.mux.HandleFunc("POST /blog/admin/user/update", s.Update)
+	s.mux.HandleFunc("POST /blog/admin/user/list", s.List)
+	s.mux.HandleFunc("POST /blog/admin/user/status", s.Status)
+	s.mux.HandleFunc("POST /blog/admin/loginuser", s.LoginUser)
 }
 
 func RegisterUserServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv UserServiceHTTPServer) {

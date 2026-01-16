@@ -27,7 +27,7 @@ type UserService struct {
 }
 
 func (s *UserService) RegisterService() {
-	s.mux.HandleFunc("POST /api/login", s.Login)
+	s.mux.HandleFunc("POST /blog/login", s.Login)
 }
 
 func RegisterUserServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv UserServiceHTTPServer) {

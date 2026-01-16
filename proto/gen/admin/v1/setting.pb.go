@@ -27,9 +27,9 @@ var File_admin_v1_setting_proto protoreflect.FileDescriptor
 
 const file_admin_v1_setting_proto_rawDesc = "" +
 	"\n" +
-	"\x16admin/v1/setting.proto\x12\x14fifsky.blog.admin.v1\x1a\x12types/common.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto2x\n" +
-	"\x0eSettingService\x12f\n" +
-	"\x06Update\x12\x1a.fifsky.blog.types.Options\x1a\x1a.fifsky.blog.types.Options\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/setting/updateB\xbb\x01\n" +
+	"\x16admin/v1/setting.proto\x12\x14fifsky.blog.admin.v1\x1a\x12types/common.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto2y\n" +
+	"\x0eSettingService\x12g\n" +
+	"\x06Update\x12\x1a.fifsky.blog.types.Options\x1a\x1a.fifsky.blog.types.Options\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/blog/admin/setting/updateB\xbb\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\fSettingProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var file_admin_v1_setting_proto_goTypes = []any{

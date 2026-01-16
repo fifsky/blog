@@ -35,10 +35,10 @@ type LinkService struct {
 }
 
 func (s *LinkService) RegisterService() {
-	s.mux.HandleFunc("POST /api/admin/link/list", s.List)
-	s.mux.HandleFunc("POST /api/admin/link/create", s.Create)
-	s.mux.HandleFunc("POST /api/admin/link/update", s.Update)
-	s.mux.HandleFunc("POST /api/admin/link/delete", s.Delete)
+	s.mux.HandleFunc("POST /blog/admin/link/list", s.List)
+	s.mux.HandleFunc("POST /blog/admin/link/create", s.Create)
+	s.mux.HandleFunc("POST /blog/admin/link/update", s.Update)
+	s.mux.HandleFunc("POST /blog/admin/link/delete", s.Delete)
 }
 
 func RegisterLinkServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv LinkServiceHTTPServer) {

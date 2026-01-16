@@ -632,14 +632,14 @@ const file_admin_v1_article_proto_rawDesc = "" +
 	"updated_at\x18\n" +
 	" \x01(\tR\tupdatedAt\x122\n" +
 	"\x04user\x18\v \x01(\v2\x1e.fifsky.blog.types.UserSummaryR\x04user\x122\n" +
-	"\x04cate\x18\f \x01(\v2\x1e.fifsky.blog.types.CateSummaryR\x04cate2\xf8\x05\n" +
-	"\x0eArticleService\x12y\n" +
-	"\x06Create\x12*.fifsky.blog.admin.v1.ArticleCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/article/create\x12y\n" +
-	"\x06Update\x12*.fifsky.blog.admin.v1.ArticleUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/article/update\x12r\n" +
-	"\x06Delete\x12*.fifsky.blog.admin.v1.ArticleDeleteRequest\x1a\x16.google.protobuf.Empty\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/article/delete\x12\x7f\n" +
-	"\x04List\x12(.fifsky.blog.admin.v1.ArticleListRequest\x1a).fifsky.blog.admin.v1.ArticleListResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/api/admin/article/list\x12|\n" +
-	"\aRestore\x12+.fifsky.blog.admin.v1.ArticleRestoreRequest\x1a\x1d.fifsky.blog.types.IDResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/admin/article/restore\x12}\n" +
-	"\x06Detail\x12*.fifsky.blog.admin.v1.ArticleDetailRequest\x1a!.fifsky.blog.admin.v1.ArticleItem\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/admin/article/detailB\xbb\x01\n" +
+	"\x04cate\x18\f \x01(\v2\x1e.fifsky.blog.types.CateSummaryR\x04cate2\xff\x05\n" +
+	"\x0eArticleService\x12z\n" +
+	"\x06Create\x12*.fifsky.blog.admin.v1.ArticleCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/blog/admin/article/create\x12z\n" +
+	"\x06Update\x12*.fifsky.blog.admin.v1.ArticleUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/blog/admin/article/update\x12s\n" +
+	"\x06Delete\x12*.fifsky.blog.admin.v1.ArticleDeleteRequest\x1a\x16.google.protobuf.Empty\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/blog/admin/article/delete\x12\x80\x01\n" +
+	"\x04List\x12(.fifsky.blog.admin.v1.ArticleListRequest\x1a).fifsky.blog.admin.v1.ArticleListResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/blog/admin/article/list\x12}\n" +
+	"\aRestore\x12+.fifsky.blog.admin.v1.ArticleRestoreRequest\x1a\x1d.fifsky.blog.types.IDResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/blog/admin/article/restore\x12~\n" +
+	"\x06Detail\x12*.fifsky.blog.admin.v1.ArticleDetailRequest\x1a!.fifsky.blog.admin.v1.ArticleItem\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/blog/admin/article/detailB\xbb\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\fArticleProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var (

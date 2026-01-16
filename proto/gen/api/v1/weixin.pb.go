@@ -183,9 +183,9 @@ const file_api_v1_weixin_proto_rawDesc = "" +
 	"\tDataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12>\n" +
 	"\x05value\x18\x02 \x01(\v2(.fifsky.blog.api.v1.MessageRequest.ValueR\x05value:\x028\x01\"\x10\n" +
-	"\x0eWeixinResponse2\x82\x01\n" +
-	"\rWeixinService\x12q\n" +
-	"\aMessage\x12\".fifsky.blog.api.v1.MessageRequest\x1a\".fifsky.blog.api.v1.WeixinResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/weixin/messageB\xac\x01\n" +
+	"\x0eWeixinResponse2\x83\x01\n" +
+	"\rWeixinService\x12r\n" +
+	"\aMessage\x12\".fifsky.blog.api.v1.MessageRequest\x1a\".fifsky.blog.api.v1.WeixinResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/blog/weixin/messageB\xac\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\vWeixinProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
 
 var (

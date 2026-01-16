@@ -28,7 +28,7 @@ type CateService struct {
 }
 
 func (s *CateService) RegisterService() {
-	s.mux.HandleFunc("POST /api/cate/all", s.All)
+	s.mux.HandleFunc("POST /blog/cate/all", s.All)
 }
 
 func RegisterCateServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv CateServiceHTTPServer) {

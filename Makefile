@@ -60,16 +60,6 @@ docker:
 lint:
 	golangci-lint run
 
-
 .PHONY: buildui
 buildui:
-	cd web && pnpm run build
-
-.PHONY: upload
-upload:
-	cd web && ossutil --recursive  cp ./dist/assets oss://fifsky/assets -f -e oss-cn-shanghai.aliyuncs.com -i ${FIFSKY_ALIYUN_KEY} -k ${FIFSKY_ALIYUN_SECRET}
-.PHONY: dockerui
-dockerui: buildui upload
-	docker login --username=${ALIYUN_DOCKER_USERNAME} --password=${ALIYUN_DOCKER_PASSWORD} registry.cn-shanghai.aliyuncs.com
-	cd web && docker build . --file Dockerfile --tag registry.cn-shanghai.aliyuncs.com/fifsky/blog-web
-	docker push registry.cn-shanghai.aliyuncs.com/fifsky/blog-web
+	cd web && pnpm run build && ossutil --recursive  cp ./dist/assets oss://fifsky/assets -f -e oss-cn-shanghai.aliyuncs.com -i ${FIFSKY_ALIYUN_KEY} -k ${FIFSKY_ALIYUN_SECRET}

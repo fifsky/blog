@@ -14,7 +14,7 @@ service UserService {
   // Login 登录
   rpc Login(LoginRequest) returns (LoginResponse) {
     option (google.api.http) = {
-      post: "/api/login"
+      post: "/blog/login"
       body: "*"
     };
   }

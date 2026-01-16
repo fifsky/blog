@@ -29,8 +29,8 @@ type RemindService struct {
 }
 
 func (s *RemindService) RegisterService() {
-	s.mux.HandleFunc("GET /api/remind/change", s.Change)
-	s.mux.HandleFunc("GET /api/remind/delay", s.Delay)
+	s.mux.HandleFunc("GET /blog/remind/change", s.Change)
+	s.mux.HandleFunc("GET /blog/remind/delay", s.Delay)
 }
 
 func RegisterRemindServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv RemindServiceHTTPServer) {

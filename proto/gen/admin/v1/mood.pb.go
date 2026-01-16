@@ -179,11 +179,11 @@ const file_admin_v1_mood_proto_rawDesc = "" +
 	"\x11MoodUpdateRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent2\xe5\x02\n" +
-	"\vMoodService\x12s\n" +
-	"\x06Create\x12'.fifsky.blog.admin.v1.MoodCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/mood/create\x12s\n" +
-	"\x06Update\x12'.fifsky.blog.admin.v1.MoodUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/mood/update\x12l\n" +
-	"\x06Delete\x12'.fifsky.blog.admin.v1.MoodDeleteRequest\x1a\x16.google.protobuf.Empty\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/mood/deleteB\xb8\x01\n" +
+	"\acontent\x18\x02 \x01(\tR\acontent2\xe8\x02\n" +
+	"\vMoodService\x12t\n" +
+	"\x06Create\x12'.fifsky.blog.admin.v1.MoodCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/mood/create\x12t\n" +
+	"\x06Update\x12'.fifsky.blog.admin.v1.MoodUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/mood/update\x12m\n" +
+	"\x06Delete\x12'.fifsky.blog.admin.v1.MoodDeleteRequest\x1a\x16.google.protobuf.Empty\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/mood/deleteB\xb8\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\tMoodProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var (

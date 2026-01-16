@@ -14,7 +14,7 @@ service MoodService {
   // List 获取心情列表
   rpc List(MoodListRequest) returns (MoodListResponse) {
     option (google.api.http) = {
-      post: "/api/mood/list"
+      post: "/blog/mood/list"
       body: "*"
     };
   }

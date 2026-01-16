@@ -14,7 +14,7 @@ service WeixinService {
   // Message 发送模板消息
   rpc Message(MessageRequest) returns (WeixinResponse) {
     option (google.api.http) = {
-      post: "/api/weixin/message"
+      post: "/blog/weixin/message"
       body: "*"
     };
   }

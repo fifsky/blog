@@ -28,7 +28,7 @@ type SettingService struct {
 }
 
 func (s *SettingService) RegisterService() {
-	s.mux.HandleFunc("POST /api/admin/setting/update", s.Update)
+	s.mux.HandleFunc("POST /blog/admin/setting/update", s.Update)
 }
 
 func RegisterSettingServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv SettingServiceHTTPServer) {

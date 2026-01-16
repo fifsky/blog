@@ -353,12 +353,12 @@ const file_admin_v1_link_proto_rawDesc = "" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x10\n" +
 	"\x03url\x18\x03 \x01(\tR\x03url\x12\x12\n" +
-	"\x04desc\x18\x04 \x01(\tR\x04desc2\xce\x03\n" +
-	"\vLinkService\x12g\n" +
-	"\x04List\x12\x16.google.protobuf.Empty\x1a&.fifsky.blog.admin.v1.LinkListResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/admin/link/list\x12s\n" +
-	"\x06Create\x12'.fifsky.blog.admin.v1.LinkCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/link/create\x12s\n" +
-	"\x06Update\x12'.fifsky.blog.admin.v1.LinkUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/link/update\x12l\n" +
-	"\x06Delete\x12'.fifsky.blog.admin.v1.LinkDeleteRequest\x1a\x16.google.protobuf.Empty\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/admin/link/deleteB\xb8\x01\n" +
+	"\x04desc\x18\x04 \x01(\tR\x04desc2\xd2\x03\n" +
+	"\vLinkService\x12h\n" +
+	"\x04List\x12\x16.google.protobuf.Empty\x1a&.fifsky.blog.admin.v1.LinkListResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/blog/admin/link/list\x12t\n" +
+	"\x06Create\x12'.fifsky.blog.admin.v1.LinkCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/link/create\x12t\n" +
+	"\x06Update\x12'.fifsky.blog.admin.v1.LinkUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/link/update\x12m\n" +
+	"\x06Delete\x12'.fifsky.blog.admin.v1.LinkDeleteRequest\x1a\x16.google.protobuf.Empty\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/link/deleteB\xb8\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\tLinkProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var (

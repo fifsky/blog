@@ -268,9 +268,9 @@ const file_api_v1_link_proto_rawDesc = "" +
 	"created_at\x18\x05 \x01(\tR\tcreatedAt\"Z\n" +
 	"\x10LinkListResponse\x120\n" +
 	"\x04list\x18\x01 \x03(\v2\x1c.fifsky.blog.api.v1.LinkItemR\x04list\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total2l\n" +
-	"\vLinkService\x12]\n" +
-	"\x03All\x12\x16.google.protobuf.Empty\x1a$.fifsky.blog.api.v1.LinkMenuResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/link/allB\xaa\x01\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total2m\n" +
+	"\vLinkService\x12^\n" +
+	"\x03All\x12\x16.google.protobuf.Empty\x1a$.fifsky.blog.api.v1.LinkMenuResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/blog/link/allB\xaa\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\tLinkProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
 
 var (

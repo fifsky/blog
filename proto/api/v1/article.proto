@@ -15,28 +15,28 @@ service ArticleService {
   // Archive 获取文章归档
   rpc Archive(google.protobuf.Empty) returns (ArchiveResponse) {
     option (google.api.http) = {
-      post: "/api/article/archive"
+      post: "/blog/article/archive"
       body: "*"
     };
   }
   // List 获取文章列表
   rpc List(ArticleListRequest) returns (ArticleListResponse) {
     option (google.api.http) = {
-      post: "/api/article/list"
+      post: "/blog/article/list"
       body: "*"
     };
   }
   // PrevNext 获取上一篇下一篇文章
   rpc PrevNext(PrevNextRequest) returns (PrevNextResponse) {
     option (google.api.http) = {
-      post: "/api/article/prevnext"
+      post: "/blog/article/prevnext"
       body: "*"
     };
   }
   // Detail 获取文章详情
   rpc Detail(ArticleDetailRequest) returns (ArticleItem) {
     option (google.api.http) = {
-      post: "/api/article/detail"
+      post: "/blog/article/detail"
       body: "*"
     };
   }
@@ -47,7 +47,7 @@ service ArticleService {
   // Calendar 获取日历文章日期
   rpc Calendar(ArticleCalendarRequest) returns (ArticleCalendarResponse) {
     option (google.api.http) = {
-      post: "/api/article/calendar"
+      post: "/blog/article/calendar"
       body: "*"
     };
   }

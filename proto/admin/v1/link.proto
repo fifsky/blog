@@ -14,28 +14,28 @@ service LinkService {
   // List 获取链接列表
   rpc List(google.protobuf.Empty) returns (LinkListResponse) {
     option (google.api.http) = {
-      post: "/api/admin/link/list"
+      post: "/blog/admin/link/list"
       body: "*"
     };
   }
   // Create 创建链接
   rpc Create(LinkCreateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
-      post: "/api/admin/link/create"
+      post: "/blog/admin/link/create"
       body: "*"
     };
   }
   // Update 更新链接
   rpc Update(LinkUpdateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
-      post: "/api/admin/link/update"
+      post: "/blog/admin/link/update"
       body: "*"
     };
   }
   // Delete 删除链接
   rpc Delete(LinkDeleteRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/admin/link/delete"
+      post: "/blog/admin/link/delete"
       body: "*"
     };
   }

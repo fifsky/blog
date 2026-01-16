@@ -298,10 +298,9 @@ const file_api_v1_user_proto_rawDesc = "" +
 	"\bpassword\x18\x02 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\bpassword\"d\n" +
 	"\rLoginResponse\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x120\n" +
-	"\x04user\x18\x02 \x01(\v2\x1c.fifsky.blog.api.v1.UserItemR\x04user2r\n" +
-	"\vUserService\x12c\n" +
-	"\x05Login\x12 .fifsky.blog.api.v1.LoginRequest\x1a!.fifsky.blog.api.v1.LoginResponse\"\x15\x82\xd3\xe4\x93\x02\x0f:\x01*\"\n" +
-	"/api/loginB\xaa\x01\n" +
+	"\x04user\x18\x02 \x01(\v2\x1c.fifsky.blog.api.v1.UserItemR\x04user2s\n" +
+	"\vUserService\x12d\n" +
+	"\x05Login\x12 .fifsky.blog.api.v1.LoginRequest\x1a!.fifsky.blog.api.v1.LoginResponse\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/blog/loginB\xaa\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\tUserProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
 
 var (

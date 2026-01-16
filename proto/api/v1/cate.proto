@@ -14,7 +14,7 @@ service CateService {
   // All 获取所有分类
   rpc All(google.protobuf.Empty) returns (CateMenuResponse) {
     option (google.api.http) = {
-      post: "/api/cate/all"
+      post: "/blog/cate/all"
       body: "*"
     };
   }
