@@ -8,10 +8,10 @@ import (
 
 	"app/cmd"
 	"app/config"
-	"app/motto"
 	"app/pkg/bark"
 	"app/pkg/wechat"
-	"app/remind"
+	"app/service/motto"
+	"app/service/remind"
 	"app/store"
 
 	"github.com/goapt/httpx"
