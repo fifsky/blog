@@ -11,7 +11,7 @@ import (
 	"slices"
 
 	"app/pkg/errors"
-	"app/response"
+	"app/server/response"
 
 	"github.com/gorilla/schema"
 	"google.golang.org/protobuf/encoding/protojson"

@@ -14,7 +14,7 @@ import (
 	"app/pkg/ossutil"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
-	"app/response"
+	"app/server/response"
 	"app/store"
 
 	"google.golang.org/protobuf/types/known/emptypb"

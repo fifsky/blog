@@ -10,7 +10,8 @@ import (
 	"app/pkg/wechat"
 	"app/server"
 	"app/server/router"
-	"app/service"
+	"app/service/admin"
+	"app/service/openapi"
 	"app/store"
 
 	"github.com/urfave/cli/v3"
@@ -32,7 +33,9 @@ func NewHttp(db *sql.DB, conf *config.Config, robot *wechat.Robot, httpClient *h
 			}
 			log.Println("[Env] Run profile:" + conf.Env)
 			s := store.New(db)
-			route := router.New(service.New(db, conf, robot, httpClient), conf, s)
+			apiService := openapi.New(s, conf, robot, httpClient)
+			adminService := admin.New(s, conf)
+			route := router.New(apiService, adminService, conf, s)
 			return server.New(
 				server.Handler(route.Handler()),
 				server.Address(cli.String("addr")),

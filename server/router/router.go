@@ -7,13 +7,13 @@ import (
 
 	"app/config"
 	"app/contract"
-	"app/middleware"
 	"app/pkg/errors"
 	adminv1 "app/proto/gen/admin/v1"
 	apiv1 "app/proto/gen/api/v1"
-	"app/response"
-	"app/service"
+	"app/server/middleware"
+	"app/server/response"
 	adminsvc "app/service/admin"
+	"app/service/openapi"
 	"app/store"
 
 	"github.com/goapt/logger"
@@ -21,16 +21,16 @@ import (
 )
 
 type Router struct {
-	service *service.Service
+	service *openapi.Service
 	admin   *adminsvc.Service
 	conf    *config.Config
 	store   *store.Store
 }
 
-func New(service *service.Service, conf *config.Config, s *store.Store) Router {
+func New(apiService *openapi.Service, adminService *adminsvc.Service, conf *config.Config, s *store.Store) Router {
 	return Router{
-		service: service,
-		admin:   adminsvc.New(s, conf),
+		service: apiService,
+		admin:   adminService,
 		conf:    conf,
 		store:   s,
 	}

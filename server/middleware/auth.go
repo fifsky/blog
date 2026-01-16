@@ -6,7 +6,7 @@ import (
 
 	"app/config"
 	"app/pkg/errors"
-	"app/response"
+	"app/server/response"
 	"app/service/admin"
 	"app/store"
 

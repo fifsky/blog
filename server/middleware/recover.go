@@ -6,7 +6,7 @@ import (
 	"runtime"
 
 	"app/pkg/errors"
-	"app/response"
+	"app/server/response"
 
 	"github.com/goapt/logger"
 )

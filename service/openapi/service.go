@@ -1,7 +1,6 @@
-package service
+package openapi
 
 import (
-	"database/sql"
 	"net/http"
 
 	"app/config"
@@ -20,8 +19,7 @@ type Service struct {
 	Weixin  *Weixin
 }
 
-func New(db *sql.DB, conf *config.Config, robot *wechat.Robot, httpClient *http.Client) *Service {
-	s := store.New(db)
+func New(s *store.Store, conf *config.Config, robot *wechat.Robot, httpClient *http.Client) *Service {
 	return &Service{
 		User:    NewUser(s, conf),
 		Article: NewArticle(s, conf),
