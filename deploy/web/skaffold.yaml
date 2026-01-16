@@ -1,0 +1,26 @@
+apiVersion: skaffold/v2beta26
+kind: Config
+metadata:
+  name: fifsky-blog-web
+build:
+  artifacts:
+    - image: registry.cn-shanghai.aliyuncs.com/fifsky/fifsky-blog-web
+      context: .
+      docker:
+        dockerfile: deploy/web/Dockerfile
+  tagPolicy:
+    dateTime:
+      format: 2006-01-02-15-04-05
+      timezone: Local
+  local:
+    push: true
+deploy:
+  kubectl:
+    defaultNamespace: default
+    manifests:
+      - deploy/web/k8s.local.yaml
+    flags:
+      apply:
+        - --force=true
+        - --grace-period=0
+  kubeContext: fifsky

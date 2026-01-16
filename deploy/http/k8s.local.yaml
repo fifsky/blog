@@ -1,0 +1,70 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fifsky-blog-http
+  namespace: default
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+  selector:
+    app: fifsky-blog-http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fifsky-blog-http
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fifsky-blog-http
+  template:
+    metadata:
+      labels:
+        app: fifsky-blog-http
+    spec:
+      containers:
+        - image: registry.cn-shanghai.aliyuncs.com/fifsky/fifsky-blog-http
+          name: fifsky-blog-http
+          ports:
+            - containerPort: 80
+              name: http
+          secret:
+            - secretName: blog-config
+          volumeMounts:
+            - mountPath: /app/storage/logs
+              name: log
+      volumes:
+        - emptyDir: {}
+          name: log
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fifsky-blog-http
+  namespace: default
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: fifsky
+spec:
+  tls:
+  - hosts:
+    - api.fifsky.com
+    secretName: api-fifsky-com-tls
+  rules:
+  - host: api.fifsky.com
+      http:
+        paths:
+        - path: /blog
+          pathType: Prefix 
+          backend:
+            service:
+              name: fifsky-blog-http # 确保这里指向你正确的 Service 名称
+              port:
+                number: 80

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fifsky-blog-job
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fifsky-blog-job
+  template:
+    metadata:
+      labels:
+        app: fifsky-blog-job
+    spec:
+      containers:
+        - image: registry.cn-shanghai.aliyuncs.com/fifsky/fifsky-blog-job
+          name: fifsky-blog-job
+          ports:
+            - containerPort: 80
+              name: http
+          secret:
+            - secretName: blog-config
+          volumeMounts:
+            - mountPath: /app/storage/logs
+              name: log
+      volumes:
+        - emptyDir: {}
+          name: log

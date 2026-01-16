@@ -44,7 +44,7 @@ vet:
 
 .PHONY: deploy
 deploy:
-	skaffold run -n pay --tail
+	@script/make.sh deploy
 
 .PHONY: proto
 proto:

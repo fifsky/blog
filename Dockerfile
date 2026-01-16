@@ -4,7 +4,7 @@ WORKDIR /build
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 make
 
-FROM docker.1ms.run/library/alpine:3.11
+FROM docker.1ms.run/library/alpine:3.23
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 RUN apk update && \
   apk add --no-cache ca-certificates \

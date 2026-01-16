@@ -1,0 +1,62 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fifsky-blog-web
+  namespace: default
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+  selector:
+    app: fifsky-blog-web
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fifsky-blog-web
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fifsky-blog-web
+  template:
+    metadata:
+      labels:
+        app: fifsky-blog-web
+    spec:
+      containers:
+        - image: registry.cn-shanghai.aliyuncs.com/fifsky/fifsky-blog-web
+          name: fifsky-blog-web
+          ports:
+            - containerPort: 80
+              name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fifsky-blog-web
+  namespace: default
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: fifsky
+spec:
+  tls:
+    - hosts:
+        - fifsky.com
+      secretName: fifsky-com-tls # 证书会自动存到这个 Secret 里
+  rules:
+    - host: fifsky.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fifsky-blog-web
+                port:
+                  number: 80
