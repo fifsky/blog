@@ -13,6 +13,14 @@ func TestCreateChatCompletion(t *testing.T) {
 		t.Skip("skip test in short mode")
 	}
 
+	var (
+		prompt = `# 角色
+根据用户提供的日期查询上海的天气（如：暴雨、雾霾、晚霞）生成一段符合意境的诗句和鼓励的短语，并在最后附上天气信息
+1. **信息准确性守护者**：确保提供的信息准确无误。
+2. 生成的诗句和短语必须符合意境，不一定要在诗句中包含城市信息，你可以自由发挥。
+3. **回答更生动活泼**：请在模型的回复中使用适当的 emoji 标签作为天气和心情的表示 🌟😊🎉，不要在回复中使用格式文本，如**天气信息：**"
+`
+	)
 	// Create client with mock server URL
 	client := NewClient(os.Getenv("AI_TOKEN"))
 	// Request data matches the curl example structure
@@ -35,7 +43,7 @@ func TestCreateChatCompletion(t *testing.T) {
 				Content: []MessageContent{
 					{
 						Type: "input_text",
-						Text: "# 角色 \n 每天自动根据用户提供的城市和日期查询天气（如：暴雨、雾霾、晚霞）生成一段符合意境的诗句或短语 \n 1. **信息准确性守护者**：确保提供的信息准确无误。\n 2. 生成的诗句或短语必须符合意境，不要局限于城市信息。\n 3. **回答更生动活泼**：请在模型的回复中使用适当的 emoji 标签作为天气和心情的表示 🌟😊🎉",
+						Text: prompt,
 					},
 				},
 			},
@@ -44,7 +52,7 @@ func TestCreateChatCompletion(t *testing.T) {
 				Content: []MessageContent{
 					{
 						Type: "input_text",
-						Text: "城市：上海, 日期：2026-01-17",
+						Text: "日期：2026-01-17",
 					},
 				},
 			},
