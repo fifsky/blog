@@ -1,18 +1,22 @@
 package motto
 
 import (
-	"context"
-	"net/http"
-	"net/http/httptest"
-	"testing"
-
 	"app/config"
 	"app/pkg/bark"
 	"app/store"
 	"app/testutil"
+	"context"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"testing"
 
 	"github.com/goapt/dbunit"
+	"github.com/openai/openai-go/v3"
+	"github.com/openai/openai-go/v3/option"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // MockAIProvider
@@ -60,4 +64,32 @@ func TestMotto_GenerateDailyMotto(t *testing.T) {
 		assert.NotEmpty(t, moods)
 		assert.Equal(t, "Test Motto Content", moods[0].Content)
 	})
+}
+
+func TestOpenAIProvider_Generate(t *testing.T) {
+	t.Skip("skip test")
+	client := openai.NewClient(
+		option.WithAPIKey(os.Getenv("AI_TOKEN")),
+		option.WithBaseURL(os.Getenv("AI_ENDPOINT")),
+	)
+	prompt := "每天自动根据用户所在城市的天气（如：暴雨、雾霾、晚霞）生成一段符合意境的诗句或短评。示例： “今日上海大雨。AI 检测到 80% 的忧郁湿度，建议配一杯热可可和坂本龙一的钢琴曲。”"
+
+	req := openai.ChatCompletionNewParams{
+		Messages: []openai.ChatCompletionMessageParamUnion{
+			openai.SystemMessage(prompt),
+			openai.UserMessage("Test Content"),
+		},
+		Model: openai.ChatModel(os.Getenv("AI_MODEL")),
+		Tools: []openai.ChatCompletionToolUnionParam{},
+	}
+
+	req.SetExtraFields(map[string]any{
+		"thinking": map[string]any{
+			"type": "disabled",
+		},
+	})
+
+	content, err := client.Chat.Completions.New(context.Background(), req)
+	require.NoError(t, err)
+	fmt.Println(content.Choices[0].Message.Content)
 }

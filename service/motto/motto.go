@@ -10,6 +10,7 @@ import (
 	"app/config"
 	"app/model"
 	"app/pkg/bark"
+	"app/pkg/doubao"
 	"app/store"
 
 	"github.com/goapt/logger"
@@ -17,6 +18,15 @@ import (
 	"github.com/openai/openai-go/v3/option"
 	"github.com/openai/openai-go/v3/shared"
 	"github.com/robfig/cron/v3"
+)
+
+var (
+	prompt = `# 角色
+每天自动根据用户提供的城市和日期查询天气（如：暴雨、雾霾、晚霞）生成一段符合意境的诗句或短语
+1. **信息准确性守护者**：确保提供的信息准确无误。
+2. 生成的诗句或短语必须符合意境，不要局限于城市信息。
+3. **回答更生动活泼**：请在模型的回复中使用适当的 emoji 标签作为天气和心情的表示 🌟😊🎉"
+`
 )
 
 // AIProvider 定义 AI 接口，方便测试
@@ -72,6 +82,64 @@ func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (
 	return "", nil
 }
 
+type DoubaoProvider struct {
+	client *doubao.Client
+	model  string
+}
+
+func NewDoubaoProvider(apiKey, model string) *DoubaoProvider {
+	return &DoubaoProvider{
+		client: doubao.NewClient(apiKey),
+		model:  model,
+	}
+}
+
+func (p *DoubaoProvider) Generate(ctx context.Context, prompt, content string) (string, error) {
+	resp, err := p.client.CreateChatCompletion(ctx, &doubao.ChatRequest{
+		Model: p.model,
+		Tools: []doubao.Tool{
+			{
+				Type:       "web_search",
+				MaxKeyword: 2,
+				Limit:      2,
+			},
+		},
+		MaxToolCalls: 1,
+		Thinking: &doubao.Thinking{
+			Type: "disabled",
+		},
+		Input: []doubao.Message{
+			{
+				Role: "system",
+				Content: []doubao.MessageContent{
+					{
+						Type: "input_text",
+						Text: prompt,
+					},
+				},
+			},
+			{
+				Role: "user",
+				Content: []doubao.MessageContent{
+					{
+						Type: "input_text",
+						Text: "城市：上海, 日期：2026-01-17",
+					},
+				},
+			},
+		},
+	})
+	if err != nil {
+		return "", err
+	}
+	for _, choice := range resp.Output {
+		if choice.Type == "message" && len(choice.Content) > 0 {
+			return choice.Content[0].Text, nil
+		}
+	}
+	return "", nil
+}
+
 type Motto struct {
 	store      *store.Store
 	conf       *config.Config
@@ -107,7 +175,6 @@ func (m *Motto) Start(spec string) {
 
 func (m *Motto) GenerateDailyMotto() error {
 	logger.Default().Info("start generate daily motto")
-	prompt := "你的任务是生成每日一言，用户告知你日期，你来生成一句名言，你只需要输出名言即可，不要输出其他内容"
 	dateStr := time.Now().Format("2006-01-02")
 
 	content, err := m.ai.Generate(context.Background(), prompt, dateStr)

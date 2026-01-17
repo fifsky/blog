@@ -43,7 +43,7 @@ func main() {
 	r := remind.New(s, conf, robot, barkClient)
 	go r.Start()
 
-	ai := motto.NewOpenAIProvider(conf.Common.AIToken, conf.Common.AIEndpoint, "kimi-k2-turbo-preview")
+	ai := motto.NewDoubaoProvider(conf.Common.AIToken, conf.Common.AIModel)
 	m := motto.New(s, conf, barkClient, ai)
 	go m.Start("0 9 * * *")
 
