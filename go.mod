@@ -15,7 +15,7 @@ require (
 	github.com/gorilla/feeds v1.2.0
 	github.com/gorilla/schema v1.4.1
 	github.com/openai/openai-go/v3 v3.16.0
-	github.com/robfig/cron/v3 v3.0.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/samber/lo v1.52.0
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v3 v3.6.1
