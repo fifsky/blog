@@ -208,6 +208,6 @@ import { articleListApi } from "@/service";
 ### General
 
 - Commit messages should follow conventional commit format
-- All files should have proper headers/comments where necessary
+- Corresponding comments should be added to functions and structure fields. Comments are required for complex logic, while they can be omitted for simple logic. Only Chinese should be used for comments.
 - Keep functions small and focused
 - Handle errors explicitly, don't swallow them
