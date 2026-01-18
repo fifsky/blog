@@ -211,6 +211,7 @@ func (m *Motto) sendBark(content string) error {
 		Body:  content,
 		Badge: 1,
 		Group: "Motto",
+		Level: "timeSensitive",
 	}
 
 	return m.barkClient.Send(msg)

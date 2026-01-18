@@ -23,12 +23,24 @@ func New(client *http.Client, url, token string) *Client {
 }
 
 type Message struct {
-	Title    string `json:"title"`
-	Body     string `json:"body,omitempty"`
-	Badge    int    `json:"badge,omitempty"`
-	Url      string `json:"url,omitempty"`
+	// 推送标题
+	Title string `json:"title"`
+	// 推送内容
+	Body string `json:"body,omitempty"`
+	// 推送角标，可以是任意数字
+	Badge int `json:"badge,omitempty"`
+	//推送中断级别。
+	// critical: 重要警告, 在静音模式下也会响铃
+	// active：默认值，系统会立即亮屏显示通知
+	// timeSensitive：时效性通知，可在专注状态下显示通知。
+	// passive：仅将通知添加到通知列表，不会亮屏提醒。
+	Level string `json:"level,omitempty"`
+	// 点击通知后跳转的 URL
+	Url string `json:"url,omitempty"`
+	// 推送内容是否支持 Markdown 格式
 	Markdown string `json:"markdown,omitempty"`
-	Group    string `json:"group,omitempty"`
+	// 推送分组，用于对通知进行分类管理
+	Group string `json:"group,omitempty"`
 }
 
 func (c *Client) Send(msg Message) error {

@@ -45,7 +45,7 @@ func main() {
 
 	ai := motto.NewDoubaoProvider(conf.Common.AIToken, conf.Common.AIModel)
 	m := motto.New(s, conf, barkClient, ai)
-	go m.Start("0 7,10,22 * * *")
+	go m.Start("0 7,11,22 * * *")
 
 	app := &cli.Command{
 		Name:  "blog",
