@@ -32,7 +32,7 @@ export default function AdminUser() {
   // 定义表格列配置
   const columns: Column<UserItem>[] = [
     {
-      title: <div style={{ width: 20 }}>&nbsp;</div>,
+      title: <div style={{ width: 20 }}></div>,
       key: "id",
       render: (_, record) => <input type="checkbox" name="ids" value={record.id} />,
     },

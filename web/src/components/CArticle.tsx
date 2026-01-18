@@ -33,8 +33,9 @@ export function CArticle({ article }: { article: ArticleItem }) {
               }}
             />
           </h2>
-          <div className="text-[12px] text-[#999]">
-            by&nbsp;{article.user.nick_name}&nbsp;&nbsp;/&nbsp;&nbsp;
+          <div className="flex items-center gap-2 text-[12px] text-[#999]">
+            <span>by {article.user.nick_name}</span>
+            <span>/</span>
             <Link
               to={`/category/${article.cate.domain}`}
               rel="category tag"
@@ -42,8 +43,8 @@ export function CArticle({ article }: { article: ArticleItem }) {
             >
               {article.cate.name}
             </Link>
-            &nbsp;&nbsp;/&nbsp;&nbsp;
-            {article.created_at}
+            <span>/</span>
+            <span>{article.created_at}</span>
           </div>
         </div>
       </div>

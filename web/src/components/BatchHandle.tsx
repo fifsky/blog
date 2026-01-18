@@ -46,13 +46,11 @@ export function BatchHandle({
       >
         反选
       </a>
-      &nbsp;&nbsp;
       {selectedCount > 0 && (
         <span className="text-[13px] text-[#666]">
           已选中 <span className="font-bold text-[#333]">{selectedCount}</span> / {totalCount}
         </span>
       )}
-      &nbsp;&nbsp;
       <select
         name="batch_operation"
         onChange={handleOperationChange}
