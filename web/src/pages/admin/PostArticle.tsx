@@ -4,9 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { adminArticleDetailApi, articleCreateApi, articleUpdateApi, cateListApi } from "@/service";
 import { useLocation, useNavigate, Link } from "react-router";
-import { Editor, Toolbar } from "@wangeditor/editor-for-react";
-import type { IDomEditor, IEditorConfig, IToolbarConfig } from "@wangeditor/editor";
 import { getApiUrl, getAccessToken } from "@/utils/common";
+import { Editor } from "@bytemd/react";
+import gfm from "@bytemd/plugin-gfm";
+import mediumZoom from "@bytemd/plugin-medium-zoom";
+
+import highlight from "@bytemd/plugin-highlight";
 import { CateListItem } from "@/types/openapi";
 
 import {
@@ -43,9 +46,42 @@ const articleSchema = z.object({
 
 type ArticleFormValues = z.infer<typeof articleSchema>;
 
+// ByteMD 插件配置
+const plugins = [gfm(), highlight(), mediumZoom()];
+
+// 图片上传函数
+const uploadImages = async (
+  files: File[],
+): Promise<{ url: string; alt: string; title: string }[]> => {
+  const results: { url: string; alt: string; title: string }[] = [];
+
+  for (const file of files) {
+    const formData = new FormData();
+    formData.append("uploadFile", file);
+
+    const response = await fetch(getApiUrl("/blog/admin/upload"), {
+      method: "POST",
+      headers: {
+        "Access-Token": getAccessToken(),
+      },
+      body: formData,
+    });
+
+    const data = await response.json();
+    if (data.url) {
+      results.push({
+        url: data.url,
+        alt: file.name,
+        title: file.name,
+      });
+    }
+  }
+
+  return results;
+};
+
 export default function PostArticle() {
   const [cates, setCates] = useState<CateListItem[]>([]);
-  const [editor, setEditor] = useState<IDomEditor | null>(null);
   const [loading, setLoading] = useState(false);
 
   const location = useLocation();
@@ -66,24 +102,7 @@ export default function PostArticle() {
   const isEditing = !!form.watch("id");
   const articleType = form.watch("type");
   const articleStatus = form.watch("status");
-
-  const toolbarConfig: Partial<IToolbarConfig> = {
-    excludeKeys: ["uploadVideo", "fontFamily", "lineHeight", "group-indent"],
-  };
-
-  const editorConfig: Partial<IEditorConfig> = {
-    placeholder: "请输入内容...",
-    MENU_CONF: {
-      uploadImage: {
-        server: getApiUrl("/blog/admin/upload"),
-        fieldName: "uploadFile",
-        headers: { "Access-Token": getAccessToken() },
-        withCredentials: false,
-        maxFileSize: 10 * 1024 * 1024,
-        allowedFileTypes: ["image/*"],
-      },
-    },
-  };
+  const contentValue = form.watch("content");
 
   // 提交表单逻辑
   const submit = async (values: ArticleFormValues) => {
@@ -153,12 +172,6 @@ export default function PostArticle() {
       form.setValue("cate_id", cates[0].id);
     }
   }, [cates, isEditing, form]);
-
-  useEffect(() => {
-    return () => {
-      if (editor) editor.destroy();
-    };
-  }, [editor]);
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -306,20 +319,12 @@ export default function PostArticle() {
               render={({ field }) => (
                 <FormItem className="grid grid-cols-1">
                   <FormControl>
-                    <div className="border border-border">
-                      <Toolbar
-                        editor={editor}
-                        defaultConfig={toolbarConfig}
-                        mode="default"
-                        style={{ borderBottom: "1px solid #ddd" }}
-                      />
+                    <div className="bytemd-editor-wrapper">
                       <Editor
-                        style={{ height: 500, overflowY: "hidden" }}
-                        defaultConfig={editorConfig}
-                        value={field.value || ""}
-                        onCreated={(ed: IDomEditor) => setEditor(ed)}
-                        onChange={(ed: IDomEditor) => field.onChange(ed.getHtml())}
-                        mode="default"
+                        value={contentValue || ""}
+                        plugins={plugins}
+                        onChange={(v) => field.onChange(v)}
+                        uploadImages={uploadImages}
                       />
                     </div>
                   </FormControl>

@@ -11,6 +11,7 @@ import (
 
 	"app/config"
 	"app/model"
+	"app/pkg/errors"
 	"app/pkg/ossutil"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
@@ -74,6 +75,10 @@ func (a *Article) Update(ctx context.Context, req *adminv1.ArticleUpdateRequest)
 	if req.Type > 0 {
 		v := int(req.Type)
 		u.Type = &v
+	}
+	if req.Status > 0 {
+		v := int(req.Status)
+		u.Status = &v
 	}
 	if req.Title != "" {
 		v := req.Title
@@ -225,26 +230,23 @@ func (a *Article) Upload(w http.ResponseWriter, r *http.Request) {
 	file, _, err := r.FormFile("uploadFile")
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		response.Upload(w, map[string]any{"errno": 201, "message": err.Error()})
+		response.Fail(w, errors.BadRequest("UPLOAD_FILE_ERROR", err.Error()))
 		return
 	}
 	day := time.Now().Format("20060102")
 	filename := "upload/" + day + "/" + md5File(file) + ".png"
 	_, err = file.Seek(0, 0)
 	if err != nil {
-		response.Upload(w, map[string]any{"errno": 203, "message": err.Error()})
+		response.Fail(w, errors.BadRequest("UPLOAD_FILE_ERROR", err.Error()))
 		return
 	}
 	err = a.upl.Put(r.Context(), filename, file)
 	if err != nil {
-		response.Upload(w, map[string]any{"errno": 202, "message": err.Error()})
+		response.Fail(w, errors.BadRequest("UPLOAD_FILE_ERROR", err.Error()))
 		return
 	}
-	response.Upload(w, map[string]any{
-		"errno": 0,
-		"data": map[string]any{
-			"url": "https://static.fifsky.com/" + filename,
-		},
+	response.Success(w, map[string]any{
+		"url": "https://static.fifsky.com/" + filename,
 	})
 }
 

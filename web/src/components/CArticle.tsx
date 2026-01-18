@@ -1,10 +1,15 @@
 import { ArticleItem } from "@/types/openapi";
-import { useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { Link, useLocation } from "react-router";
-import CodeHighlight from "./CodeHighlight";
+import { Viewer } from "@bytemd/react";
+import gfm from "@bytemd/plugin-gfm";
+import highlight from "@bytemd/plugin-highlight";
+import mediumZoom from "@bytemd/plugin-medium-zoom";
+
+// ByteMD 插件配置
+const plugins = [gfm(), highlight(), mediumZoom()];
 
 export function CArticle({ article }: { article: ArticleItem }) {
-  const rootRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const keyword = useMemo(
     () => new URLSearchParams(location.search).get("keyword") || "",
@@ -16,7 +21,7 @@ export function CArticle({ article }: { article: ArticleItem }) {
   };
   if (!article) return null;
   return (
-    <div ref={rootRef}>
+    <div>
       <div className="flex justify-between items-center h-[54px] overflow-hidden">
         <img className="p-[2px] w-[40px] h-[40px]" src="/assets/images/avatar.jpg" alt="" />
         <div className="flex-1 ml-4">
@@ -42,7 +47,9 @@ export function CArticle({ article }: { article: ArticleItem }) {
           </div>
         </div>
       </div>
-      <CodeHighlight htmlContent={article.content} />
+      <div className="article">
+        <Viewer value={article.content} plugins={plugins} />
+      </div>
     </div>
   );
 }

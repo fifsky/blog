@@ -1,7 +1,9 @@
 @import "tailwindcss";
 @import "./assets/iconfont/iconfont.css";
 @import "tw-animate-css";
-@import "@wangeditor/editor/dist/css/style.css";
+@import "bytemd/dist/index.css";
+@import "highlight.js/styles/vs.css";
+@import "github-markdown-css/github-markdown.css";
 @import "./themes/default.css";
 
 @custom-variant dark (&:is(.dark *));
@@ -60,39 +62,6 @@
     word-spacing: 1px;
     letter-spacing: 1px;
   }
-  .article img {
-    max-width: 98%;
-    border-radius: 3px;
-    padding: 5px;
-    background: #fff;
-    box-shadow: 0 0 8px #e1e1e1;
-  }
-
-  .article p {
-    line-height: 30px;
-  }
-  .article ol,
-  ul {
-    padding: 0 20px;
-  }
-  .article table {
-    border-top: 1px solid #161515;
-    border-left: 1px solid #ccc;
-  }
-  .article table {
-    border-top: 1px solid #ccc;
-    border-left: 1px solid #ccc;
-  }
-  .article table th {
-    border-bottom: 2px solid #ccc;
-    text-align: center;
-  }
-  .article table td,
-  .article table th {
-    border-bottom: 1px solid #ccc;
-    border-right: 1px solid #ccc;
-    padding: 3px 5px;
-  }
 
   span.highlight {
     color: #ff0000;
@@ -103,4 +72,64 @@
     background: orange;
     color: black;
   }
+}
+
+/* Overrides for github-markdown-css */
+.markdown-body {
+  font-size: 14px;
+}
+
+.markdown-body ol,
+ul {
+  padding: 0 20px;
+}
+.markdown-body table {
+  border-top: 1px solid #161515;
+  border-left: 1px solid #ccc;
+}
+.markdown-body table {
+  border-top: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+}
+.markdown-body table th {
+  border-bottom: 2px solid #ccc;
+  text-align: center;
+}
+.markdown-body table td,
+.markdown-body table th {
+  border-bottom: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  padding: 3px 5px;
+}
+
+.markdown-body img {
+  max-width: 98%;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 0 4px #e1e1e1;
+  margin: 10px 0;
+}
+
+.markdown-body p {
+  margin-bottom: 0;
+  line-height: 30px;
+}
+
+.markdown-body blockquote p {
+  line-height: 24px;
+}
+
+.markdown-body pre code {
+  font-size: 13px;
+}
+
+.medium-zoom-overlay {
+  z-index: 100;
+}
+.medium-zoom-image--opened {
+  z-index: 101;
+}
+
+.bytemd {
+  height: calc(100vh - 350px);
 }

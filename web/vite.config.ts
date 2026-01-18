@@ -16,11 +16,7 @@ export default defineConfig(() => {
     server: {
       port: 5173,
       proxy: {
-        "/api": {
-          target: "http://127.0.0.1:8080",
-          changeOrigin: true,
-        },
-        "/feed.xml": {
+        "/blog": {
           target: "http://127.0.0.1:8080",
           changeOrigin: true,
         },
@@ -32,7 +28,7 @@ export default defineConfig(() => {
       rollupOptions: {
         output: {
           manualChunks: {
-            "utils-vendor": ["dayjs", "prismjs", "@wangeditor/editor"],
+            "utils-vendor": ["dayjs", "bytemd", "highlight.js"],
           },
         },
       },
