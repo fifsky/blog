@@ -35,7 +35,7 @@ DROP TABLE IF EXISTS `moods`;
 
 CREATE TABLE `moods` (
                          `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-                         `content` varchar(255) NOT NULL DEFAULT '',
+                         `content` varchar(2048) NOT NULL DEFAULT '',
                          `user_id` int(10) unsigned NOT NULL,
                          `created_at` datetime NOT NULL,
                          PRIMARY KEY (`id`)

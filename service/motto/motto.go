@@ -189,7 +189,7 @@ func (m *Motto) GenerateDailyMotto() error {
 	// 写入数据库
 	md := &model.Mood{
 		Content:   content,
-		UserId:    1, // 默认为管理员ID，假设为1
+		UserId:    3, // 固定位AI用户生成
 		CreatedAt: time.Now(),
 	}
 

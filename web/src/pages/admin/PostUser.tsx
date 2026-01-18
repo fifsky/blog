@@ -29,7 +29,7 @@ const userSchema = z
   .object({
     id: z.number().optional(),
     name: z.string().min(1, "用户名不能为空"),
-    email: z.string().email("请输入有效的邮箱地址"),
+    email: z.email("请输入有效的邮箱地址"),
     nick_name: z.string().optional(),
     password1: z.string().min(6, "密码至少6个字符"),
     password2: z.string().min(6, "确认密码至少6个字符"),
@@ -64,16 +64,24 @@ export default function PostUser() {
     setLoading(true);
     try {
       const { id, name, nick_name, password1, email, type } = values;
-      const data = {
-        id: id || 0,
-        name,
-        nick_name: nick_name || "",
-        password: password1,
-        email,
-        type,
-      };
-      if (id) await userUpdateApi(data);
-      else await userCreateApi(data);
+      if (id) {
+        await userUpdateApi({
+          id: id || 0,
+          name,
+          nick_name: nick_name || "",
+          password: password1,
+          email,
+          type,
+        });
+      } else {
+        await userCreateApi({
+          name,
+          nick_name: nick_name || "",
+          password: password1,
+          email,
+          type,
+        });
+      }
       navigate("/admin/users");
     } finally {
       setLoading(false);
