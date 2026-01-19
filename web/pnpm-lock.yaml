@@ -11,9 +11,6 @@ importers:
       '@bytemd/plugin-gfm':
         specifier: ^1.22.0
         version: 1.22.0(bytemd@1.22.0)
-      '@bytemd/plugin-highlight':
-        specifier: ^1.22.0
-        version: 1.22.0(bytemd@1.22.0)
       '@bytemd/plugin-medium-zoom':
         specifier: ^1.22.0
         version: 1.22.0(bytemd@1.22.0)
@@ -229,11 +226,6 @@ packages:
 
   '@bytemd/plugin-gfm@1.22.0':
     resolution: {integrity: sha512-ICmDwK5pCKrsoM2btNUo11R2Cpvaaz8dF/BAVrZ/w7mdY8985f7l8zIc7yX3tO5i3KYVvxBKhTCmerOS4xAcig==}
-    peerDependencies:
-      bytemd: ^1.5.0
-
-  '@bytemd/plugin-highlight@1.22.0':
-    resolution: {integrity: sha512-fMLEvsY8KQrVrtokIWeBFu8/JGGSX0V3Hf6Fhbdn9Q8vsz6u/WuI+wo78xRX7OWhUHpx99UxUcwEy/Hq4+NbpQ==}
     peerDependencies:
       bytemd: ^1.5.0
 
@@ -2110,11 +2102,6 @@ snapshots:
       remark-gfm: 3.0.1
     transitivePeerDependencies:
       - supports-color
-
-  '@bytemd/plugin-highlight@1.22.0(bytemd@1.22.0)':
-    dependencies:
-      bytemd: 1.22.0
-      highlight.js: 11.11.1
 
   '@bytemd/plugin-medium-zoom@1.22.0(bytemd@1.22.0)':
     dependencies:

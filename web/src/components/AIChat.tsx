@@ -5,8 +5,8 @@ import { Viewer } from "@bytemd/react";
 import gfm from "@bytemd/plugin-gfm";
 import { highlightPlugin } from "@/lib/highlight-plugin";
 import { getApiUrl } from "@/utils/common";
-import { Spinner } from "./ui/spinner";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { Spinner } from "@/components/ui/spinner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // ByteMD plugins for rendering
 const plugins = [gfm(), highlightPlugin()];
