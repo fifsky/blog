@@ -5,6 +5,7 @@ import { Viewer } from "@bytemd/react";
 import gfm from "@bytemd/plugin-gfm";
 import highlight from "@bytemd/plugin-highlight";
 import { getApiUrl } from "@/utils/common";
+import { Spinner } from "./ui/spinner";
 
 // ByteMD plugins for rendering
 const plugins = [gfm(), highlight()];
@@ -143,17 +144,17 @@ export function AIChat() {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 flex items-center justify-center"
+        className="fixed bottom-6 right-20 z-50 w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 flex items-center justify-center"
         aria-label="AI Chat"
       >
-        {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+        {isOpen ? <X className="w-5 h-5" /> : <MessageCircle className="w-5 h-5" />}
       </button>
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-[420px] h-[600px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed bottom-24 right-20 z-50 w-[520px] h-[600px] bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-5 py-4 flex items-center justify-between">
+          <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                 <MessageCircle className="w-4 h-4" />
@@ -185,7 +186,7 @@ export function AIChat() {
                 className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+                  className={`max-w-[85%] rounded-xl px-4 py-3 ${
                     message.role === "user"
                       ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
                       : "bg-white border border-gray-200 shadow-sm"
@@ -194,7 +195,11 @@ export function AIChat() {
                   {message.role === "assistant" ? (
                     <div className="relative group">
                       <div className="markdown-body text-sm prose prose-sm max-w-none [&_pre]:bg-gray-100 [&_pre]:p-2 [&_pre]:rounded">
-                        <Viewer value={message.content || "..."} plugins={plugins} />
+                        {!message.content ? (
+                          <Spinner />
+                        ) : (
+                          <Viewer value={message.content || ""} plugins={plugins} />
+                        )}
                       </div>
                       {!message.isStreaming && message.content && (
                         <button
@@ -220,7 +225,7 @@ export function AIChat() {
           </div>
 
           {/* Input Area */}
-          <div className="p-4 bg-white border-t border-gray-200">
+          <div className="px-4 py-3 bg-white border-t border-gray-200">
             <div className="flex items-center gap-2">
               <input
                 type="text"
@@ -229,12 +234,12 @@ export function AIChat() {
                 onKeyDown={handleKeyDown}
                 placeholder="输入您的问题..."
                 disabled={isLoading}
-                className="flex-1 px-4 py-3 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all disabled:opacity-50"
               />
               <Button
                 onClick={sendMessage}
                 disabled={!input.trim() || isLoading}
-                className="w-11 h-11 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 p-0 flex items-center justify-center"
+                className="w-9 h-9 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 p-0 flex items-center justify-center"
               >
                 <Send className="w-5 h-5" />
               </Button>
