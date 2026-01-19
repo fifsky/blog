@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Copy, Check } from "lucide-react";
+import { MessageCircle, X, Send, Copy, Check, Trash2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Viewer } from "@bytemd/react";
 import gfm from "@bytemd/plugin-gfm";
@@ -7,12 +7,20 @@ import { highlightPlugin } from "@/lib/highlight-plugin";
 import { getApiUrl } from "@/utils/common";
 import { Spinner } from "@/components/ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  getAllMessages,
+  addMessagePair,
+  updateAssistantMessage,
+  deleteMessagePair,
+  clearAllMessages,
+} from "@/lib/chat-db";
 
 // ByteMD plugins for rendering
 const plugins = [gfm(), highlightPlugin()];
 
-interface Message {
-  id: string;
+interface DisplayMessage {
+  id: number;
+  pairId: string;
   role: "user" | "assistant";
   content: string;
   isStreaming?: boolean;
@@ -20,13 +28,31 @@ interface Message {
 
 export function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<DisplayMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Load messages from Dexie on mount
+  useEffect(() => {
+    loadMessages();
+  }, []);
+
+  const loadMessages = async () => {
+    const dbMessages = await getAllMessages();
+    setMessages(
+      dbMessages.map((m) => ({
+        id: m.id!,
+        pairId: m.pairId,
+        role: m.role,
+        content: m.content,
+        isStreaming: false,
+      })),
+    );
+  };
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -36,13 +62,12 @@ export function AIChat() {
   // Focus input when chat opens
   useEffect(() => {
     if (isOpen) {
-      // Small delay to ensure DOM is ready
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen]);
 
   // Copy message content to clipboard
-  const copyToClipboard = async (content: string, id: string) => {
+  const copyToClipboard = async (content: string, id: number) => {
     try {
       await navigator.clipboard.writeText(content);
       setCopiedId(id);
@@ -52,24 +77,45 @@ export function AIChat() {
     }
   };
 
+  // Delete a message pair
+  const handleDeletePair = async (pairId: string) => {
+    await deleteMessagePair(pairId);
+    setMessages((prev) => prev.filter((m) => m.pairId !== pairId));
+  };
+
+  // Clear all messages
+  const handleClearAll = async () => {
+    await clearAllMessages();
+    setMessages([]);
+  };
+
   // Send message to AI
   const sendMessage = useCallback(async () => {
     if (!input.trim() || isLoading) return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
+    const pairId = Date.now().toString();
+    const userContent = input.trim();
+
+    // Add to Dexie and get IDs
+    const { userMsg, assistantMsg } = await addMessagePair(pairId, userContent);
+
+    // Add to local state
+    const newUserMessage: DisplayMessage = {
+      id: userMsg.id!,
+      pairId,
       role: "user",
-      content: input.trim(),
+      content: userContent,
     };
 
-    const assistantMessage: Message = {
-      id: (Date.now() + 1).toString(),
+    const newAssistantMessage: DisplayMessage = {
+      id: assistantMsg.id!,
+      pairId,
       role: "assistant",
       content: "",
       isStreaming: true,
     };
 
-    setMessages((prev) => [...prev, userMessage, assistantMessage]);
+    setMessages((prev) => [...prev, newUserMessage, newAssistantMessage]);
     setInput("");
     setIsLoading(true);
 
@@ -77,13 +123,21 @@ export function AIChat() {
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
+      // Build messages array for API (history + current)
+      const historyMessages = messages
+        .filter((m) => m.content.trim() !== "")
+        .map((m) => ({ role: m.role, content: m.content }));
+
+      // Add the new user message
+      const apiMessages = [...historyMessages, { role: "user", content: userContent }];
+
       const response = await fetch(getApiUrl("/blog/admin/ai/chat"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Access-Token": localStorage.getItem("access_token") || "",
         },
-        body: JSON.stringify({ message: userMessage.content }),
+        body: JSON.stringify({ messages: apiMessages }),
         signal: controller.signal,
       });
 
@@ -108,29 +162,33 @@ export function AIChat() {
           if (line.startsWith("data: ")) {
             const data = line.slice(6);
             if (data === "[DONE]") continue;
-            // Unescape newlines
             const content = data.replace(/\\n/g, "\n");
             accumulatedContent += content;
 
             setMessages((prev) =>
               prev.map((msg) =>
-                msg.id === assistantMessage.id ? { ...msg, content: accumulatedContent } : msg,
+                msg.id === assistantMsg.id ? { ...msg, content: accumulatedContent } : msg,
               ),
             );
           }
         }
       }
 
+      // Save final content to Dexie
+      await updateAssistantMessage(assistantMsg.id!, accumulatedContent);
+
       // Mark streaming as complete
       setMessages((prev) =>
-        prev.map((msg) => (msg.id === assistantMessage.id ? { ...msg, isStreaming: false } : msg)),
+        prev.map((msg) => (msg.id === assistantMsg.id ? { ...msg, isStreaming: false } : msg)),
       );
     } catch (err) {
       if ((err as Error).name !== "AbortError") {
+        const errorContent = "抱歉，请求失败，请稍后重试。";
+        await updateAssistantMessage(assistantMsg.id!, errorContent);
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === assistantMessage.id
-              ? { ...msg, content: "抱歉，请求失败，请稍后重试。", isStreaming: false }
+            msg.id === assistantMsg.id
+              ? { ...msg, content: errorContent, isStreaming: false }
               : msg,
           ),
         );
@@ -138,10 +196,9 @@ export function AIChat() {
     } finally {
       setIsLoading(false);
       abortControllerRef.current = null;
-      // Restore focus to input after AI finishes
       setTimeout(() => inputRef.current?.focus(), 100);
     }
-  }, [input, isLoading]);
+  }, [input, isLoading, messages]);
 
   // Handle Enter key
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -205,14 +262,14 @@ export function AIChat() {
                 className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[85%] rounded-xl px-4 py-3 ${
+                  className={`max-w-[85%] rounded-xl px-4 py-3 relative group ${
                     message.role === "user"
                       ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
                       : "bg-white border border-gray-200 shadow-sm"
                   }`}
                 >
                   {message.role === "assistant" ? (
-                    <div className="relative group">
+                    <div className="relative">
                       <div className="markdown-body text-sm prose prose-sm max-w-none [&_pre]:bg-gray-100 [&_pre]:p-2 [&_pre]:rounded">
                         {!message.content ? (
                           <Spinner />
@@ -220,6 +277,7 @@ export function AIChat() {
                           <Viewer value={message.content || ""} plugins={plugins} />
                         )}
                       </div>
+                      {/* Copy button for assistant */}
                       {!message.isStreaming && message.content && (
                         <button
                           onClick={() => copyToClipboard(message.content, message.id)}
@@ -236,6 +294,16 @@ export function AIChat() {
                     </div>
                   ) : (
                     <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  )}
+                  {/* Delete button for messages (shown on user messages, deletes pair) */}
+                  {message.role === "user" && !isLoading && (
+                    <button
+                      onClick={() => handleDeletePair(message.pairId)}
+                      className="absolute -top-2 -left-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white border border-gray-200 rounded-full p-1.5 shadow-sm hover:bg-red-50"
+                      title="删除对话"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                    </button>
                   )}
                 </div>
               </div>
@@ -263,6 +331,21 @@ export function AIChat() {
               >
                 <Send className="w-5 h-5" />
               </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={handleClearAll}
+                    disabled={messages.length === 0 || isLoading}
+                    variant="outline"
+                    className="w-9 h-9 rounded-full p-0 flex items-center justify-center"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>清空聊天</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
         </div>

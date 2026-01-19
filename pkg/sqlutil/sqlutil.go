@@ -228,4 +228,3 @@ func setFieldFromNullable(field reflect.Value, wrapper any) {
 		}
 	}
 }
-

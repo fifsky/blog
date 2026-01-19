@@ -31,9 +31,15 @@ func NewAI(conf *config.Config) *AI {
 	}
 }
 
-// ChatRequest represents the incoming chat message
+// ChatMessage represents a single message in the conversation
+type ChatMessage struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+// ChatRequest represents the incoming chat request with message history
 type ChatRequest struct {
-	Message string `json:"message"`
+	Messages []ChatMessage `json:"messages"`
 }
 
 // Chat handles SSE streaming AI chat responses
@@ -45,8 +51,21 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if strings.TrimSpace(req.Message) == "" {
-		response.Fail(w, errors.BadRequest("EMPTY_MESSAGE", "Message cannot be empty"))
+	if len(req.Messages) == 0 {
+		response.Fail(w, errors.BadRequest("EMPTY_MESSAGES", "Messages cannot be empty"))
+		return
+	}
+
+	// Validate that there's at least one user message with content
+	hasContent := false
+	for _, msg := range req.Messages {
+		if strings.TrimSpace(msg.Content) != "" {
+			hasContent = true
+			break
+		}
+	}
+	if !hasContent {
+		response.Fail(w, errors.BadRequest("EMPTY_MESSAGE", "Message content cannot be empty"))
 		return
 	}
 
@@ -62,13 +81,27 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Build OpenAI messages from request history
+	openAIMessages := []openai.ChatCompletionMessageParamUnion{
+		openai.SystemMessage("You are a helpful assistant. Respond in the same language as the user's message."),
+	}
+
+	for _, msg := range req.Messages {
+		if strings.TrimSpace(msg.Content) == "" {
+			continue // skip empty messages
+		}
+		switch msg.Role {
+		case "user":
+			openAIMessages = append(openAIMessages, openai.UserMessage(msg.Content))
+		case "assistant":
+			openAIMessages = append(openAIMessages, openai.AssistantMessage(msg.Content))
+		}
+	}
+
 	// Create streaming chat completion using OpenAI SDK v3
 	aiReq := openai.ChatCompletionNewParams{
-		Model: a.conf.Common.AIModel,
-		Messages: []openai.ChatCompletionMessageParamUnion{
-			openai.SystemMessage("You are a helpful assistant. Respond in the same language as the user's message."),
-			openai.UserMessage(req.Message),
-		},
+		Model:    a.conf.Common.AIModel,
+		Messages: openAIMessages,
 	}
 	if strings.HasPrefix(a.conf.Common.AIModel, "doubao") {
 		aiReq.SetExtraFields(map[string]any{
