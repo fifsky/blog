@@ -103,5 +103,8 @@ func (r *Router) Handler() http.Handler {
 	adminv1.RegisterUserServiceHTTPServer(adminAuth, codec, r.admin.User)
 	adminv1.RegisterSettingServiceHTTPServer(adminAuth, codec, r.admin.Setting)
 
+	// AI chat endpoint (SSE streaming)
+	adminAuth.HandleFunc("POST /blog/admin/ai/chat", r.admin.AI.Chat)
+
 	return &NotFoundHandler{mux: mux.ServeMux}
 }

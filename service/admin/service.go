@@ -13,6 +13,7 @@ type Service struct {
 	Mood    *Mood
 	Remind  *Remind
 	Setting *Setting
+	AI      *AI
 }
 
 func New(s *store.Store, conf *config.Config) *Service {
@@ -24,5 +25,6 @@ func New(s *store.Store, conf *config.Config) *Service {
 		Mood:    NewMood(s),
 		Remind:  NewRemind(s),
 		Setting: NewSetting(s),
+		AI:      NewAI(conf),
 	}
 }
