@@ -3,13 +3,13 @@ import { MessageCircle, X, Send, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Viewer } from "@bytemd/react";
 import gfm from "@bytemd/plugin-gfm";
-import highlight from "@bytemd/plugin-highlight";
+import { highlightPlugin } from "@/lib/highlight-plugin";
 import { getApiUrl } from "@/utils/common";
 import { Spinner } from "./ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 // ByteMD plugins for rendering
-const plugins = [gfm(), highlight()];
+const plugins = [gfm(), highlightPlugin()];
 
 interface Message {
   id: string;

@@ -8,8 +8,7 @@ import { getApiUrl, getAccessToken } from "@/utils/common";
 import { Editor } from "@bytemd/react";
 import gfm from "@bytemd/plugin-gfm";
 import mediumZoom from "@bytemd/plugin-medium-zoom";
-
-import highlight from "@bytemd/plugin-highlight";
+import { highlightPlugin } from "@/lib/highlight-plugin";
 import { CateListItem } from "@/types/openapi";
 
 import {
@@ -47,7 +46,7 @@ const articleSchema = z.object({
 type ArticleFormValues = z.infer<typeof articleSchema>;
 
 // ByteMD 插件配置
-const plugins = [gfm(), highlight(), mediumZoom()];
+const plugins = [gfm(), highlightPlugin(), mediumZoom()];
 
 // 图片上传函数
 const uploadImages = async (
