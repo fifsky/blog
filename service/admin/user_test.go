@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"app/config"
-	"app/model"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/store"
+	"app/store/model"
 	"app/testutil"
 
 	"google.golang.org/protobuf/types/known/emptypb"

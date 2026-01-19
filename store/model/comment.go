@@ -11,6 +11,7 @@ type Comment struct {
 	IP        string
 	CreatedAt time.Time
 }
+
 type NewComment struct {
 	Comment
 	Type         int

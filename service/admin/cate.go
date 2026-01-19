@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"app/model"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
 	"app/store"
+	"app/store/model"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 )

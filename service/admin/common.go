@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"app/model"
+	"app/store/model"
 )
 
 type loginUserKey struct{}

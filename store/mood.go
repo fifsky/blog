@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"app/model"
+	"app/store/model"
 )
 
 func (s *Store) ListMood(ctx context.Context, start int, num int) ([]model.Mood, error) {

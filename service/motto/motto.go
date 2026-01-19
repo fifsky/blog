@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"app/config"
-	"app/model"
 	"app/pkg/bark"
 	"app/pkg/doubao"
 	"app/store"
+	"app/store/model"
 
 	"github.com/goapt/logger"
 	"github.com/openai/openai-go/v3"

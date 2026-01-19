@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"app/model"
+	"app/store/model"
 )
 
 func (s *Store) GetAllLinks(ctx context.Context) ([]*model.Link, error) {

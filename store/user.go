@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"app/model"
+	"app/store/model"
 )
 
 func (s *Store) GetUser(ctx context.Context, uid int) (*model.User, error) {

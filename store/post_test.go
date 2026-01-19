@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"app/model"
+	"app/store/model"
 	"app/testutil"
 
 	"github.com/goapt/dbunit"

@@ -10,13 +10,13 @@ import (
 	"time"
 
 	"app/config"
-	"app/model"
 	"app/pkg/errors"
 	"app/pkg/ossutil"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
 	"app/server/response"
 	"app/store"
+	"app/store/model"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 )

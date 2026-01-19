@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"app/model"
 	apiv1 "app/proto/gen/api/v1"
 	"app/proto/gen/types"
 	"app/store"
+	"app/store/model"
 
 	"github.com/samber/lo"
 )

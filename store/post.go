@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"app/model"
+	"app/store/model"
 )
 
 func (s *Store) GetPost(ctx context.Context, id int, url string) (*model.Post, error) {

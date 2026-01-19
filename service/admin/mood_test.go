@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"app/model"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/store"
+	"app/store/model"
 	"app/testutil"
 
 	"github.com/goapt/dbunit"

@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"app/config"
-	"app/model"
 	"app/pkg/bark"
+	"app/store/model"
 )
 
 func Test_messageForBark(t *testing.T) {

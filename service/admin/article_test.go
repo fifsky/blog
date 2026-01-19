@@ -12,10 +12,10 @@ import (
 	"testing"
 
 	"app/config"
-	"app/model"
 	"app/pkg/ossutil"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/store"
+	"app/store/model"
 	"app/testutil"
 
 	"github.com/goapt/dbunit"

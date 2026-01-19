@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"app/model"
+	"app/store/model"
 )
 
 func (s *Store) GetCate(ctx context.Context, id int) (*model.Cate, error) {

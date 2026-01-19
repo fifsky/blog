@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"app/config"
-	"app/model"
 	"app/pkg/aesutil"
 	"app/pkg/bark"
 	"app/pkg/wechat"
 	"app/store"
+	"app/store/model"
 
 	"github.com/goapt/logger"
 )

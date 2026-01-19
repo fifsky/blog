@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"app/config"
-	"app/model"
 	"app/pkg/errors"
 	apiv1 "app/proto/gen/api/v1"
 	"app/proto/gen/types"
 	"app/store"
+	"app/store/model"
 
 	"google.golang.org/genproto/googleapis/api/httpbody"
 	"google.golang.org/protobuf/types/known/emptypb"

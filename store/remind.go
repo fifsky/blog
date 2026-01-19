@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"app/model"
+	"app/store/model"
 )
 
 func (s *Store) GetRemind(ctx context.Context, id int) (*model.Remind, error) {
