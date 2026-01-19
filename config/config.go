@@ -32,13 +32,19 @@ type WeixinConf struct {
 	Token     string `yaml:"token"`
 }
 
+type WebSearchConf struct {
+	URL   string `yaml:"url"`
+	Token string `yaml:"token"`
+}
+
 type Config struct {
-	Env     string
-	AppName string     `yaml:"app_name"`
-	Common  common     `yaml:"common"`
-	DB      DBConf     `yaml:"database"`
-	OSS     ossConf    `yaml:"oss"`
-	Weixin  WeixinConf `yaml:"weixin"`
+	Env       string
+	AppName   string        `yaml:"app_name"`
+	Common    common        `yaml:"common"`
+	DB        DBConf        `yaml:"database"`
+	OSS       ossConf       `yaml:"oss"`
+	Weixin    WeixinConf    `yaml:"weixin"`
+	WebSearch WebSearchConf `yaml:"web_search"`
 }
 
 func New() *Config {

@@ -1,4 +1,3 @@
-~1、使用Dexie.js来存储用户的聊天上下文~
-~2、聊天记录支持删除，删除聊天要删除提问和回答，他们是关联的~
-~3、接口调整为接收用户历史消息和当前消息，从而实现上下文对话~
-~4、发送按钮旁边新增一个清空按钮，可以一键清空聊天记录~
+1、给ai聊天添加mcp调用功能，使用mcp golang sdk github.com/modelcontextprotocol/go-sdk
+2、添加搜索MCP，搜索MCP信息如下 url 配置在config.WebSearch.URL ，token配置在config.WebSearch.Token
+3、调整系统提示词，添加搜索工具的描述，和搜索意图识别
