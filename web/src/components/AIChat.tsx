@@ -1,5 +1,16 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Copy, Check, Trash2, RotateCcw } from "lucide-react";
+import {
+  MessageCircle,
+  X,
+  Send,
+  Copy,
+  Check,
+  Trash2,
+  RotateCcw,
+  Wrench,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Viewer } from "@bytemd/react";
 import gfm from "@bytemd/plugin-gfm";
@@ -18,12 +29,81 @@ import {
 // ByteMD plugins for rendering
 const plugins = [gfm(), highlightPlugin()];
 
+interface ToolCall {
+  id: string;
+  name: string;
+  arguments: string;
+  result?: string;
+  isLoading: boolean;
+}
+
 interface DisplayMessage {
   id: number;
   pairId: string;
   role: "user" | "assistant";
   content: string;
   isStreaming?: boolean;
+  toolCalls?: ToolCall[];
+}
+
+// Tool Call Card Component
+function ToolCallCard({ toolCall }: { toolCall: ToolCall }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const formatJson = (str: string) => {
+    try {
+      return JSON.stringify(JSON.parse(str), null, 2);
+    } catch {
+      return str;
+    }
+  };
+
+  return (
+    <div className="my-2 border border-gray-200 rounded-lg bg-gray-50 overflow-hidden">
+      <button
+        onClick={() => !toolCall.isLoading && setIsExpanded(!isExpanded)}
+        disabled={toolCall.isLoading}
+        className={`w-full px-3 py-2 flex items-center gap-2 text-left text-sm ${
+          toolCall.isLoading ? "cursor-wait" : "hover:bg-gray-100 cursor-pointer"
+        }`}
+      >
+        {toolCall.isLoading ? (
+          <Spinner className="w-4 h-4" />
+        ) : (
+          <Wrench className="w-4 h-4 text-blue-500" />
+        )}
+        <span className="font-medium text-gray-700">{toolCall.name}</span>
+        {!toolCall.isLoading && (
+          <span className="ml-auto text-gray-400">
+            {isExpanded ? (
+              <ChevronDown className="w-4 h-4" />
+            ) : (
+              <ChevronRight className="w-4 h-4" />
+            )}
+          </span>
+        )}
+        {toolCall.isLoading && <span className="ml-auto text-xs text-gray-400">调用中...</span>}
+      </button>
+      {isExpanded && !toolCall.isLoading && (
+        <div className="px-3 py-2 border-t border-gray-200 bg-white">
+          <div className="mb-2">
+            <div className="text-xs font-medium text-gray-500 mb-1">参数</div>
+            <pre className="text-xs bg-gray-100 p-2 rounded overflow-x-auto">
+              {formatJson(toolCall.arguments)}
+            </pre>
+          </div>
+          {toolCall.result && (
+            <div>
+              <div className="text-xs font-medium text-gray-500 mb-1">结果</div>
+              <pre className="text-xs bg-gray-100 p-2 rounded overflow-x-auto max-h-40 overflow-y-auto">
+                {formatJson(toolCall.result)}
+              </pre>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function AIChat() {
@@ -113,6 +193,7 @@ export function AIChat() {
       role: "assistant",
       content: "",
       isStreaming: true,
+      toolCalls: [],
     };
 
     setMessages((prev) => [...prev, newUserMessage, newAssistantMessage]);
@@ -150,6 +231,7 @@ export function AIChat() {
 
       const decoder = new TextDecoder();
       let accumulatedContent = "";
+      let currentToolCalls: ToolCall[] = [];
 
       while (true) {
         const { done, value } = await reader.read();
@@ -161,7 +243,42 @@ export function AIChat() {
         for (const line of lines) {
           if (line.startsWith("data: ")) {
             const data = line.slice(6);
+
             if (data === "[DONE]") continue;
+
+            // Handle tool start event
+            if (data.startsWith("[TOOL_START] ")) {
+              const toolData = JSON.parse(data.slice(13));
+              const newToolCall: ToolCall = {
+                id: toolData.id,
+                name: toolData.name,
+                arguments: toolData.arguments,
+                isLoading: true,
+              };
+              currentToolCalls = [...currentToolCalls, newToolCall];
+              setMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === assistantMsg.id ? { ...msg, toolCalls: currentToolCalls } : msg,
+                ),
+              );
+              continue;
+            }
+
+            // Handle tool end event
+            if (data.startsWith("[TOOL_END] ")) {
+              const toolData = JSON.parse(data.slice(11));
+              currentToolCalls = currentToolCalls.map((tc) =>
+                tc.id === toolData.id ? { ...tc, result: toolData.result, isLoading: false } : tc,
+              );
+              setMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === assistantMsg.id ? { ...msg, toolCalls: currentToolCalls } : msg,
+                ),
+              );
+              continue;
+            }
+
+            // Handle regular content
             const content = data.replace(/\\n/g, "\n");
             accumulatedContent += content;
 
@@ -270,12 +387,20 @@ export function AIChat() {
                 >
                   {message.role === "assistant" ? (
                     <div className="relative">
+                      {/* Tool Calls UI */}
+                      {message.toolCalls && message.toolCalls.length > 0 && (
+                        <div className="mb-2">
+                          {message.toolCalls.map((toolCall) => (
+                            <ToolCallCard key={toolCall.id} toolCall={toolCall} />
+                          ))}
+                        </div>
+                      )}
                       <div className="markdown-body text-sm prose prose-sm max-w-none [&_pre]:bg-gray-100 [&_pre]:p-2 [&_pre]:rounded">
-                        {!message.content ? (
+                        {!message.content && !message.toolCalls?.length ? (
                           <Spinner />
-                        ) : (
+                        ) : message.content ? (
                           <Viewer value={message.content || ""} plugins={plugins} />
-                        )}
+                        ) : null}
                       </div>
                       {/* Copy button for assistant */}
                       {!message.isStreaming && message.content && (

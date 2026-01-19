@@ -52,6 +52,19 @@ type ChatRequest struct {
 	Messages []ChatMessage `json:"messages"`
 }
 
+// ToolStartEvent represents a tool call start event sent to frontend
+type ToolStartEvent struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Arguments string `json:"arguments"`
+}
+
+// ToolEndEvent represents a tool call end event sent to frontend
+type ToolEndEvent struct {
+	ID     string `json:"id"`
+	Result string `json:"result"`
+}
+
 // Chat handles SSE streaming AI chat responses
 func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 	// Parse request body
@@ -175,7 +188,28 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 
 			// Execute all tool calls and add results
 			for _, toolCall := range acc.Choices[0].Message.ToolCalls {
+				// Send tool start event to frontend
+				toolStartEvent := ToolStartEvent{
+					ID:        toolCall.ID,
+					Name:      toolCall.Function.Name,
+					Arguments: toolCall.Function.Arguments,
+				}
+				toolStartJSON, _ := json.Marshal(toolStartEvent)
+				fmt.Fprintf(w, "data: [TOOL_START] %s\n\n", toolStartJSON)
+				flusher.Flush()
+
+				// Execute tool
 				toolResult := a.executeTool(ctx, toolCall.Function.Name, toolCall.Function.Arguments)
+
+				// Send tool end event to frontend
+				toolEndEvent := ToolEndEvent{
+					ID:     toolCall.ID,
+					Result: toolResult,
+				}
+				toolEndJSON, _ := json.Marshal(toolEndEvent)
+				fmt.Fprintf(w, "data: [TOOL_END] %s\n\n", toolEndJSON)
+				flusher.Flush()
+
 				aiReq.Messages = append(aiReq.Messages, openai.ToolMessage(toolResult, toolCall.ID))
 			}
 
