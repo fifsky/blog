@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"app/config"
 	"app/pkg/errors"
@@ -81,9 +82,13 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	prompt := fmt.Sprintf(`You are a helpful assistant. Respond in the same language as the user's message.
+Current Time: %s
+	`, time.Now().Format(time.DateTime))
+
 	// Build OpenAI messages from request history
 	openAIMessages := []openai.ChatCompletionMessageParamUnion{
-		openai.SystemMessage("You are a helpful assistant. Respond in the same language as the user's message."),
+		openai.SystemMessage(prompt),
 	}
 
 	for _, msg := range req.Messages {
