@@ -262,10 +262,10 @@ export function AIChat() {
                 className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[85%] rounded-xl px-4 py-3 relative group ${
+                  className={`max-w-[85%] rounded-xl px-3 py-2 relative group ${
                     message.role === "user"
                       ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
-                      : "bg-white border border-gray-200 shadow-sm"
+                      : "bg-white border border-gray-200"
                   }`}
                 >
                   {message.role === "assistant" ? (
@@ -279,17 +279,26 @@ export function AIChat() {
                       </div>
                       {/* Copy button for assistant */}
                       {!message.isStreaming && message.content && (
-                        <button
-                          onClick={() => copyToClipboard(message.content, message.id)}
-                          className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white border border-gray-200 rounded-full p-1.5 shadow-sm hover:bg-gray-50"
-                          title="复制"
-                        >
-                          {copiedId === message.id ? (
-                            <Check className="w-3.5 h-3.5 text-green-500" />
-                          ) : (
-                            <Copy className="w-3.5 h-3.5 text-gray-500" />
-                          )}
-                        </button>
+                        <div className="absolute -bottom-11 -left-4 flex items-center gap-1">
+                          <button
+                            onClick={() => copyToClipboard(message.content, message.id)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity rounded-full p-1.5 hover:bg-gray-200"
+                            title="复制"
+                          >
+                            {copiedId === message.id ? (
+                              <Check className="w-3.5 h-3.5 text-green-500" />
+                            ) : (
+                              <Copy className="w-3.5 h-3.5 text-gray-500" />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleDeletePair(message.pairId)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity rounded-full p-1.5 hover:bg-gray-200"
+                            title="删除对话"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 text-gray-500" />
+                          </button>
+                        </div>
                       )}
                     </div>
                   ) : (
@@ -299,10 +308,10 @@ export function AIChat() {
                   {message.role === "user" && !isLoading && (
                     <button
                       onClick={() => handleDeletePair(message.pairId)}
-                      className="absolute -top-2 -left-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white border border-gray-200 rounded-full p-1.5 shadow-sm hover:bg-red-50"
+                      className="absolute -top-0 -left-8 opacity-0 group-hover:opacity-100 transition-opacity rounded-full p-1.5 hover:bg-gray-200"
                       title="删除对话"
                     >
-                      <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                      <Trash2 className="w-3.5 h-3.5 text-gray-500" />
                     </button>
                   )}
                 </div>
