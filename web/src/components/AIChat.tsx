@@ -6,6 +6,7 @@ import gfm from "@bytemd/plugin-gfm";
 import highlight from "@bytemd/plugin-highlight";
 import { getApiUrl } from "@/utils/common";
 import { Spinner } from "./ui/spinner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 // ByteMD plugins for rendering
 const plugins = [gfm(), highlight()];
@@ -25,11 +26,20 @@ export function AIChat() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Focus input when chat opens
+  useEffect(() => {
+    if (isOpen) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [isOpen]);
 
   // Copy message content to clipboard
   const copyToClipboard = async (content: string, id: string) => {
@@ -128,6 +138,8 @@ export function AIChat() {
     } finally {
       setIsLoading(false);
       abortControllerRef.current = null;
+      // Restore focus to input after AI finishes
+      setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [input, isLoading]);
 
@@ -142,13 +154,20 @@ export function AIChat() {
   return (
     <>
       {/* Floating Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-20 z-50 w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 flex items-center justify-center"
-        aria-label="AI Chat"
-      >
-        {isOpen ? <X className="w-5 h-5" /> : <MessageCircle className="w-5 h-5" />}
-      </button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="fixed bottom-6 right-20 z-50 w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 flex items-center justify-center"
+            aria-label="AI Chat"
+          >
+            {isOpen ? <X className="w-5 h-5" /> : <MessageCircle className="w-5 h-5" />}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{isOpen ? "收起聊天" : "展开聊天"}</p>
+        </TooltipContent>
+      </Tooltip>
 
       {/* Chat Window */}
       {isOpen && (
@@ -228,6 +247,7 @@ export function AIChat() {
           <div className="px-4 py-3 bg-white border-t border-gray-200">
             <div className="flex items-center gap-2">
               <input
+                ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
