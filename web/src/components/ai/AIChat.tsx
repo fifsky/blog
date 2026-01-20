@@ -15,7 +15,6 @@ import { Viewer } from "@bytemd/react";
 import gfm from "@bytemd/plugin-gfm";
 import { highlightPlugin } from "@/lib/highlight-plugin";
 import { getApiUrl } from "@/utils/common";
-import { Spinner } from "@/components/ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   getAllMessages,
@@ -26,6 +25,7 @@ import {
 } from "@/lib/chat-db";
 import { ToolCallCard } from "./ToolCallCard";
 import type { ToolCall, DisplayMessage } from "./types";
+import { AgentChatIndicator } from "@/components/agents-ui/agent-chat-indicator";
 
 // ByteMD plugins for rendering
 const plugins = [gfm(), highlightPlugin()];
@@ -351,7 +351,7 @@ export function AIChat() {
                         )}
                         <div className="markdown-body text-sm prose prose-sm max-w-none [&_pre]:bg-gray-100 [&_pre]:p-2 [&_pre]:rounded">
                           {!message.content && !message.toolCalls?.length ? (
-                            <Spinner />
+                            <AgentChatIndicator size={"sm"} />
                           ) : message.content ? (
                             <Viewer value={message.content || ""} plugins={plugins} />
                           ) : null}
