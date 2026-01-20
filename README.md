@@ -10,3 +10,16 @@ https://fifsky.com/
 - Generate an http.Handler based on protobuf and [googleapis](https://buf.build/googleapis/googleapis)
 - Generate an OpenAPI description
 - Use slog to record request logs
+
+## Development
+
+### Web
+
+- Node.js: >= 20 (see `.nvmrc`)
+- Package manager: pnpm (see `web/package.json`)
+
+```bash
+cd web
+pnpm install
+pnpm dev
+```
