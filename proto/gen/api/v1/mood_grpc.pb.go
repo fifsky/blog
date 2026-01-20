@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,7 +20,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MoodService_List_FullMethodName = "/fifsky.blog.api.v1.MoodService/List"
+	MoodService_List_FullMethodName   = "/fifsky.blog.api.v1.MoodService/List"
+	MoodService_Random_FullMethodName = "/fifsky.blog.api.v1.MoodService/Random"
 )
 
 // MoodServiceClient is the client API for MoodService service.
@@ -30,6 +32,8 @@ const (
 type MoodServiceClient interface {
 	// List 获取心情列表
 	List(ctx context.Context, in *MoodListRequest, opts ...grpc.CallOption) (*MoodListResponse, error)
+	// Random 随机获取一条心情
+	Random(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MoodItem, error)
 }
 
 type moodServiceClient struct {
@@ -50,6 +54,16 @@ func (c *moodServiceClient) List(ctx context.Context, in *MoodListRequest, opts 
 	return out, nil
 }
 
+func (c *moodServiceClient) Random(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MoodItem, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MoodItem)
+	err := c.cc.Invoke(ctx, MoodService_Random_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MoodServiceServer is the server API for MoodService service.
 // All implementations must embed UnimplementedMoodServiceServer
 // for forward compatibility.
@@ -58,6 +72,8 @@ func (c *moodServiceClient) List(ctx context.Context, in *MoodListRequest, opts 
 type MoodServiceServer interface {
 	// List 获取心情列表
 	List(context.Context, *MoodListRequest) (*MoodListResponse, error)
+	// Random 随机获取一条心情
+	Random(context.Context, *emptypb.Empty) (*MoodItem, error)
 	mustEmbedUnimplementedMoodServiceServer()
 }
 
@@ -70,6 +86,9 @@ type UnimplementedMoodServiceServer struct{}
 
 func (UnimplementedMoodServiceServer) List(context.Context, *MoodListRequest) (*MoodListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method List not implemented")
+}
+func (UnimplementedMoodServiceServer) Random(context.Context, *emptypb.Empty) (*MoodItem, error) {
+	return nil, status.Error(codes.Unimplemented, "method Random not implemented")
 }
 func (UnimplementedMoodServiceServer) mustEmbedUnimplementedMoodServiceServer() {}
 func (UnimplementedMoodServiceServer) testEmbeddedByValue()                     {}
@@ -110,6 +129,24 @@ func _MoodService_List_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MoodService_Random_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MoodServiceServer).Random(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MoodService_Random_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MoodServiceServer).Random(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MoodService_ServiceDesc is the grpc.ServiceDesc for MoodService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -120,6 +157,10 @@ var MoodService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "List",
 			Handler:    _MoodService_List_Handler,
+		},
+		{
+			MethodName: "Random",
+			Handler:    _MoodService_Random_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -9,6 +9,7 @@ import type {
   PrevNextResponse,
   MoodListRequest,
   MoodListResponse,
+  MoodItem,
   Options,
   CateMenuResponse,
   ArchiveResponse,
@@ -62,6 +63,8 @@ export const prevnextArticleApi = (data: { id: number }, errorHandler?: (e: AppE
   createApi<PrevNextResponse>("/blog/article/prevnext", data, errorHandler);
 export const moodListApi = (data: MoodListRequest, errorHandler?: (e: AppError) => void) =>
   createApi<MoodListResponse>("/blog/mood/list", data, errorHandler);
+export const moodRandomApi = (errorHandler?: (e: AppError) => void) =>
+  createApi<MoodItem>("/blog/mood/random", undefined, errorHandler);
 export const commentListApi = (data: any, errorHandler?: (e: AppError) => void) =>
   createApi("/blog/comment/list", data, errorHandler);
 export const commentPostApi = (data: any, errorHandler?: (e: AppError) => void) =>

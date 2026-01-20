@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { moodListApi } from "@/service";
+import { moodListApi, moodRandomApi } from "@/service";
 import dayjs from "dayjs";
 import { MoodItem } from "@/types/openapi";
 import { Typewriter } from "react-simple-typewriter";
+import { ListRestart } from "lucide-react";
 
 function humanTime(v: string) {
   const currTime = dayjs().add(1, "second");
@@ -30,17 +31,26 @@ function humanTime(v: string) {
 }
 
 export function Mood() {
-  const [moods, setMoods] = useState<MoodItem[]>([]);
-  const [index, setIndex] = useState(0);
+  const [mood, setMood] = useState<MoodItem | null>(null);
+  const [key, setKey] = useState(0);
+
+  // 初始化时获取最新的一条心情
   useEffect(() => {
     (async () => {
       const ret = await moodListApi({ page: 1 });
-      setMoods(ret.list || []);
+      if (ret.list && ret.list.length > 0) {
+        setMood(ret.list[0]);
+      }
     })();
   }, []);
-  const prev = () => setIndex((i) => (i - 1 >= 0 ? i - 1 : i));
-  const next = () => setIndex((i) => (i + 1 < moods.length ? i + 1 : i));
-  const m = moods[index];
+
+  // 点击按钮时随机获取一条
+  const fetchRandomMood = async () => {
+    const ret = await moodRandomApi();
+    setMood(ret);
+    setKey((k) => k + 1);
+  };
+
   return (
     <div className="relative mb-[10px] flex items-start group">
       <div className="p-px border border-[#89d5ef] bg-white overflow-hidden">
@@ -54,26 +64,21 @@ export function Mood() {
       <div className="flex-1 min-w-0 min-h-[98px] ml-[20px] border border-[#89d5ef] bg-gradient-to-b from-white to-[#eeffde]">
         {/* 左侧箭头 */}
         <div className="absolute top-[0.9rem] left-[110px] w-0 h-0 border-t-[0.6rem] border-t-transparent border-b-[0.6rem] border-b-transparent border-r-[0.7rem] border-r-white"></div>
-        {m && (
+        {mood && (
           <p className="p-[10px] line-[120%] break-all overflow-hidden text-ellipsis text-[#555]">
-            <Typewriter key={m.id} words={[m.content]} typeSpeed={50} />
+            <Typewriter key={key} words={[mood.content]} typeSpeed={50} />
             <span className="absolute right-[10px] bottom-[5px] line-[120%] text-[#8c8c8c] text-xs">
-              {humanTime(m.created_at)} by {m.user.nick_name}
+              {humanTime(mood.created_at)} by {mood.user.nick_name}
             </span>
           </p>
         )}
       </div>
-      <div className="absolute bottom-0 left-[125px] cursor-pointer user-select-none opacity-0 group-hover:opacity-100 transition-opacity">
-        <i
-          className="iconfont icon-left text-[20px] text-[rgba(48,175,255,0.5)] hover:text-[rgba(48,175,255,1)]"
-          title="上一条"
-          onClick={prev}
-        />
-        <i
-          className="iconfont icon-right text-[20px] text-[rgba(48,175,255,0.5)] hover:text-[rgba(48,175,255,1)]"
-          title="下一条"
-          onClick={next}
-        />
+      <div
+        className="absolute bottom-1 left-[125px] cursor-pointer user-select-none opacity-0 group-hover:opacity-100 transition-opacity"
+        title="随机一条"
+        onClick={fetchRandomMood}
+      >
+        <ListRestart className="w-[20px] h-[20px] text-[rgba(48,175,255,0.5)] hover:text-[rgba(48,175,255,1)] transition-colors" />
       </div>
     </div>
   );

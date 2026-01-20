@@ -3,7 +3,6 @@ package fifsky.blog.api.v1;
 
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
-import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 import "types/common.proto";
 
@@ -15,6 +14,14 @@ service MoodService {
   rpc List(MoodListRequest) returns (MoodListResponse) {
     option (google.api.http) = {
       post: "/blog/mood/list"
+      body: "*"
+    };
+  }
+
+  // Random 随机获取一条心情
+  rpc Random(google.protobuf.Empty) returns (MoodItem) {
+    option (google.api.http) = {
+      post: "/blog/mood/random"
       body: "*"
     };
   }

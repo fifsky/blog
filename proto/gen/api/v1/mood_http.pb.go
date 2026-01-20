@@ -7,6 +7,7 @@ package apiv1
 import (
 	context "context"
 	contract "github.com/goapt/grpc-http/contract"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	http "net/http"
 )
 
@@ -18,6 +19,8 @@ import (
 type MoodServiceHTTPServer interface {
 	// List 获取心情列表
 	List(context.Context, *MoodListRequest) (*MoodListResponse, error)
+	// Random 随机获取一条心情
+	Random(context.Context, *emptypb.Empty) (*MoodItem, error)
 }
 
 type MoodService struct {
@@ -28,6 +31,7 @@ type MoodService struct {
 
 func (s *MoodService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/mood/list", s.List)
+	s.mux.HandleFunc("POST /blog/mood/random", s.Random)
 }
 
 func RegisterMoodServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv MoodServiceHTTPServer) {
@@ -52,6 +56,18 @@ func (s *MoodService) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	out, err := s.server.List(r.Context(), &in)
+	if err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+	s.codec.Encode(w, r, out)
+	return
+}
+
+func (s *MoodService) Random(w http.ResponseWriter, r *http.Request) {
+	var in emptypb.Empty
+
+	out, err := s.server.Random(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
 		return

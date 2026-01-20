@@ -12,7 +12,7 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/known/emptypb"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -194,7 +194,7 @@ var File_api_v1_mood_proto protoreflect.FileDescriptor
 
 const file_api_v1_mood_proto_rawDesc = "" +
 	"\n" +
-	"\x11api/v1/mood.proto\x12\x12fifsky.blog.api.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\".\n" +
+	"\x11api/v1/mood.proto\x12\x12fifsky.blog.api.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\".\n" +
 	"\x0fMoodListRequest\x12\x1b\n" +
 	"\x04page\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02 \x00R\x04page\"\x87\x01\n" +
 	"\bMoodItem\x12\x0e\n" +
@@ -205,9 +205,10 @@ const file_api_v1_mood_proto_rawDesc = "" +
 	"created_at\x18\x04 \x01(\tR\tcreatedAt\"Z\n" +
 	"\x10MoodListResponse\x120\n" +
 	"\x04list\x18\x01 \x03(\v2\x1c.fifsky.blog.api.v1.MoodItemR\x04list\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total2|\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total2\xda\x01\n" +
 	"\vMoodService\x12m\n" +
-	"\x04List\x12#.fifsky.blog.api.v1.MoodListRequest\x1a$.fifsky.blog.api.v1.MoodListResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/blog/mood/listB\xaa\x01\n" +
+	"\x04List\x12#.fifsky.blog.api.v1.MoodListRequest\x1a$.fifsky.blog.api.v1.MoodListResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/blog/mood/list\x12\\\n" +
+	"\x06Random\x12\x16.google.protobuf.Empty\x1a\x1c.fifsky.blog.api.v1.MoodItem\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/blog/mood/randomB\xaa\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\tMoodProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
 
 var (
@@ -228,14 +229,17 @@ var file_api_v1_mood_proto_goTypes = []any{
 	(*MoodItem)(nil),          // 1: fifsky.blog.api.v1.MoodItem
 	(*MoodListResponse)(nil),  // 2: fifsky.blog.api.v1.MoodListResponse
 	(*types.UserSummary)(nil), // 3: fifsky.blog.types.UserSummary
+	(*emptypb.Empty)(nil),     // 4: google.protobuf.Empty
 }
 var file_api_v1_mood_proto_depIdxs = []int32{
 	3, // 0: fifsky.blog.api.v1.MoodItem.user:type_name -> fifsky.blog.types.UserSummary
 	1, // 1: fifsky.blog.api.v1.MoodListResponse.list:type_name -> fifsky.blog.api.v1.MoodItem
 	0, // 2: fifsky.blog.api.v1.MoodService.List:input_type -> fifsky.blog.api.v1.MoodListRequest
-	2, // 3: fifsky.blog.api.v1.MoodService.List:output_type -> fifsky.blog.api.v1.MoodListResponse
-	3, // [3:4] is the sub-list for method output_type
-	2, // [2:3] is the sub-list for method input_type
+	4, // 3: fifsky.blog.api.v1.MoodService.Random:input_type -> google.protobuf.Empty
+	2, // 4: fifsky.blog.api.v1.MoodService.List:output_type -> fifsky.blog.api.v1.MoodListResponse
+	1, // 5: fifsky.blog.api.v1.MoodService.Random:output_type -> fifsky.blog.api.v1.MoodItem
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
 	2, // [2:2] is the sub-list for extension extendee
 	0, // [0:2] is the sub-list for field type_name

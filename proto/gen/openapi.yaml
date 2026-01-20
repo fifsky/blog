@@ -690,6 +690,23 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/MoodListResponse'
+    /blog/mood/random:
+        post:
+            tags:
+                - MoodService
+            description: Random 随机获取一条心情
+            operationId: MoodService_Random
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MoodItem'
     /blog/remind/change:
         get:
             tags:
