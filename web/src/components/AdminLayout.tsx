@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Outlet, useLocation, Link, useNavigate } from "react-router";
 import { CHeader } from "./CHeader";
 import { CFooter } from "./CFooter";
-import { AIChat } from "./AIChat";
+import { AIChat } from "./ai/AIChat";
 import { useStore } from "@/store/context";
 import { getAccessToken } from "@/utils/common";
 

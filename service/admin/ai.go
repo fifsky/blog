@@ -18,9 +18,9 @@ import (
 )
 
 type AI struct {
-	conf      *config.Config
-	client    openai.Client
-	mcpClient *mcp.Client
+	conf       *config.Config
+	client     openai.Client
+	mcpManager *mcp.Manager
 }
 
 func NewAI(conf *config.Config) *AI {
@@ -29,15 +29,22 @@ func NewAI(conf *config.Config) *AI {
 		option.WithBaseURL(conf.Common.AIEndpoint),
 	)
 
-	var mcpClient *mcp.Client
-	if conf.WebSearch.URL != "" {
-		mcpClient = mcp.NewClient(conf.WebSearch.URL, conf.WebSearch.Token)
+	// Create MCP manager with all configured MCP clients
+	mcpManager := mcp.NewManager()
+	for key, mcpConf := range conf.MCP {
+		if mcpConf.URL != "" {
+			displayName := mcpConf.Name
+			if displayName == "" {
+				displayName = key
+			}
+			mcpManager.AddClient(key, displayName, mcpConf.URL, mcpConf.Token)
+		}
 	}
 
 	return &AI{
-		conf:      conf,
-		client:    client,
-		mcpClient: mcpClient,
+		conf:       conf,
+		client:     client,
+		mcpManager: mcpManager,
 	}
 }
 
@@ -56,6 +63,7 @@ type ChatRequest struct {
 type ToolStartEvent struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
+	MCPName   string `json:"mcpName"`
 	Arguments string `json:"arguments"`
 }
 
@@ -126,7 +134,7 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Get tools from MCP if available
+	// Get tools from all MCP clients
 	tools := a.getMCPTools(ctx)
 
 	// Create streaming chat completion using OpenAI SDK v3
@@ -192,6 +200,7 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 				toolStartEvent := ToolStartEvent{
 					ID:        toolCall.ID,
 					Name:      toolCall.Function.Name,
+					MCPName:   a.mcpManager.GetMCPDisplayName(toolCall.Function.Name),
 					Arguments: toolCall.Function.Arguments,
 				}
 				toolStartJSON, _ := json.Marshal(toolStartEvent)
@@ -237,18 +246,18 @@ When you encounter questions that you cannot answer directly, such as:
 - Specific facts you are uncertain about
 - Information that may have changed after your training data cutoff
 
-You should use the available search tool to find accurate and up-to-date information.`, time.Now().Format(time.DateTime))
+You should use the available tools to find accurate and up-to-date information.`, time.Now().Format(time.DateTime))
 
 	return basePrompt
 }
 
-// getMCPTools returns the available tools from MCP server as OpenAI tool params
+// getMCPTools returns the available tools from all MCP clients as OpenAI tool params
 func (a *AI) getMCPTools(ctx context.Context) []openai.ChatCompletionToolUnionParam {
-	if a.mcpClient == nil {
+	if !a.mcpManager.HasClients() {
 		return nil
 	}
 
-	mcpTools, err := a.mcpClient.ListTools(ctx)
+	mcpTools, err := a.mcpManager.ListAllTools(ctx)
 	if err != nil {
 		return nil
 	}
@@ -278,10 +287,10 @@ func (a *AI) getMCPTools(ctx context.Context) []openai.ChatCompletionToolUnionPa
 	return tools
 }
 
-// executeTool executes a tool call via MCP and returns the result
+// executeTool executes a tool call via MCP manager and returns the result
 func (a *AI) executeTool(ctx context.Context, name string, arguments string) string {
-	if a.mcpClient == nil {
-		return "Tool execution failed: MCP client not available"
+	if !a.mcpManager.HasClients() {
+		return "Tool execution failed: no MCP clients available"
 	}
 
 	// Parse arguments
@@ -290,7 +299,7 @@ func (a *AI) executeTool(ctx context.Context, name string, arguments string) str
 		return fmt.Sprintf("Tool execution failed: invalid arguments: %v", err)
 	}
 
-	result, err := a.mcpClient.CallTool(ctx, name, args)
+	result, err := a.mcpManager.CallTool(ctx, name, args)
 	if err != nil {
 		return fmt.Sprintf("Tool execution failed: %v", err)
 	}

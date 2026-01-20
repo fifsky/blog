@@ -32,19 +32,20 @@ type WeixinConf struct {
 	Token     string `yaml:"token"`
 }
 
-type WebSearchConf struct {
-	URL   string `yaml:"url"`
-	Token string `yaml:"token"`
+type MCPConf struct {
+	Name  string `yaml:"name"`  // MCP名称，用于前端展示
+	URL   string `yaml:"url"`   // MCP StreamHttp地址
+	Token string `yaml:"token"` // MCP Token
 }
 
 type Config struct {
-	Env       string
-	AppName   string        `yaml:"app_name"`
-	Common    common        `yaml:"common"`
-	DB        DBConf        `yaml:"database"`
-	OSS       ossConf       `yaml:"oss"`
-	Weixin    WeixinConf    `yaml:"weixin"`
-	WebSearch WebSearchConf `yaml:"web_search"`
+	Env     string
+	AppName string             `yaml:"app_name"`
+	Common  common             `yaml:"common"`
+	DB      DBConf             `yaml:"database"`
+	OSS     ossConf            `yaml:"oss"`
+	Weixin  WeixinConf         `yaml:"weixin"`
+	MCP     map[string]MCPConf `yaml:"mcp"`
 }
 
 func New() *Config {
