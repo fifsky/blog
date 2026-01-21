@@ -36,36 +36,7 @@
 
   blockquote {
     color: #7e7e7e;
-    padding-left: 10px;
-    margin: 10px 0;
-    border-left: 3px solid #00ffff;
     background-color: #f8f8f8;
-    word-break: break-all;
-  }
-
-  img {
-    border: 0;
-    vertical-align: middle;
-  }
-  abbr {
-    border-bottom: 1px dashed #666;
-    cursor: help;
-  }
-
-  .article {
-    color: #555555;
-    line-height: 22px;
-    font-size: 14px;
-    text-align: justify;
-    word-wrap: break-word;
-    hyphens: auto;
-    word-spacing: 1px;
-    letter-spacing: 1px;
-  }
-
-  span.highlight {
-    color: #ff0000;
-    position: absolute;
   }
 
   mark {

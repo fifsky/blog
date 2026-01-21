@@ -26,7 +26,7 @@ export function CArticle({ article }: { article: ArticleItem }) {
       <div className="flex justify-between items-center h-[54px] overflow-hidden">
         <img className="p-[2px] w-[40px] h-[40px]" src="/assets/images/avatar.jpg" alt="" />
         <div className="flex-1 ml-4">
-          <h2 className="text-[14px]">
+          <h2 className="text-[16px] font-medium">
             <Link
               to={`/article/${article.id}`}
               dangerouslySetInnerHTML={{
@@ -49,7 +49,7 @@ export function CArticle({ article }: { article: ArticleItem }) {
           </div>
         </div>
       </div>
-      <div className="article">
+      <div className="mt-2">
         <Viewer value={article.content} plugins={plugins} />
       </div>
     </div>
