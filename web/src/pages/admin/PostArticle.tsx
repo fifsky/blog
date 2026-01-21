@@ -224,7 +224,7 @@ export default function PostArticle() {
                         <FormControl>
                           <RadioGroup
                             onValueChange={(value) => field.onChange(parseInt(value) as 1 | 2)}
-                            defaultValue={field.value.toString()}
+                            value={field.value.toString()}
                             className="flex space-x-6"
                           >
                             <div className="flex items-center space-x-2">

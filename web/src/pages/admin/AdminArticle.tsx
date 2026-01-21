@@ -35,7 +35,7 @@ export default function AdminArticle() {
   const [batchLoading, setBatchLoading] = useState(false);
 
   const loadList = async () => {
-    const ret = await articleListAdminApi({ page, type: 1, status: statusFilter });
+    const ret = await articleListAdminApi({ page, status: statusFilter });
     setList(ret.list || []);
     setTotal(ret.total || 0);
   };
