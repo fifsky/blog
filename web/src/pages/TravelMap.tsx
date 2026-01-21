@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { settingApi } from "@/service";
 
 export default function TravelMap() {
   const chartRef = useRef<HTMLDivElement>(null);
@@ -19,11 +20,12 @@ export default function TravelMap() {
       if (!chartRef.current) return;
 
       try {
-        // Fetch China Map Data
-        const response = await fetch(
-          "https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json",
-        );
-        const chinaJson = await response.json();
+        // Fetch China Map Data and Settings
+        const [mapResponse, settingResponse] = await Promise.all([
+          fetch("https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json"),
+          settingApi(),
+        ]);
+        const chinaJson = await mapResponse.json();
 
         // Register Map
         (window as any).echarts.registerMap("china", chinaJson);
@@ -31,48 +33,32 @@ export default function TravelMap() {
         // Initialize Chart
         chartInstance = (window as any).echarts.init(chartRef.current);
 
-        const data = [
-          { name: "北京", value: [116.407387, 39.904179] },
-          { name: "南昌", value: [115.892151, 28.676493] },
-          { name: "西安", value: [108.94866, 34.22245] },
-          { name: "华山", value: [110.08752, 34.56608] },
-          { name: "银川", value: [106.206479, 38.502621] },
-          { name: "厦门", value: [118.103886, 24.489231] },
-          { name: "武夷山", value: [118.036655, 27.756515] },
-          { name: "东莞", value: [113.760234, 23.051271] },
-          { name: "广州", value: [113.30765, 23.120049] },
-          { name: "上海", value: [121.487899, 31.249162] },
-          { name: "无锡", value: [120.318665, 31.501063] },
-          { name: "苏州", value: [120.619907, 31.317987] },
-          { name: "杭州", value: [120.219375, 30.259244] },
-          { name: "绍兴", value: [120.592467, 30.002365] },
-          { name: "嘉兴", value: [120.760428, 30.773992] },
-          { name: "湖州", value: [120.137243, 30.877925] },
-          { name: "中卫", value: [105.196754, 37.521124] },
-          { name: "阿拉善盟左旗", value: [105.706422, 38.844814] },
-          { name: "洪湖", value: [113.461212, 29.827365] },
-          { name: "武汉", value: [114.3162, 30.581084] },
-          { name: "咸宁", value: [114.300061, 29.880657] },
-          { name: "泗洪", value: [118.22861, 33.40972] },
-          { name: "日照", value: [119.52685, 35.41691] },
-          { name: "香港", value: [114.1095, 22.3964] },
-        ];
+        let data = [];
+        let regionsList = [];
+
+        if (settingResponse.kv?.map_footprints) {
+          try {
+            const parsed = JSON.parse(settingResponse.kv.map_footprints);
+            if (Array.isArray(parsed)) data = parsed;
+          } catch (e) {
+            console.error("Failed to parse map_footprints", e);
+          }
+        }
+
+        if (settingResponse.kv?.map_regions) {
+          try {
+            const parsed = JSON.parse(settingResponse.kv.map_regions);
+            if (Array.isArray(parsed)) regionsList = parsed;
+          } catch (e) {
+            console.error("Failed to parse map_regions", e);
+          }
+        }
+
         const selectBg = "#fff";
-        const regions = [
-          { name: "北京市", itemStyle: { areaColor: selectBg } },
-          { name: "上海市", itemStyle: { areaColor: selectBg } },
-          { name: "湖北省", itemStyle: { areaColor: selectBg } },
-          { name: "广东省", itemStyle: { areaColor: selectBg } },
-          { name: "福建省", itemStyle: { areaColor: selectBg } },
-          { name: "浙江省", itemStyle: { areaColor: selectBg } },
-          { name: "江苏省", itemStyle: { areaColor: selectBg } },
-          { name: "宁夏回族自治区", itemStyle: { areaColor: selectBg } },
-          { name: "内蒙古自治区", itemStyle: { areaColor: selectBg } },
-          { name: "山东省", itemStyle: { areaColor: selectBg } },
-          { name: "江西省", itemStyle: { areaColor: selectBg } },
-          { name: "陕西省", itemStyle: { areaColor: selectBg } },
-          { name: "香港特别行政区", itemStyle: { areaColor: selectBg } },
-        ];
+        const regions = regionsList.map((name) => ({
+          name,
+          itemStyle: { areaColor: selectBg },
+        }));
 
         const option = {
           backgroundColor: "#fff", // tailwind gray-100
