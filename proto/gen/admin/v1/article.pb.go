@@ -462,6 +462,7 @@ type ArticleItem struct {
 	UpdatedAt     string                 `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	User          *types.UserSummary     `protobuf:"bytes,11,opt,name=user,proto3" json:"user,omitempty"`
 	Cate          *types.CateSummary     `protobuf:"bytes,12,opt,name=cate,proto3" json:"cate,omitempty"`
+	ViewNum       int32                  `protobuf:"varint,13,opt,name=view_num,json=viewNum,proto3" json:"view_num,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -580,6 +581,13 @@ func (x *ArticleItem) GetCate() *types.CateSummary {
 	return nil
 }
 
+func (x *ArticleItem) GetViewNum() int32 {
+	if x != nil {
+		return x.ViewNum
+	}
+	return 0
+}
+
 var File_admin_v1_article_proto protoreflect.FileDescriptor
 
 const file_admin_v1_article_proto_rawDesc = "" +
@@ -616,7 +624,7 @@ const file_admin_v1_article_proto_rawDesc = "" +
 	"\x06status\x18\x03 \x01(\x05R\x06status\"b\n" +
 	"\x13ArticleListResponse\x125\n" +
 	"\x04list\x18\x01 \x03(\v2!.fifsky.blog.admin.v1.ArticleItemR\x04list\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total\"\xe3\x02\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"\xfe\x02\n" +
 	"\vArticleItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x17\n" +
 	"\acate_id\x18\x02 \x01(\x05R\x06cateId\x12\x12\n" +
@@ -632,7 +640,8 @@ const file_admin_v1_article_proto_rawDesc = "" +
 	"updated_at\x18\n" +
 	" \x01(\tR\tupdatedAt\x122\n" +
 	"\x04user\x18\v \x01(\v2\x1e.fifsky.blog.types.UserSummaryR\x04user\x122\n" +
-	"\x04cate\x18\f \x01(\v2\x1e.fifsky.blog.types.CateSummaryR\x04cate2\xff\x05\n" +
+	"\x04cate\x18\f \x01(\v2\x1e.fifsky.blog.types.CateSummaryR\x04cate\x12\x19\n" +
+	"\bview_num\x18\r \x01(\x05R\aviewNum2\xff\x05\n" +
 	"\x0eArticleService\x12z\n" +
 	"\x06Create\x12*.fifsky.blog.admin.v1.ArticleCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/blog/admin/article/create\x12z\n" +
 	"\x06Update\x12*.fifsky.blog.admin.v1.ArticleUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/blog/admin/article/update\x12s\n" +

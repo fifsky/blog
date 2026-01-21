@@ -11,6 +11,7 @@ type Post struct {
 	Url       string
 	Content   string
 	Status    int
+	ViewNum   int
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

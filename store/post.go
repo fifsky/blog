@@ -21,13 +21,18 @@ func (s *Store) GetPost(ctx context.Context, id int, url string) (*model.Post, e
 		arg = url
 	}
 
-	query := "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where " + where + " limit 1"
-	err := s.db.QueryRowContext(ctx, query, arg).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
+	query := "select id,cate_id,type,user_id,title,url,content,status,view_num,created_at,updated_at from posts where " + where + " limit 1"
+	err := s.db.QueryRowContext(ctx, query, arg).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.ViewNum, &p.CreatedAt, &p.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
 
 	return &p, nil
+}
+
+func (s *Store) IncrementPostViewNum(ctx context.Context, id int) error {
+	_, err := s.db.ExecContext(ctx, "update posts set view_num = view_num + 1 where id = ?", id)
+	return err
 }
 
 func (s *Store) GetPostDaysInMonth(ctx context.Context, year, month int) ([]int32, error) {
@@ -249,7 +254,7 @@ func (s *Store) ListPostForAdmin(ctx context.Context, p *model.Post, start int, 
 	}
 	args = append(args, num, offset)
 
-	query := "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where " + where + " order by id desc limit ? offset ?"
+	query := "select id,cate_id,type,user_id,title,url,content,status,view_num,created_at,updated_at from posts where " + where + " order by id desc limit ? offset ?"
 	rows, err := s.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
@@ -258,7 +263,7 @@ func (s *Store) ListPostForAdmin(ctx context.Context, p *model.Post, start int, 
 
 	for rows.Next() {
 		var bp model.Post
-		if err := rows.Scan(&bp.Id, &bp.CateId, &bp.Type, &bp.UserId, &bp.Title, &bp.Url, &bp.Content, &bp.Status, &bp.CreatedAt, &bp.UpdatedAt); err != nil {
+		if err := rows.Scan(&bp.Id, &bp.CateId, &bp.Type, &bp.UserId, &bp.Title, &bp.Url, &bp.Content, &bp.Status, &bp.ViewNum, &bp.CreatedAt, &bp.UpdatedAt); err != nil {
 			return nil, err
 		}
 		posts = append(posts, bp)

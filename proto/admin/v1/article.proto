@@ -131,4 +131,5 @@ message ArticleItem {
   string updated_at = 10;
   fifsky.blog.types.UserSummary user = 11;
   fifsky.blog.types.CateSummary cate = 12;
+  int32 view_num = 13;
 }

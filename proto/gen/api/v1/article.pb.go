@@ -324,6 +324,7 @@ type ArticleItem struct {
 	UpdatedAt     string                 `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	User          *types.UserSummary     `protobuf:"bytes,11,opt,name=user,proto3" json:"user,omitempty"`
 	Cate          *types.CateSummary     `protobuf:"bytes,12,opt,name=cate,proto3" json:"cate,omitempty"`
+	ViewNum       int32                  `protobuf:"varint,13,opt,name=view_num,json=viewNum,proto3" json:"view_num,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -440,6 +441,13 @@ func (x *ArticleItem) GetCate() *types.CateSummary {
 		return x.Cate
 	}
 	return nil
+}
+
+func (x *ArticleItem) GetViewNum() int32 {
+	if x != nil {
+		return x.ViewNum
+	}
+	return 0
 }
 
 type ArticleListResponse struct {
@@ -716,7 +724,7 @@ const file_api_v1_article_proto_rawDesc = "" +
 	"\akeyword\x18\x04 \x01(\tR\akeyword\x12\x12\n" +
 	"\x04page\x18\x05 \x01(\x05R\x04page\x12\x12\n" +
 	"\x04type\x18\x06 \x01(\x05R\x04type\x12\x10\n" +
-	"\x03day\x18\a \x01(\tR\x03day\"\xe3\x02\n" +
+	"\x03day\x18\a \x01(\tR\x03day\"\xfe\x02\n" +
 	"\vArticleItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x17\n" +
 	"\acate_id\x18\x02 \x01(\x05R\x06cateId\x12\x12\n" +
@@ -732,7 +740,8 @@ const file_api_v1_article_proto_rawDesc = "" +
 	"updated_at\x18\n" +
 	" \x01(\tR\tupdatedAt\x122\n" +
 	"\x04user\x18\v \x01(\v2\x1e.fifsky.blog.types.UserSummaryR\x04user\x122\n" +
-	"\x04cate\x18\f \x01(\v2\x1e.fifsky.blog.types.CateSummaryR\x04cate\"`\n" +
+	"\x04cate\x18\f \x01(\v2\x1e.fifsky.blog.types.CateSummaryR\x04cate\x12\x19\n" +
+	"\bview_num\x18\r \x01(\x05R\aviewNum\"`\n" +
 	"\x13ArticleListResponse\x123\n" +
 	"\x04list\x18\x01 \x03(\v2\x1f.fifsky.blog.api.v1.ArticleItemR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\"-\n" +

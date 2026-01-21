@@ -158,6 +158,9 @@ func (a *Article) Detail(ctx context.Context, req *apiv1.ArticleDetailRequest) (
 		return nil, errors.ErrArticleNotFound
 	}
 
+	// Increment view count
+	_ = a.store.IncrementPostViewNum(ctx, post.Id)
+
 	item := &apiv1.ArticleItem{
 		Id:        int32(post.Id),
 		CateId:    int32(post.CateId),
@@ -167,6 +170,7 @@ func (a *Article) Detail(ctx context.Context, req *apiv1.ArticleDetailRequest) (
 		Url:       post.Url,
 		Content:   post.Content,
 		Status:    int32(post.Status),
+		ViewNum:   int32(post.ViewNum + 1), // Return incremented value
 		CreatedAt: post.CreatedAt.Format(time.DateTime),
 		UpdatedAt: post.UpdatedAt.Format(time.DateTime),
 	}

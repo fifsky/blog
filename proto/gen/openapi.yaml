@@ -878,6 +878,9 @@ components:
                     $ref: '#/components/schemas/UserSummary'
                 cate:
                     $ref: '#/components/schemas/CateSummary'
+                view_num:
+                    type: integer
+                    format: int32
         ArticleListRequest:
             type: object
             properties:

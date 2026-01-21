@@ -102,6 +102,7 @@ export type ArticleItem = {
   url?: string;
   content: string;
   status: number;
+  view_num: number;
   created_at: string;
   updated_at: string;
   user: UserSummary;

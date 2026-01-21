@@ -141,13 +141,9 @@ export default function AdminArticle() {
       ),
     },
     {
-      title: (
-        <div style={{ width: 20 }}>
-          <i className="iconfont icon-comment text-[12px]"></i>
-        </div>
-      ),
-      key: "id",
-      render: () => <Badge variant="secondary">0</Badge>,
+      title: <div style={{ width: 30 }}>浏览</div>,
+      key: "view_num",
+      render: (value) => <Badge variant="secondary">{value}</Badge>,
     },
     {
       title: "标题",

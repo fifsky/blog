@@ -149,6 +149,7 @@ func (a *Article) Detail(ctx context.Context, req *adminv1.ArticleDetailRequest)
 		Url:       post.Url,
 		Content:   post.Content,
 		Status:    int32(post.Status),
+		ViewNum:   int32(post.ViewNum),
 		CreatedAt: post.CreatedAt.Format(time.DateTime),
 		UpdatedAt: post.UpdatedAt.Format(time.DateTime),
 	}
@@ -201,6 +202,7 @@ func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*a
 			Url:       p.Url,
 			Content:   p.Content,
 			Status:    int32(p.Status),
+			ViewNum:   int32(p.ViewNum),
 			CreatedAt: p.CreatedAt.Format(time.DateTime),
 			UpdatedAt: p.UpdatedAt.Format(time.DateTime),
 		}
