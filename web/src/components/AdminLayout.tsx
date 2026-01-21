@@ -5,6 +5,33 @@ import { CFooter } from "./CFooter";
 import { AIChat } from "./ai/AIChat";
 import { useStore } from "@/store/context";
 import { getAccessToken } from "@/utils/common";
+import { cn } from "@/lib/utils";
+
+function AdminNavItem({
+  to,
+  children,
+  isActive,
+}: {
+  to: string;
+  children: React.ReactNode;
+  isActive?: boolean;
+}) {
+  return (
+    <li className="ml-1.5">
+      <Link
+        to={to}
+        className={cn(
+          "no-underline inline-flex text-gray-800 border border-[#89d5ef]",
+          isActive
+            ? "mt-0 px-4 py-1.5 pb-1 border-b-[#fff] bg-white"
+            : "mt-1.5 px-3.5 py-0.5 bg-[#89d5ef] hover:bg-white hover:text-[#ff7031]",
+        )}
+      >
+        {children}
+      </Link>
+    </li>
+  );
+}
 
 export function AdminLayout() {
   const userInfo = useStore((s) => s.userInfo);
@@ -14,12 +41,6 @@ export function AdminLayout() {
   const navigate = useNavigate();
 
   const isPage = (...paths: string[]) => paths.some((p) => location.pathname === p);
-
-  // 导航链接样式变量
-  const activeNavClass =
-    "mt-0 px-4 py-1.5 pb-1 border border-[#89d5ef] border-b-[#fff] bg-white no-underline inline-flex text-gray-800";
-  const navClass =
-    "mt-1.5 px-3.5 py-0.5 bg-[#89d5ef] border border-[#89d5ef] text-gray-800 no-underline inline-flex hover:bg-white hover:text-[#ff7031]";
 
   useEffect(() => {
     if (getAccessToken()) {
@@ -44,74 +65,43 @@ export function AdminLayout() {
         <div>
           <div className="tabs relative top-px">
             <ul className="flex justify-start list-none">
-              <li className="ml-1.5">
-                <Link
-                  to="/admin/index"
-                  className={isPage("/admin/index") ? activeNavClass : navClass}
-                >
-                  设置
-                </Link>
-              </li>
-              <li className="ml-1.5">
-                <Link
-                  to="/admin/articles"
-                  className={
-                    isPage("/admin/articles", "/admin/post/article") ? activeNavClass : navClass
-                  }
-                >
-                  文章
-                </Link>
-              </li>
+              <AdminNavItem to="/admin/index" isActive={isPage("/admin/index")}>
+                设置
+              </AdminNavItem>
+              <AdminNavItem
+                to="/admin/articles"
+                isActive={isPage("/admin/articles", "/admin/post/article")}
+              >
+                文章
+              </AdminNavItem>
               <li className="ml-1.5">
                 <a
                   href="https://github.com/fifsky/blog/discussions/categories/comment"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={navClass}
+                  className={cn(
+                    "no-underline inline-flex text-gray-800 border border-[#89d5ef]",
+                    "mt-1.5 px-3.5 py-0.5 bg-[#89d5ef] hover:bg-white hover:text-[#ff7031]",
+                  )}
                 >
                   评论
                 </a>
               </li>
-              <li className="ml-1.5">
-                <Link
-                  to="/admin/moods"
-                  className={isPage("/admin/moods") ? activeNavClass : navClass}
-                >
-                  心情
-                </Link>
-              </li>
-              <li className="ml-1.5">
-                <Link
-                  to="/admin/cates"
-                  className={isPage("/admin/cates") ? activeNavClass : navClass}
-                >
-                  分类
-                </Link>
-              </li>
-              <li className="ml-1.5">
-                <Link
-                  to="/admin/links"
-                  className={isPage("/admin/links") ? activeNavClass : navClass}
-                >
-                  链接
-                </Link>
-              </li>
-              <li className="ml-1.5">
-                <Link
-                  to="/admin/remind"
-                  className={isPage("/admin/remind") ? activeNavClass : navClass}
-                >
-                  提醒
-                </Link>
-              </li>
-              <li className="ml-1.5">
-                <Link
-                  to="/admin/users"
-                  className={isPage("/admin/users") ? activeNavClass : navClass}
-                >
-                  用户
-                </Link>
-              </li>
+              <AdminNavItem to="/admin/moods" isActive={isPage("/admin/moods")}>
+                心情
+              </AdminNavItem>
+              <AdminNavItem to="/admin/cates" isActive={isPage("/admin/cates")}>
+                分类
+              </AdminNavItem>
+              <AdminNavItem to="/admin/links" isActive={isPage("/admin/links")}>
+                链接
+              </AdminNavItem>
+              <AdminNavItem to="/admin/remind" isActive={isPage("/admin/remind")}>
+                提醒
+              </AdminNavItem>
+              <AdminNavItem to="/admin/users" isActive={isPage("/admin/users")}>
+                用户
+              </AdminNavItem>
             </ul>
           </div>
           <div className="p-5 border border-[#89d5ef] bg-white">

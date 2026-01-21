@@ -48,6 +48,7 @@
 /* Overrides for github-markdown-css */
 .markdown-body {
   font-size: 14px;
+  @apply font-sans;
 }
 
 .markdown-body ol,

@@ -8,6 +8,7 @@ import { SkeletonArticle, SkeletonArticleList } from "@/components/Skeleton";
 
 const ArticleList = lazy(() => import("@/pages/ArticleList"));
 const ArticleDetail = lazy(() => import("@/pages/ArticleDetail"));
+const TravelMap = lazy(() => import("@/pages/TravelMap"));
 const Archive = lazy(() => import("@/pages/Archive"));
 const About = lazy(() => import("@/pages/About"));
 const Login = lazy(() => import("@/pages/Login"));
@@ -60,6 +61,14 @@ const routesConfig: RouteObject[] = [
             element: (
               <Suspense fallback={<SkeletonArticleList />}>
                 <Archive />
+              </Suspense>
+            ),
+          },
+          {
+            path: "travel",
+            element: (
+              <Suspense fallback={<SkeletonArticleList />}>
+                <TravelMap />
               </Suspense>
             ),
           },
