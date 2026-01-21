@@ -97,6 +97,6 @@
   z-index: 101;
 }
 
-.bytemd {
-  height: calc(100vh - 350px);
+.bytemd-editor-wrapper .bytemd {
+  height: 500px;
 }
