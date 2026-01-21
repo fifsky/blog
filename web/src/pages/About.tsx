@@ -4,6 +4,7 @@ import { Comment } from "@/components/Comment";
 import { articleDetailApi, settingApi } from "@/service";
 import { ArticleItem, Options } from "@/types/openapi";
 import { useAsyncEffect } from "@/hooks";
+import { SkeletonArticle } from "@/components/Skeleton";
 
 export default function About() {
   const [article, setArticle] = useState<ArticleItem>();
@@ -13,7 +14,9 @@ export default function About() {
     setArticle(a);
     setSettings(s);
   }, []);
-  if (!article?.id) return null;
+  if (!article?.id) {
+    return <SkeletonArticle />;
+  }
   const siteName = settings?.kv?.site_name || "無處告別";
   const pageTitle = `关于我 - ${siteName}`;
   return (

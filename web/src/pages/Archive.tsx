@@ -3,8 +3,10 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { Archive as ArchiveIcon } from "lucide-react";
 import { Pagination } from "@/components/Pagination";
 import { Empty } from "@/components/Empty";
+import { PageTransition } from "@/components/PageTransition";
 import { articleListApi, settingApi } from "@/service";
 import { ArticleItem, Options } from "@/types/openapi";
+import { SkeletonArchive } from "@/components/Skeleton";
 
 type GroupedArticles = {
   yearMonth: string;
@@ -16,11 +18,13 @@ export default function Archive() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [settings, setSettings] = useState<Options>();
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
   const pageSize = 50;
 
   const loadList = async () => {
+    setLoading(true);
     const q = new URLSearchParams(location.search);
     const currentPage = q.get("page") ? parseInt(q.get("page")!) : 1;
     setPage(currentPage);
@@ -31,6 +35,7 @@ export default function Archive() {
     setList(ret.list || []);
     setSettings(s);
     setTotal(ret.total || 0);
+    setLoading(false);
   };
 
   const changePage = (p: number) => {
@@ -62,7 +67,10 @@ export default function Archive() {
     }));
   };
 
-  if (!list) return null;
+  // Show skeleton during initial load
+  if (!list) {
+    return <SkeletonArchive />;
+  }
   const siteName = settings?.kv?.site_name || "無處告別";
 
   return (
@@ -76,7 +84,7 @@ export default function Archive() {
       {list.length === 0 ? (
         <Empty icon={<ArchiveIcon />} title="暂无文章" content="当前没有可显示的文章内容" />
       ) : (
-        <>
+        <PageTransition loading={loading}>
           <div className="archive-timeline">
             {groupedArticles().map((group) => (
               <div key={group.yearMonth} className="mb-6">
@@ -99,7 +107,7 @@ export default function Archive() {
             ))}
           </div>
           <Pagination page={page} total={total} pageSize={pageSize} onChange={changePage} />
-        </>
+        </PageTransition>
       )}
     </div>
   );
