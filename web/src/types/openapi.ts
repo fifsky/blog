@@ -115,6 +115,8 @@ export type ArticleListRequest = {
   keyword?: string;
   page?: number;
   type?: number;
+  day?: string;
+  page_size?: number;
 };
 export type ArticleListResponse = { list: ArticleItem[]; total: number };
 export type ArticleCreateRequest = {

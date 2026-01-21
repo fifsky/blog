@@ -40,12 +40,12 @@ export function CHeader() {
             </a>
           </li>
           <li className="bg-white">
-            <a
-              href="https://gist.github.com/fifsky"
+            <Link
+              to="/archive"
               className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
             >
-              技术
-            </a>
+              归档
+            </Link>
           </li>
           <li className="bg-white">
             <Link

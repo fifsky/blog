@@ -63,11 +63,16 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 	if err != nil {
 		return nil, err
 	}
-	n, err := strconv.ParseInt(options["post_num"], 10, 0)
-	if err != nil {
-		n = 10
+	var num int
+	if req.PageSize > 0 {
+		num = int(req.PageSize)
+	} else {
+		n, err := strconv.ParseInt(options["post_num"], 10, 0)
+		if err != nil {
+			n = 10
+		}
+		num = max(int(n), 1)
 	}
-	num := max(int(n), 1)
 
 	cateId := 0
 	if req.Domain != "" {

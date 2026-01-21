@@ -227,6 +227,7 @@ type ArticleListRequest struct {
 	Page          int32                  `protobuf:"varint,5,opt,name=page,proto3" json:"page,omitempty"`
 	Type          int32                  `protobuf:"varint,6,opt,name=type,proto3" json:"type,omitempty"`
 	Day           string                 `protobuf:"bytes,7,opt,name=day,proto3" json:"day,omitempty"`
+	PageSize      int32                  `protobuf:"varint,8,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -308,6 +309,13 @@ func (x *ArticleListRequest) GetDay() string {
 		return x.Day
 	}
 	return ""
+}
+
+func (x *ArticleListRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
 }
 
 type ArticleItem struct {
@@ -716,7 +724,7 @@ const file_api_v1_article_proto_rawDesc = "" +
 	"\x04year\x18\x01 \x01(\x05R\x04year\x12\x14\n" +
 	"\x05month\x18\x02 \x01(\x05R\x05month\"-\n" +
 	"\x17ArticleCalendarResponse\x12\x12\n" +
-	"\x04days\x18\x01 \x03(\x05R\x04days\"\xaa\x01\n" +
+	"\x04days\x18\x01 \x03(\x05R\x04days\"\xc7\x01\n" +
 	"\x12ArticleListRequest\x12\x12\n" +
 	"\x04year\x18\x01 \x01(\tR\x04year\x12\x14\n" +
 	"\x05month\x18\x02 \x01(\tR\x05month\x12\x16\n" +
@@ -724,7 +732,8 @@ const file_api_v1_article_proto_rawDesc = "" +
 	"\akeyword\x18\x04 \x01(\tR\akeyword\x12\x12\n" +
 	"\x04page\x18\x05 \x01(\x05R\x04page\x12\x12\n" +
 	"\x04type\x18\x06 \x01(\x05R\x04type\x12\x10\n" +
-	"\x03day\x18\a \x01(\tR\x03day\"\xfe\x02\n" +
+	"\x03day\x18\a \x01(\tR\x03day\x12\x1b\n" +
+	"\tpage_size\x18\b \x01(\x05R\bpageSize\"\xfe\x02\n" +
 	"\vArticleItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x17\n" +
 	"\acate_id\x18\x02 \x01(\x05R\x06cateId\x12\x12\n" +
