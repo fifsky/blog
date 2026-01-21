@@ -9,6 +9,7 @@ package apiv1
 import (
 	types "app/proto/gen/types"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
+	httpbody "google.golang.org/genproto/googleapis/api/httpbody"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -27,20 +28,24 @@ var File_api_v1_setting_proto protoreflect.FileDescriptor
 
 const file_api_v1_setting_proto_rawDesc = "" +
 	"\n" +
-	"\x14api/v1/setting.proto\x12\x12fifsky.blog.api.v1\x1a\x12types/common.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto2e\n" +
+	"\x14api/v1/setting.proto\x12\x12fifsky.blog.api.v1\x1a\x12types/common.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x19google/api/httpbody.proto2\xbb\x01\n" +
 	"\x0eSettingService\x12S\n" +
-	"\x03Get\x12\x16.google.protobuf.Empty\x1a\x1a.fifsky.blog.types.Options\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/blog/settingB\xad\x01\n" +
+	"\x03Get\x12\x16.google.protobuf.Empty\x1a\x1a.fifsky.blog.types.Options\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/blog/setting\x12T\n" +
+	"\vGetChinaMap\x12\x16.google.protobuf.Empty\x1a\x14.google.api.HttpBody\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/blog/china_mapB\xad\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\fSettingProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
 
 var file_api_v1_setting_proto_goTypes = []any{
-	(*emptypb.Empty)(nil), // 0: google.protobuf.Empty
-	(*types.Options)(nil), // 1: fifsky.blog.types.Options
+	(*emptypb.Empty)(nil),     // 0: google.protobuf.Empty
+	(*types.Options)(nil),     // 1: fifsky.blog.types.Options
+	(*httpbody.HttpBody)(nil), // 2: google.api.HttpBody
 }
 var file_api_v1_setting_proto_depIdxs = []int32{
 	0, // 0: fifsky.blog.api.v1.SettingService.Get:input_type -> google.protobuf.Empty
-	1, // 1: fifsky.blog.api.v1.SettingService.Get:output_type -> fifsky.blog.types.Options
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	0, // 1: fifsky.blog.api.v1.SettingService.GetChinaMap:input_type -> google.protobuf.Empty
+	1, // 2: fifsky.blog.api.v1.SettingService.Get:output_type -> fifsky.blog.types.Options
+	2, // 3: fifsky.blog.api.v1.SettingService.GetChinaMap:output_type -> google.api.HttpBody
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

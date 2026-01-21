@@ -1,4 +1,5 @@
-import { createApi } from "@/utils/request";
+import { createApi, request } from "@/utils/request";
+import { getApiUrl } from "@/utils/common";
 import type { AppError } from "@/utils/error";
 import type {
   LoginRequest,
@@ -71,6 +72,8 @@ export const commentPostApi = (data: any, errorHandler?: (e: AppError) => void) 
   createApi("/blog/comment/post", data, errorHandler);
 export const settingApi = (errorHandler?: (e: AppError) => void) =>
   createApi<Options>("/blog/setting", undefined, errorHandler);
+export const settingChinaMapApi = (errorHandler?: (e: AppError) => void) =>
+  request<any>({ url: getApiUrl("/blog/china_map") }, errorHandler);
 export const cateAllApi = (errorHandler?: (e: AppError) => void) =>
   createApi<CateMenuResponse>("/blog/cate/all", undefined, errorHandler);
 export const archiveApi = (errorHandler?: (e: AppError) => void) =>

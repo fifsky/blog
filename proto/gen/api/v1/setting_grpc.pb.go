@@ -9,6 +9,7 @@ package apiv1
 import (
 	types "app/proto/gen/types"
 	context "context"
+	httpbody "google.golang.org/genproto/googleapis/api/httpbody"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -21,7 +22,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	SettingService_Get_FullMethodName = "/fifsky.blog.api.v1.SettingService/Get"
+	SettingService_Get_FullMethodName         = "/fifsky.blog.api.v1.SettingService/Get"
+	SettingService_GetChinaMap_FullMethodName = "/fifsky.blog.api.v1.SettingService/GetChinaMap"
 )
 
 // SettingServiceClient is the client API for SettingService service.
@@ -32,6 +34,8 @@ const (
 type SettingServiceClient interface {
 	// Get 获取设置
 	Get(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*types.Options, error)
+	// GetChinaMap 获取中国地图数据
+	GetChinaMap(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*httpbody.HttpBody, error)
 }
 
 type settingServiceClient struct {
@@ -52,6 +56,16 @@ func (c *settingServiceClient) Get(ctx context.Context, in *emptypb.Empty, opts 
 	return out, nil
 }
 
+func (c *settingServiceClient) GetChinaMap(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*httpbody.HttpBody, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(httpbody.HttpBody)
+	err := c.cc.Invoke(ctx, SettingService_GetChinaMap_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SettingServiceServer is the server API for SettingService service.
 // All implementations must embed UnimplementedSettingServiceServer
 // for forward compatibility.
@@ -60,6 +74,8 @@ func (c *settingServiceClient) Get(ctx context.Context, in *emptypb.Empty, opts 
 type SettingServiceServer interface {
 	// Get 获取设置
 	Get(context.Context, *emptypb.Empty) (*types.Options, error)
+	// GetChinaMap 获取中国地图数据
+	GetChinaMap(context.Context, *emptypb.Empty) (*httpbody.HttpBody, error)
 	mustEmbedUnimplementedSettingServiceServer()
 }
 
@@ -72,6 +88,9 @@ type UnimplementedSettingServiceServer struct{}
 
 func (UnimplementedSettingServiceServer) Get(context.Context, *emptypb.Empty) (*types.Options, error) {
 	return nil, status.Error(codes.Unimplemented, "method Get not implemented")
+}
+func (UnimplementedSettingServiceServer) GetChinaMap(context.Context, *emptypb.Empty) (*httpbody.HttpBody, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetChinaMap not implemented")
 }
 func (UnimplementedSettingServiceServer) mustEmbedUnimplementedSettingServiceServer() {}
 func (UnimplementedSettingServiceServer) testEmbeddedByValue()                        {}
@@ -112,6 +131,24 @@ func _SettingService_Get_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SettingService_GetChinaMap_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SettingServiceServer).GetChinaMap(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SettingService_GetChinaMap_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SettingServiceServer).GetChinaMap(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SettingService_ServiceDesc is the grpc.ServiceDesc for SettingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -122,6 +159,10 @@ var SettingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Get",
 			Handler:    _SettingService_Get_Handler,
+		},
+		{
+			MethodName: "GetChinaMap",
+			Handler:    _SettingService_GetChinaMap_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

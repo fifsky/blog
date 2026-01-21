@@ -8,6 +8,7 @@ import (
 	types "app/proto/gen/types"
 	context "context"
 	contract "github.com/goapt/grpc-http/contract"
+	httpbody "google.golang.org/genproto/googleapis/api/httpbody"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	http "net/http"
 )
@@ -20,6 +21,8 @@ import (
 type SettingServiceHTTPServer interface {
 	// Get 获取设置
 	Get(context.Context, *emptypb.Empty) (*types.Options, error)
+	// GetChinaMap 获取中国地图数据
+	GetChinaMap(context.Context, *emptypb.Empty) (*httpbody.HttpBody, error)
 }
 
 type SettingService struct {
@@ -30,6 +33,7 @@ type SettingService struct {
 
 func (s *SettingService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/setting", s.Get)
+	s.mux.HandleFunc("GET /blog/china_map", s.GetChinaMap)
 }
 
 func RegisterSettingServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv SettingServiceHTTPServer) {
@@ -50,5 +54,18 @@ func (s *SettingService) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.codec.Encode(w, r, out)
+	return
+}
+
+func (s *SettingService) GetChinaMap(w http.ResponseWriter, r *http.Request) {
+	var in emptypb.Empty
+
+	out, err := s.server.GetChinaMap(r.Context(), &in)
+	if err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+	w.Header().Set("Content-Type", out.ContentType)
+	_, _ = w.Write(out.Data)
 	return
 }

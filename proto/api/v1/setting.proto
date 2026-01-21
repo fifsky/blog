@@ -4,6 +4,7 @@ package fifsky.blog.api.v1;
 import "types/common.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "google/api/httpbody.proto";
 
 option go_package = "gen/api/v1";
 
@@ -14,6 +15,13 @@ service SettingService {
     option (google.api.http) = {
       post: "/blog/setting"
       body: "*"
+    };
+  }
+
+  // GetChinaMap 获取中国地图数据
+  rpc GetChinaMap(google.protobuf.Empty) returns (google.api.HttpBody) {
+    option (google.api.http) = {
+      get: "/blog/china_map"
     };
   }
 }

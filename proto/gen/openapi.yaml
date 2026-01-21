@@ -624,6 +624,17 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CateMenuResponse'
+    /blog/china_map:
+        get:
+            tags:
+                - SettingService
+            description: GetChinaMap 获取中国地图数据
+            operationId: SettingService_GetChinaMap
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        '*/*': {}
     /blog/feed.xml:
         get:
             tags:

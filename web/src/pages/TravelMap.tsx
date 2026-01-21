@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { settingApi } from "@/service";
+import { settingApi, settingChinaMapApi } from "@/service";
 
 export default function TravelMap() {
   const chartRef = useRef<HTMLDivElement>(null);
@@ -21,11 +21,10 @@ export default function TravelMap() {
 
       try {
         // Fetch China Map Data and Settings
-        const [mapResponse, settingResponse] = await Promise.all([
-          fetch("https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json"),
+        const [chinaJson, settingResponse] = await Promise.all([
+          settingChinaMapApi(),
           settingApi(),
         ]);
-        const chinaJson = await mapResponse.json();
 
         // Register Map
         (window as any).echarts.registerMap("china", chinaJson);

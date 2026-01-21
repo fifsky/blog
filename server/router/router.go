@@ -61,7 +61,7 @@ func (r *Router) Handler() http.Handler {
 		WithResponseHeader: true,
 		// WithResponseBody: true,
 		Filters: []sloghttp.Filter{
-			sloghttp.IgnorePath("/blog/admin/upload"),
+			sloghttp.IgnorePath("/blog/admin/upload", "/blog/china_map", "/blog/admin/ai/chat"),
 		},
 	}
 
