@@ -80,17 +80,13 @@
 }
 
 .markdown-body ol,
-ul {
-  padding: 0 20px;
+.markdown-body ul {
+  list-style: inside;
 }
-.markdown-body table {
-  border-top: 1px solid #161515;
-  border-left: 1px solid #ccc;
+.markdown-body ol {
+  list-style: decimal;
 }
-.markdown-body table {
-  border-top: 1px solid #ccc;
-  border-left: 1px solid #ccc;
-}
+
 .markdown-body table th {
   border-bottom: 2px solid #ccc;
   text-align: center;

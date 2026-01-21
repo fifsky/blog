@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Viewer } from "@bytemd/react";
 import gfm from "@bytemd/plugin-gfm";
+import breaks from "@bytemd/plugin-breaks";
 import { highlightPlugin } from "@/lib/highlight-plugin";
 import { getApiUrl } from "@/utils/common";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -28,7 +29,7 @@ import type { ToolCall, DisplayMessage } from "./types";
 import { AgentChatIndicator } from "@/components/agents-ui/agent-chat-indicator";
 
 // ByteMD plugins for rendering
-const plugins = [gfm(), highlightPlugin()];
+const plugins = [gfm(), breaks(), highlightPlugin()];
 
 export function AIChat() {
   const [isOpen, setIsOpen] = useState(false);

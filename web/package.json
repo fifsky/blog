@@ -10,6 +10,7 @@
     "format": "oxfmt --write"
   },
   "dependencies": {
+    "@bytemd/plugin-breaks": "^1.22.0",
     "@bytemd/plugin-gfm": "^1.22.0",
     "@bytemd/plugin-medium-zoom": "^1.22.0",
     "@bytemd/react": "^1.22.0",

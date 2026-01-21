@@ -7,8 +7,10 @@ import { useLocation, useNavigate, Link } from "react-router";
 import { getApiUrl, getAccessToken } from "@/utils/common";
 import { Editor } from "@bytemd/react";
 import gfm from "@bytemd/plugin-gfm";
+import breaks from "@bytemd/plugin-breaks";
 import mediumZoom from "@bytemd/plugin-medium-zoom";
 import { highlightPlugin } from "@/lib/highlight-plugin";
+import "bytemd/dist/index.css";
 import { CateListItem } from "@/types/openapi";
 
 import {
@@ -46,7 +48,7 @@ const articleSchema = z.object({
 type ArticleFormValues = z.infer<typeof articleSchema>;
 
 // ByteMD 插件配置
-const plugins = [gfm(), highlightPlugin(), mediumZoom()];
+const plugins = [gfm(), breaks(), highlightPlugin(), mediumZoom()];
 
 // 图片上传函数
 const uploadImages = async (

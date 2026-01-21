@@ -3,11 +3,12 @@ import { useMemo } from "react";
 import { Link, useLocation } from "react-router";
 import { Viewer } from "@bytemd/react";
 import gfm from "@bytemd/plugin-gfm";
+import breaks from "@bytemd/plugin-breaks";
 import { highlightPlugin } from "@/lib/highlight-plugin";
 import mediumZoom from "@bytemd/plugin-medium-zoom";
 
 // ByteMD 插件配置
-const plugins = [gfm(), highlightPlugin(), mediumZoom()];
+const plugins = [gfm(), breaks(), highlightPlugin(), mediumZoom()];
 
 export function CArticle({ article }: { article: ArticleItem }) {
   const location = useLocation();
