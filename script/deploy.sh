@@ -36,6 +36,12 @@ _rundeploy() {
     log::fatal "部署项目不存在: $1"
   fi
 
+  # 如果是 web 项目，先执行构建
+  if [[ "$1" == "deploy/web" ]]; then
+    log::info "检测到 web 项目，正在执行构建..."
+    make buildui
+  fi
+
   log::info "$(date "+%Y-%m-%d %H:%M:%S") 开始部署: $1"
   uname=$(uname -m)
   if [ "$uname" == "arm64" ]; then
