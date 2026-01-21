@@ -29,6 +29,7 @@ export function CArticle({ article }: { article: ArticleItem }) {
           <h2 className="text-[16px] font-medium">
             <Link
               to={`/article/${article.id}`}
+              onClick={() => window.scrollTo({ top: 0 })}
               dangerouslySetInnerHTML={{
                 __html: markHigh(article.title, keyword),
               }}

@@ -51,7 +51,7 @@ export function Layout() {
               </li>
             </ul>
           </div>
-          <div className="p-5 border border-[#89d5ef] bg-white">
+          <div className="p-5 border border-[#89d5ef] bg-white min-h-100">
             <Outlet />
           </div>
         </div>

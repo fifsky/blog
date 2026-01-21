@@ -1,8 +1,9 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
-export function SkeletonArticle() {
+export function SkeletonArticle({ className }: { className?: string }) {
   return (
-    <div>
+    <div className={cn(className)}>
       <div className="flex items-center space-x-4">
         <Skeleton className="h-12 w-12 rounded-full" />
         <div className="space-y-2">

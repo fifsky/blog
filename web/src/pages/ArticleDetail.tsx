@@ -33,7 +33,7 @@ export default function ArticleDetail() {
 
   // Show skeleton during initial load
   if (!article?.id) {
-    return <SkeletonArticle />;
+    return <SkeletonArticle className={"h-200"} />;
   }
 
   return (
