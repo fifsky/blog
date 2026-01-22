@@ -33,7 +33,7 @@ func TestNewAuthLogin(t *testing.T) {
 	conf.Common.TokenSecret = "abcdabcdabcdabcd"
 
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixture("users"))
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixture("users"))
 
 		tests := []struct {
 			Token        string

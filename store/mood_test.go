@@ -12,7 +12,7 @@ import (
 
 func TestMood_MoodGetList(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("moods", "users")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("moods", "users")...)
 		s := New(db)
 		ret, err := s.ListMood(context.Background(), 1, 1)
 		assert.NoError(t, err)

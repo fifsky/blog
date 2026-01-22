@@ -38,7 +38,7 @@ func TestMotto_GenerateDailyMotto(t *testing.T) {
 
 	// Prepare DB
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("moods", "users")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("moods", "users")...)
 		s := store.New(db)
 
 		// Prepare Config

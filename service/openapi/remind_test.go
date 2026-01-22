@@ -24,7 +24,7 @@ func TestRemind_Change(t *testing.T) {
 	conf.Common.TokenSecret = "abcdabcdabcdabcd"
 
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("reminds")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("reminds")...)
 		robot := wechat.NewRobot("123")
 		svc := NewRemind(store.New(db), wechat.NewRobot("123"), conf)
 		resp, err := svc.Change(context.Background(), &apiv1.RemindActionRequest{Token: getRemindTestToken(8, conf)})
@@ -40,7 +40,7 @@ func TestRemind_Delay(t *testing.T) {
 	conf.Common.TokenSecret = "abcdabcdabcdabcd"
 
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("reminds")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("reminds")...)
 		svc := NewRemind(store.New(db), wechat.NewRobot("123"), conf)
 		resp, err := svc.Delay(context.Background(), &apiv1.RemindActionRequest{Token: getRemindTestToken(8, conf)})
 		if err != nil || resp.Text == "" {

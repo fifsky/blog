@@ -12,7 +12,7 @@ import (
 
 func TestRemind_RemindGetList(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("reminds")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("reminds")...)
 		s := New(db)
 		ret, err := s.ListRemind(context.Background(), 1, 1)
 		assert.NoError(t, err)

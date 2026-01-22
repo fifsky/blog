@@ -14,7 +14,7 @@ import (
 
 func TestAdminMood_CreateDelete(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixture("moods"))
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixture("moods"))
 		svc := NewMood(store.New(db))
 		ctx := SetLoginUser(context.Background(), &model.User{Id: 1})
 		_, err := svc.Create(ctx, &adminv1.MoodCreateRequest{Content: "demo"})

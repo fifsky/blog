@@ -12,7 +12,7 @@ import (
 
 func TestUser_GetList(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixture("users"))
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixture("users"))
 		s := New(db)
 		users, err := s.ListUser(context.Background(), 1, 1)
 		assert.NoError(t, err)
@@ -23,7 +23,7 @@ func TestUser_GetList(t *testing.T) {
 
 func TestUser_GetUser(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixture("users"))
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixture("users"))
 		s := New(db)
 		ret, err := s.GetUser(context.Background(), 1)
 		assert.NoError(t, err)

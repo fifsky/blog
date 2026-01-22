@@ -15,7 +15,7 @@ import (
 
 func TestAdminLink_ListCreateDelete(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("links")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("links")...)
 		svc := NewLink(store.New(db))
 		resp, err := svc.List(context.Background(), &emptypb.Empty{})
 		if err != nil || len(resp.List) == 0 {

@@ -24,7 +24,7 @@ import (
 
 func TestAdminArticle_CreateDeleteUpload(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("options", "posts")...)
 		conf := &config.Config{}
 		conf.OSS.Endpoint = "oss-cn-shanghai-internal.aliyuncs.com"
 		conf.OSS.AccessKey = "test"

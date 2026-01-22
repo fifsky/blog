@@ -12,7 +12,7 @@ import (
 
 func TestSetting_GetOptions(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("options")...)
 		s := New(db)
 		ret, err := s.GetOptions(context.Background())
 		assert.NoError(t, err)

@@ -14,7 +14,7 @@ import (
 
 func TestUser_Login(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("users")...)
 		conf := &config.Config{}
 		conf.Common.TokenSecret = "abcdabcdabcdabcd"
 		svc := NewUser(store.New(db), conf)

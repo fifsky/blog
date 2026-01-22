@@ -7,7 +7,7 @@ require (
 	buf.build/go/protovalidate v1.1.0
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/go-sql-driver/mysql v1.9.3
-	github.com/goapt/dbunit v0.0.5
+	github.com/goapt/dbunit v0.1.0
 	github.com/goapt/grpc-http/contract v0.0.2
 	github.com/goapt/httpx v0.0.2
 	github.com/goapt/logger v1.5.0
@@ -41,6 +41,10 @@ require (
 	github.com/google/cel-go v0.26.1 // indirect
 	github.com/google/jsonschema-go v0.3.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
+	github.com/jackc/pgx/v5 v5.8.0 // indirect
+	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stoewer/go-strcase v1.3.1 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect

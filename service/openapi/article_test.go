@@ -14,7 +14,7 @@ import (
 
 func TestArticle_Archive(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("options", "posts")...)
 		svc := NewArticle(store.New(db), nil)
 		resp, err := svc.Archive(context.Background(), &emptypb.Empty{})
 		if err != nil || len(resp.List) == 0 {
@@ -25,7 +25,7 @@ func TestArticle_Archive(t *testing.T) {
 
 func TestArticle_Calendar(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("options", "posts")...)
 		svc := NewArticle(store.New(db), nil)
 		resp, err := svc.Calendar(context.Background(), &apiv1.ArticleCalendarRequest{Year: 2012, Month: 9})
 		if err != nil {
@@ -39,7 +39,7 @@ func TestArticle_Calendar(t *testing.T) {
 
 func TestArticle_List(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates")...)
 		svc := NewArticle(store.New(db), nil)
 		resp, err := svc.List(context.Background(), &apiv1.ArticleListRequest{Page: 1})
 		if err != nil || len(resp.List) == 0 {
@@ -50,7 +50,7 @@ func TestArticle_List(t *testing.T) {
 
 func TestArticle_List_Day(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates")...)
 		svc := NewArticle(store.New(db), nil)
 		resp, err := svc.List(context.Background(), &apiv1.ArticleListRequest{Year: "2012", Month: "09", Day: "10", Page: 1})
 		if err != nil || len(resp.List) != 1 {
@@ -61,7 +61,7 @@ func TestArticle_List_Day(t *testing.T) {
 
 func TestArticle_PrevNext(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("options", "posts")...)
 		svc := NewArticle(store.New(db), nil)
 		resp, err := svc.PrevNext(context.Background(), &apiv1.PrevNextRequest{Id: 7})
 		if err != nil || resp.Prev == nil || resp.Next == nil {
@@ -72,7 +72,7 @@ func TestArticle_PrevNext(t *testing.T) {
 
 func TestArticle_Detail(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates")...)
 		svc := NewArticle(store.New(db), nil)
 		item, err := svc.Detail(context.Background(), &apiv1.ArticleDetailRequest{Id: 7})
 		if err != nil || item == nil || item.Id == 0 {
@@ -83,7 +83,7 @@ func TestArticle_Detail(t *testing.T) {
 
 func TestArticle_Feed(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("options", "posts", "users")...)
 		svc := NewArticle(store.New(db), nil)
 		resp, err := svc.Feed(context.Background(), &emptypb.Empty{})
 		if err != nil || resp == nil || len(resp.Data) == 0 {

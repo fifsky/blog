@@ -13,7 +13,7 @@ import (
 
 func TestArticle_PostPrev(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("posts")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("posts")...)
 		s := New(db)
 		ret, err := s.PrevPost(context.Background(), 7)
 		assert.NoError(t, err)
@@ -24,7 +24,7 @@ func TestArticle_PostPrev(t *testing.T) {
 
 func TestArticle_PostNext(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("posts")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("posts")...)
 		s := New(db)
 		ret, err := s.NextPost(context.Background(), 4)
 		assert.NoError(t, err)
@@ -35,7 +35,7 @@ func TestArticle_PostNext(t *testing.T) {
 
 func TestArticle_PostArchive(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("posts")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("posts")...)
 		s := New(db)
 		ret, err := s.PostArchive(context.Background())
 		assert.NoError(t, err)
@@ -46,7 +46,7 @@ func TestArticle_PostArchive(t *testing.T) {
 
 func TestArticle_PostGetList(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("posts", "users", "cates")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("posts", "users", "cates")...)
 		s := New(db)
 
 		p := &model.Post{

@@ -13,7 +13,7 @@ import (
 
 func TestCate_GetAllCates(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("cates", "posts")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("cates", "posts")...)
 		s := New(db)
 		ret, err := s.GetAllCates(context.Background())
 		assert.NoError(t, err)

@@ -12,7 +12,7 @@ import (
 
 func TestLink_GetAllLinks(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("links")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("links")...)
 		s := New(db)
 		ret, err := s.GetAllLinks(context.Background())
 		assert.NoError(t, err)

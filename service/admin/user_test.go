@@ -19,7 +19,7 @@ import (
 
 func TestAdminUser_LoginUserGetListStatusCreate(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users")...)
+		db := d.NewDatabase(testutil.TestDSN, testutil.Schema(), testutil.Fixtures("users")...)
 		svc := NewUser(store.New(db), &config.Config{})
 
 		t.Run("获取当前登录用户", func(t *testing.T) {
