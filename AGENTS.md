@@ -9,7 +9,7 @@ Full-stack blog application with Go backend and React frontend.
 - **Go 1.25.5** - No framework, uses native `net/http`
 - **Protobuf** - API definitions with buf (googleapis)
 - **Validation** - buf protovalidate
-- **Database** - MySQL with native `database/sql` (no ORM)
+- **Database** - PostgreSQL with native `database/sql` (no ORM)
 - **Logging** - slog
 - **Testing** - standard Go testing + dbunit
 

@@ -5,7 +5,7 @@ import (
 )
 
 func (s *Store) GetOptions(ctx context.Context) (map[string]string, error) {
-	rows, err := s.db.QueryContext(ctx, "select id,option_key,option_value from options")
+	rows, err := s.db.QueryContext(ctx, "select id,option_key,option_value from blog.options")
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func (s *Store) GetOptions(ctx context.Context) (map[string]string, error) {
 
 func (s *Store) UpdateOptions(ctx context.Context, m map[string]string) (map[string]string, error) {
 	for k, v := range m {
-		_, err := s.db.ExecContext(ctx, "update options set option_value = ? where option_key = ?", v, k)
+		_, err := s.db.ExecContext(ctx, "update blog.options set option_value = $1 where option_key = $2", v, k)
 		if err != nil {
 			return nil, err
 		}

@@ -1,7 +1,7 @@
 package testutil
 
 import (
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-var TestDSN = "root:123456@tcp(127.0.0.1:3306)/"
+var TestDSN = "postgresql://postgres:123456@localhost:5432/?timezone=Asia%2FShanghai"

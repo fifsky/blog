@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/go-sql-driver/mysql"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 // Config is database connection configuration
@@ -18,7 +18,7 @@ type Config struct {
 }
 
 func (d *Config) connect() (*sql.DB, error) {
-	sess, err := sql.Open(d.Driver, d.Dsn)
+	sess, err := sql.Open("pgx", d.Dsn)
 
 	if err != nil {
 		return nil, err
@@ -38,14 +38,10 @@ func (d *Config) connect() (*sql.DB, error) {
 }
 
 func Connect(conf Config) (*sql.DB, func()) {
-	dsn, err := mysql.ParseDSN(conf.Dsn)
-	if err != nil {
-		log.Fatalf("[db] failed parse dsn: %s\n", err)
-	}
-	log.Printf("[db] connect: %s %s\n", dsn.DBName, dsn.Addr)
+	log.Printf("[db] connect: %s\n", conf.Dsn)
 	db, err := conf.connect()
 	if err != nil {
-		log.Fatalf("[db] failed to connect: %s %s\n", dsn.DBName, err)
+		log.Fatalf("[db] failed to connect: %s\n", err)
 	}
 	return db, func() {
 		if err := db.Close(); err != nil {

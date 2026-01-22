@@ -2,13 +2,14 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"app/store/model"
 )
 
 func (s *Store) GetAllLinks(ctx context.Context) ([]*model.Link, error) {
-	rows, err := s.db.QueryContext(ctx, "select id,name,url,`desc`,created_at from links")
+	rows, err := s.db.QueryContext(ctx, `select id,name,url,"desc",created_at from blog.links`)
 	if err != nil {
 		return nil, err
 	}
@@ -26,33 +27,35 @@ func (s *Store) GetAllLinks(ctx context.Context) ([]*model.Link, error) {
 }
 
 func (s *Store) CreateLink(ctx context.Context, link *model.Link) (int64, error) {
-	res, err := s.db.ExecContext(ctx, "insert into links (name,url,`desc`,created_at) values (?,?,?,?)",
-		link.Name, link.Url, link.Desc, link.CreatedAt)
+	var id int64
+	err := s.db.QueryRowContext(ctx, `insert into blog.links (name,url,"desc",created_at) values ($1,$2,$3,$4) RETURNING id`,
+		link.Name, link.Url, link.Desc, link.CreatedAt).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
-	return res.LastInsertId()
+	return id, nil
 }
 
 func (s *Store) UpdateLink(ctx context.Context, link *model.UpdateLink) error {
 	set := make([]string, 0)
 	args := make([]any, 0)
+
 	if v := link.Name; v != nil {
-		set, args = append(set, "`name` = ?"), append(args, *v)
+		set, args = append(set, "name = "+placeholder(len(args)+1)), append(args, *v)
 	}
 	if v := link.Url; v != nil {
-		set, args = append(set, "`url` = ?"), append(args, *v)
+		set, args = append(set, "url = "+placeholder(len(args)+1)), append(args, *v)
 	}
 	if v := link.Desc; v != nil {
-		set, args = append(set, "`desc` = ?"), append(args, *v)
+		set, args = append(set, `"desc" = `+placeholder(len(args)+1)), append(args, *v)
 	}
 	args = append(args, link.Id)
-	query := "update links set " + strings.Join(set, ", ") + " where id = ?"
+	query := fmt.Sprintf("update blog.links set %s where id = %s", strings.Join(set, ", "), placeholder(len(args)))
 	_, err := s.db.ExecContext(ctx, query, args...)
 	return err
 }
 
 func (s *Store) DeleteLink(ctx context.Context, id int) error {
-	_, err := s.db.ExecContext(ctx, "delete from links where id = ?", id)
+	_, err := s.db.ExecContext(ctx, "delete from blog.links where id = $1", id)
 	return err
 }
