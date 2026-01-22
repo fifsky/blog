@@ -15,7 +15,7 @@ func TestDataPath(path ...string) string {
 }
 
 func Schema() string {
-	return filepath.Join(TestDataPath(), "schema.sql")
+	return filepath.Join(TestDataPath(), "schema-postgre.sql")
 }
 
 func Fixture(file string) string {
