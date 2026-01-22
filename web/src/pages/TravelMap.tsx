@@ -7,13 +7,12 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/captions.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
-import { TravelPhoto, FootprintRegion } from "@/types/openapi";
+import { TravelPhoto } from "@/types/openapi";
 
 export default function TravelMap() {
   const chartRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [photos, setPhotos] = useState<TravelPhoto[]>([]);
-  const [citiesData, setCitiesData] = useState<FootprintRegion[]>([]);
 
   useEffect(() => {
     let chartInstance: any = null;
@@ -45,7 +44,6 @@ export default function TravelMap() {
 
         // Store cities data for later use
         const cities = footprintsResp.cities || [];
-        setCitiesData(cities);
 
         // Map regions (provinces) for highlighting
         const regionsList = (footprintsResp.provinces || []).map((p) => p.name);
