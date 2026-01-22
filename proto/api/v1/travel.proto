@@ -1,0 +1,62 @@
+syntax = "proto3";
+package fifsky.blog.api.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+
+option go_package = "gen/api/v1";
+
+// TravelService 提供旅行足迹相关的接口
+service TravelService {
+  // GetFootprints 获取足迹数据（省份和城市）
+  rpc GetFootprints(GetFootprintsRequest) returns (GetFootprintsResponse) {
+    option (google.api.http) = {
+      post: "/blog/travel/footprints"
+      body: "*"
+    };
+  }
+  // ListCityPhotos 根据城市获取照片列表
+  rpc ListCityPhotos(ListCityPhotosRequest) returns (ListCityPhotosResponse) {
+    option (google.api.http) = {
+      post: "/blog/travel/photos"
+      body: "*"
+    };
+  }
+}
+
+message FootprintRegion {
+  string region_id = 1;
+  string name = 2;
+  string longitude = 3;
+  string latitude = 4;
+}
+
+// GetFootprintsRequest 获取足迹请求
+message GetFootprintsRequest {}
+
+// GetFootprintsResponse 足迹响应
+message GetFootprintsResponse {
+  repeated FootprintRegion provinces = 1;
+  repeated FootprintRegion cities = 2;
+}
+
+message TravelPhoto {
+  string title = 1;
+  string description = 2;
+  string src = 3;
+  string thumbnail = 4;
+}
+
+// ListCityPhotosRequest 城市照片列表请求
+message ListCityPhotosRequest {
+  string region_id = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// ListCityPhotosResponse 城市照片列表响应
+message ListCityPhotosResponse {
+  repeated TravelPhoto photos = 1;
+}

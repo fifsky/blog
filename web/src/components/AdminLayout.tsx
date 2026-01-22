@@ -74,6 +74,9 @@ export function AdminLayout() {
               >
                 文章
               </AdminNavItem>
+              <AdminNavItem to="/admin/photos" isActive={isPage("/admin/photos")}>
+                相册
+              </AdminNavItem>
               <li className="ml-1.5">
                 <a
                   href="https://github.com/fifsky/blog/discussions/categories/comment"

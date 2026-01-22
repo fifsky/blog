@@ -1,0 +1,33 @@
+syntax = "proto3";
+package fifsky.blog.admin.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+
+option go_package = "gen/admin/v1";
+
+// OSSService 提供OSS相关的接口
+service OSSService {
+  // GetPresignURL 获取OSS预签名上传URL
+  rpc GetPresignURL(GetPresignURLRequest) returns (GetPresignURLResponse) {
+    option (google.api.http) = {
+      post: "/blog/admin/oss/presign"
+      body: "*"
+    };
+  }
+}
+
+// GetPresignURLRequest 获取预签名URL请求
+message GetPresignURLRequest {
+  string filename = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// GetPresignURLResponse 预签名URL响应
+message GetPresignURLResponse {
+  string url = 1; // 预签名上传URL
+  string cdn_url = 2; // CDN访问地址
+}

@@ -1,8 +1,19 @@
-import { useEffect, useRef } from "react";
-import { settingApi, settingChinaMapApi } from "@/service";
+import { useEffect, useRef, useState } from "react";
+import { settingChinaMapApi, footprintsApi, cityPhotosApi } from "@/service";
+import Lightbox from "yet-another-react-lightbox";
+import Captions from "yet-another-react-lightbox/plugins/captions";
+import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import "yet-another-react-lightbox/styles.css";
+import "yet-another-react-lightbox/plugins/captions.css";
+import "yet-another-react-lightbox/plugins/thumbnails.css";
+import { TravelPhoto, FootprintRegion } from "@/types/openapi";
 
 export default function TravelMap() {
   const chartRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const [photos, setPhotos] = useState<TravelPhoto[]>([]);
+  const [citiesData, setCitiesData] = useState<FootprintRegion[]>([]);
 
   useEffect(() => {
     let chartInstance: any = null;
@@ -20,10 +31,10 @@ export default function TravelMap() {
       if (!chartRef.current) return;
 
       try {
-        // Fetch China Map Data and Settings
-        const [chinaJson, settingResponse] = await Promise.all([
+        // Fetch China Map Data and Footprints
+        const [chinaJson, footprintsResp] = await Promise.all([
           settingChinaMapApi(),
-          settingApi(),
+          footprintsApi(),
         ]);
 
         // Register Map
@@ -32,26 +43,19 @@ export default function TravelMap() {
         // Initialize Chart
         chartInstance = (window as any).echarts.init(chartRef.current);
 
-        let data = [];
-        let regionsList = [];
+        // Store cities data for later use
+        const cities = footprintsResp.cities || [];
+        setCitiesData(cities);
 
-        if (settingResponse.kv?.map_footprints) {
-          try {
-            const parsed = JSON.parse(settingResponse.kv.map_footprints);
-            if (Array.isArray(parsed)) data = parsed;
-          } catch (e) {
-            console.error("Failed to parse map_footprints", e);
-          }
-        }
+        // Map regions (provinces) for highlighting
+        const regionsList = (footprintsResp.provinces || []).map((p) => p.name);
 
-        if (settingResponse.kv?.map_regions) {
-          try {
-            const parsed = JSON.parse(settingResponse.kv.map_regions);
-            if (Array.isArray(parsed)) regionsList = parsed;
-          } catch (e) {
-            console.error("Failed to parse map_regions", e);
-          }
-        }
+        // Map footprints (cities) for scatter points
+        const data = cities.map((city) => ({
+          name: city.name,
+          value: [parseFloat(city.longitude), parseFloat(city.latitude)],
+          regionId: city.region_id,
+        }));
 
         const selectBg = "#fff";
         const regions = regionsList.map((name) => ({
@@ -60,13 +64,13 @@ export default function TravelMap() {
         }));
 
         const option = {
-          backgroundColor: "#fff", // tailwind gray-100
+          backgroundColor: "#fff",
           title: {
             text: "山海漫记，皆是旅途",
             left: "center",
             top: 20,
             textStyle: {
-              color: "#374151", // tailwind gray-700
+              color: "#374151",
               fontSize: 20,
             },
           },
@@ -81,11 +85,11 @@ export default function TravelMap() {
             regions: regions,
             itemStyle: {
               normal: {
-                areaColor: "#e5e7eb", // tailwind gray-200
-                borderColor: "#9ca3af", // tailwind gray-400
+                areaColor: "#e5e7eb",
+                borderColor: "#9ca3af",
               },
               emphasis: {
-                areaColor: "#d1d5db", // tailwind gray-300
+                areaColor: "#d1d5db",
               },
             },
           },
@@ -100,23 +104,18 @@ export default function TravelMap() {
               data: data,
               symbol: "circle",
               symbolSize: 6,
-              // showEffectOn: "render",
-              // rippleEffect: {
-              //   brushType: "stroke",
-              //   scale: 3,
-              // },
-              // hoverAnimation: true,
               label: {
                 formatter: "{b}",
                 position: "right",
                 show: true,
-                color: "#1f2937", // tailwind gray-800
+                color: "#1f2937",
                 fontSize: 10,
               },
               itemStyle: {
-                color: "#60a5fa", // tailwind blue-400
+                color: "#60a5fa",
                 shadowBlur: 10,
                 shadowColor: "rgba(96, 165, 250, 0.5)",
+                cursor: "pointer",
               },
               zlevel: 1,
             },
@@ -124,14 +123,33 @@ export default function TravelMap() {
         };
 
         chartInstance.setOption(option);
+
+        chartInstance.on("click", async (params: any) => {
+          if (params.componentType === "series" && params.seriesName === "足迹") {
+            const regionId = params.data?.regionId;
+            if (regionId) {
+              try {
+                const resp = await cityPhotosApi({ region_id: regionId });
+                const cityPhotos = resp.photos || [];
+                if (cityPhotos.length > 0) {
+                  setPhotos(cityPhotos);
+                  setOpen(true);
+                } else {
+                  console.log("No photos for this city");
+                }
+              } catch (error) {
+                console.error("Failed to load city photos", error);
+              }
+            }
+          }
+        });
+
         window.addEventListener("resize", handleResize);
       } catch (error) {
         console.error("Failed to load map data", error);
       }
     };
 
-    // If echarts is not loaded yet (e.g. async script), we might want to wait or retry.
-    // For now, assume it's loaded as we put it in head without defer/async or before main.
     initChart();
 
     return () => {
@@ -140,9 +158,39 @@ export default function TravelMap() {
     };
   }, []);
 
+  // Convert photos to lightbox slides format
+  const slides = photos.map((photo) => ({
+    src: photo.src,
+    thumbnail: photo.thumbnail,
+    title: photo.title,
+    description: photo.description,
+  }));
+
   return (
-    <div className="w-full h-[800px]">
-      <div ref={chartRef} className="w-full h-full bg-white overflow-hidden" />
-    </div>
+    <>
+      <div className="w-full h-[800px]">
+        <div ref={chartRef} className="w-full h-full bg-white overflow-hidden" />
+      </div>
+      <Lightbox
+        open={open}
+        close={() => setOpen(false)}
+        slides={slides}
+        plugins={[Captions, Thumbnails, Zoom]}
+        render={{
+          thumbnail: ({ slide, rect }) => {
+            const s = slide as any;
+            return (
+              <img
+                src={s.thumbnail || s.src}
+                alt={s.title || ""}
+                width={rect.width}
+                height={rect.height}
+                className="w-full h-full object-cover"
+              />
+            );
+          },
+        }}
+      />
+    </>
   );
 }

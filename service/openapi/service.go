@@ -17,6 +17,7 @@ type Service struct {
 	Remind  *Remind
 	Setting *Setting
 	Weixin  *Weixin
+	Travel  *Travel
 }
 
 func New(s *store.Store, conf *config.Config, robot *wechat.Robot, httpClient *http.Client) *Service {
@@ -29,5 +30,6 @@ func New(s *store.Store, conf *config.Config, robot *wechat.Robot, httpClient *h
 		Remind:  NewRemind(s, robot, conf),
 		Setting: NewSetting(s),
 		Weixin:  NewWeixin(s, conf, httpClient),
+		Travel:  NewTravel(s),
 	}
 }

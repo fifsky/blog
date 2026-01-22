@@ -1,0 +1,46 @@
+# 省份数据 (level=1)
+- region_id: 310000
+  parent_id: 0
+  level: 1
+  region_name: "上海市"
+  longitude: "121.473701"
+  latitude: "31.230416"
+  pinyin: "shanghai"
+  az_no: "S"
+
+- region_id: 330000
+  parent_id: 0
+  level: 1
+  region_name: "浙江省"
+  longitude: "120.152791"
+  latitude: "30.267446"
+  pinyin: "zhejiang"
+  az_no: "Z"
+
+# 城市数据 (level=2)
+- region_id: 310100
+  parent_id: 310000
+  level: 2
+  region_name: "上海市"
+  longitude: "121.473701"
+  latitude: "31.230416"
+  pinyin: "shanghai"
+  az_no: "S"
+
+- region_id: 330100
+  parent_id: 330000
+  level: 2
+  region_name: "杭州市"
+  longitude: "120.15507"
+  latitude: "30.274084"
+  pinyin: "hangzhou"
+  az_no: "H"
+
+- region_id: 330200
+  parent_id: 330000
+  level: 2
+  region_name: "宁波市"
+  longitude: "121.549792"
+  latitude: "29.868388"
+  pinyin: "ningbo"
+  az_no: "N"

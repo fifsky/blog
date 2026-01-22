@@ -92,6 +92,7 @@ func (r *Router) Handler() http.Handler {
 	apiv1.RegisterUserServiceHTTPServer(api, codec, r.service.User)
 	apiv1.RegisterSettingServiceHTTPServer(api, codec, r.service.Setting)
 	apiv1.RegisterWeixinServiceHTTPServer(api, codec, r.service.Weixin)
+	apiv1.RegisterTravelServiceHTTPServer(api, codec, r.service.Travel)
 
 	adminAuth := api.Use(middleware.NewAuthLogin(r.store, r.conf))
 	adminAuth.HandleFunc("POST /blog/admin/upload", r.admin.Article.Upload)
@@ -102,6 +103,9 @@ func (r *Router) Handler() http.Handler {
 	adminv1.RegisterRemindServiceHTTPServer(adminAuth, codec, r.admin.Remind)
 	adminv1.RegisterUserServiceHTTPServer(adminAuth, codec, r.admin.User)
 	adminv1.RegisterSettingServiceHTTPServer(adminAuth, codec, r.admin.Setting)
+	adminv1.RegisterPhotoServiceHTTPServer(adminAuth, codec, r.admin.Photo)
+	adminv1.RegisterOSSServiceHTTPServer(adminAuth, codec, r.admin.OSS)
+	adminv1.RegisterRegionServiceHTTPServer(adminAuth, codec, r.admin.Region)
 
 	// AI chat endpoint (SSE streaming)
 	adminAuth.HandleFunc("POST /blog/admin/ai/chat", r.admin.AI.Chat)

@@ -46,6 +46,18 @@ import type {
   LinkDeleteRequest,
   ArticleCalendarRequest,
   ArticleCalendarResponse,
+  PhotoListRequest,
+  PhotoListResponse,
+  PhotoCreateRequest,
+  PhotoUpdateRequest,
+  PhotoDeleteRequest,
+  RegionListRequest,
+  RegionListResponse,
+  OSSPresignRequest,
+  OSSPresignResponse,
+  FootprintsResponse,
+  CityPhotosRequest,
+  CityPhotosResponse,
 } from "@/types/openapi";
 
 export const loginApi = (data: LoginRequest, errorHandler?: (e: AppError) => void) =>
@@ -155,3 +167,27 @@ export const userGetApi = (data: GetUserRequest, errorHandler?: (e: AppError) =>
   createApi<User>("/blog/admin/user/get", data, errorHandler);
 export const userStatusApi = (data: UserStatusRequest, errorHandler?: (e: AppError) => void) =>
   createApi("/blog/admin/user/status", data, errorHandler);
+
+// Photo APIs
+export const photoListApi = (data: PhotoListRequest, errorHandler?: (e: AppError) => void) =>
+  createApi<PhotoListResponse>("/blog/admin/photo/list", data, errorHandler);
+export const photoCreateApi = (data: PhotoCreateRequest, errorHandler?: (e: AppError) => void) =>
+  createApi<IDResponse>("/blog/admin/photo/create", data, errorHandler);
+export const photoUpdateApi = (data: PhotoUpdateRequest, errorHandler?: (e: AppError) => void) =>
+  createApi<IDResponse>("/blog/admin/photo/update", data, errorHandler);
+export const photoDeleteApi = (data: PhotoDeleteRequest, errorHandler?: (e: AppError) => void) =>
+  createApi("/blog/admin/photo/delete", data, errorHandler);
+
+// Region APIs
+export const regionListApi = (data: RegionListRequest, errorHandler?: (e: AppError) => void) =>
+  createApi<RegionListResponse>("/blog/admin/region/list", data, errorHandler);
+
+// OSS APIs
+export const ossPresignApi = (data: OSSPresignRequest, errorHandler?: (e: AppError) => void) =>
+  createApi<OSSPresignResponse>("/blog/admin/oss/presign", data, errorHandler);
+
+// Travel APIs (public)
+export const footprintsApi = (errorHandler?: (e: AppError) => void) =>
+  createApi<FootprintsResponse>("/blog/travel/footprints", undefined, errorHandler);
+export const cityPhotosApi = (data: CityPhotosRequest, errorHandler?: (e: AppError) => void) =>
+  createApi<CityPhotosResponse>("/blog/travel/photos", data, errorHandler);

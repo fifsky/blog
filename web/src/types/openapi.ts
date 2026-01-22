@@ -249,3 +249,75 @@ export type RemindUpdateRequest = {
   minute?: number;
   content?: string;
 };
+
+// Photo types
+export type PhotoItem = {
+  id: number;
+  title: string;
+  description: string;
+  src: string;
+  thumbnail: string;
+  province: string;
+  province_name: string;
+  city: string;
+  city_name: string;
+  created_at: string;
+};
+export type PhotoListRequest = { page: number };
+export type PhotoListResponse = { list: PhotoItem[]; total: number };
+export type PhotoCreateRequest = {
+  title: string;
+  description?: string;
+  src: string;
+  province: string;
+  city: string;
+};
+export type PhotoUpdateRequest = {
+  id: number;
+  title?: string;
+  description?: string;
+  province?: string;
+  city?: string;
+};
+export type PhotoDeleteRequest = { id: number };
+
+// Region types
+export type RegionItem = {
+  region_id: number;
+  parent_id: number;
+  level: number;
+  region_name: string;
+  longitude: string;
+  latitude: string;
+  pinyin: string;
+  az_no: string;
+};
+export type RegionListRequest = { parent_id: number };
+export type RegionListResponse = { list: RegionItem[] };
+
+// OSS types
+export type OSSPresignRequest = { filename: string };
+export type OSSPresignResponse = {
+  url: string; // 预签名上传URL
+  cdn_url: string; // CDN访问地址
+};
+
+// Travel types
+export type FootprintRegion = {
+  region_id: string;
+  name: string;
+  longitude: string;
+  latitude: string;
+};
+export type FootprintsResponse = {
+  provinces: FootprintRegion[];
+  cities: FootprintRegion[];
+};
+export type TravelPhoto = {
+  title: string;
+  description: string;
+  src: string;
+  thumbnail: string;
+};
+export type CityPhotosRequest = { region_id: string };
+export type CityPhotosResponse = { photos: TravelPhoto[] };
