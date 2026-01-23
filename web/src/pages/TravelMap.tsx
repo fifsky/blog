@@ -125,7 +125,7 @@ export default function TravelMap() {
         chartInstance.on("click", async (params: any) => {
           if (params.componentType === "series" && params.seriesName === "足迹") {
             const regionId = params.data?.regionId;
-            if (regionId) {
+            if (typeof regionId === "number" && regionId > 0) {
               try {
                 const resp = await cityPhotosApi({ region_id: regionId });
                 const cityPhotos = resp.photos || [];

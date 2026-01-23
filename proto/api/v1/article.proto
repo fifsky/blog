@@ -79,6 +79,7 @@ message ArticleListRequest {
   int32 type = 6;
   string day = 7;
   int32 page_size = 8;
+  string tag = 9;
 }
 
 message ArticleItem {
@@ -95,6 +96,7 @@ message ArticleItem {
   fifsky.blog.types.UserSummary user = 11;
   fifsky.blog.types.CateSummary cate = 12;
   int32 view_num = 13;
+  repeated string tags = 14;
 }
 
 message ArticleListResponse {

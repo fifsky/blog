@@ -29,6 +29,7 @@ export default function ArticleList() {
     const data: ArticleListRequest = {
       ...params,
       keyword: q.get("keyword") || "",
+      tag: q.get("tag") || "",
       page: currentPage,
       type: 1,
     };

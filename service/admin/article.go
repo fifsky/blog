@@ -52,6 +52,7 @@ func (a *Article) Create(ctx context.Context, req *adminv1.ArticleCreateRequest)
 		Title:     req.Title,
 		Url:       req.Url,
 		Content:   req.Content,
+		Tags:      model.Tags(req.Tags),
 		Status:    int(status),
 		CreatedAt: now,
 		UpdatedAt: now,
@@ -89,6 +90,10 @@ func (a *Article) Update(ctx context.Context, req *adminv1.ArticleUpdateRequest)
 	if req.Content != "" {
 		v := req.Content
 		u.Content = &v
+	}
+	if req.Tags != nil {
+		v := model.Tags(req.Tags)
+		u.Tags = &v
 	}
 	u.UpdatedAt = &now
 	if err := a.store.UpdatePost(ctx, u); err != nil {
@@ -146,6 +151,7 @@ func (a *Article) Detail(ctx context.Context, req *adminv1.ArticleDetailRequest)
 		Title:     post.Title,
 		Url:       post.Url,
 		Content:   post.Content,
+		Tags:      []string(post.Tags),
 		Status:    int32(post.Status),
 		ViewNum:   int32(post.ViewNum),
 		CreatedAt: post.CreatedAt.Format(time.DateTime),
@@ -199,6 +205,7 @@ func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*a
 			Title:     p.Title,
 			Url:       p.Url,
 			Content:   p.Content,
+			Tags:      []string(p.Tags),
 			Status:    int32(p.Status),
 			ViewNum:   int32(p.ViewNum),
 			CreatedAt: p.CreatedAt.Format(time.DateTime),

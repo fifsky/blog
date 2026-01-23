@@ -101,6 +101,7 @@ export type ArticleItem = {
   title: string;
   url?: string;
   content: string;
+  tags?: string[];
   status: number;
   view_num: number;
   created_at: string;
@@ -117,6 +118,7 @@ export type ArticleListRequest = {
   type?: number;
   day?: string;
   page_size?: number;
+  tag?: string;
 };
 export type ArticleListResponse = { list: ArticleItem[]; total: number };
 export type ArticleCreateRequest = {
@@ -126,6 +128,7 @@ export type ArticleCreateRequest = {
   url?: string;
   content: string;
   status?: number;
+  tags?: string[];
 };
 export type ArticleUpdateRequest = {
   id: number;
@@ -135,6 +138,7 @@ export type ArticleUpdateRequest = {
   url?: string;
   content?: string;
   status?: number;
+  tags?: string[];
 };
 
 export type AdminArticleListRequest = {
@@ -257,9 +261,9 @@ export type PhotoItem = {
   description: string;
   src: string;
   thumbnail: string;
-  province: string;
+  province: number;
   province_name: string;
-  city: string;
+  city: number;
   city_name: string;
   created_at: string;
 };
@@ -269,15 +273,15 @@ export type PhotoCreateRequest = {
   title: string;
   description?: string;
   srcs: string[]; // 支持多个图片地址
-  province: string;
-  city: string;
+  province: number;
+  city: number;
 };
 export type PhotoUpdateRequest = {
   id: number;
   title?: string;
   description?: string;
-  province?: string;
-  city?: string;
+  province?: number;
+  city?: number;
 };
 export type PhotoDeleteRequest = { id: number };
 
@@ -304,7 +308,7 @@ export type OSSPresignResponse = {
 
 // Travel types
 export type FootprintRegion = {
-  region_id: string;
+  region_id: number;
   name: string;
   longitude: string;
   latitude: string;
@@ -319,5 +323,5 @@ export type TravelPhoto = {
   src: string;
   thumbnail: string;
 };
-export type CityPhotosRequest = { region_id: string };
+export type CityPhotosRequest = { region_id: number };
 export type CityPhotosResponse = { photos: TravelPhoto[] };

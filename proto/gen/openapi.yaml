@@ -988,6 +988,10 @@ components:
                 status:
                     type: integer
                     format: int32
+                tags:
+                    type: array
+                    items:
+                        type: string
         ArticleDeleteRequest:
             type: object
             properties:
@@ -1041,6 +1045,10 @@ components:
                 view_num:
                     type: integer
                     format: int32
+                tags:
+                    type: array
+                    items:
+                        type: string
         ArticleListRequest:
             type: object
             properties:
@@ -1095,6 +1103,10 @@ components:
                 status:
                     type: integer
                     format: int32
+                tags:
+                    type: array
+                    items:
+                        type: string
         CateCreateRequest:
             required:
                 - name
@@ -1194,7 +1206,8 @@ components:
             type: object
             properties:
                 region_id:
-                    type: string
+                    type: integer
+                    format: int32
                 name:
                     type: string
                 longitude:
@@ -1326,7 +1339,8 @@ components:
             type: object
             properties:
                 region_id:
-                    type: string
+                    type: integer
+                    format: int32
             description: ListCityPhotosRequest 城市照片列表请求
         ListCityPhotosResponse:
             type: object
@@ -1455,9 +1469,11 @@ components:
                     items:
                         type: string
                 province:
-                    type: string
+                    type: integer
+                    format: int32
                 city:
-                    type: string
+                    type: integer
+                    format: int32
             description: PhotoCreateRequest 创建照片请求
         PhotoDeleteRequest:
             required:
@@ -1483,11 +1499,13 @@ components:
                 thumbnail:
                     type: string
                 province:
-                    type: string
+                    type: integer
+                    format: int32
                 province_name:
                     type: string
                 city:
-                    type: string
+                    type: integer
+                    format: int32
                 city_name:
                     type: string
                 created_at:
@@ -1523,9 +1541,11 @@ components:
                 description:
                     type: string
                 province:
-                    type: string
+                    type: integer
+                    format: int32
                 city:
-                    type: string
+                    type: integer
+                    format: int32
             description: PhotoUpdateRequest 更新照片请求
         PrevNextItem:
             type: object

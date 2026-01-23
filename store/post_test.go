@@ -53,7 +53,7 @@ func TestArticle_PostGetList(t *testing.T) {
 			CateId: 1,
 		}
 
-		ret, err := s.ListPost(context.Background(), p, 1, 1, "", "")
+		ret, err := s.ListPost(context.Background(), p, 1, 1, "", "", "")
 		assert.NoError(t, err)
 		assert.NotNil(t, ret)
 		assert.True(t, len(ret) > 0)

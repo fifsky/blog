@@ -10,6 +10,7 @@ type Post struct {
 	Title     string
 	Url       string
 	Content   string
+	Tags      Tags
 	Status    int
 	ViewNum   int
 	CreatedAt time.Time
@@ -23,6 +24,7 @@ type UpdatePost struct {
 	Title     *string
 	Url       *string
 	Content   *string
+	Tags      *Tags
 	Status    *int
 	UpdatedAt *time.Time
 }

@@ -228,6 +228,7 @@ type ArticleListRequest struct {
 	Type          int32                  `protobuf:"varint,6,opt,name=type,proto3" json:"type,omitempty"`
 	Day           string                 `protobuf:"bytes,7,opt,name=day,proto3" json:"day,omitempty"`
 	PageSize      int32                  `protobuf:"varint,8,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	Tag           string                 `protobuf:"bytes,9,opt,name=tag,proto3" json:"tag,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -318,6 +319,13 @@ func (x *ArticleListRequest) GetPageSize() int32 {
 	return 0
 }
 
+func (x *ArticleListRequest) GetTag() string {
+	if x != nil {
+		return x.Tag
+	}
+	return ""
+}
+
 type ArticleItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -333,6 +341,7 @@ type ArticleItem struct {
 	User          *types.UserSummary     `protobuf:"bytes,11,opt,name=user,proto3" json:"user,omitempty"`
 	Cate          *types.CateSummary     `protobuf:"bytes,12,opt,name=cate,proto3" json:"cate,omitempty"`
 	ViewNum       int32                  `protobuf:"varint,13,opt,name=view_num,json=viewNum,proto3" json:"view_num,omitempty"`
+	Tags          []string               `protobuf:"bytes,14,rep,name=tags,proto3" json:"tags,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -456,6 +465,13 @@ func (x *ArticleItem) GetViewNum() int32 {
 		return x.ViewNum
 	}
 	return 0
+}
+
+func (x *ArticleItem) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
 }
 
 type ArticleListResponse struct {
@@ -724,7 +740,7 @@ const file_api_v1_article_proto_rawDesc = "" +
 	"\x04year\x18\x01 \x01(\x05R\x04year\x12\x14\n" +
 	"\x05month\x18\x02 \x01(\x05R\x05month\"-\n" +
 	"\x17ArticleCalendarResponse\x12\x12\n" +
-	"\x04days\x18\x01 \x03(\x05R\x04days\"\xc7\x01\n" +
+	"\x04days\x18\x01 \x03(\x05R\x04days\"\xd9\x01\n" +
 	"\x12ArticleListRequest\x12\x12\n" +
 	"\x04year\x18\x01 \x01(\tR\x04year\x12\x14\n" +
 	"\x05month\x18\x02 \x01(\tR\x05month\x12\x16\n" +
@@ -733,7 +749,8 @@ const file_api_v1_article_proto_rawDesc = "" +
 	"\x04page\x18\x05 \x01(\x05R\x04page\x12\x12\n" +
 	"\x04type\x18\x06 \x01(\x05R\x04type\x12\x10\n" +
 	"\x03day\x18\a \x01(\tR\x03day\x12\x1b\n" +
-	"\tpage_size\x18\b \x01(\x05R\bpageSize\"\xfe\x02\n" +
+	"\tpage_size\x18\b \x01(\x05R\bpageSize\x12\x10\n" +
+	"\x03tag\x18\t \x01(\tR\x03tag\"\x92\x03\n" +
 	"\vArticleItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x17\n" +
 	"\acate_id\x18\x02 \x01(\x05R\x06cateId\x12\x12\n" +
@@ -750,7 +767,8 @@ const file_api_v1_article_proto_rawDesc = "" +
 	" \x01(\tR\tupdatedAt\x122\n" +
 	"\x04user\x18\v \x01(\v2\x1e.fifsky.blog.types.UserSummaryR\x04user\x122\n" +
 	"\x04cate\x18\f \x01(\v2\x1e.fifsky.blog.types.CateSummaryR\x04cate\x12\x19\n" +
-	"\bview_num\x18\r \x01(\x05R\aviewNum\"`\n" +
+	"\bview_num\x18\r \x01(\x05R\aviewNum\x12\x12\n" +
+	"\x04tags\x18\x0e \x03(\tR\x04tags\"`\n" +
 	"\x13ArticleListResponse\x123\n" +
 	"\x04list\x18\x01 \x03(\v2\x1f.fifsky.blog.api.v1.ArticleItemR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\"-\n" +

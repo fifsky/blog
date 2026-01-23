@@ -97,6 +97,10 @@ export const linkAllApi = (errorHandler?: (e: AppError) => void) =>
 
 export const loginUserApi = (errorHandler?: (e: AppError) => void) =>
   createApi<User>("/blog/admin/loginuser", undefined, errorHandler);
+export const aiGenerateTagsApi = (
+  data: { title?: string; content: string },
+  errorHandler?: (e: AppError) => void,
+) => createApi<{ tags: string[] }>("/blog/admin/ai/tags", data, errorHandler);
 export const settingUpdateApi = (data: Options, errorHandler?: (e: AppError) => void) =>
   createApi<Options>("/blog/admin/setting/update", data, errorHandler);
 export const articleCreateApi = (

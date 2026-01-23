@@ -30,6 +30,27 @@ func (p *Photo) List(ctx context.Context, req *adminv1.PhotoListRequest) (*admin
 		return nil, err
 	}
 
+	regionIDs := make([]int, 0, len(photos)*2)
+	regionSeen := make(map[int]struct{}, len(photos)*2)
+	for _, v := range photos {
+		if v.Province > 0 {
+			if _, ok := regionSeen[v.Province]; !ok {
+				regionSeen[v.Province] = struct{}{}
+				regionIDs = append(regionIDs, v.Province)
+			}
+		}
+		if v.City > 0 {
+			if _, ok := regionSeen[v.City]; !ok {
+				regionSeen[v.City] = struct{}{}
+				regionIDs = append(regionIDs, v.City)
+			}
+		}
+	}
+	regionMap, err := p.store.GetRegionByIds(ctx, regionIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	items := make([]*adminv1.PhotoItem, 0, len(photos))
 	for _, v := range photos {
 		item := &adminv1.PhotoItem{
@@ -38,21 +59,18 @@ func (p *Photo) List(ctx context.Context, req *adminv1.PhotoListRequest) (*admin
 			Description: v.Description,
 			Src:         v.Src,
 			Thumbnail:   v.Thumbnail,
-			Province:    v.Province,
-			City:        v.City,
+			Province:    int32(v.Province),
+			City:        int32(v.City),
 			CreatedAt:   v.CreatedAt.Format(time.DateTime),
 		}
 
-		// Get province name
-		if v.Province != "" {
-			if province, err := p.store.GetRegion(ctx, parseInt(v.Province)); err == nil {
+		if v.Province > 0 && regionMap != nil {
+			if province, ok := regionMap[v.Province]; ok {
 				item.ProvinceName = province.RegionName
 			}
 		}
-
-		// Get city name
-		if v.City != "" {
-			if city, err := p.store.GetRegion(ctx, parseInt(v.City)); err == nil {
+		if v.City > 0 && regionMap != nil {
+			if city, ok := regionMap[v.City]; ok {
 				item.CityName = city.RegionName
 			}
 		}
@@ -85,8 +103,8 @@ func (p *Photo) Create(ctx context.Context, req *adminv1.PhotoCreateRequest) (*t
 			Description: req.Description,
 			Src:         src,
 			Thumbnail:   thumbnail,
-			Province:    req.Province,
-			City:        req.City,
+			Province:    int(req.Province),
+			City:        int(req.City),
 		}
 
 		lastId, err = p.store.CreatePhoto(ctx, photo)
@@ -107,11 +125,13 @@ func (p *Photo) Update(ctx context.Context, req *adminv1.PhotoUpdateRequest) (*t
 	if req.Description != "" {
 		u.Description = &req.Description
 	}
-	if req.Province != "" {
-		u.Province = &req.Province
+	if req.Province > 0 {
+		v := int(req.Province)
+		u.Province = &v
 	}
-	if req.City != "" {
-		u.City = &req.City
+	if req.City > 0 {
+		v := int(req.City)
+		u.City = &v
 	}
 
 	if err := p.store.UpdatePhoto(ctx, u); err != nil {
@@ -126,15 +146,4 @@ func (p *Photo) Delete(ctx context.Context, req *adminv1.PhotoDeleteRequest) (*e
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil
-}
-
-// parseInt converts string to int, returns 0 if failed
-func parseInt(s string) int {
-	var n int
-	for _, c := range s {
-		if c >= '0' && c <= '9' {
-			n = n*10 + int(c-'0')
-		}
-	}
-	return n
 }

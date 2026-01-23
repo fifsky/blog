@@ -26,7 +26,7 @@ service TravelService {
 }
 
 message FootprintRegion {
-  string region_id = 1;
+  int32 region_id = 1;
   string name = 2;
   string longitude = 3;
   string latitude = 4;
@@ -50,8 +50,8 @@ message TravelPhoto {
 
 // ListCityPhotosRequest 城市照片列表请求
 message ListCityPhotosRequest {
-  string region_id = 1 [
-    (buf.validate.field).required = true,
+  int32 region_id = 1 [
+    (buf.validate.field).int32.gt = 0,
     (google.api.field_behavior) = REQUIRED
   ];
 }

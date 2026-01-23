@@ -16,6 +16,28 @@ func (s *Store) GetRegion(ctx context.Context, regionId int) (*model.Region, err
 	return &m, nil
 }
 
+func (s *Store) GetRegionByIds(ctx context.Context, ids []int) (map[int]model.Region, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	ph, args := In(ids)
+	query := "SELECT region_id, parent_id, level, region_name, longitude, latitude, pinyin, az_no FROM regions WHERE region_id IN(" + ph + ")"
+	rows, err := s.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	rm := make(map[int]model.Region, len(ids))
+	for rows.Next() {
+		var m model.Region
+		if err := rows.Scan(&m.RegionId, &m.ParentId, &m.Level, &m.RegionName, &m.Longitude, &m.Latitude, &m.Pinyin, &m.AzNo); err != nil {
+			return nil, err
+		}
+		rm[m.RegionId] = m
+	}
+	return rm, nil
+}
+
 func (s *Store) ListRegionByParent(ctx context.Context, parentId int) ([]*model.Region, error) {
 	rows, err := s.db.QueryContext(ctx, "SELECT region_id, parent_id, level, region_name, longitude, latitude, pinyin, az_no FROM regions WHERE parent_id = ? ORDER BY region_id", parentId)
 	if err != nil {

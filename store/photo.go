@@ -84,7 +84,7 @@ func (s *Store) DeletePhoto(ctx context.Context, id int) error {
 	return err
 }
 
-func (s *Store) ListPhotoByCity(ctx context.Context, city string) ([]*model.Photo, error) {
+func (s *Store) ListPhotoByCity(ctx context.Context, city int) ([]*model.Photo, error) {
 	rows, err := s.db.QueryContext(ctx, "SELECT id, title, description, src, thumbnail, province, city, created_at, updated_at FROM photos WHERE city = ? ORDER BY id DESC", city)
 	if err != nil {
 		return nil, err

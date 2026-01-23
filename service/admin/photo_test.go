@@ -30,8 +30,8 @@ func TestPhoto_ListCreateUpdateDelete(t *testing.T) {
 			Title:       "测试标题",
 			Description: "测试描述",
 			Srcs:        []string{"https://static.fifsky.com/blog/photos/2026/01/22/test.jpg"},
-			Province:    "310000",
-			City:        "310100",
+			Province:    310000,
+			City:        310100,
 		})
 		if err != nil {
 			t.Fatalf("Create failed: %v", err)

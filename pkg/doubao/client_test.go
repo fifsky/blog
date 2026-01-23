@@ -14,6 +14,9 @@ func TestCreateChatCompletion(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skip test in short mode")
 	}
+	if os.Getenv("AI_TOKEN") == "" {
+		t.Skip("skip integration test: AI_TOKEN not set")
+	}
 
 	prompt, err := os.ReadFile("testdata/blog.md")
 	require.NoError(t, err)

@@ -92,7 +92,8 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 	page := max(int(req.Page), 1)
 	posts, err := a.store.ListPost(ctx, &model.Post{
 		CateId: cateId,
-	}, page, num, artdate, req.Keyword)
+		Type:   int(req.Type),
+	}, page, num, artdate, req.Keyword, req.Tag)
 	if err != nil {
 		return nil, err
 	}
@@ -120,6 +121,7 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 			Title:     p.Title,
 			Url:       p.Url,
 			Content:   p.Content,
+			Tags:      []string(p.Tags),
 			Status:    int32(p.Status),
 			CreatedAt: p.CreatedAt.Format(time.DateTime),
 			UpdatedAt: p.UpdatedAt.Format(time.DateTime),
@@ -132,7 +134,7 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 		}
 		items = append(items, item)
 	}
-	total, err := a.store.CountPosts(ctx, &model.Post{CateId: cateId}, artdate, req.Keyword)
+	total, err := a.store.CountPosts(ctx, &model.Post{CateId: cateId, Type: int(req.Type)}, artdate, req.Keyword, req.Tag)
 	if err != nil {
 		return nil, err
 	}
@@ -174,6 +176,7 @@ func (a *Article) Detail(ctx context.Context, req *apiv1.ArticleDetailRequest) (
 		Title:     post.Title,
 		Url:       post.Url,
 		Content:   post.Content,
+		Tags:      []string(post.Tags),
 		Status:    int32(post.Status),
 		ViewNum:   int32(post.ViewNum + 1), // Return incremented value
 		CreatedAt: post.CreatedAt.Format(time.DateTime),
@@ -204,7 +207,7 @@ func (a *Article) Feed(ctx context.Context, _ *emptypb.Empty) (*httpbody.HttpBod
 		Author:      &feeds.Author{Name: "fifsky", Email: "fifsky@gmail.com"},
 		Created:     now,
 	}
-	posts, err := a.store.ListPost(ctx, &model.Post{}, 1, 10, "", "")
+	posts, err := a.store.ListPost(ctx, &model.Post{Type: 1}, 1, 10, "", "", "")
 	if err != nil {
 		return nil, err
 	}

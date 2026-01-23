@@ -8,8 +8,8 @@ type Photo struct {
 	Description string
 	Src         string
 	Thumbnail   string
-	Province    string
-	City        string
+	Province    int
+	City        int
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
@@ -18,6 +18,6 @@ type UpdatePhoto struct {
 	Id          int
 	Title       *string
 	Description *string
-	Province    *string
-	City        *string
+	Province    *int
+	City        *int
 }

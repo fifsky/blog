@@ -47,9 +47,9 @@ message PhotoItem {
   string description = 3;
   string src = 4;
   string thumbnail = 5;
-  string province = 6; // 省份 region_id
+  int32 province = 6; // 省份 region_id
   string province_name = 7; // 省份名称
-  string city = 8; // 城市 region_id
+  int32 city = 8; // 城市 region_id
   string city_name = 9; // 城市名称
   string created_at = 10;
 }
@@ -76,12 +76,12 @@ message PhotoCreateRequest {
     (buf.validate.field).repeated.min_items = 1,
     (google.api.field_behavior) = REQUIRED
   ]; // 支持多个图片地址
-  string province = 4 [
-    (buf.validate.field).required = true,
+  int32 province = 4 [
+    (buf.validate.field).int32.gt = 0,
     (google.api.field_behavior) = REQUIRED
   ];
-  string city = 5 [
-    (buf.validate.field).required = true,
+  int32 city = 5 [
+    (buf.validate.field).int32.gt = 0,
     (google.api.field_behavior) = REQUIRED
   ];
 }
@@ -94,8 +94,8 @@ message PhotoUpdateRequest {
   ];
   string title = 2;
   string description = 3;
-  string province = 4;
-  string city = 5;
+  int32 province = 4;
+  int32 city = 5;
 }
 
 // PhotoDeleteRequest 删除照片请求

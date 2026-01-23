@@ -200,7 +200,7 @@ import { articleListApi } from "@/service";
 
 ### Testing
 
-- Backend: `make test` runs all tests
+- Backend: Must `make test` runs all tests, Use -short to skip some tests
 - Single test: `go test -v -run TestName ./path/to/package`
 - Use dbunit fixtures in `testdata/` directory
 - Linter configuration: `.golangci.yml`

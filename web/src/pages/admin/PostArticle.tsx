@@ -2,9 +2,16 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { adminArticleDetailApi, articleCreateApi, articleUpdateApi, cateListApi } from "@/service";
+import {
+  adminArticleDetailApi,
+  aiGenerateTagsApi,
+  articleCreateApi,
+  articleUpdateApi,
+  cateListApi,
+} from "@/service";
 import { useLocation, useNavigate, Link } from "react-router";
 import { getApiUrl, getAccessToken } from "@/utils/common";
+import { dialog } from "@/utils/dialog";
 import { Editor } from "@bytemd/react";
 import gfm from "@bytemd/plugin-gfm";
 import breaks from "@bytemd/plugin-breaks";
@@ -12,6 +19,7 @@ import mediumZoom from "@bytemd/plugin-medium-zoom";
 import { highlightPlugin } from "@/lib/highlight-plugin";
 import "bytemd/dist/index.css";
 import { CateListItem } from "@/types/openapi";
+import InputTags from "@/components/custom/input-tag";
 
 import {
   Form,
@@ -34,6 +42,8 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { useAsyncEffect } from "@/hooks";
+import { Sparkles } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const articleSchema = z.object({
   id: z.number().optional(),
@@ -41,6 +51,7 @@ const articleSchema = z.object({
   cate_id: z.number().min(1, "请选择分类"),
   url: z.string().optional(),
   content: z.string().optional(),
+  tags: z.array(z.string()).optional(),
   type: z.union([z.literal(1), z.literal(2)]),
   status: z.number().optional(),
 });
@@ -84,6 +95,7 @@ const uploadImages = async (
 export default function PostArticle() {
   const [cates, setCates] = useState<CateListItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -97,6 +109,7 @@ export default function PostArticle() {
       cate_id: 0,
       url: "",
       content: "",
+      tags: [],
     },
   });
 
@@ -104,17 +117,19 @@ export default function PostArticle() {
   const articleType = form.watch("type");
   const articleStatus = form.watch("status");
   const contentValue = form.watch("content");
+  const tagsValue = form.watch("tags");
 
   // 提交表单逻辑
   const submit = async (values: ArticleFormValues) => {
     setLoading(true);
     try {
-      const { id, cate_id, title, content, type, url, status } = values;
+      const { id, cate_id, title, content, type, url, status, tags } = values;
       // 构造通用请求载荷，status 默认为 1 (发布)
       const payload = {
         cate_id,
         title,
         content: content || "",
+        tags: tags || [],
         type,
         url: url || "",
         status: status || 1,
@@ -160,6 +175,7 @@ export default function PostArticle() {
         cate_id: a.cate_id || 0,
         url: a.url || "",
         content: a.content || "",
+        tags: a.tags || [],
         type: a.type === 1 || a.type === 2 ? a.type : 1,
         status: a.status,
       });
@@ -313,6 +329,68 @@ export default function PostArticle() {
                 />
               )}
             </div>
+
+            <FormField
+              control={form.control}
+              name="tags"
+              render={({ field }) => (
+                <Field>
+                  <FormLabel>标签</FormLabel>
+                  <FieldContent>
+                    <FormItem>
+                      <FormControl>
+                        <div className="flex items-start gap-2 w-139">
+                          <InputTags
+                            value={field.value || []}
+                            onChange={(updater) => {
+                              const prev = field.value || [];
+                              const next = typeof updater === "function" ? updater(prev) : updater;
+                              field.onChange(next);
+                            }}
+                            placeholder="输入标签，回车/逗号确认"
+                          />
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                type="button"
+                                size={"sm"}
+                                variant="outline"
+                                loading={aiLoading}
+                                disabled={loading}
+                                onClick={async () => {
+                                  const title = form.getValues("title") || "";
+                                  const content = (form.getValues("content") || "").trim();
+                                  if (!content) {
+                                    dialog.message("请先填写文章内容，再生成标签");
+                                    return;
+                                  }
+                                  setAiLoading(true);
+                                  try {
+                                    const ret = await aiGenerateTagsApi({ title, content });
+                                    const tags = (ret.tags || []).filter(Boolean);
+                                    const prev = tagsValue || [];
+                                    const merged = Array.from(new Set([...prev, ...tags]));
+                                    form.setValue("tags", merged, { shouldDirty: true });
+                                  } finally {
+                                    setAiLoading(false);
+                                  }
+                                }}
+                              >
+                                <Sparkles />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>根据文章内容自动生成标签</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  </FieldContent>
+                </Field>
+              )}
+            />
 
             <FormField
               control={form.control}

@@ -21,8 +21,8 @@ func (s *Store) GetPost(ctx context.Context, id int, url string) (*model.Post, e
 		arg = url
 	}
 
-	query := "select id,cate_id,type,user_id,title,url,content,status,view_num,created_at,updated_at from posts where " + where + " limit 1"
-	err := s.db.QueryRowContext(ctx, query, arg).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.ViewNum, &p.CreatedAt, &p.UpdatedAt)
+	query := "select id,cate_id,type,user_id,title,url,content,tags,status,view_num,created_at,updated_at from posts where " + where + " limit 1"
+	err := s.db.QueryRowContext(ctx, query, arg).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Tags, &p.Status, &p.ViewNum, &p.CreatedAt, &p.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (s *Store) PostArchive(ctx context.Context) ([]model.PostArchive, error) {
 	return res, nil
 }
 
-func (s *Store) ListPost(ctx context.Context, p *model.Post, start int, num int, artdate, keyword string) ([]model.Post, error) {
+func (s *Store) ListPost(ctx context.Context, p *model.Post, start int, num int, artdate, keyword, tag string) ([]model.Post, error) {
 	posts := make([]model.Post, 0)
 	offset := (start - 1) * num
 
@@ -119,9 +119,13 @@ func (s *Store) ListPost(ctx context.Context, p *model.Post, start int, num int,
 		where += " and title like ?"
 		args = append(args, fmt.Sprintf("%%%s%%", keyword))
 	}
+	if tag != "" {
+		where += " and JSON_CONTAINS(tags, JSON_QUOTE(?))"
+		args = append(args, tag)
+	}
 	args = append(args, num, offset)
 
-	query := "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where " + where + " order by id desc limit ? offset ?"
+	query := "select id,cate_id,type,user_id,title,url,content,tags,status,created_at,updated_at from posts where " + where + " order by id desc limit ? offset ?"
 	rows, err := s.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
@@ -130,7 +134,7 @@ func (s *Store) ListPost(ctx context.Context, p *model.Post, start int, num int,
 
 	for rows.Next() {
 		var bp model.Post
-		if err := rows.Scan(&bp.Id, &bp.CateId, &bp.Type, &bp.UserId, &bp.Title, &bp.Url, &bp.Content, &bp.Status, &bp.CreatedAt, &bp.UpdatedAt); err != nil {
+		if err := rows.Scan(&bp.Id, &bp.CateId, &bp.Type, &bp.UserId, &bp.Title, &bp.Url, &bp.Content, &bp.Tags, &bp.Status, &bp.CreatedAt, &bp.UpdatedAt); err != nil {
 			return nil, err
 		}
 		posts = append(posts, bp)
@@ -138,7 +142,7 @@ func (s *Store) ListPost(ctx context.Context, p *model.Post, start int, num int,
 	return posts, nil
 }
 
-func (s *Store) CountPosts(ctx context.Context, p *model.Post, artdate, keyword string) (int, error) {
+func (s *Store) CountPosts(ctx context.Context, p *model.Post, artdate, keyword, tag string) (int, error) {
 	args := make([]any, 0)
 	where := "status = 1"
 	if p.CateId > 0 {
@@ -161,6 +165,10 @@ func (s *Store) CountPosts(ctx context.Context, p *model.Post, artdate, keyword 
 		where += " and title like ?"
 		args = append(args, fmt.Sprintf("%%%s%%", keyword))
 	}
+	if tag != "" {
+		where += " and JSON_CONTAINS(tags, JSON_QUOTE(?))"
+		args = append(args, tag)
+	}
 	q := "select count(*) from posts where " + where
 	var total int
 	err := s.db.QueryRowContext(ctx, q, args...).Scan(&total)
@@ -180,8 +188,8 @@ func (s *Store) GetCateByDomain(ctx context.Context, domain string) (*model.Cate
 }
 
 func (s *Store) CreatePost(ctx context.Context, p *model.Post) (int64, error) {
-	res, err := s.db.ExecContext(ctx, "insert into posts (cate_id,type,user_id,title,url,content,status,created_at,updated_at) values (?,?,?,?,?,?,?,?,?)",
-		p.CateId, p.Type, p.UserId, p.Title, p.Url, p.Content, p.Status, p.CreatedAt, p.UpdatedAt)
+	res, err := s.db.ExecContext(ctx, "insert into posts (cate_id,type,user_id,title,url,content,tags,status,created_at,updated_at) values (?,?,?,?,?,?,?,?,?,?)",
+		p.CateId, p.Type, p.UserId, p.Title, p.Url, p.Content, p.Tags, p.Status, p.CreatedAt, p.UpdatedAt)
 	if err != nil {
 		return 0, err
 	}
@@ -206,11 +214,17 @@ func (s *Store) UpdatePost(ctx context.Context, p *model.UpdatePost) error {
 	if v := p.Content; v != nil {
 		set, args = append(set, "`content` = ?"), append(args, *v)
 	}
+	if v := p.Tags; v != nil {
+		set, args = append(set, "`tags` = ?"), append(args, *v)
+	}
 	if v := p.Status; v != nil {
 		set, args = append(set, "`status` = ?"), append(args, *v)
 	}
 	if v := p.UpdatedAt; v != nil {
 		set, args = append(set, "`updated_at` = ?"), append(args, *v)
+	}
+	if len(set) == 0 {
+		return nil
 	}
 	args = append(args, p.Id)
 	query := "update posts set " + strings.Join(set, ", ") + " where id = ?"
@@ -254,7 +268,7 @@ func (s *Store) ListPostForAdmin(ctx context.Context, p *model.Post, start int, 
 	}
 	args = append(args, num, offset)
 
-	query := "select id,cate_id,type,user_id,title,url,content,status,view_num,created_at,updated_at from posts where " + where + " order by id desc limit ? offset ?"
+	query := "select id,cate_id,type,user_id,title,url,content,tags,status,view_num,created_at,updated_at from posts where " + where + " order by id desc limit ? offset ?"
 	rows, err := s.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
@@ -263,7 +277,7 @@ func (s *Store) ListPostForAdmin(ctx context.Context, p *model.Post, start int, 
 
 	for rows.Next() {
 		var bp model.Post
-		if err := rows.Scan(&bp.Id, &bp.CateId, &bp.Type, &bp.UserId, &bp.Title, &bp.Url, &bp.Content, &bp.Status, &bp.ViewNum, &bp.CreatedAt, &bp.UpdatedAt); err != nil {
+		if err := rows.Scan(&bp.Id, &bp.CateId, &bp.Type, &bp.UserId, &bp.Title, &bp.Url, &bp.Content, &bp.Tags, &bp.Status, &bp.ViewNum, &bp.CreatedAt, &bp.UpdatedAt); err != nil {
 			return nil, err
 		}
 		posts = append(posts, bp)

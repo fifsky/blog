@@ -2,7 +2,6 @@ package openapi
 
 import (
 	"context"
-	"strconv"
 
 	apiv1 "app/proto/gen/api/v1"
 	"app/store"
@@ -33,7 +32,7 @@ func (t *Travel) GetFootprints(ctx context.Context, req *apiv1.GetFootprintsRequ
 	provinceItems := make([]*apiv1.FootprintRegion, 0, len(provinces))
 	for _, v := range provinces {
 		provinceItems = append(provinceItems, &apiv1.FootprintRegion{
-			RegionId:  strconv.Itoa(v.RegionId),
+			RegionId:  int32(v.RegionId),
 			Name:      v.RegionName,
 			Longitude: v.Longitude,
 			Latitude:  v.Latitude,
@@ -43,7 +42,7 @@ func (t *Travel) GetFootprints(ctx context.Context, req *apiv1.GetFootprintsRequ
 	cityItems := make([]*apiv1.FootprintRegion, 0, len(cities))
 	for _, v := range cities {
 		cityItems = append(cityItems, &apiv1.FootprintRegion{
-			RegionId:  strconv.Itoa(v.RegionId),
+			RegionId:  int32(v.RegionId),
 			Name:      v.RegionName,
 			Longitude: v.Longitude,
 			Latitude:  v.Latitude,
@@ -57,7 +56,7 @@ func (t *Travel) GetFootprints(ctx context.Context, req *apiv1.GetFootprintsRequ
 }
 
 func (t *Travel) ListCityPhotos(ctx context.Context, req *apiv1.ListCityPhotosRequest) (*apiv1.ListCityPhotosResponse, error) {
-	photos, err := t.store.ListPhotoByCity(ctx, req.RegionId)
+	photos, err := t.store.ListPhotoByCity(ctx, int(req.RegionId))
 	if err != nil {
 		return nil, err
 	}

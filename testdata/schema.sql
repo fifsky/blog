@@ -68,6 +68,7 @@ CREATE TABLE `posts` (
   `url` varchar(100) NOT NULL DEFAULT '' COMMENT '页面缩略名',
   `content` longtext NOT NULL COMMENT '文章内容',
   `view_num` int NOT NULL DEFAULT '1' COMMENT '浏览次数',
+  `tags` json DEFAULT NULL COMMENT '文章标签',
   `status` int NOT NULL DEFAULT '1' COMMENT '状态，1正常 2删除 3草稿',
   `created_at` datetime NOT NULL COMMENT '创建时间',
   `updated_at` datetime NOT NULL COMMENT '更新时间',
@@ -140,8 +141,8 @@ CREATE TABLE `photos` (
   `description` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '照片描述',
   `src` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '原图地址',
   `thumbnail` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '缩略图地址',
-  `province` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '省份区域ID',
-  `city` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '城市区域ID',
+  `province` int NOT NULL COMMENT '省份区域ID',
+  `city` int NOT NULL COMMENT '城市区域ID',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)

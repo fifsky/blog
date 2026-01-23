@@ -11,7 +11,12 @@ func TestClient_Send(t *testing.T) {
 		t.Skip("skipping test in short mode.")
 	}
 
-	clientb := New(http.DefaultClient, os.Getenv("BARK_URL"), os.Getenv("BARK_TOKEN"))
+	url := os.Getenv("BARK_URL")
+	token := os.Getenv("BARK_TOKEN")
+	if url == "" || token == "" {
+		t.Skip("skip integration test: BARK_URL/BARK_TOKEN not set")
+	}
+	clientb := New(http.DefaultClient, url, token)
 	msg := Message{
 		Title:    "test",
 		Body:     "test",

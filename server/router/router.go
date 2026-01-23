@@ -61,7 +61,7 @@ func (r *Router) Handler() http.Handler {
 		WithResponseHeader: true,
 		// WithResponseBody: true,
 		Filters: []sloghttp.Filter{
-			sloghttp.IgnorePath("/blog/admin/upload", "/blog/china_map", "/blog/admin/ai/chat"),
+			sloghttp.IgnorePath("/blog/admin/upload", "/blog/china_map", "/blog/admin/ai/chat", "/blog/admin/ai/tags"),
 		},
 	}
 
@@ -109,6 +109,7 @@ func (r *Router) Handler() http.Handler {
 
 	// AI chat endpoint (SSE streaming)
 	adminAuth.HandleFunc("POST /blog/admin/ai/chat", r.admin.AI.Chat)
+	adminAuth.HandleFunc("POST /blog/admin/ai/tags", r.admin.AI.GenerateTags)
 
 	return &NotFoundHandler{mux: mux.ServeMux}
 }

@@ -168,6 +168,7 @@ type ArticleCreateRequest struct {
 	Url           string                 `protobuf:"bytes,4,opt,name=url,proto3" json:"url,omitempty"`
 	Content       string                 `protobuf:"bytes,5,opt,name=content,proto3" json:"content,omitempty"`
 	Status        int32                  `protobuf:"varint,6,opt,name=status,proto3" json:"status,omitempty"`
+	Tags          []string               `protobuf:"bytes,7,rep,name=tags,proto3" json:"tags,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -244,6 +245,13 @@ func (x *ArticleCreateRequest) GetStatus() int32 {
 	return 0
 }
 
+func (x *ArticleCreateRequest) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
 type ArticleUpdateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -253,6 +261,7 @@ type ArticleUpdateRequest struct {
 	Url           string                 `protobuf:"bytes,5,opt,name=url,proto3" json:"url,omitempty"`
 	Content       string                 `protobuf:"bytes,6,opt,name=content,proto3" json:"content,omitempty"`
 	Status        int32                  `protobuf:"varint,7,opt,name=status,proto3" json:"status,omitempty"`
+	Tags          []string               `protobuf:"bytes,8,rep,name=tags,proto3" json:"tags,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -334,6 +343,13 @@ func (x *ArticleUpdateRequest) GetStatus() int32 {
 		return x.Status
 	}
 	return 0
+}
+
+func (x *ArticleUpdateRequest) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
 }
 
 type ArticleListRequest struct {
@@ -463,6 +479,7 @@ type ArticleItem struct {
 	User          *types.UserSummary     `protobuf:"bytes,11,opt,name=user,proto3" json:"user,omitempty"`
 	Cate          *types.CateSummary     `protobuf:"bytes,12,opt,name=cate,proto3" json:"cate,omitempty"`
 	ViewNum       int32                  `protobuf:"varint,13,opt,name=view_num,json=viewNum,proto3" json:"view_num,omitempty"`
+	Tags          []string               `protobuf:"bytes,14,rep,name=tags,proto3" json:"tags,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -588,6 +605,13 @@ func (x *ArticleItem) GetViewNum() int32 {
 	return 0
 }
 
+func (x *ArticleItem) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
 var File_admin_v1_article_proto protoreflect.FileDescriptor
 
 const file_admin_v1_article_proto_rawDesc = "" +
@@ -599,7 +623,7 @@ const file_admin_v1_article_proto_rawDesc = "" +
 	"\x14ArticleDeleteRequest\x12\x1a\n" +
 	"\x03ids\x18\x01 \x03(\x05B\b\xbaH\x05\x92\x01\x02\b\x01R\x03ids\"3\n" +
 	"\x15ArticleRestoreRequest\x12\x1a\n" +
-	"\x03ids\x18\x01 \x03(\x05B\b\xbaH\x05\x92\x01\x02\b\x01R\x03ids\"\xcb\x01\n" +
+	"\x03ids\x18\x01 \x03(\x05B\b\xbaH\x05\x92\x01\x02\b\x01R\x03ids\"\xdf\x01\n" +
 	"\x14ArticleCreateRequest\x12#\n" +
 	"\acate_id\x18\x01 \x01(\x05B\n" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x06cateId\x12\x1e\n" +
@@ -608,7 +632,8 @@ const file_admin_v1_article_proto_rawDesc = "" +
 	"\x05title\x18\x03 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x05title\x12\x10\n" +
 	"\x03url\x18\x04 \x01(\tR\x03url\x12#\n" +
 	"\acontent\x18\x05 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\acontent\x12\x16\n" +
-	"\x06status\x18\x06 \x01(\x05R\x06status\"\xb9\x01\n" +
+	"\x06status\x18\x06 \x01(\x05R\x06status\x12\x12\n" +
+	"\x04tags\x18\a \x03(\tR\x04tags\"\xcd\x01\n" +
 	"\x14ArticleUpdateRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\x12\x17\n" +
@@ -617,14 +642,15 @@ const file_admin_v1_article_proto_rawDesc = "" +
 	"\x05title\x18\x04 \x01(\tR\x05title\x12\x10\n" +
 	"\x03url\x18\x05 \x01(\tR\x03url\x12\x18\n" +
 	"\acontent\x18\x06 \x01(\tR\acontent\x12\x16\n" +
-	"\x06status\x18\a \x01(\x05R\x06status\"T\n" +
+	"\x06status\x18\a \x01(\x05R\x06status\x12\x12\n" +
+	"\x04tags\x18\b \x03(\tR\x04tags\"T\n" +
 	"\x12ArticleListRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\x05R\x04type\x12\x16\n" +
 	"\x06status\x18\x03 \x01(\x05R\x06status\"b\n" +
 	"\x13ArticleListResponse\x125\n" +
 	"\x04list\x18\x01 \x03(\v2!.fifsky.blog.admin.v1.ArticleItemR\x04list\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total\"\xfe\x02\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"\x92\x03\n" +
 	"\vArticleItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x17\n" +
 	"\acate_id\x18\x02 \x01(\x05R\x06cateId\x12\x12\n" +
@@ -641,7 +667,8 @@ const file_admin_v1_article_proto_rawDesc = "" +
 	" \x01(\tR\tupdatedAt\x122\n" +
 	"\x04user\x18\v \x01(\v2\x1e.fifsky.blog.types.UserSummaryR\x04user\x122\n" +
 	"\x04cate\x18\f \x01(\v2\x1e.fifsky.blog.types.CateSummaryR\x04cate\x12\x19\n" +
-	"\bview_num\x18\r \x01(\x05R\aviewNum2\xff\x05\n" +
+	"\bview_num\x18\r \x01(\x05R\aviewNum\x12\x12\n" +
+	"\x04tags\x18\x0e \x03(\tR\x04tags2\xff\x05\n" +
 	"\x0eArticleService\x12z\n" +
 	"\x06Create\x12*.fifsky.blog.admin.v1.ArticleCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/blog/admin/article/create\x12z\n" +
 	"\x06Update\x12*.fifsky.blog.admin.v1.ArticleUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/blog/admin/article/update\x12s\n" +

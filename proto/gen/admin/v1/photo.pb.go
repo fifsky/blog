@@ -32,9 +32,9 @@ type PhotoItem struct {
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	Src           string                 `protobuf:"bytes,4,opt,name=src,proto3" json:"src,omitempty"`
 	Thumbnail     string                 `protobuf:"bytes,5,opt,name=thumbnail,proto3" json:"thumbnail,omitempty"`
-	Province      string                 `protobuf:"bytes,6,opt,name=province,proto3" json:"province,omitempty"`                             // 省份 region_id
+	Province      int32                  `protobuf:"varint,6,opt,name=province,proto3" json:"province,omitempty"`                            // 省份 region_id
 	ProvinceName  string                 `protobuf:"bytes,7,opt,name=province_name,json=provinceName,proto3" json:"province_name,omitempty"` // 省份名称
-	City          string                 `protobuf:"bytes,8,opt,name=city,proto3" json:"city,omitempty"`                                     // 城市 region_id
+	City          int32                  `protobuf:"varint,8,opt,name=city,proto3" json:"city,omitempty"`                                    // 城市 region_id
 	CityName      string                 `protobuf:"bytes,9,opt,name=city_name,json=cityName,proto3" json:"city_name,omitempty"`             // 城市名称
 	CreatedAt     string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -106,11 +106,11 @@ func (x *PhotoItem) GetThumbnail() string {
 	return ""
 }
 
-func (x *PhotoItem) GetProvince() string {
+func (x *PhotoItem) GetProvince() int32 {
 	if x != nil {
 		return x.Province
 	}
-	return ""
+	return 0
 }
 
 func (x *PhotoItem) GetProvinceName() string {
@@ -120,11 +120,11 @@ func (x *PhotoItem) GetProvinceName() string {
 	return ""
 }
 
-func (x *PhotoItem) GetCity() string {
+func (x *PhotoItem) GetCity() int32 {
 	if x != nil {
 		return x.City
 	}
-	return ""
+	return 0
 }
 
 func (x *PhotoItem) GetCityName() string {
@@ -245,8 +245,8 @@ type PhotoCreateRequest struct {
 	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	Srcs          []string               `protobuf:"bytes,3,rep,name=srcs,proto3" json:"srcs,omitempty"` // 支持多个图片地址
-	Province      string                 `protobuf:"bytes,4,opt,name=province,proto3" json:"province,omitempty"`
-	City          string                 `protobuf:"bytes,5,opt,name=city,proto3" json:"city,omitempty"`
+	Province      int32                  `protobuf:"varint,4,opt,name=province,proto3" json:"province,omitempty"`
+	City          int32                  `protobuf:"varint,5,opt,name=city,proto3" json:"city,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -302,18 +302,18 @@ func (x *PhotoCreateRequest) GetSrcs() []string {
 	return nil
 }
 
-func (x *PhotoCreateRequest) GetProvince() string {
+func (x *PhotoCreateRequest) GetProvince() int32 {
 	if x != nil {
 		return x.Province
 	}
-	return ""
+	return 0
 }
 
-func (x *PhotoCreateRequest) GetCity() string {
+func (x *PhotoCreateRequest) GetCity() int32 {
 	if x != nil {
 		return x.City
 	}
-	return ""
+	return 0
 }
 
 // PhotoUpdateRequest 更新照片请求
@@ -322,8 +322,8 @@ type PhotoUpdateRequest struct {
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Province      string                 `protobuf:"bytes,4,opt,name=province,proto3" json:"province,omitempty"`
-	City          string                 `protobuf:"bytes,5,opt,name=city,proto3" json:"city,omitempty"`
+	Province      int32                  `protobuf:"varint,4,opt,name=province,proto3" json:"province,omitempty"`
+	City          int32                  `protobuf:"varint,5,opt,name=city,proto3" json:"city,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -379,18 +379,18 @@ func (x *PhotoUpdateRequest) GetDescription() string {
 	return ""
 }
 
-func (x *PhotoUpdateRequest) GetProvince() string {
+func (x *PhotoUpdateRequest) GetProvince() int32 {
 	if x != nil {
 		return x.Province
 	}
-	return ""
+	return 0
 }
 
-func (x *PhotoUpdateRequest) GetCity() string {
+func (x *PhotoUpdateRequest) GetCity() int32 {
 	if x != nil {
 		return x.City
 	}
-	return ""
+	return 0
 }
 
 // PhotoDeleteRequest 删除照片请求
@@ -449,9 +449,9 @@ const file_admin_v1_photo_proto_rawDesc = "" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x10\n" +
 	"\x03src\x18\x04 \x01(\tR\x03src\x12\x1c\n" +
 	"\tthumbnail\x18\x05 \x01(\tR\tthumbnail\x12\x1a\n" +
-	"\bprovince\x18\x06 \x01(\tR\bprovince\x12#\n" +
+	"\bprovince\x18\x06 \x01(\x05R\bprovince\x12#\n" +
 	"\rprovince_name\x18\a \x01(\tR\fprovinceName\x12\x12\n" +
-	"\x04city\x18\b \x01(\tR\x04city\x12\x1b\n" +
+	"\x04city\x18\b \x01(\x05R\x04city\x12\x1b\n" +
 	"\tcity_name\x18\t \x01(\tR\bcityName\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\n" +
@@ -460,20 +460,22 @@ const file_admin_v1_photo_proto_rawDesc = "" +
 	"\x04page\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02 \x00R\x04page\"^\n" +
 	"\x11PhotoListResponse\x123\n" +
 	"\x04list\x18\x01 \x03(\v2\x1f.fifsky.blog.admin.v1.PhotoItemR\x04list\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total\"\xbe\x01\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"\xc0\x01\n" +
 	"\x12PhotoCreateRequest\x12\x1f\n" +
 	"\x05title\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x05title\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1f\n" +
-	"\x04srcs\x18\x03 \x03(\tB\v\xe0A\x02\xbaH\x05\x92\x01\x02\b\x01R\x04srcs\x12%\n" +
-	"\bprovince\x18\x04 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\bprovince\x12\x1d\n" +
-	"\x04city\x18\x05 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x04city\"\x98\x01\n" +
+	"\x04srcs\x18\x03 \x03(\tB\v\xe0A\x02\xbaH\x05\x92\x01\x02\b\x01R\x04srcs\x12&\n" +
+	"\bprovince\x18\x04 \x01(\x05B\n" +
+	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\bprovince\x12\x1e\n" +
+	"\x04city\x18\x05 \x01(\x05B\n" +
+	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x04city\"\x98\x01\n" +
 	"\x12PhotoUpdateRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1a\n" +
-	"\bprovince\x18\x04 \x01(\tR\bprovince\x12\x12\n" +
-	"\x04city\x18\x05 \x01(\tR\x04city\"0\n" +
+	"\bprovince\x18\x04 \x01(\x05R\bprovince\x12\x12\n" +
+	"\x04city\x18\x05 \x01(\x05R\x04city\"0\n" +
 	"\x12PhotoDeleteRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id2\xeb\x03\n" +

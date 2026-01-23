@@ -25,7 +25,7 @@ const (
 
 type FootprintRegion struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RegionId      string                 `protobuf:"bytes,1,opt,name=region_id,json=regionId,proto3" json:"region_id,omitempty"`
+	RegionId      int32                  `protobuf:"varint,1,opt,name=region_id,json=regionId,proto3" json:"region_id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Longitude     string                 `protobuf:"bytes,3,opt,name=longitude,proto3" json:"longitude,omitempty"`
 	Latitude      string                 `protobuf:"bytes,4,opt,name=latitude,proto3" json:"latitude,omitempty"`
@@ -63,11 +63,11 @@ func (*FootprintRegion) Descriptor() ([]byte, []int) {
 	return file_api_v1_travel_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *FootprintRegion) GetRegionId() string {
+func (x *FootprintRegion) GetRegionId() int32 {
 	if x != nil {
 		return x.RegionId
 	}
-	return ""
+	return 0
 }
 
 func (x *FootprintRegion) GetName() string {
@@ -252,7 +252,7 @@ func (x *TravelPhoto) GetThumbnail() string {
 // ListCityPhotosRequest 城市照片列表请求
 type ListCityPhotosRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RegionId      string                 `protobuf:"bytes,1,opt,name=region_id,json=regionId,proto3" json:"region_id,omitempty"`
+	RegionId      int32                  `protobuf:"varint,1,opt,name=region_id,json=regionId,proto3" json:"region_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -287,11 +287,11 @@ func (*ListCityPhotosRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_travel_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *ListCityPhotosRequest) GetRegionId() string {
+func (x *ListCityPhotosRequest) GetRegionId() int32 {
 	if x != nil {
 		return x.RegionId
 	}
-	return ""
+	return 0
 }
 
 // ListCityPhotosResponse 城市照片列表响应
@@ -345,7 +345,7 @@ const file_api_v1_travel_proto_rawDesc = "" +
 	"\n" +
 	"\x13api/v1/travel.proto\x12\x12fifsky.blog.api.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\"|\n" +
 	"\x0fFootprintRegion\x12\x1b\n" +
-	"\tregion_id\x18\x01 \x01(\tR\bregionId\x12\x12\n" +
+	"\tregion_id\x18\x01 \x01(\x05R\bregionId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
 	"\tlongitude\x18\x03 \x01(\tR\tlongitude\x12\x1a\n" +
 	"\blatitude\x18\x04 \x01(\tR\blatitude\"\x16\n" +
@@ -357,9 +357,10 @@ const file_api_v1_travel_proto_rawDesc = "" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x10\n" +
 	"\x03src\x18\x03 \x01(\tR\x03src\x12\x1c\n" +
-	"\tthumbnail\x18\x04 \x01(\tR\tthumbnail\"?\n" +
-	"\x15ListCityPhotosRequest\x12&\n" +
-	"\tregion_id\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\bregionId\"Q\n" +
+	"\tthumbnail\x18\x04 \x01(\tR\tthumbnail\"@\n" +
+	"\x15ListCityPhotosRequest\x12'\n" +
+	"\tregion_id\x18\x01 \x01(\x05B\n" +
+	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\bregionId\"Q\n" +
 	"\x16ListCityPhotosResponse\x127\n" +
 	"\x06photos\x18\x01 \x03(\v2\x1f.fifsky.blog.api.v1.TravelPhotoR\x06photos2\xa4\x02\n" +
 	"\rTravelService\x12\x88\x01\n" +

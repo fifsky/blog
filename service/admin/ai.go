@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -305,4 +306,118 @@ func (a *AI) executeTool(ctx context.Context, name string, arguments string) str
 	}
 
 	return result
+}
+
+type GenerateTagsRequest struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
+
+type GenerateTagsResponse struct {
+	Tags []string `json:"tags"`
+}
+
+func (a *AI) GenerateTags(w http.ResponseWriter, r *http.Request) {
+	var req GenerateTagsRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		response.Fail(w, errors.BadRequest("INVALID_REQUEST", "Invalid request body"))
+		return
+	}
+	content := strings.TrimSpace(req.Content)
+	if content == "" {
+		response.Fail(w, errors.BadRequest("EMPTY_CONTENT", "Content cannot be empty"))
+		return
+	}
+
+	prompt := `你是一个博客写作助手。请根据用户提供的文章标题与正文，为文章生成 3-8 个中文标签。
+要求：
+1) 标签要简短（2-6 个字），可用中英文混合（如 Go、React、MySQL）。
+2) 标签去重，不要包含无意义的词（比如“文章”“随笔”“记录”）。
+3) 只输出 JSON 数组（例如：["Go","数据库","性能优化"]），不要输出其它任何文字。`
+
+	userInput := fmt.Sprintf("标题：%s\n正文：\n%s", strings.TrimSpace(req.Title), content)
+
+	aiReq := openai.ChatCompletionNewParams{
+		Model: a.conf.Common.AIModel,
+		Messages: []openai.ChatCompletionMessageParamUnion{
+			openai.SystemMessage(prompt),
+			openai.UserMessage(userInput),
+		},
+	}
+	if strings.HasPrefix(a.conf.Common.AIModel, "doubao") {
+		aiReq.SetExtraFields(map[string]any{
+			"thinking": map[string]any{
+				"type": "disabled",
+			},
+		})
+	}
+
+	completion, err := a.client.Chat.Completions.New(r.Context(), aiReq)
+	if err != nil {
+		response.Fail(w, errors.InternalServer("AI_GENERATE_TAGS_ERROR", err.Error()))
+		return
+	}
+	if len(completion.Choices) == 0 {
+		response.Success(w, &GenerateTagsResponse{Tags: []string{}})
+		return
+	}
+
+	raw := strings.TrimSpace(completion.Choices[0].Message.Content)
+	tags := parseTagsFromAIResponse(raw)
+	response.Success(w, &GenerateTagsResponse{Tags: tags})
+}
+
+func parseTagsFromAIResponse(text string) []string {
+	if tags, ok := parseTagsFromJSONArray(text); ok {
+		return normalizeTags(tags)
+	}
+
+	extracted, ok := extractFirstJSONArray(text)
+	if !ok {
+		return []string{}
+	}
+	if tags, ok := parseTagsFromJSONArray(extracted); ok {
+		return normalizeTags(tags)
+	}
+	return []string{}
+}
+
+func parseTagsFromJSONArray(text string) ([]string, bool) {
+	var tags []string
+	if err := json.Unmarshal([]byte(text), &tags); err != nil {
+		return nil, false
+	}
+	return tags, true
+}
+
+func extractFirstJSONArray(text string) (string, bool) {
+	re := regexp.MustCompile(`\[[\s\S]*?\]`)
+	m := re.FindString(text)
+	if strings.TrimSpace(m) == "" {
+		return "", false
+	}
+	return m, true
+}
+
+func normalizeTags(tags []string) []string {
+	seen := make(map[string]struct{}, len(tags))
+	out := make([]string, 0, len(tags))
+	for _, t := range tags {
+		v := strings.TrimSpace(t)
+		if v == "" {
+			continue
+		}
+		if len([]rune(v)) > 12 {
+			continue
+		}
+		if _, ok := seen[v]; ok {
+			continue
+		}
+		seen[v] = struct{}{}
+		out = append(out, v)
+		if len(out) >= 10 {
+			break
+		}
+	}
+	return out
 }

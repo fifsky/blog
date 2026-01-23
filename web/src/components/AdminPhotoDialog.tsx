@@ -24,8 +24,8 @@ interface FormValues {
   title: string;
   description?: string;
   srcs: string[];
-  province: string;
-  city: string;
+  province: number;
+  city: number;
 }
 
 const formSchema = z.object({
@@ -49,8 +49,8 @@ export function AdminPhotoDialog({ isOpen, onClose, item, onSubmit }: AdminPhoto
     defaultValues: {
       title: item?.title ?? "",
       description: item?.description ?? "",
-      province: item?.province ?? "",
-      city: item?.city ?? "",
+      province: item?.province ? String(item.province) : "",
+      city: item?.city ? String(item.city) : "",
     },
     mode: "onChange",
   });
@@ -67,9 +67,10 @@ export function AdminPhotoDialog({ isOpen, onClose, item, onSubmit }: AdminPhoto
   // Load cities when province changes
   const selectedProvince = form.watch("province");
   useEffect(() => {
-    if (selectedProvince) {
+    const provinceId = Number(selectedProvince);
+    if (provinceId > 0) {
       const loadCities = async () => {
-        const resp = await regionListApi({ parent_id: Number(selectedProvince) });
+        const resp = await regionListApi({ parent_id: provinceId });
         setCities(resp.list || []);
       };
       loadCities();
@@ -84,14 +85,14 @@ export function AdminPhotoDialog({ isOpen, onClose, item, onSubmit }: AdminPhoto
       form.reset({
         title: item?.title ?? "",
         description: item?.description ?? "",
-        province: item?.province ?? "",
-        city: item?.city ?? "",
+        province: item?.province ? String(item.province) : "",
+        city: item?.city ? String(item.city) : "",
       });
       setPendingFiles([]);
 
       // Load cities for existing item
-      if (item.province) {
-        regionListApi({ parent_id: Number(item.province) }).then((resp) => {
+      if (item.province > 0) {
+        regionListApi({ parent_id: item.province }).then((resp) => {
           setCities(resp.list || []);
         });
       }
@@ -174,8 +175,8 @@ export function AdminPhotoDialog({ isOpen, onClose, item, onSubmit }: AdminPhoto
         title: values.title,
         description: values.description,
         srcs,
-        province: values.province,
-        city: values.city,
+        province: Number(values.province),
+        city: Number(values.city),
       });
 
       onClose();
@@ -278,7 +279,7 @@ export function AdminPhotoDialog({ isOpen, onClose, item, onSubmit }: AdminPhoto
                     <FieldContent>
                       <Select
                         value={field.value}
-                        onValueChange={field.onChange}
+                        onValueChange={(v) => field.onChange(v)}
                         disabled={!selectedProvince}
                       >
                         <SelectTrigger size="sm">

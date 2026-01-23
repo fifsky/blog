@@ -36,7 +36,7 @@ func TestTravel_ListCityPhotos(t *testing.T) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("photos", "regions")...)
 		svc := NewTravel(store.New(db))
 
-		resp, err := svc.ListCityPhotos(context.Background(), &apiv1.ListCityPhotosRequest{RegionId: "310100"})
+		resp, err := svc.ListCityPhotos(context.Background(), &apiv1.ListCityPhotosRequest{RegionId: 310100})
 		if err != nil {
 			t.Fatalf("ListCityPhotos failed: %v", err)
 		}
