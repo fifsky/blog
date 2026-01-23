@@ -27,7 +27,6 @@ type Article struct {
 	adminv1.UnimplementedArticleServiceServer
 	store *store.Store
 	conf  *config.Config
-	http  *http.Client
 	upl   ossutil.Uploader
 }
 
@@ -35,8 +34,7 @@ func NewArticle(s *store.Store, conf *config.Config) *Article {
 	return &Article{
 		store: s,
 		conf:  conf,
-		http:  http.DefaultClient,
-		upl:   ossutil.NewAliyunUploader(conf, http.DefaultClient),
+		upl:   ossutil.NewAliyunUploader(conf),
 	}
 }
 

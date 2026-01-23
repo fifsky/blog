@@ -1,15 +1,21 @@
-'use client';
+"use client";
 
 import {
   formatBytes,
   useFileUpload,
   type FileMetadata,
   type FileWithPreview,
-} from '@/hooks/use-file-upload';
-import { Alert, AlertContent, AlertDescription, AlertIcon, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { FileIcon, PlusIcon, TriangleAlert, XIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
+} from "@/hooks/use-file-upload";
+import {
+  Alert,
+  AlertContent,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
+} from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { FileIcon, PlusIcon, TriangleAlert, XIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface FileUploadCompactProps {
   maxFiles?: number;
@@ -23,14 +29,22 @@ interface FileUploadCompactProps {
 export default function FileUploadCompact({
   maxFiles = 3,
   maxSize = 2 * 1024 * 1024, // 2MB
-  accept = 'image/*',
+  accept = "image/*",
   multiple = true,
   className,
   onFilesChange,
 }: FileUploadCompactProps) {
   const [
     { files, isDragging, errors },
-    { removeFile, handleDragEnter, handleDragLeave, handleDragOver, handleDrop, openFileDialog, getInputProps },
+    {
+      removeFile,
+      handleDragEnter,
+      handleDragLeave,
+      handleDragOver,
+      handleDrop,
+      openFileDialog,
+      getInputProps,
+    },
   ] = useFileUpload({
     maxFiles,
     maxSize,
@@ -41,16 +55,18 @@ export default function FileUploadCompact({
 
   const isImage = (file: File | FileMetadata) => {
     const type = file instanceof File ? file.type : file.type;
-    return type.startsWith('image/');
+    return type.startsWith("image/");
   };
 
   return (
-    <div className={cn('w-full max-w-lg', className)}>
+    <div className={cn("w-full max-w-lg", className)}>
       {/* Compact Upload Area */}
       <div
         className={cn(
-          'flex items-center gap-3 rounded-lg border border-border border-dashed p-4 transition-colors',
-          isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-muted-foreground/50',
+          "flex items-center gap-3 rounded-lg border border-border border-dashed p-4 transition-colors",
+          isDragging
+            ? "border-primary bg-primary/5"
+            : "border-muted-foreground/25 hover:border-muted-foreground/50",
         )}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -60,7 +76,12 @@ export default function FileUploadCompact({
         <input {...getInputProps()} className="sr-only" />
 
         {/* Upload Button */}
-        <Button onClick={openFileDialog} size="sm" className={cn(isDragging && 'animate-bounce')}>
+        <Button
+          type="button"
+          onClick={openFileDialog}
+          size="sm"
+          className={cn(isDragging && "animate-bounce")}
+        >
           <PlusIcon className="h-4 w-4" />
           Add files
         </Button>
@@ -68,7 +89,9 @@ export default function FileUploadCompact({
         {/* File Previews */}
         <div className="flex flex-1 items-center gap-2">
           {files.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Drop files here or click to browse (max {maxFiles} files)</p>
+            <p className="text-sm text-muted-foreground">
+              Drop files here or click to browse (max {maxFiles} files)
+            </p>
           ) : (
             files.map((fileItem) => (
               <div key={fileItem.id} className="group shrink-0">

@@ -34,6 +34,7 @@ func (o *OSS) GetPresignURL(ctx context.Context, req *adminv1.GetPresignURLReque
 		if len(parts) > 0 {
 			region = strings.TrimPrefix(parts[0], "oss-")
 		}
+		region = strings.TrimSuffix(region, "-internal")
 	}
 
 	// Create OSS client using new SDK v2
@@ -42,7 +43,7 @@ func (o *OSS) GetPresignURL(ctx context.Context, req *adminv1.GetPresignURLReque
 			o.conf.OSS.AccessKey,
 			o.conf.OSS.AccessSecret,
 		)).
-		WithRegion(region)
+		WithRegion(region).WithUseInternalEndpoint(false)
 
 	client := oss.NewClient(cfg)
 
