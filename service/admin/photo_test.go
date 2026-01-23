@@ -29,7 +29,7 @@ func TestPhoto_ListCreateUpdateDelete(t *testing.T) {
 		createResp, err := svc.Create(context.Background(), &adminv1.PhotoCreateRequest{
 			Title:       "测试标题",
 			Description: "测试描述",
-			Src:         "https://static.fifsky.com/blog/photos/2026/01/22/test.jpg",
+			Srcs:        []string{"https://static.fifsky.com/blog/photos/2026/01/22/test.jpg"},
 			Province:    "310000",
 			City:        "310100",
 		})

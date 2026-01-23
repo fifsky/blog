@@ -1441,7 +1441,7 @@ components:
         PhotoCreateRequest:
             required:
                 - title
-                - src
+                - srcs
                 - province
                 - city
             type: object
@@ -1450,8 +1450,10 @@ components:
                     type: string
                 description:
                     type: string
-                src:
-                    type: string
+                srcs:
+                    type: array
+                    items:
+                        type: string
                 province:
                     type: string
                 city:

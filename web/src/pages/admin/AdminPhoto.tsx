@@ -51,7 +51,7 @@ export default function AdminPhoto() {
       await photoCreateApi({
         title: values.title,
         description: values.description,
-        src: values.src,
+        srcs: values.srcs,
         province: values.province,
         city: values.city,
       });

@@ -8,20 +8,29 @@ import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { PhotoItem, RegionItem } from "@/types/openapi";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { regionListApi, ossPresignApi } from "@/service";
+import FileUploadCompact from "./file-upload/compact-upload";
+import { FileWithPreview } from "@/hooks/use-file-upload";
 
 interface AdminPhotoDialogProps {
   isOpen: boolean;
   onClose: () => void;
   item: PhotoItem | undefined;
-  onSubmit: (values: z.infer<typeof formSchema>) => Promise<void>;
+  onSubmit: (values: FormValues) => Promise<void>;
+}
+
+interface FormValues {
+  title: string;
+  description?: string;
+  srcs: string[];
+  province: string;
+  city: string;
 }
 
 const formSchema = z.object({
   title: z.string().min(1, "请输入照片标题"),
   description: z.string().optional(),
-  src: z.string().optional(),
   province: z.string().min(1, "请选择省份"),
   city: z.string().min(1, "请选择城市"),
 });
@@ -31,7 +40,7 @@ export function AdminPhotoDialog({ isOpen, onClose, item, onSubmit }: AdminPhoto
   const [uploading, setUploading] = useState(false);
   const [provinces, setProvinces] = useState<RegionItem[]>([]);
   const [cities, setCities] = useState<RegionItem[]>([]);
-  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [pendingFiles, setPendingFiles] = useState<FileWithPreview[]>([]);
 
   const isEdit = !!item?.id;
 
@@ -40,7 +49,6 @@ export function AdminPhotoDialog({ isOpen, onClose, item, onSubmit }: AdminPhoto
     defaultValues: {
       title: item?.title ?? "",
       description: item?.description ?? "",
-      src: item?.src ?? "",
       province: item?.province ?? "",
       city: item?.city ?? "",
     },
@@ -76,11 +84,10 @@ export function AdminPhotoDialog({ isOpen, onClose, item, onSubmit }: AdminPhoto
       form.reset({
         title: item?.title ?? "",
         description: item?.description ?? "",
-        src: item?.src ?? "",
         province: item?.province ?? "",
         city: item?.city ?? "",
       });
-      setPreviewUrl(item?.thumbnail || "");
+      setPendingFiles([]);
 
       // Load cities for existing item
       if (item.province) {
@@ -92,70 +99,101 @@ export function AdminPhotoDialog({ isOpen, onClose, item, onSubmit }: AdminPhoto
       form.reset({
         title: "",
         description: "",
-        src: "",
         province: "",
         city: "",
       });
-      setPreviewUrl("");
+      setPendingFiles([]);
     }
   }, [item, form]);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // Handle files change from upload component
+  const handleFilesChange = useCallback((files: FileWithPreview[]) => {
+    setPendingFiles(files);
+  }, []);
 
-    setUploading(true);
-    try {
-      // Get presigned URL from backend
-      const presignResp = await ossPresignApi({ filename: file.name });
+  // Upload all pending files and return their CDN URLs
+  const uploadAllFiles = async (): Promise<string[]> => {
+    const urls: string[] = [];
 
-      // Upload file directly using PUT request
-      const uploadResp = await fetch(presignResp.url, {
-        headers: {
-          "Content-Type": "text/plain;charset=utf8",
-        },
-        method: "PUT",
-        body: file,
-      });
-
-      if (!uploadResp.ok) {
-        throw new Error(`Upload failed, status: ${uploadResp.status}`);
+    for (const fileItem of pendingFiles) {
+      // Only upload actual File objects, skip FileMetadata
+      if (!(fileItem.file instanceof File)) {
+        continue;
       }
 
-      // Set the CDN URL as src
-      form.setValue("src", presignResp.cdn_url);
-      setPreviewUrl(presignResp.cdn_url + "!photothumb");
+      try {
+        // Get presigned URL from backend
+        const presignResp = await ossPresignApi({ filename: fileItem.file.name });
 
-      console.log("File uploaded successfully to:", presignResp.cdn_url);
-    } catch (error) {
-      console.error("Upload failed:", error);
-      alert("上传失败，请重试");
-    } finally {
-      setUploading(false);
+        // Upload file directly using PUT request
+        const uploadResp = await fetch(presignResp.url, {
+          headers: {
+            "Content-Type": "text/plain;charset=utf8",
+          },
+          method: "PUT",
+          body: fileItem.file,
+        });
+
+        if (!uploadResp.ok) {
+          throw new Error(`Upload failed, status: ${uploadResp.status}`);
+        }
+
+        urls.push(presignResp.cdn_url);
+        console.log("File uploaded successfully to:", presignResp.cdn_url);
+      } catch (error) {
+        console.error("Upload failed:", error);
+        throw error;
+      }
     }
+
+    return urls;
   };
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!isEdit && !values.src) {
-      alert("请先上传照片");
+    if (!isEdit && pendingFiles.length === 0) {
+      alert("请先选择照片");
       return;
     }
 
     setLoading(true);
+    setUploading(true);
+
     try {
-      await onSubmit(values);
+      let srcs: string[] = [];
+
+      if (!isEdit) {
+        // Upload all files first
+        srcs = await uploadAllFiles();
+        if (srcs.length === 0) {
+          alert("上传失败，请重试");
+          return;
+        }
+      }
+
+      await onSubmit({
+        title: values.title,
+        description: values.description,
+        srcs,
+        province: values.province,
+        city: values.city,
+      });
+
       onClose();
       form.reset();
-      setPreviewUrl("");
+      setPendingFiles([]);
+    } catch (error) {
+      console.error("Submit failed:", error);
+      alert("提交失败，请重试");
     } finally {
       setLoading(false);
+      setUploading(false);
     }
   };
 
   const handleCancel = () => {
     onClose();
     form.reset();
-    setPreviewUrl("");
+    setPendingFiles([]);
   };
 
   return (
@@ -265,50 +303,31 @@ export function AdminPhotoDialog({ isOpen, onClose, item, onSubmit }: AdminPhoto
               <Field orientation="vertical">
                 <FieldLabel>上传照片</FieldLabel>
                 <FieldContent>
-                  <div className="flex items-center gap-4">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      disabled={uploading}
-                      className="text-sm"
-                    />
-                    {uploading && <span className="text-sm text-gray-500">上传中...</span>}
-                  </div>
-                  {previewUrl && (
-                    <div className="mt-2">
-                      <img
-                        src={previewUrl}
-                        alt="预览"
-                        className="max-w-[200px] max-h-[150px] object-cover rounded"
-                      />
-                    </div>
-                  )}
-                </FieldContent>
-              </Field>
-            )}
-
-            {isEdit && previewUrl && (
-              <Field orientation="vertical">
-                <FieldLabel>当前照片</FieldLabel>
-                <FieldContent>
-                  <img
-                    src={previewUrl}
-                    alt="当前照片"
-                    className="max-w-[200px] max-h-[150px] object-cover rounded"
+                  <FileUploadCompact
+                    maxFiles={10}
+                    maxSize={10 * 1024 * 1024}
+                    accept="image/*"
+                    multiple={true}
+                    onFilesChange={handleFilesChange}
                   />
-                  <p className="text-xs text-gray-500 mt-1">编辑模式不支持重新上传</p>
+                  {uploading && (
+                    <p className="text-sm text-gray-500 mt-2">
+                      正在上传 {pendingFiles.length} 张照片...
+                    </p>
+                  )}
                 </FieldContent>
               </Field>
             )}
 
             <Field orientation="horizontal">
               <Button type="submit" size="sm" loading={loading || uploading}>
-                {isEdit ? "修改" : "添加"}
+                {isEdit
+                  ? "修改"
+                  : `提交${pendingFiles.length > 0 ? ` (${pendingFiles.length} 张)` : ""}`}
               </Button>
               <Button
                 size={"sm"}
-                variant="link"
+                variant="secondary"
                 onClick={(e) => {
                   e.preventDefault();
                   handleCancel();

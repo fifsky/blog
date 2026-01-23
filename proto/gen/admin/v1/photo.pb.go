@@ -244,7 +244,7 @@ type PhotoCreateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Src           string                 `protobuf:"bytes,3,opt,name=src,proto3" json:"src,omitempty"`
+	Srcs          []string               `protobuf:"bytes,3,rep,name=srcs,proto3" json:"srcs,omitempty"` // 支持多个图片地址
 	Province      string                 `protobuf:"bytes,4,opt,name=province,proto3" json:"province,omitempty"`
 	City          string                 `protobuf:"bytes,5,opt,name=city,proto3" json:"city,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -295,11 +295,11 @@ func (x *PhotoCreateRequest) GetDescription() string {
 	return ""
 }
 
-func (x *PhotoCreateRequest) GetSrc() string {
+func (x *PhotoCreateRequest) GetSrcs() []string {
 	if x != nil {
-		return x.Src
+		return x.Srcs
 	}
-	return ""
+	return nil
 }
 
 func (x *PhotoCreateRequest) GetProvince() string {
@@ -460,11 +460,11 @@ const file_admin_v1_photo_proto_rawDesc = "" +
 	"\x04page\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02 \x00R\x04page\"^\n" +
 	"\x11PhotoListResponse\x123\n" +
 	"\x04list\x18\x01 \x03(\v2\x1f.fifsky.blog.admin.v1.PhotoItemR\x04list\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total\"\xba\x01\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"\xbe\x01\n" +
 	"\x12PhotoCreateRequest\x12\x1f\n" +
 	"\x05title\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x05title\x12 \n" +
-	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1b\n" +
-	"\x03src\x18\x03 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x03src\x12%\n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1f\n" +
+	"\x04srcs\x18\x03 \x03(\tB\v\xe0A\x02\xbaH\x05\x92\x01\x02\b\x01R\x04srcs\x12%\n" +
 	"\bprovince\x18\x04 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\bprovince\x12\x1d\n" +
 	"\x04city\x18\x05 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x04city\"\x98\x01\n" +
 	"\x12PhotoUpdateRequest\x12\x1a\n" +

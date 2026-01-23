@@ -72,10 +72,10 @@ message PhotoCreateRequest {
     (google.api.field_behavior) = REQUIRED
   ];
   string description = 2;
-  string src = 3 [
-    (buf.validate.field).required = true,
+  repeated string srcs = 3 [
+    (buf.validate.field).repeated.min_items = 1,
     (google.api.field_behavior) = REQUIRED
-  ];
+  ]; // 支持多个图片地址
   string province = 4 [
     (buf.validate.field).required = true,
     (google.api.field_behavior) = REQUIRED

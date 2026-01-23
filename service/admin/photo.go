@@ -72,21 +72,27 @@ func (p *Photo) List(ctx context.Context, req *adminv1.PhotoListRequest) (*admin
 }
 
 func (p *Photo) Create(ctx context.Context, req *adminv1.PhotoCreateRequest) (*types.IDResponse, error) {
-	// Build thumbnail URL by appending !photothumb suffix
-	thumbnail := req.Src + "!photothumb"
+	var lastId int64
+	var err error
 
-	photo := &model.Photo{
-		Title:       req.Title,
-		Description: req.Description,
-		Src:         req.Src,
-		Thumbnail:   thumbnail,
-		Province:    req.Province,
-		City:        req.City,
-	}
+	// Create a record for each src
+	for _, src := range req.Srcs {
+		// Build thumbnail URL by appending !photothumb suffix
+		thumbnail := src + "!photothumb"
 
-	lastId, err := p.store.CreatePhoto(ctx, photo)
-	if err != nil {
-		return nil, err
+		photo := &model.Photo{
+			Title:       req.Title,
+			Description: req.Description,
+			Src:         src,
+			Thumbnail:   thumbnail,
+			Province:    req.Province,
+			City:        req.City,
+		}
+
+		lastId, err = p.store.CreatePhoto(ctx, photo)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &types.IDResponse{Id: int32(lastId)}, nil

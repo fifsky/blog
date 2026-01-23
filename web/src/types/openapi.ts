@@ -268,7 +268,7 @@ export type PhotoListResponse = { list: PhotoItem[]; total: number };
 export type PhotoCreateRequest = {
   title: string;
   description?: string;
-  src: string;
+  srcs: string[]; // 支持多个图片地址
   province: string;
   city: string;
 };
