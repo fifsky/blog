@@ -116,3 +116,12 @@ func (s *Store) GetUserByIds(ctx context.Context, ids []int) (map[int]model.User
 	}
 	return um, nil
 }
+
+func (s *Store) GetUserIDByOpenid(ctx context.Context, openid string) (int, error) {
+	var uid int
+	err := s.db.QueryRowContext(ctx, "select id from users where openid = ? limit 1", openid).Scan(&uid)
+	if err != nil {
+		return 0, err
+	}
+	return uid, nil
+}

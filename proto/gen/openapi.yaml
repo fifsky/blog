@@ -793,6 +793,25 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LoginResponse'
+    /blog/miniapp/login:
+        post:
+            tags:
+                - MiniAppService
+            description: LoginCode 使用微信小程序登录 code 换取 openid 并登录
+            operationId: MiniAppService_LoginCode
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/MiniAppLoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MiniAppLoginResponse'
     /blog/mood/list:
         post:
             tags:
@@ -1390,6 +1409,18 @@ components:
             properties:
                 value:
                     type: string
+        MiniAppLoginRequest:
+            type: object
+            properties:
+                code:
+                    type: string
+                    description: 微信小程序前端 wx.login 返回的 code
+        MiniAppLoginResponse:
+            type: object
+            properties:
+                access_token:
+                    type: string
+                    description: 和 Web 端保持一致的 JWT Access Token
         MoodCreateRequest:
             required:
                 - content
@@ -1869,6 +1900,8 @@ tags:
       description: LinkService 提供链接相关的接口
     - name: LinkService
       description: LinkService 提供链接相关的接口
+    - name: MiniAppService
+      description: MiniAppService 提供微信小程序相关接口
     - name: MoodService
       description: MoodService 提供心情相关的接口
     - name: MoodService

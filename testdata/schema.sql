@@ -107,6 +107,7 @@ CREATE TABLE `users` (
                          `email` varchar(100) NOT NULL DEFAULT '邮箱',
                          `status` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '1正常，2删除',
                          `type` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '1:管理员,2:编辑',
+                         `openid` varchar(256) COLLATE utf8mb4_general_ci NOT NULL COMMENT '小程序openid',
                          `created_at` datetime NOT NULL,
                          `updated_at` datetime NOT NULL,
                          PRIMARY KEY (`id`),

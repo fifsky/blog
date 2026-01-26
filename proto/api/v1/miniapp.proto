@@ -1,0 +1,31 @@
+syntax = "proto3";
+package fifsky.blog.api.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+
+option go_package = "gen/api/v1";
+
+// MiniAppService 提供微信小程序相关接口
+service MiniAppService {
+  // LoginCode 使用微信小程序登录 code 换取 openid 并登录
+  rpc LoginCode(MiniAppLoginRequest) returns (MiniAppLoginResponse) {
+    option (google.api.http) = {
+      post: "/blog/miniapp/login"
+      body: "*"
+    };
+  }
+}
+
+message MiniAppLoginRequest {
+  // 微信小程序前端 wx.login 返回的 code
+  string code = 1 [
+    (buf.validate.field).required = true
+  ];
+}
+
+message MiniAppLoginResponse {
+  // 和 Web 端保持一致的 JWT Access Token
+  string access_token = 1;
+}
+

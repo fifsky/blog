@@ -10,6 +10,7 @@ type User struct {
 	Email     string
 	Status    int
 	Type      int
+	Openid    string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

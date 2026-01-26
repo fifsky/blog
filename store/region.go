@@ -2,6 +2,9 @@ package store
 
 import (
 	"context"
+	"database/sql"
+	"math"
+	"strconv"
 
 	"app/store/model"
 )
@@ -106,4 +109,52 @@ func (s *Store) ListCitiesWithPhotos(ctx context.Context) ([]*model.Region, erro
 		ret = append(ret, &tmp)
 	}
 	return ret, nil
+}
+
+func (s *Store) FindNearestCity(ctx context.Context, latitude, longitude float64) (*model.Region, *model.Region, error) {
+	rows, err := s.db.QueryContext(ctx, "SELECT region_id, parent_id, level, region_name, longitude, latitude, pinyin, az_no FROM regions WHERE level = 2")
+	if err != nil {
+		return nil, nil, err
+	}
+	defer rows.Close()
+
+	var best *model.Region
+	bestDist := math.MaxFloat64
+	for rows.Next() {
+		var item model.Region
+		if err := rows.Scan(&item.RegionId, &item.ParentId, &item.Level, &item.RegionName, &item.Longitude, &item.Latitude, &item.Pinyin, &item.AzNo); err != nil {
+			return nil, nil, err
+		}
+		cityLng, err1 := strconv.ParseFloat(item.Longitude, 64)
+		cityLat, err2 := strconv.ParseFloat(item.Latitude, 64)
+		if err1 != nil || err2 != nil {
+			continue
+		}
+		d := haversine(latitude, longitude, cityLat, cityLng)
+		if d < bestDist {
+			tmp := item
+			best = &tmp
+			bestDist = d
+		}
+	}
+	if best == nil {
+		return nil, nil, sql.ErrNoRows
+	}
+
+	province, err := s.GetRegion(ctx, best.ParentId)
+	if err != nil {
+		return nil, nil, err
+	}
+	return best, province, nil
+}
+
+func haversine(lat1, lon1, lat2, lon2 float64) float64 {
+	const earthRadius = 6371.0
+	rad := func(v float64) float64 { return v * math.Pi / 180 }
+	dLat := rad(lat2 - lat1)
+	dLon := rad(lon2 - lon1)
+	a := math.Sin(dLat/2)*math.Sin(dLat/2) +
+		math.Cos(rad(lat1))*math.Cos(rad(lat2))*math.Sin(dLon/2)*math.Sin(dLon/2)
+	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
+	return earthRadius * c
 }

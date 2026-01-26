@@ -38,6 +38,11 @@ type MCPConf struct {
 	Token string `yaml:"token"` // MCP Token
 }
 
+type MiniAPPConf struct {
+	Appid     string `yaml:"appid"`
+	AppSecret string `yaml:"app_secret"`
+}
+
 type Config struct {
 	Env     string
 	AppName string             `yaml:"app_name"`
@@ -46,6 +51,7 @@ type Config struct {
 	OSS     ossConf            `yaml:"oss"`
 	Weixin  WeixinConf         `yaml:"weixin"`
 	MCP     map[string]MCPConf `yaml:"mcp"`
+	MiniAPP MiniAPPConf        `yaml:"miniapp"`
 }
 
 func New() *Config {

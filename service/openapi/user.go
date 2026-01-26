@@ -9,7 +9,6 @@ import (
 	"app/config"
 	apiv1 "app/proto/gen/api/v1"
 	"app/store"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 var _ apiv1.UserServiceServer = (*User)(nil)
@@ -38,11 +37,7 @@ func (u *User) Login(ctx context.Context, in *apiv1.LoginRequest) (*apiv1.LoginR
 	if user.Status != 1 {
 		return nil, fmt.Errorf("用户已停用")
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
-		Issuer:    fmt.Sprint(user.Id),
-	})
-	tokenString, err := token.SignedString([]byte(u.conf.Common.TokenSecret))
+	tokenString, err := signAccessToken(u.conf.Common.TokenSecret, user.Id)
 	if err != nil {
 		return nil, fmt.Errorf("Access Token加密错误:%s", err)
 	}

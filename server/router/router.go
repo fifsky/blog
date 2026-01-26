@@ -82,6 +82,7 @@ func (r *Router) Handler() http.Handler {
 
 	api.HandleFunc("GET /blog/weixin/notify", r.service.Weixin.Notify)
 	api.HandleFunc("POST /blog/weixin/notify", r.service.Weixin.Notify)
+	api.HandleFunc("GET /blog/region/nearest", r.service.Geo.Nearest)
 
 	codec := contract.NewCodec()
 	apiv1.RegisterArticleServiceHTTPServer(api, codec, r.service.Article)
@@ -93,6 +94,7 @@ func (r *Router) Handler() http.Handler {
 	apiv1.RegisterSettingServiceHTTPServer(api, codec, r.service.Setting)
 	apiv1.RegisterWeixinServiceHTTPServer(api, codec, r.service.Weixin)
 	apiv1.RegisterTravelServiceHTTPServer(api, codec, r.service.Travel)
+	apiv1.RegisterMiniAppServiceHTTPServer(api, codec, r.service.MiniApp)
 
 	adminAuth := api.Use(middleware.NewAuthLogin(r.store, r.conf))
 	adminAuth.HandleFunc("POST /blog/admin/upload", r.admin.Article.Upload)
