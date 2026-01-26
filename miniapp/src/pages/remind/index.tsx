@@ -139,7 +139,16 @@ export default function RemindPage() {
               </View>
             </View>
             <View style={{ paddingTop: "12rpx" }}>
-              <Text style={{ fontSize: "28rpx", color: "#333" }}>{r.content}</Text>
+              <Text
+                style={{
+                  fontSize: "28rpx",
+                  color: "#333",
+                  wordBreak: "break-all",
+                  overflowWrap: "break-word",
+                }}
+              >
+                {r.content}
+              </Text>
             </View>
             <View style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
               <Text style={{ fontSize: "24rpx", color: "#999" }}>{r.created_at}</Text>

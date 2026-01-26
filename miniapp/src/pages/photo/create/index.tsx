@@ -118,6 +118,9 @@ export default function PhotoCreatePage() {
     setUploading(true);
     try {
       const choose = await Taro.chooseImage({ count: 1, sourceType });
+      if (choose.tempFilePaths.length === 0) {
+        return;
+      }
       const filePath = choose.tempFilePaths[0];
       const fileName = filePath.split("/").pop() || "photo.jpg";
 
@@ -125,8 +128,8 @@ export default function PhotoCreatePage() {
       await putFileToPresignUrl(presign.url, filePath);
 
       await photoCreateApi({
-        title: "小程序上传",
-        description: "",
+        title: city.region_name || "打卡照片",
+        description: `${province.region_name} ${city.region_name}`,
         srcs: [presign.cdn_url],
         province: province.region_id,
         city: city.region_id,
@@ -135,6 +138,10 @@ export default function PhotoCreatePage() {
       Taro.showToast({ title: "上传成功", icon: "success" });
       backToList();
     } catch (e: any) {
+      const msg = String(e?.errMsg || e?.message || "");
+      if (msg.includes("cancel")) {
+        return;
+      }
       Taro.showToast({ title: e?.message || "上传失败", icon: "none" });
     } finally {
       setUploading(false);
