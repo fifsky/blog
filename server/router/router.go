@@ -112,6 +112,7 @@ func (r *Router) Handler() http.Handler {
 	// AI chat endpoint (SSE streaming)
 	adminAuth.HandleFunc("POST /blog/admin/ai/chat", r.admin.AI.Chat)
 	adminAuth.HandleFunc("POST /blog/admin/ai/tags", r.admin.AI.GenerateTags)
+	adminAuth.HandleFunc("POST /blog/admin/ai/remind/create", r.admin.AI.RemindSmartCreate)
 
 	return &NotFoundHandler{mux: mux.ServeMux}
 }

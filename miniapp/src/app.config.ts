@@ -41,4 +41,10 @@ export default defineAppConfig({
     navigationBarTitleText: "fifsky",
     navigationBarTextStyle: "black",
   },
+  requiredPrivateInfos: ["getLocation"],
+  permission: {
+    "scope.userLocation": {
+      desc: "你的位置信息将用于打卡坐标",
+    },
+  },
 });

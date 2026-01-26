@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Picker, Text, View } from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import { AtButton, AtCard } from "taro-ui";
+import { AtActionSheet, AtActionSheetItem, AtButton, AtCard, AtIcon } from "taro-ui";
 import type { RegionItem } from "../../../types/openapi";
 import { nearestRegionApi, ossPresignApi, photoCreateApi, regionListApi } from "../../../service";
 import { putFileToPresignUrl } from "../../../utils/upload";
@@ -12,6 +12,8 @@ export default function PhotoCreatePage() {
   const [provinceIndex, setProvinceIndex] = useState(0);
   const [cityIndex, setCityIndex] = useState(0);
   const [uploading, setUploading] = useState(false);
+  const [actionOpen, setActionOpen] = useState(false);
+  const [autoLocated, setAutoLocated] = useState(false);
 
   const backToList = () => {
     const pages = Taro.getCurrentPages();
@@ -40,18 +42,38 @@ export default function PhotoCreatePage() {
     void loadRegions();
   }, []);
 
-  const onProvinceChange = async (e: any) => {
-    const index = Number(e.detail.value);
-    setProvinceIndex(index);
-    const province = provinceOptions[index];
-    if (!province) return;
-    const cities = await regionListApi({ parent_id: province.region_id });
-    setCityOptions(cities.list || []);
-    setCityIndex(0);
+  useEffect(() => {
+    if (!autoLocated && provinceOptions.length > 0) {
+      setAutoLocated(true);
+      void autoDetectRegion();
+    }
+  }, [autoLocated, provinceOptions]);
+
+  const onRegionChange = (e: any) => {
+    const value: number[] = e.detail.value || [];
+    const pIndex = value[0] ?? 0;
+    const cIndex = value[1] ?? 0;
+    setProvinceIndex(pIndex);
+    setCityIndex(cIndex);
   };
 
-  const onCityChange = (e: any) => {
-    setCityIndex(Number(e.detail.value));
+  const onRegionColumnChange = async (e: any) => {
+    const column: number = e.detail.column;
+    const value: number = e.detail.value;
+
+    if (column === 0) {
+      const pIndex = value;
+      setProvinceIndex(pIndex);
+      const province = provinceOptions[pIndex];
+      if (!province) return;
+      const cities = await regionListApi({ parent_id: province.region_id });
+      setCityOptions(cities.list || []);
+      setCityIndex(0);
+    }
+
+    if (column === 1) {
+      setCityIndex(value);
+    }
   };
 
   const autoDetectRegion = async () => {
@@ -74,7 +96,16 @@ export default function PhotoCreatePage() {
     }
   };
 
-  const upload = async () => {
+  const openActionSheet = () => {
+    if (uploading) return;
+    setActionOpen(true);
+  };
+
+  const closeActionSheet = () => {
+    setActionOpen(false);
+  };
+
+  const doUpload = async (sourceType: ("camera" | "album")[]) => {
     if (uploading) return;
 
     const province = provinceOptions[provinceIndex];
@@ -86,7 +117,7 @@ export default function PhotoCreatePage() {
 
     setUploading(true);
     try {
-      const choose = await Taro.chooseImage({ count: 1 });
+      const choose = await Taro.chooseImage({ count: 1, sourceType });
       const filePath = choose.tempFilePaths[0];
       const fileName = filePath.split("/").pop() || "photo.jpg";
 
@@ -117,57 +148,66 @@ export default function PhotoCreatePage() {
     <View style={{ minHeight: "100vh", backgroundColor: "#f5f5f5", padding: "24rpx" }}>
       <AtCard title="上传相册">
         <View style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <Text style={{ fontSize: "28rpx", color: "#333" }}>打卡城市</Text>
-          <AtButton size="small" onClick={autoDetectRegion}>
-            自动识别
+          <Picker
+            mode="multiSelector"
+            range={[
+              provinceOptions.map((p) => p.region_name),
+              cityOptions.map((c) => c.region_name),
+            ]}
+            value={[provinceIndex, cityIndex]}
+            onChange={onRegionChange}
+            onColumnChange={onRegionColumnChange}
+          >
+            <View
+              style={{
+                flex: 1,
+                padding: "20rpx 0",
+              }}
+            >
+              <Text style={{ fontSize: "28rpx", color: "#333" }}>
+                <Text style={{ fontWeight: "bold" }}>打卡城市</Text>{" "}
+                {provinceName && cityName && provinceName !== "选择省份" && cityName !== "选择城市"
+                  ? `${provinceName} ${cityName}`
+                  : "请选择"}
+              </Text>
+            </View>
+          </Picker>
+
+          <AtButton size="small" circle={true} onClick={autoDetectRegion}>
+            <AtIcon value="map-pin" size={14} />
+            <Text style={{ fontSize: "24rpx" }}>定位</Text>
           </AtButton>
-        </View>
-
-        <View style={{ marginTop: "24rpx", display: "flex", gap: "24rpx" }}>
-          <Picker
-            mode="selector"
-            range={provinceOptions}
-            rangeKey="region_name"
-            onChange={onProvinceChange}
-          >
-            <View
-              style={{
-                flex: 1,
-                padding: "20rpx",
-                borderRadius: "16rpx",
-                backgroundColor: "#fff",
-                border: "1rpx solid #eee",
-              }}
-            >
-              <Text style={{ fontSize: "26rpx", color: "#333" }}>{provinceName}</Text>
-            </View>
-          </Picker>
-
-          <Picker
-            mode="selector"
-            range={cityOptions}
-            rangeKey="region_name"
-            onChange={onCityChange}
-          >
-            <View
-              style={{
-                flex: 1,
-                padding: "20rpx",
-                borderRadius: "16rpx",
-                backgroundColor: "#fff",
-                border: "1rpx solid #eee",
-              }}
-            >
-              <Text style={{ fontSize: "26rpx", color: "#333" }}>{cityName}</Text>
-            </View>
-          </Picker>
         </View>
 
         <View style={{ marginTop: "24rpx" }}>
-          <AtButton type="primary" loading={uploading} disabled={uploading} onClick={upload}>
-            选择图片并上传
+          <AtButton
+            type="primary"
+            loading={uploading}
+            disabled={uploading}
+            onClick={openActionSheet}
+          >
+            拍照或上传
           </AtButton>
         </View>
+
+        <AtActionSheet isOpened={actionOpen} cancelText="取消" onClose={closeActionSheet}>
+          <AtActionSheetItem
+            onClick={() => {
+              setActionOpen(false);
+              void doUpload(["camera"]);
+            }}
+          >
+            拍照
+          </AtActionSheetItem>
+          <AtActionSheetItem
+            onClick={() => {
+              setActionOpen(false);
+              void doUpload(["album"]);
+            }}
+          >
+            从相册上传
+          </AtActionSheetItem>
+        </AtActionSheet>
       </AtCard>
     </View>
   );

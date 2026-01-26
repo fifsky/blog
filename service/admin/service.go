@@ -28,7 +28,7 @@ func New(s *store.Store, conf *config.Config) *Service {
 		Mood:    NewMood(s),
 		Remind:  NewRemind(s),
 		Setting: NewSetting(s),
-		AI:      NewAI(conf),
+		AI:      NewAI(conf, s),
 		Photo:   NewPhoto(s),
 		OSS:     NewOSS(conf),
 		Region:  NewRegion(s),

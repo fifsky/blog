@@ -52,3 +52,6 @@ export const remindCreateApi = (data: RemindCreateRequest) =>
   createApi<IDResponse>("/blog/admin/remind/create", data);
 export const remindDeleteApi = (data: RemindDeleteRequest) =>
   createApi("/blog/admin/remind/delete", data);
+
+export const remindSmartCreateApi = (content: string) =>
+  createApi<IDResponse>("/blog/admin/ai/remind/create", { content });

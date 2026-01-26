@@ -6,6 +6,7 @@ import (
 
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
+	"app/service/remind"
 	"app/store"
 	"app/store/model"
 
@@ -67,6 +68,7 @@ func (r *Remind) Create(ctx context.Context, req *adminv1.RemindCreateRequest) (
 		Status:    1,
 		CreatedAt: time.Now(),
 	}
+	c.NextTime = remind.NextTimeFromRule(c.CreatedAt, c)
 	lastId, err := r.store.CreateRemind(ctx, c)
 	if err != nil {
 		return nil, err
@@ -76,6 +78,7 @@ func (r *Remind) Create(ctx context.Context, req *adminv1.RemindCreateRequest) (
 
 func (r *Remind) Update(ctx context.Context, req *adminv1.RemindUpdateRequest) (*types.IDResponse, error) {
 	u := &model.UpdateRemind{Id: int(req.Id)}
+
 	if req.Type > 0 {
 		v := int(req.Type)
 		u.Type = &v
@@ -104,6 +107,18 @@ func (r *Remind) Update(ctx context.Context, req *adminv1.RemindUpdateRequest) (
 		v := int(req.Minute)
 		u.Minute = &v
 	}
+
+	nextTime := remind.NextTimeFromRule(time.Now(), &model.Remind{
+		Type:      int(req.Type),
+		Month:     int(req.Month),
+		Week:      int(req.Week),
+		Day:       int(req.Day),
+		Hour:      int(req.Hour),
+		Minute:    int(req.Minute),
+		CreatedAt: time.Now(),
+	})
+	u.NextTime = &nextTime
+
 	if err := r.store.UpdateRemind(ctx, u); err != nil {
 		return nil, err
 	}

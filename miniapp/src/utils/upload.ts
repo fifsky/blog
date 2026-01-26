@@ -19,7 +19,7 @@ export async function putFileToPresignUrl(presignUrl: string, filePath: string) 
     method: "PUT",
     data: buf,
     header: {
-      "Content-Type": "application/octet-stream",
+      "Content-Type": "text/plain;charset=utf8",
     },
   });
 
@@ -28,4 +28,3 @@ export async function putFileToPresignUrl(presignUrl: string, filePath: string) 
   }
   throw new Error(`上传文件失败(${resp.statusCode})`);
 }
-
