@@ -13,6 +13,7 @@ import (
 	"app/server/middleware"
 	"app/server/response"
 	adminsvc "app/service/admin"
+	"app/service/mcptool"
 	"app/service/openapi"
 	"app/store"
 
@@ -95,6 +96,11 @@ func (r *Router) Handler() http.Handler {
 	apiv1.RegisterWeixinServiceHTTPServer(api, codec, r.service.Weixin)
 	apiv1.RegisterTravelServiceHTTPServer(api, codec, r.service.Travel)
 	apiv1.RegisterMiniAppServiceHTTPServer(api, codec, r.service.MiniApp)
+
+	mcpAuth := api.Use(middleware.NewToken(r.conf.Common.MCPToken))
+	mcpRemindHandler := mcptool.NewRemindHandler(r.conf, r.store)
+	mcpAuth.Handle("POST /blog/mcp/remind", mcpRemindHandler)
+	mcpAuth.Handle("GET /blog/mcp/remind", mcpRemindHandler)
 
 	adminAuth := api.Use(middleware.NewAuthLogin(r.store, r.conf))
 	adminAuth.HandleFunc("POST /blog/admin/upload", r.admin.Article.Upload)

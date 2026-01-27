@@ -26,8 +26,6 @@ export default function AdminIndex() {
     site_desc: z.string().optional(),
     site_keyword: z.string().optional(),
     post_num: z.string().regex(/^\d+$/, "请输入数字"),
-    map_regions: z.string().optional(),
-    map_footprints: z.string().optional(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -37,8 +35,6 @@ export default function AdminIndex() {
       site_desc: "",
       site_keyword: "",
       post_num: "",
-      map_regions: "",
-      map_footprints: "",
     },
     mode: "onChange",
   });
@@ -62,8 +58,6 @@ export default function AdminIndex() {
       site_desc: data.kv?.site_desc || "",
       site_keyword: data.kv?.site_keyword || "",
       post_num: data.kv?.post_num || "",
-      map_regions: data.kv?.map_regions || "",
-      map_footprints: data.kv?.map_footprints || "",
     });
   }, [form]);
   return (
@@ -129,48 +123,6 @@ export default function AdminIndex() {
                   <FieldLabel htmlFor={field.name}>每页显示文章数</FieldLabel>
                   <FieldContent>
                     <Input {...field} id={field.name} style={{ width: 80 }} />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </FieldContent>
-                </Field>
-              )}
-            />
-            <Controller
-              name="map_regions"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field orientation="vertical" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>点亮省份 (JSON数组)</FieldLabel>
-                  <FieldContent>
-                    <Textarea
-                      className="h-20"
-                      {...field}
-                      id={field.name}
-                      placeholder='例如: ["北京市", "上海市"]'
-                    />
-                    <FieldDescription>
-                      输入JSON数组格式的省份名称列表，用于点亮地图背景。
-                    </FieldDescription>
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </FieldContent>
-                </Field>
-              )}
-            />
-            <Controller
-              name="map_footprints"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field orientation="vertical" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>足迹数据 (JSON数组)</FieldLabel>
-                  <FieldContent>
-                    <Textarea
-                      className="h-20"
-                      {...field}
-                      id={field.name}
-                      placeholder='例如: [{"name": "北京", "value": [116.40, 39.90]}]'
-                    />
-                    <FieldDescription>
-                      输入JSON数组格式的足迹数据，包含名称和经纬度。
-                    </FieldDescription>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </FieldContent>
                 </Field>

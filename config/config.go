@@ -17,6 +17,7 @@ type common struct {
 	AIToken     string `yaml:"ai_token"`
 	AIEndpoint  string `yaml:"ai_endpoint"`
 	AIModel     string `yaml:"ai_model"`
+	MCPToken    string `yaml:"mcp_token"`
 }
 
 type ossConf struct {

@@ -5,9 +5,9 @@ metadata:
 build:
   artifacts:
     - image: registry.cn-shanghai.aliyuncs.com/fifsky/fifsky-blog-web
-      context: .
+      context: web
       docker:
-        dockerfile: deploy/web/Dockerfile
+        dockerfile: ../deploy/web/Dockerfile
   tagPolicy:
     dateTime:
       format: 2006-01-02-15-04-05
