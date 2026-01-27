@@ -31,6 +31,14 @@ import { AgentChatIndicator } from "@/components/agents-ui/agent-chat-indicator"
 // ByteMD plugins for rendering
 const plugins = [gfm(), breaks(), highlightPlugin()];
 
+const STORAGE_KEY = "ai-chat-button-position";
+const DEFAULT_POSITION = { bottom: 24, right: 80 };
+
+interface ButtonPosition {
+  bottom: number;
+  right: number;
+}
+
 export function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -41,6 +49,100 @@ export function AIChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Draggable button state
+  const [buttonPosition, setButtonPosition] = useState<ButtonPosition>(DEFAULT_POSITION);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef<{ x: number; y: number; bottom: number; right: number } | null>(null);
+  const hasMovedRef = useRef(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Load button position from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as ButtonPosition;
+        // Validate the saved position is within viewport
+        const maxRight = window.innerWidth - 48; // button width
+        const maxBottom = window.innerHeight - 48; // button height
+        setButtonPosition({
+          bottom: Math.max(0, Math.min(parsed.bottom, maxBottom)),
+          right: Math.max(0, Math.min(parsed.right, maxRight)),
+        });
+      } catch {
+        // Use default position if parsing fails
+      }
+    }
+  }, []);
+
+  // Handle drag start
+  const handleDragStart = useCallback(
+    (e: React.MouseEvent | React.TouchEvent) => {
+      e.preventDefault();
+      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+      const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+
+      dragStartRef.current = {
+        x: clientX,
+        y: clientY,
+        bottom: buttonPosition.bottom,
+        right: buttonPosition.right,
+      };
+      setIsDragging(true);
+      hasMovedRef.current = false;
+    },
+    [buttonPosition],
+  );
+
+  // Handle drag move and end
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMove = (e: MouseEvent | TouchEvent) => {
+      if (!dragStartRef.current) return;
+
+      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+      const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+
+      const deltaX = dragStartRef.current.x - clientX;
+      const deltaY = dragStartRef.current.y - clientY;
+
+      const maxRight = window.innerWidth - 48;
+      const maxBottom = window.innerHeight - 48;
+
+      const newRight = Math.max(0, Math.min(dragStartRef.current.right + deltaX, maxRight));
+      const newBottom = Math.max(0, Math.min(dragStartRef.current.bottom + deltaY, maxBottom));
+
+      setButtonPosition({ bottom: newBottom, right: newRight });
+      hasMovedRef.current = true;
+    };
+
+    const handleEnd = () => {
+      if (dragStartRef.current && hasMovedRef.current) {
+        // Save position to localStorage only if actually moved
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(buttonPosition));
+      }
+      setIsDragging(false);
+      dragStartRef.current = null;
+      // Reset hasMoved after a short delay to allow onClick to check it
+      setTimeout(() => {
+        hasMovedRef.current = false;
+      }, 100);
+    };
+
+    document.addEventListener("mousemove", handleMove);
+    document.addEventListener("mouseup", handleEnd);
+    document.addEventListener("touchmove", handleMove);
+    document.addEventListener("touchend", handleEnd);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMove);
+      document.removeEventListener("mouseup", handleEnd);
+      document.removeEventListener("touchmove", handleMove);
+      document.removeEventListener("touchend", handleEnd);
+    };
+  }, [isDragging, buttonPosition]);
 
   // Load messages from Dexie on mount
   useEffect(() => {
@@ -254,29 +356,51 @@ export function AIChat() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button - Draggable */}
       <Tooltip>
         <TooltipTrigger asChild>
           <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="fixed bottom-6 right-20 z-50 w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 flex items-center justify-center"
+            ref={buttonRef}
+            onClick={() => {
+              // Only toggle if not actually moved (prevent click after drag)
+              if (!hasMovedRef.current) {
+                setIsOpen(!isOpen);
+              }
+            }}
+            onMouseDown={handleDragStart}
+            onTouchStart={handleDragStart}
+            style={{
+              bottom: `${buttonPosition.bottom}px`,
+              right: `${buttonPosition.right}px`,
+            }}
+            className={`fixed z-50 w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center ${
+              isDragging ? "cursor-grabbing scale-110" : "cursor-grab hover:scale-110"
+            }`}
             aria-label="AI Chat"
           >
             {isOpen ? <X className="w-5 h-5" /> : <MessageCircle className="w-5 h-5" />}
           </button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{isOpen ? "收起聊天" : "展开聊天"}</p>
+          <p>{isOpen ? "收起聊天" : "展开聊天（可拖动）"}</p>
         </TooltipContent>
       </Tooltip>
 
       {/* Chat Window */}
       {isOpen && (
         <div
+          style={
+            isFullscreen
+              ? undefined
+              : {
+                  bottom: `${buttonPosition.bottom + 60}px`,
+                  right: `${buttonPosition.right}px`,
+                }
+          }
           className={`fixed z-50 bg-white shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-in duration-300 ${
             isFullscreen
               ? "inset-0 rounded-none"
-              : "bottom-24 right-20 w-[520px] h-[600px] rounded-xl slide-in-from-bottom-4"
+              : "w-[520px] h-[600px] rounded-xl slide-in-from-bottom-4"
           }`}
         >
           {/* Fullscreen wrapper for centering content */}
