@@ -12,6 +12,8 @@ import (
 	"app/config"
 	"app/pkg/errors"
 	"app/pkg/mcp"
+	adminv1 "app/proto/gen/admin/v1"
+	"app/proto/gen/types"
 	"app/server/response"
 	"app/service/mcptool"
 	"app/store"
@@ -20,7 +22,10 @@ import (
 	"github.com/openai/openai-go/v3/option"
 )
 
+var _ adminv1.AIServiceServer = (*AI)(nil)
+
 type AI struct {
+	adminv1.UnimplementedAIServiceServer
 	conf       *config.Config
 	client     openai.Client
 	mcpManager *mcp.Manager
@@ -62,14 +67,6 @@ type ChatMessage struct {
 // ChatRequest represents the incoming chat request with message history
 type ChatRequest struct {
 	Messages []ChatMessage `json:"messages"`
-}
-
-type RemindSmartCreateRequest struct {
-	Content string `json:"content"`
-}
-
-type RemindSmartCreateResponse struct {
-	Id int32 `json:"id"`
 }
 
 // ToolStartEvent represents a tool call start event sent to frontend
@@ -320,31 +317,16 @@ func (a *AI) executeTool(ctx context.Context, name string, arguments string) str
 	return result
 }
 
-type GenerateTagsRequest struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
-}
-
-type GenerateTagsResponse struct {
-	Tags []string `json:"tags"`
-}
-
-func (a *AI) GenerateTags(w http.ResponseWriter, r *http.Request) {
-	var req GenerateTagsRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		response.Fail(w, errors.BadRequest("INVALID_REQUEST", "Invalid request body"))
-		return
-	}
+func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest) (*adminv1.GenerateTagsResponse, error) {
 	content := strings.TrimSpace(req.Content)
 	if content == "" {
-		response.Fail(w, errors.BadRequest("EMPTY_CONTENT", "Content cannot be empty"))
-		return
+		return nil, errors.BadRequest("EMPTY_CONTENT", "Content cannot be empty")
 	}
 
 	prompt := `你是一个博客写作助手。请根据用户提供的文章标题与正文，为文章生成 3-8 个中文标签。
 要求：
 1) 标签要简短（2-6 个字），可用中英文混合（如 Go、React、MySQL）。
-2) 标签去重，不要包含无意义的词（比如“文章”“随笔”“记录”）。
+2) 标签去重，不要包含无意义的词（比如"文章""随笔""记录"）。
 3) 只输出 JSON 数组（例如：["Go","数据库","性能优化"]），不要输出其它任何文字。`
 
 	userInput := fmt.Sprintf("标题：%s\n正文：\n%s", strings.TrimSpace(req.Title), content)
@@ -364,33 +346,25 @@ func (a *AI) GenerateTags(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	completion, err := a.client.Chat.Completions.New(r.Context(), aiReq)
+	completion, err := a.client.Chat.Completions.New(ctx, aiReq)
 	if err != nil {
-		response.Fail(w, errors.InternalServer("AI_GENERATE_TAGS_ERROR", err.Error()))
-		return
+		return nil, errors.InternalServer("AI_GENERATE_TAGS_ERROR", err.Error())
 	}
 	if len(completion.Choices) == 0 {
-		response.Success(w, &GenerateTagsResponse{Tags: []string{}})
-		return
+		return &adminv1.GenerateTagsResponse{Tags: []string{}}, nil
 	}
 
 	raw := strings.TrimSpace(completion.Choices[0].Message.Content)
 	tags := parseTagsFromAIResponse(raw)
-	response.Success(w, &GenerateTagsResponse{Tags: tags})
+	return &adminv1.GenerateTagsResponse{Tags: tags}, nil
 }
 
-func (a *AI) RemindSmartCreate(w http.ResponseWriter, r *http.Request) {
-	var req RemindSmartCreateRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		response.Fail(w, errors.BadRequest("INVALID_REQUEST", "Invalid request body"))
-		return
-	}
-	lastID, err := mcptool.SmartCreateRemind(r.Context(), a.conf, a.client, a.store, req.Content)
+func (a *AI) RemindSmartCreate(ctx context.Context, req *adminv1.RemindSmartCreateRequest) (*types.IDResponse, error) {
+	lastID, err := mcptool.SmartCreateRemind(ctx, a.conf, a.client, a.store, req.Content)
 	if err != nil {
-		response.Fail(w, err)
-		return
+		return nil, err
 	}
-	response.Success(w, &RemindSmartCreateResponse{Id: int32(lastID)})
+	return &types.IDResponse{Id: int32(lastID)}, nil
 }
 
 func parseTagsFromAIResponse(text string) []string {

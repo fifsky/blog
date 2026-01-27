@@ -1,57 +1,38 @@
 package openapi
 
 import (
+	"context"
 	"database/sql"
-	"net/http"
-	"strconv"
 
 	"app/pkg/errors"
-	"app/server/response"
+	apiv1 "app/proto/gen/api/v1"
 	"app/store"
 )
 
-type Geo struct {
-	store *store.Store
-}
+var _ apiv1.GeoServiceServer = (*Geo)(nil)
 
-type NearestRegionResponse struct {
-	ProvinceID   int    `json:"province_id"`
-	ProvinceName string `json:"province_name"`
-	CityID       int    `json:"city_id"`
-	CityName     string `json:"city_name"`
+type Geo struct {
+	apiv1.UnimplementedGeoServiceServer
+	store *store.Store
 }
 
 func NewGeo(s *store.Store) *Geo {
 	return &Geo{store: s}
 }
 
-func (g *Geo) Nearest(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query()
-	lat, err := strconv.ParseFloat(q.Get("latitude"), 64)
-	if err != nil {
-		response.Fail(w, errors.BadRequest("INVALID_LATITUDE", "latitude 参数错误").WithCause(err))
-		return
-	}
-	lng, err := strconv.ParseFloat(q.Get("longitude"), 64)
-	if err != nil {
-		response.Fail(w, errors.BadRequest("INVALID_LONGITUDE", "longitude 参数错误").WithCause(err))
-		return
-	}
-
-	city, province, err := g.store.FindNearestCity(r.Context(), lat, lng)
+func (g *Geo) GetNearestRegion(ctx context.Context, req *apiv1.GetNearestRegionRequest) (*apiv1.GetNearestRegionResponse, error) {
+	city, province, err := g.store.FindNearestCity(ctx, req.Latitude, req.Longitude)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			response.Fail(w, errors.NotFound("REGION_NOT_FOUND", "未找到匹配的城市"))
-			return
+			return nil, errors.NotFound("REGION_NOT_FOUND", "未找到匹配的城市")
 		}
-		response.Fail(w, errors.ErrSystem.WithCause(err))
-		return
+		return nil, errors.ErrSystem.WithCause(err)
 	}
 
-	response.Success(w, &NearestRegionResponse{
-		ProvinceID:   province.RegionId,
+	return &apiv1.GetNearestRegionResponse{
+		ProvinceId:   int32(province.RegionId),
 		ProvinceName: province.RegionName,
-		CityID:       city.RegionId,
+		CityId:       int32(city.RegionId),
 		CityName:     city.RegionName,
-	})
+	}, nil
 }

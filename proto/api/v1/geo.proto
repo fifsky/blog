@@ -1,0 +1,36 @@
+syntax = "proto3";
+package fifsky.blog.api.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+
+option go_package = "gen/api/v1";
+
+// GeoService 提供地理位置相关的接口
+service GeoService {
+  // GetNearestRegion 根据经纬度获取最近的城市
+  rpc GetNearestRegion(GetNearestRegionRequest) returns (GetNearestRegionResponse) {
+    option (google.api.http) = {get: "/blog/region/nearest"};
+  }
+}
+
+// GetNearestRegionRequest 最近城市请求
+message GetNearestRegionRequest {
+  double latitude = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+  double longitude = 2 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// GetNearestRegionResponse 最近城市响应
+message GetNearestRegionResponse {
+  int32 province_id = 1;
+  string province_name = 2;
+  int32 city_id = 3;
+  string city_name = 4;
+}

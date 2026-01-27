@@ -83,7 +83,6 @@ func (r *Router) Handler() http.Handler {
 
 	api.HandleFunc("GET /blog/weixin/notify", r.service.Weixin.Notify)
 	api.HandleFunc("POST /blog/weixin/notify", r.service.Weixin.Notify)
-	api.HandleFunc("GET /blog/region/nearest", r.service.Geo.Nearest)
 
 	codec := contract.NewCodec()
 	apiv1.RegisterArticleServiceHTTPServer(api, codec, r.service.Article)
@@ -96,6 +95,7 @@ func (r *Router) Handler() http.Handler {
 	apiv1.RegisterWeixinServiceHTTPServer(api, codec, r.service.Weixin)
 	apiv1.RegisterTravelServiceHTTPServer(api, codec, r.service.Travel)
 	apiv1.RegisterMiniAppServiceHTTPServer(api, codec, r.service.MiniApp)
+	apiv1.RegisterGeoServiceHTTPServer(api, codec, r.service.Geo)
 
 	mcpAuth := api.Use(middleware.NewToken(r.conf.Common.MCPToken))
 	mcpRemindHandler := mcptool.NewRemindHandler(r.conf, r.store)
@@ -114,11 +114,10 @@ func (r *Router) Handler() http.Handler {
 	adminv1.RegisterPhotoServiceHTTPServer(adminAuth, codec, r.admin.Photo)
 	adminv1.RegisterOSSServiceHTTPServer(adminAuth, codec, r.admin.OSS)
 	adminv1.RegisterRegionServiceHTTPServer(adminAuth, codec, r.admin.Region)
+	adminv1.RegisterAIServiceHTTPServer(adminAuth, codec, r.admin.AI)
 
 	// AI chat endpoint (SSE streaming)
 	adminAuth.HandleFunc("POST /blog/admin/ai/chat", r.admin.AI.Chat)
-	adminAuth.HandleFunc("POST /blog/admin/ai/tags", r.admin.AI.GenerateTags)
-	adminAuth.HandleFunc("POST /blog/admin/ai/remind/create", r.admin.AI.RemindSmartCreate)
 
 	return &NotFoundHandler{mux: mux.ServeMux}
 }

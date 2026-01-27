@@ -325,3 +325,7 @@ export type TravelPhoto = {
 };
 export type CityPhotosRequest = { region_id: number };
 export type CityPhotosResponse = { photos: TravelPhoto[] };
+
+// AI types
+export type GenerateTagsRequest = { title?: string; content: string };
+export type GenerateTagsResponse = { tags: string[] };

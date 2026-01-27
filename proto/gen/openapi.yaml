@@ -6,6 +6,44 @@ info:
     title: API文档
     version: 0.0.1
 paths:
+    /blog/admin/ai/remind/create:
+        post:
+            tags:
+                - AIService
+            description: RemindSmartCreate 智能创建提醒
+            operationId: AIService_RemindSmartCreate
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RemindSmartCreateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/IDResponse'
+    /blog/admin/ai/tags:
+        post:
+            tags:
+                - AIService
+            description: GenerateTags 根据文章标题和内容生成标签
+            operationId: AIService_GenerateTags
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GenerateTagsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GenerateTagsResponse'
     /blog/admin/article/create:
         post:
             tags:
@@ -848,6 +886,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/MoodItem'
+    /blog/region/nearest:
+        get:
+            tags:
+                - GeoService
+            description: GetNearestRegion 根据经纬度获取最近的城市
+            operationId: GeoService_GetNearestRegion
+            parameters:
+                - name: latitude
+                  in: query
+                  schema:
+                    type: number
+                    format: double
+                - name: longitude
+                  in: query
+                  schema:
+                    type: number
+                    format: double
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetNearestRegionResponse'
     /blog/remind/change:
         get:
             tags:
@@ -1233,6 +1295,24 @@ components:
                     type: string
                 latitude:
                     type: string
+        GenerateTagsRequest:
+            required:
+                - content
+            type: object
+            properties:
+                title:
+                    type: string
+                content:
+                    type: string
+            description: GenerateTagsRequest 生成标签请求
+        GenerateTagsResponse:
+            type: object
+            properties:
+                tags:
+                    type: array
+                    items:
+                        type: string
+            description: GenerateTagsResponse 生成标签响应
         GetFootprintsRequest:
             type: object
             properties: {}
@@ -1249,6 +1329,20 @@ components:
                     items:
                         $ref: '#/components/schemas/FootprintRegion'
             description: GetFootprintsResponse 足迹响应
+        GetNearestRegionResponse:
+            type: object
+            properties:
+                province_id:
+                    type: integer
+                    format: int32
+                province_name:
+                    type: string
+                city_id:
+                    type: integer
+                    format: int32
+                city_name:
+                    type: string
+            description: GetNearestRegionResponse 最近城市响应
         GetPresignURLRequest:
             required:
                 - filename
@@ -1722,6 +1816,14 @@ components:
                 total:
                     type: integer
                     format: int32
+        RemindSmartCreateRequest:
+            required:
+                - content
+            type: object
+            properties:
+                content:
+                    type: string
+            description: RemindSmartCreateRequest 智能创建提醒请求
         RemindUpdateRequest:
             required:
                 - id
@@ -1888,6 +1990,8 @@ components:
             type: object
             properties: {}
 tags:
+    - name: AIService
+      description: AIService 提供 AI 相关的接口
     - name: ArticleService
       description: ArticleService 提供文章相关的接口
     - name: ArticleService
@@ -1896,6 +2000,8 @@ tags:
       description: CateService 提供分类相关的接口
     - name: CateService
       description: CateService 提供分类相关的接口
+    - name: GeoService
+      description: GeoService 提供地理位置相关的接口
     - name: LinkService
       description: LinkService 提供链接相关的接口
     - name: LinkService

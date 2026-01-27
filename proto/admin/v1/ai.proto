@@ -1,0 +1,49 @@
+syntax = "proto3";
+package fifsky.blog.admin.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "types/common.proto";
+
+option go_package = "gen/admin/v1";
+
+// AIService 提供 AI 相关的接口
+service AIService {
+  // GenerateTags 根据文章标题和内容生成标签
+  rpc GenerateTags(GenerateTagsRequest) returns (GenerateTagsResponse) {
+    option (google.api.http) = {
+      post: "/blog/admin/ai/tags"
+      body: "*"
+    };
+  }
+  // RemindSmartCreate 智能创建提醒
+  rpc RemindSmartCreate(RemindSmartCreateRequest) returns (fifsky.blog.types.IDResponse) {
+    option (google.api.http) = {
+      post: "/blog/admin/ai/remind/create"
+      body: "*"
+    };
+  }
+}
+
+// GenerateTagsRequest 生成标签请求
+message GenerateTagsRequest {
+  string title = 1;
+  string content = 2 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// GenerateTagsResponse 生成标签响应
+message GenerateTagsResponse {
+  repeated string tags = 1;
+}
+
+// RemindSmartCreateRequest 智能创建提醒请求
+message RemindSmartCreateRequest {
+  string content = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
