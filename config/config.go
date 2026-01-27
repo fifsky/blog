@@ -27,12 +27,6 @@ type ossConf struct {
 	Bucket       string `yaml:"bucket"`
 }
 
-type WeixinConf struct {
-	Appid     string `yaml:"appid"`
-	AppSecret string `yaml:"app_secret"`
-	Token     string `yaml:"token"`
-}
-
 type MCPConf struct {
 	Name  string `yaml:"name"`  // MCP名称，用于前端展示
 	URL   string `yaml:"url"`   // MCP StreamHttp地址
@@ -50,7 +44,6 @@ type Config struct {
 	Common  common             `yaml:"common"`
 	DB      DBConf             `yaml:"database"`
 	OSS     ossConf            `yaml:"oss"`
-	Weixin  WeixinConf         `yaml:"weixin"`
 	MCP     map[string]MCPConf `yaml:"mcp"`
 	MiniAPP MiniAPPConf        `yaml:"miniapp"`
 }
