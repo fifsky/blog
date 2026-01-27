@@ -38,6 +38,12 @@ type MiniAPPConf struct {
 	AppSecret string `yaml:"app_secret"`
 }
 
+type FeishuConf struct {
+	Appid      string `yaml:"appid"`
+	AppSecret  string `yaml:"app_secret"`
+	EncryptKey string `yaml:"encrypt_key"`
+}
+
 type Config struct {
 	Env     string
 	AppName string             `yaml:"app_name"`
@@ -46,6 +52,7 @@ type Config struct {
 	OSS     ossConf            `yaml:"oss"`
 	MCP     map[string]MCPConf `yaml:"mcp"`
 	MiniAPP MiniAPPConf        `yaml:"miniapp"`
+	Feishu  FeishuConf         `yaml:"feishu"`
 }
 
 func New() *Config {

@@ -10,6 +10,7 @@ import (
 	"app/config"
 	"app/pkg/bark"
 	"app/pkg/wechat"
+	"app/service/feishu"
 	"app/service/motto"
 	"app/service/remind"
 	"app/store"
@@ -46,6 +47,12 @@ func main() {
 	ai := motto.NewDoubaoProvider(conf.Common.AIToken, conf.Common.AIModel)
 	m := motto.New(s, conf, barkClient, ai)
 	go m.Start("0 7 * * *")
+
+	// Feishu bot service
+	if conf.Feishu.Appid != "" {
+		feishuBot := feishu.NewBot(conf)
+		go feishuBot.Start(context.Background())
+	}
 
 	app := &cli.Command{
 		Name:  "blog",
