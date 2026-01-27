@@ -56,7 +56,9 @@ export async function request<T = any>(
       // 返回一个 rejected promise 让调用方自行停止后续逻辑或继续链式处理
       throw err;
     } else {
-      dialog.message(err.message);
+      if (err.code !== "UNAUTHORIZED") {
+        dialog.message(err.message);
+      }
       throw err;
     }
   }
