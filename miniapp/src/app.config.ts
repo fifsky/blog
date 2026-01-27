@@ -1,13 +1,5 @@
 export default defineAppConfig({
-  pages: [
-    "pages/mood/index",
-    "pages/photo/index",
-    "pages/remind/index",
-    "pages/mood/create/index",
-    "pages/photo/create/index",
-    "pages/remind/create/index",
-    "pages/login/index",
-  ],
+  pages: ["pages/mood/index", "pages/photo/index", "pages/remind/index", "pages/login/index"],
   tabBar: {
     color: "#64748b",
     selectedColor: "#4f46e5",
@@ -37,9 +29,11 @@ export default defineAppConfig({
   usingComponents: {},
   window: {
     backgroundTextStyle: "light",
-    navigationBarBackgroundColor: "#fff",
-    navigationBarTitleText: "fifsky",
+    navigationBarBackgroundColor: "#89d5ef",
+    navigationBarTitleText: "無處告別",
     navigationBarTextStyle: "black",
+    backgroundColor: "#89d5ef",
+    enablePullDownRefresh: true,
   },
   requiredPrivateInfos: ["getLocation"],
   permission: {

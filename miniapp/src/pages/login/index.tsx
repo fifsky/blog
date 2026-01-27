@@ -1,6 +1,6 @@
 import Taro, { useDidShow } from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
-import { AtButton, AtCard } from "taro-ui";
+import { Button } from "@taroify/core";
 import { miniappLoginApi } from "../../service";
 
 const ACCESS_TOKEN_STORAGE_KEY = "access_token";
@@ -45,12 +45,28 @@ export default function LoginPage() {
   };
 
   return (
-    <View style={{ minHeight: "100vh", backgroundColor: "#f5f5f5", padding: "48rpx 32rpx" }}>
-      <AtCard title="fifsky" note="使用微信一键登录，登录后可发表心情、上传相册、管理提醒">
-        <AtButton type="primary" onClick={handleLogin}>
-          微信一键登录
-        </AtButton>
-      </AtCard>
+    <View style={{ minHeight: "100vh", backgroundColor: "#f2f4f6", padding: "48rpx 32rpx" }}>
+      <View
+        style={{
+          backgroundColor: "#fff",
+          borderRadius: "16rpx",
+          padding: "32rpx",
+        }}
+      >
+        <View>
+          <Text style={{ fontSize: "32rpx", color: "#333", fontWeight: 600 }}>fifsky</Text>
+        </View>
+        <View style={{ marginTop: "12rpx" }}>
+          <Text style={{ fontSize: "24rpx", color: "#999" }}>
+            使用微信一键登录，登录后可发表心情、上传相册、管理提醒
+          </Text>
+        </View>
+        <View style={{ marginTop: "24rpx" }}>
+          <Button color="primary" onClick={handleLogin} style={{ width: "100%" } as any}>
+            微信一键登录
+          </Button>
+        </View>
+      </View>
       <View style={{ marginTop: "32rpx" }}>
         <Text style={{ fontSize: "24rpx", color: "#999" }}>
           本地：127.0.0.1:8080 / 线上：api.fifsky.com

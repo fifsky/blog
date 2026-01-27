@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "@tarojs/components";
 import Taro, { useDidShow } from "@tarojs/taro";
-import { AtFab, AtIcon } from "taro-ui";
+import { Button, Cell, Field, Popup, Textarea } from "@taroify/core";
 import type { MoodItem } from "../../types/openapi";
-import { moodListApi } from "../../service";
+import { moodCreateApi, moodListApi } from "../../service";
 
 export default function MoodPage() {
   const [list, setList] = useState<MoodItem[]>([]);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [content, setContent] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const load = async () => {
     try {
@@ -25,13 +28,53 @@ export default function MoodPage() {
     void load();
   }, []);
 
-  const goCreate = () => {
-    Taro.navigateTo({ url: "/pages/mood/create/index" });
+  const openCreate = () => {
+    setCreateOpen(true);
+  };
+
+  const closeCreate = () => {
+    if (submitting) return;
+    setCreateOpen(false);
+  };
+
+  const submit = async () => {
+    if (!content.trim()) {
+      Taro.showToast({ title: "请输入心情内容", icon: "none" });
+      return;
+    }
+    if (submitting) return;
+
+    setSubmitting(true);
+    try {
+      await moodCreateApi({ content });
+      Taro.showToast({ title: "发布成功", icon: "success" });
+      setContent("");
+      setCreateOpen(false);
+      await load();
+    } catch (e: any) {
+      Taro.showToast({ title: e?.message || "发布失败", icon: "none" });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <View style={{ minHeight: "100vh", backgroundColor: "#f5f5f5", paddingBottom: "120rpx" }}>
+    <View style={{ minHeight: "100vh", backgroundColor: "#f2f4f6", paddingBottom: "120rpx" }}>
       <ScrollView scrollY style={{ height: "100vh" }}>
+        <View
+          style={{
+            padding: "24rpx",
+          }}
+        >
+          <Button
+            color="primary"
+            shape="round"
+            style={{ width: "100%", height: "88rpx", fontSize: "28rpx" } as any}
+            onClick={openCreate}
+          >
+            + 写心情
+          </Button>
+        </View>
         {list.map((m) => (
           <View
             key={m.id}
@@ -56,19 +99,52 @@ export default function MoodPage() {
           </View>
         ) : null}
       </ScrollView>
-
-      <View
-        style={{
-          position: "fixed",
-          right: "32rpx",
-          bottom: "140rpx",
-          zIndex: 1000,
-        }}
-      >
-        <AtFab onClick={goCreate}>
-          <AtIcon value="add" size={24} />
-        </AtFab>
-      </View>
+      <Popup open={createOpen} rounded placement="bottom" onClose={setCreateOpen}>
+        <View style={{ padding: "32rpx 24rpx 40rpx" }}>
+          <Text style={{ fontSize: "32rpx", fontWeight: 600, color: "#333" }}>写下此刻的心情</Text>
+          <View style={{ marginTop: "24rpx" }}>
+            <Cell.Group inset>
+              <Field align="start">
+                <Textarea
+                  value={content}
+                  onChange={(v: any) => setContent(String(v?.detail?.value ?? v))}
+                  limit={500}
+                  autoHeight
+                  placeholder="写点什么…"
+                />
+              </Field>
+            </Cell.Group>
+          </View>
+          <View
+            style={{
+              marginTop: "32rpx",
+              display: "flex",
+              justifyContent: "space-between",
+              gap: "24rpx",
+            }}
+          >
+            <Button
+              size="small"
+              shape="round"
+              onClick={closeCreate}
+              style={{ flex: 1, backgroundColor: "#f5f5f5", border: "none" } as any}
+            >
+              取消
+            </Button>
+            <Button
+              color="primary"
+              size="small"
+              shape="round"
+              loading={submitting}
+              disabled={submitting}
+              onClick={submit}
+              style={{ flex: 1 } as any}
+            >
+              发布
+            </Button>
+          </View>
+        </View>
+      </Popup>
     </View>
   );
 }
