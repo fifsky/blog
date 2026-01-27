@@ -133,8 +133,8 @@ func (r *Remind) messageForBark(content string, v *model.Remind) {
 [收到提醒](%s)  [稍后提醒](%s)
 `
 
-	changeUrl := "https://api.fifsky.com/api/remind/change?token=" + url.QueryEscape(token)
-	delayUrl := "https://api.fifsky.com/api/remind/delay?token=" + url.QueryEscape(token)
+	changeUrl := "https://api.fifsky.com/blog/remind/change?token=" + url.QueryEscape(token)
+	delayUrl := "https://api.fifsky.com/blog/remind/delay?token=" + url.QueryEscape(token)
 
 	msg := bark.Message{
 		Title:    "⏰重要提醒⏰",
