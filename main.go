@@ -55,7 +55,7 @@ func main() {
 
 	// Feishu bot service
 	if conf.Feishu.Appid != "" {
-		feishuBot := feishu.NewBot(conf)
+		feishuBot := feishu.NewBot(conf, s)
 		go feishuBot.Start(context.Background())
 	}
 

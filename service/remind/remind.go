@@ -123,6 +123,7 @@ func NextTimeFromRule(from time.Time, m *model.Remind) time.Time {
 func (r *Remind) buildMessage(title, content string, v *model.Remind) messenger.Message {
 	token, _ := aesutil.AesEncode(r.conf.Common.TokenSecret, strconv.Itoa(v.Id))
 
+	// For non-Feishu channels, still use URL
 	changeURL := "https://api.fifsky.com/blog/remind/change?token=" + url.QueryEscape(token)
 	delayURL := "https://api.fifsky.com/blog/remind/delay?token=" + url.QueryEscape(token)
 
@@ -130,8 +131,9 @@ func (r *Remind) buildMessage(title, content string, v *model.Remind) messenger.
 		Title:   title,
 		Content: content,
 		Time:    time.Now().Format("2006-01-02 15:04"),
+		Token:   token,
 		Actions: []messenger.Action{
-			{Title: "收到提醒", URL: changeURL},
+			{Title: "标记完成", URL: changeURL},
 			{Title: "稍后提醒", URL: delayURL},
 		},
 	}

@@ -7,10 +7,10 @@ import (
 
 	"app/config"
 	"app/pkg/aesutil"
-	"app/pkg/wechat"
 	apiv1 "app/proto/gen/api/v1"
 	"app/store"
 	"app/testutil"
+
 	"github.com/goapt/dbunit"
 )
 
@@ -25,13 +25,11 @@ func TestRemind_Change(t *testing.T) {
 
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("reminds")...)
-		robot := wechat.NewRobot("123")
-		svc := NewRemind(store.New(db), wechat.NewRobot("123"), conf)
+		svc := NewRemind(store.New(db), conf)
 		resp, err := svc.Change(context.Background(), &apiv1.RemindActionRequest{Token: getRemindTestToken(8, conf)})
 		if err != nil || resp.Text == "" {
 			t.Fatalf("unexpected err=%v resp=%v", err, resp)
 		}
-		_ = robot
 	})
 }
 
@@ -41,7 +39,7 @@ func TestRemind_Delay(t *testing.T) {
 
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("reminds")...)
-		svc := NewRemind(store.New(db), wechat.NewRobot("123"), conf)
+		svc := NewRemind(store.New(db), conf)
 		resp, err := svc.Delay(context.Background(), &apiv1.RemindActionRequest{Token: getRemindTestToken(8, conf)})
 		if err != nil || resp.Text == "" {
 			t.Fatalf("unexpected err=%v resp=%v", err, resp)

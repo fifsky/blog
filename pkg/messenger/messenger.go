@@ -5,7 +5,7 @@ import "context"
 // Action represents a button action in the message.
 type Action struct {
 	Title string // Button title
-	URL   string // Action URL
+	URL   string // Action URL (for URL-based actions)
 }
 
 // Message represents a notification message to be sent.
@@ -13,6 +13,7 @@ type Message struct {
 	Title   string   // Message title
 	Content string   // Message content (markdown supported)
 	Time    string   // Optional time display
+	Token   string   // Token to pass in callback value
 	Actions []Action // Action buttons
 }
 
