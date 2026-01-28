@@ -70,17 +70,19 @@ func NewCardUpdater(cardID string, larkClient *lark.Client) *CardUpdater {
 	}
 }
 
+func (u *CardUpdater) getSeq() int {
+	return int(atomic.AddInt64(&u.sequence, 1))
+}
+
 // UpdateElement updates a card element's content with auto-incrementing sequence.
 func (u *CardUpdater) UpdateElement(ctx context.Context, elementID, content string) error {
-	seq := int(atomic.AddInt64(&u.sequence, 1))
-
 	req := larkcardkit.NewContentCardElementReqBuilder().
 		CardId(u.cardID).
 		ElementId(elementID).
 		Body(larkcardkit.NewContentCardElementReqBodyBuilder().
 			Content(content).
 			Uuid(uuid.NewString()).
-			Sequence(seq).
+			Sequence(u.getSeq()).
 			Build()).
 		Build()
 
@@ -103,8 +105,6 @@ func (u *CardUpdater) UpdateContent(ctx context.Context, content string) error {
 
 // UpdateTip updates the tip div element using Patch API (div elements don't support streaming updates).
 func (u *CardUpdater) UpdateTip(ctx context.Context, tipText string) error {
-	seq := int(atomic.AddInt64(&u.sequence, 1))
-
 	// Use PartialElement to update the text.content property of the div
 	partial := map[string]any{
 		"text": map[string]any{
@@ -123,7 +123,7 @@ func (u *CardUpdater) UpdateTip(ctx context.Context, tipText string) error {
 		Body(larkcardkit.NewPatchCardElementReqBodyBuilder().
 			PartialElement(partialElement).
 			Uuid(uuid.NewString()).
-			Sequence(seq).
+			Sequence(u.getSeq()).
 			Build()).
 		Build()
 
@@ -134,6 +134,36 @@ func (u *CardUpdater) UpdateTip(ctx context.Context, tipText string) error {
 
 	if !resp.Success() {
 		return fmt.Errorf("update tip element failed: code=%d, msg=%s", resp.Code, resp.Msg)
+	}
+
+	return nil
+}
+
+// CloseStreaming closes streaming mode by updating card settings.
+func (u *CardUpdater) CloseStreaming(ctx context.Context) error {
+	settings := map[string]any{
+		"config": map[string]any{
+			"streaming_mode": false,
+		},
+	}
+	settingsBytes, _ := json.Marshal(settings)
+
+	req := larkcardkit.NewSettingsCardReqBuilder().
+		CardId(u.cardID).
+		Body(larkcardkit.NewSettingsCardReqBodyBuilder().
+			Settings(string(settingsBytes)).
+			Uuid(uuid.NewString()).
+			Sequence(u.getSeq()).
+			Build()).
+		Build()
+
+	resp, err := u.larkClient.Cardkit.V1.Card.Settings(ctx, req)
+	if err != nil {
+		return err
+	}
+
+	if !resp.Success() {
+		return fmt.Errorf("close streaming failed: code=%d, msg=%s", resp.Code, resp.Msg)
 	}
 
 	return nil
@@ -452,6 +482,11 @@ You should use the available tools to find accurate and up-to-date information.
 
 	if err := updater.UpdateTip(ctx, "以上内容由 AI 生成，仅供参考"); err != nil {
 		return fmt.Errorf("failed to update tip: %w", err)
+	}
+
+	// Close streaming mode
+	if err := updater.CloseStreaming(ctx); err != nil {
+		fmt.Printf("[Feishu Bot] Failed to close streaming: %v\n", err)
 	}
 
 	return nil

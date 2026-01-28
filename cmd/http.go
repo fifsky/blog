@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"app/config"
-	"app/pkg/wechat"
 	"app/server"
 	"app/server/router"
 	"app/service/admin"
@@ -17,7 +16,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func NewHttp(db *sql.DB, conf *config.Config, robot *wechat.Robot, httpClient *http.Client) *cli.Command {
+func NewHttp(db *sql.DB, conf *config.Config, httpClient *http.Client) *cli.Command {
 	return &cli.Command{
 		Name:  "http",
 		Usage: "http command eg: ./app http --addr=:8080",
@@ -33,7 +32,7 @@ func NewHttp(db *sql.DB, conf *config.Config, robot *wechat.Robot, httpClient *h
 			}
 			log.Println("[Env] Run profile:" + conf.Env)
 			s := store.New(db)
-			apiService := openapi.New(s, conf, robot, httpClient)
+			apiService := openapi.New(s, conf, httpClient)
 			adminService := admin.New(s, conf)
 			route := router.New(apiService, adminService, conf, s)
 			return server.New(

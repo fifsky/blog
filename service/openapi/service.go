@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"app/config"
-	"app/pkg/wechat"
 	"app/store"
 )
 
@@ -21,14 +20,14 @@ type Service struct {
 	Geo     *Geo
 }
 
-func New(s *store.Store, conf *config.Config, robot *wechat.Robot, httpClient *http.Client) *Service {
+func New(s *store.Store, conf *config.Config, httpClient *http.Client) *Service {
 	return &Service{
 		User:    NewUser(s, conf),
 		Article: NewArticle(s, conf),
 		Cate:    NewCate(s),
 		Link:    NewLink(s),
 		Mood:    NewMood(s),
-		Remind:  NewRemind(s, robot, conf),
+		Remind:  NewRemind(s, conf),
 		Setting: NewSetting(s),
 		Travel:  NewTravel(s),
 		MiniApp: NewMiniApp(s, conf, httpClient),

@@ -39,9 +39,9 @@ type MiniAPPConf struct {
 }
 
 type FeishuConf struct {
-	Appid      string `yaml:"appid"`
-	AppSecret  string `yaml:"app_secret"`
-	EncryptKey string `yaml:"encrypt_key"`
+	Appid     string `yaml:"appid"`
+	AppSecret string `yaml:"app_secret"`
+	UserID    string `yaml:"user_id"`
 }
 
 type Config struct {

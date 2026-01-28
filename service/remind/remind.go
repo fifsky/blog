@@ -2,7 +2,6 @@ package remind
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/url"
 	"strconv"
@@ -10,8 +9,7 @@ import (
 
 	"app/config"
 	"app/pkg/aesutil"
-	"app/pkg/bark"
-	"app/pkg/wechat"
+	"app/pkg/messenger"
 	"app/store"
 	"app/store/model"
 
@@ -19,18 +17,16 @@ import (
 )
 
 type Remind struct {
-	store      *store.Store
-	conf       *config.Config
-	robot      *wechat.Robot
-	barkClient *bark.Client
+	store     *store.Store
+	conf      *config.Config
+	messenger messenger.Sender
 }
 
-func New(s *store.Store, conf *config.Config, robot *wechat.Robot, barkClient *bark.Client) *Remind {
+func New(s *store.Store, conf *config.Config, msgSender messenger.Sender) *Remind {
 	return &Remind{
-		store:      s,
-		conf:       conf,
-		robot:      robot,
-		barkClient: barkClient,
+		store:     s,
+		conf:      conf,
+		messenger: msgSender,
 	}
 }
 
@@ -124,46 +120,29 @@ func NextTimeFromRule(from time.Time, m *model.Remind) time.Time {
 	}
 }
 
-func (r *Remind) messageForBark(content string, v *model.Remind) {
+func (r *Remind) buildMessage(title, content string, v *model.Remind) messenger.Message {
 	token, _ := aesutil.AesEncode(r.conf.Common.TokenSecret, strconv.Itoa(v.Id))
 
-	markdown := `
-%s
+	changeURL := "https://api.fifsky.com/blog/remind/change?token=" + url.QueryEscape(token)
+	delayURL := "https://api.fifsky.com/blog/remind/delay?token=" + url.QueryEscape(token)
 
-[收到提醒](%s)  [稍后提醒](%s)
-`
-
-	changeUrl := "https://api.fifsky.com/blog/remind/change?token=" + url.QueryEscape(token)
-	delayUrl := "https://api.fifsky.com/blog/remind/delay?token=" + url.QueryEscape(token)
-
-	msg := bark.Message{
-		Title:    "⏰重要提醒⏰",
-		Badge:    1,
-		Markdown: fmt.Sprintf(markdown, content, changeUrl, delayUrl),
-	}
-
-	if err := r.barkClient.Send(msg); err != nil {
-		logger.Default().Error("remind request bark error", slog.String("err", err.Error()))
+	return messenger.Message{
+		Title:   title,
+		Content: content,
+		Time:    time.Now().Format("2006-01-02 15:04"),
+		Actions: []messenger.Action{
+			{Title: "收到提醒", URL: changeURL},
+			{Title: "稍后提醒", URL: delayURL},
+		},
 	}
 }
 
-func (r *Remind) message(content string, v *model.Remind) {
-	token, _ := aesutil.AesEncode(r.conf.Common.TokenSecret, strconv.Itoa(v.Id))
+func (r *Remind) message(title, content string, v *model.Remind) {
+	msg := r.buildMessage(title, content, v)
 
-	err := r.robot.CardMessage("⏰重要提醒⏰", content, []map[string]string{
-		{
-			"title":     "收到提醒",
-			"actionURL": "https://api.fifsky.com/api/remind/change?token=" + url.QueryEscape(token),
-		},
-		{
-			"title":     "稍后提醒",
-			"actionURL": "https://api.fifsky.com/api/remind/delay?token=" + url.QueryEscape(token),
-		},
-	})
-	if err != nil {
-		logger.Default().Error("remind request robot error", slog.String("err", err.Error()))
+	if err := r.messenger.Send(context.Background(), msg); err != nil {
+		logger.Default().Error("remind send message error", slog.String("err", err.Error()))
 	}
-	r.messageForBark(content, v)
 }
 
 func (r *Remind) changeNextTime(id int) {
@@ -179,14 +158,14 @@ func (r *Remind) run(t time.Time) {
 	reminds, _ := r.store.RemindAll(context.Background())
 
 	for _, v := range reminds {
-		content := "提醒时间:" + time.Now().Format("2006-01-02 15:04:00") + " \n\n提醒内容:" + v.Content
+		content := v.Content
 
 		// 如果是等待确认的消息，则每天都需要提醒
 		if v.Status == 2 {
 			// 未确认的消息每天都需要在相同的时间点提醒
 			if t.Format("15:04") == v.NextTime.Format("15:04") {
 				v2 := v
-				r.message("🙋🏻‍再次提醒 \n "+content, &v2)
+				r.message("🙋🏻‍再次提醒", content, &v2)
 				r.changeNextTime(v.Id)
 			}
 
@@ -225,7 +204,7 @@ func (r *Remind) run(t time.Time) {
 
 		if isRemind {
 			v2 := v
-			r.message(content, &v2)
+			r.message("⏰重要提醒⏰", content, &v2)
 			// 如果发出提醒，在用户没有点击确认收到之前，会不断提醒，因此需要更新下一次提醒时间为次日相同时间点
 			r.changeNextTime(v.Id)
 		}

@@ -9,7 +9,7 @@ import (
 	"app/cmd"
 	"app/config"
 	"app/pkg/bark"
-	"app/pkg/wechat"
+	"app/pkg/messenger"
 	"app/service/feishu"
 	"app/service/motto"
 	"app/service/remind"
@@ -38,10 +38,15 @@ func main() {
 	httpClient := httpx.NewClient(httpx.WithMiddleware(httpx.AccessLog(logger.Default())))
 	barkClient := bark.New(httpClient, conf.Common.NotifyUrl, conf.Common.NotifyToken)
 
-	robot := wechat.NewRobot(conf.Common.RobotToken)
+	// Create message senders for remind service
+	var senders []messenger.Sender
+	// senders = append(senders, messenger.NewWechatSender(conf.Common.RobotToken))
+	senders = append(senders, messenger.NewBarkSender(barkClient), messenger.NewFeishuSender(conf.Feishu))
+	multiSender := messenger.NewMultiSender(senders...)
+
 	// crontab setup
 	s := store.New(db)
-	r := remind.New(s, conf, robot, barkClient)
+	r := remind.New(s, conf, multiSender)
 	go r.Start()
 
 	ai := motto.NewDoubaoProvider(conf.Common.AIToken, conf.Common.AIModel)
@@ -58,7 +63,7 @@ func main() {
 		Name:  "blog",
 		Usage: "fifsky blog",
 		Commands: []*cli.Command{
-			cmd.NewHttp(db, conf, robot, httpClient),
+			cmd.NewHttp(db, conf, httpClient),
 			cmd.NewTmp(db, conf),
 		},
 	}
