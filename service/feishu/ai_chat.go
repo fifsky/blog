@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"app/config"
+	"app/pkg/mcp"
 
 	"github.com/google/uuid"
 	lark "github.com/larksuite/oapi-sdk-go/v3"
@@ -23,6 +24,7 @@ type AIChat struct {
 	conf       *config.Config
 	larkClient *lark.Client
 	aiClient   openai.Client
+	mcpManager *mcp.Manager
 }
 
 // NewAIChat creates a new AIChat instance.
@@ -32,10 +34,23 @@ func NewAIChat(conf *config.Config, larkClient *lark.Client) *AIChat {
 		option.WithBaseURL(conf.Common.AIEndpoint),
 	)
 
+	// Create MCP manager with all configured MCP clients
+	mcpManager := mcp.NewManager()
+	for key, mcpConf := range conf.MCP {
+		if mcpConf.URL != "" {
+			displayName := mcpConf.Name
+			if displayName == "" {
+				displayName = key
+			}
+			mcpManager.AddClient(key, displayName, mcpConf.URL, mcpConf.Token)
+		}
+	}
+
 	return &AIChat{
 		conf:       conf,
 		larkClient: larkClient,
 		aiClient:   aiClient,
+		mcpManager: mcpManager,
 	}
 }
 
@@ -255,10 +270,74 @@ func (a *AIChat) getCardID(ctx context.Context, messageID string) (string, error
 	return *resp.Data.CardId, nil
 }
 
+// getMCPTools returns the available tools from all MCP clients as OpenAI tool params
+func (a *AIChat) getMCPTools(ctx context.Context) []openai.ChatCompletionToolUnionParam {
+	if !a.mcpManager.HasClients() {
+		return nil
+	}
+
+	mcpTools, err := a.mcpManager.ListAllTools(ctx)
+	if err != nil {
+		return nil
+	}
+
+	tools := make([]openai.ChatCompletionToolUnionParam, 0, len(mcpTools))
+	for _, t := range mcpTools {
+		// Convert MCP tool InputSchema to OpenAI FunctionParameters
+		var params openai.FunctionParameters
+		if len(t.InputSchema) > 0 {
+			_ = json.Unmarshal(t.InputSchema, &params)
+		}
+		if params == nil {
+			params = openai.FunctionParameters{"type": "object"}
+		}
+
+		tools = append(tools, openai.ChatCompletionToolUnionParam{
+			OfFunction: &openai.ChatCompletionFunctionToolParam{
+				Function: openai.FunctionDefinitionParam{
+					Name:        t.Name,
+					Description: openai.String(t.Description),
+					Parameters:  params,
+				},
+			},
+		})
+	}
+
+	return tools
+}
+
+// executeTool executes a tool call via MCP manager and returns the result
+func (a *AIChat) executeTool(ctx context.Context, name string, arguments string) string {
+	if !a.mcpManager.HasClients() {
+		return "Tool execution failed: no MCP clients available"
+	}
+
+	// Parse arguments
+	var args map[string]any
+	if err := json.Unmarshal([]byte(arguments), &args); err != nil {
+		return fmt.Sprintf("Tool execution failed: invalid arguments: %v", err)
+	}
+
+	result, err := a.mcpManager.CallTool(ctx, name, args)
+	if err != nil {
+		return fmt.Sprintf("Tool execution failed: %v", err)
+	}
+
+	return result
+}
+
 // streamAIResponse calls the AI API and streams the response to the card.
 func (a *AIChat) streamAIResponse(ctx context.Context, updater *CardUpdater, userMessage string) error {
 	prompt := fmt.Sprintf(`You are a helpful assistant. Respond in the same language as the user's message.
 Current Time: %s
+
+When you encounter questions that you cannot answer directly, such as:
+- Current events, news, or real-time information
+- Recent research or developments in professional fields
+- Specific facts you are uncertain about
+- Information that may have changed after your training data cutoff
+
+You should use the available tools to find accurate and up-to-date information.
 
 请用简洁友好的方式回答用户的问题。`, time.Now().Format(time.DateTime))
 
@@ -267,9 +346,13 @@ Current Time: %s
 		openai.UserMessage(userMessage),
 	}
 
+	// Get tools from all MCP clients
+	tools := a.getMCPTools(ctx)
+
 	aiReq := openai.ChatCompletionNewParams{
 		Model:    a.conf.Common.AIModel,
 		Messages: messages,
+		Tools:    tools,
 	}
 
 	if strings.HasPrefix(a.conf.Common.AIModel, "doubao") {
@@ -280,30 +363,80 @@ Current Time: %s
 		})
 	}
 
-	stream := a.aiClient.Chat.Completions.NewStreaming(ctx, aiReq)
-
 	var content strings.Builder
 	updateInterval := 300 * time.Millisecond
 	lastUpdate := time.Now()
 
-	for stream.Next() {
-		chunk := stream.Current()
+	// Tool calling loop - handle tool calls until we get a final response
+	for {
+		stream := a.aiClient.Chat.Completions.NewStreaming(ctx, aiReq)
+		acc := openai.ChatCompletionAccumulator{}
+		hasToolCalls := false
 
-		if len(chunk.Choices) > 0 && chunk.Choices[0].Delta.Content != "" {
-			content.WriteString(chunk.Choices[0].Delta.Content)
+		// Stream the response
+		for stream.Next() {
+			chunk := stream.Current()
+			acc.AddChunk(chunk)
 
-			// Update card at intervals to avoid rate limiting
-			if time.Since(lastUpdate) >= updateInterval {
-				if err := updater.UpdateContent(ctx, content.String()); err != nil {
-					fmt.Printf("[Feishu Bot] Failed to update card content: %v\n", err)
+			// Check if stream finished with tool_calls
+			if len(chunk.Choices) > 0 && chunk.Choices[0].FinishReason == "tool_calls" {
+				hasToolCalls = true
+				break
+			}
+
+			// Stream content to card
+			if len(chunk.Choices) > 0 && chunk.Choices[0].Delta.Content != "" {
+				content.WriteString(chunk.Choices[0].Delta.Content)
+
+				// Update card at intervals to avoid rate limiting
+				if time.Since(lastUpdate) >= updateInterval {
+					if err := updater.UpdateContent(ctx, content.String()); err != nil {
+						fmt.Printf("[Feishu Bot] Failed to update card content: %v\n", err)
+					}
+					lastUpdate = time.Now()
 				}
-				lastUpdate = time.Now()
 			}
 		}
-	}
 
-	if err := stream.Err(); err != nil {
-		return fmt.Errorf("AI stream error: %w", err)
+		if err := stream.Err(); err != nil {
+			return fmt.Errorf("AI stream error: %w", err)
+		}
+
+		// Handle tool calls if any
+		if hasToolCalls && len(acc.Choices) > 0 && len(acc.Choices[0].Message.ToolCalls) > 0 {
+			// Add assistant message with tool calls
+			aiReq.Messages = append(aiReq.Messages, acc.Choices[0].Message.ToParam())
+
+			// Execute all tool calls and add results
+			for _, toolCall := range acc.Choices[0].Message.ToolCalls {
+				// Get MCP display name for the tool
+				mcpName := a.mcpManager.GetMCPDisplayName(toolCall.Function.Name)
+
+				// Update tip to show tool calling status
+				tipText := fmt.Sprintf("正在调用工具，%s", mcpName)
+				if err := updater.UpdateTip(ctx, tipText); err != nil {
+					fmt.Printf("[Feishu Bot] Failed to update tip: %v\n", err)
+				}
+
+				fmt.Printf("[Feishu Bot] Calling tool: %s (%s)\n", toolCall.Function.Name, mcpName)
+
+				// Execute tool
+				toolResult := a.executeTool(ctx, toolCall.Function.Name, toolCall.Function.Arguments)
+
+				// Restore tip to default
+				if err := updater.UpdateTip(ctx, "努力回答中…"); err != nil {
+					fmt.Printf("[Feishu Bot] Failed to restore tip: %v\n", err)
+				}
+
+				aiReq.Messages = append(aiReq.Messages, openai.ToolMessage(toolResult, toolCall.ID))
+			}
+
+			// Continue the loop to get the next response
+			continue
+		}
+
+		// No tool calls, we're done
+		break
 	}
 
 	// Final update with complete content
