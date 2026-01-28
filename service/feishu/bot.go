@@ -75,9 +75,12 @@ func NewBot(conf *config.Config, s *store.Store) *Bot {
 
 // Start starts the WebSocket connection and begins listening for messages.
 // This method blocks until the connection is closed or an error occurs.
-func (b *Bot) Start(ctx context.Context) error {
+func (b *Bot) Start(ctx context.Context) {
 	fmt.Println("[Feishu Bot] Starting WebSocket connection...")
-	return b.wsClient.Start(ctx)
+	err := b.wsClient.Start(ctx)
+	if err != nil {
+		fmt.Printf("[Feishu Bot] wsClient.Start failed: %s\n", err.Error())
+	}
 }
 
 // handleCardAction handles card button callback actions.
