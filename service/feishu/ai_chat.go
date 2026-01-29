@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -19,12 +20,25 @@ import (
 	"github.com/openai/openai-go/v3/option"
 )
 
+// chatContext stores conversation history with expiration time
+type chatContext struct {
+	messages  []openai.ChatCompletionMessageParamUnion
+	expiresAt time.Time
+}
+
+// contextCacheTTL is the duration for which chat context is cached (1 hour)
+const contextCacheTTL = 1 * time.Hour
+
+// maxContextMessages is the maximum number of messages to keep in context
+const maxContextMessages = 20
+
 // AIChat handles AI chat interactions with streaming card updates.
 type AIChat struct {
-	conf       *config.Config
-	larkClient *lark.Client
-	aiClient   openai.Client
-	mcpManager *mcp.Manager
+	conf         *config.Config
+	larkClient   *lark.Client
+	aiClient     openai.Client
+	mcpManager   *mcp.Manager
+	contextCache sync.Map // map[string]*chatContext, key is senderID
 }
 
 // NewAIChat creates a new AIChat instance.
@@ -171,7 +185,8 @@ func (u *CardUpdater) CloseStreaming(ctx context.Context) error {
 
 // HandleMessage processes a user message and responds with AI-generated content
 // using streaming card updates for typewriter effect.
-func (a *AIChat) HandleMessage(ctx context.Context, messageID, userMessage string) error {
+// senderID is used as the cache key for conversation context (typically user's OpenId).
+func (a *AIChat) HandleMessage(ctx context.Context, senderID, messageID, userMessage string) error {
 	// Step 1: Create a streaming card with initial loading state
 	cardID, msgID, err := a.createStreamingCard(ctx, messageID)
 	if err != nil {
@@ -182,7 +197,7 @@ func (a *AIChat) HandleMessage(ctx context.Context, messageID, userMessage strin
 	updater := NewCardUpdater(cardID, a.larkClient)
 
 	// Step 2: Call AI streaming API and update card content progressively
-	if err := a.streamAIResponse(ctx, updater, userMessage); err != nil {
+	if err := a.streamAIResponse(ctx, updater, senderID, userMessage); err != nil {
 		// Update card with error message and final tip
 		_ = updater.UpdateContent(ctx, fmt.Sprintf("❌ AI 响应失败: %v", err))
 		_ = updater.UpdateTip(ctx, "以上内容由 AI 生成，仅供参考")
@@ -357,7 +372,11 @@ func (a *AIChat) executeTool(ctx context.Context, name string, arguments string)
 }
 
 // streamAIResponse calls the AI API and streams the response to the card.
-func (a *AIChat) streamAIResponse(ctx context.Context, updater *CardUpdater, userMessage string) error {
+// senderID is used to maintain conversation context across messages.
+func (a *AIChat) streamAIResponse(ctx context.Context, updater *CardUpdater, senderID, userMessage string) error {
+	// Periodically clean expired contexts
+	a.cleanExpiredContexts()
+
 	prompt := fmt.Sprintf(`You are a helpful assistant. Respond in the same language as the user's message.
 Current Time: %s
 
@@ -371,10 +390,14 @@ You should use the available tools to find accurate and up-to-date information.
 
 请用简洁友好的方式回答用户的问题。`, time.Now().Format(time.DateTime))
 
-	messages := []openai.ChatCompletionMessageParamUnion{
-		openai.SystemMessage(prompt),
-		openai.UserMessage(userMessage),
-	}
+	// Get existing context messages or create new context
+	contextMessages := a.getOrCreateContext(senderID)
+
+	// Build messages with system prompt, context, and new user message
+	messages := make([]openai.ChatCompletionMessageParamUnion, 0, len(contextMessages)+2)
+	messages = append(messages, openai.SystemMessage(prompt))
+	messages = append(messages, contextMessages...)
+	messages = append(messages, openai.UserMessage(userMessage))
 
 	// Get tools from all MCP clients
 	tools := a.getMCPTools(ctx)
@@ -489,5 +512,77 @@ You should use the available tools to find accurate and up-to-date information.
 		fmt.Printf("[Feishu Bot] Failed to close streaming: %v\n", err)
 	}
 
+	// Save context with the new user message and assistant response
+	a.saveContext(senderID, userMessage, finalContent)
+
 	return nil
+}
+
+// getOrCreateContext retrieves cached context messages for a sender, or returns empty slice if not found/expired.
+func (a *AIChat) getOrCreateContext(senderID string) []openai.ChatCompletionMessageParamUnion {
+	if senderID == "" {
+		return nil
+	}
+
+	value, ok := a.contextCache.Load(senderID)
+	if !ok {
+		return nil
+	}
+
+	cached := value.(*chatContext)
+	if time.Now().After(cached.expiresAt) {
+		a.contextCache.Delete(senderID)
+		return nil
+	}
+
+	// Return a copy of messages to avoid mutation
+	result := make([]openai.ChatCompletionMessageParamUnion, len(cached.messages))
+	copy(result, cached.messages)
+	return result
+}
+
+// saveContext saves the conversation context for a sender with 1 hour expiration.
+func (a *AIChat) saveContext(senderID, userMessage, assistantResponse string) {
+	if senderID == "" {
+		return
+	}
+
+	// Get existing context or create new
+	var existingMessages []openai.ChatCompletionMessageParamUnion
+	if value, ok := a.contextCache.Load(senderID); ok {
+		cached := value.(*chatContext)
+		if time.Now().Before(cached.expiresAt) {
+			existingMessages = cached.messages
+		}
+	}
+
+	// Append new messages
+	newMessages := append(existingMessages,
+		openai.UserMessage(userMessage),
+		openai.AssistantMessage(assistantResponse),
+	)
+
+	// Trim to max context size (keep most recent messages)
+	if len(newMessages) > maxContextMessages {
+		newMessages = newMessages[len(newMessages)-maxContextMessages:]
+	}
+
+	// Save with new expiration time
+	a.contextCache.Store(senderID, &chatContext{
+		messages:  newMessages,
+		expiresAt: time.Now().Add(contextCacheTTL),
+	})
+}
+
+// cleanExpiredContexts removes expired entries from the context cache.
+// This is called periodically during message processing.
+func (a *AIChat) cleanExpiredContexts() {
+	now := time.Now()
+	a.contextCache.Range(func(key, value any) bool {
+		cached := value.(*chatContext)
+		if now.After(cached.expiresAt) {
+			a.contextCache.Delete(key)
+		}
+		return true
+	})
 }
