@@ -98,6 +98,10 @@ func (r *Router) Handler() http.Handler {
 	mcpAuth.Handle("POST /blog/mcp/remind", mcpRemindHandler)
 	mcpAuth.Handle("GET /blog/mcp/remind", mcpRemindHandler)
 
+	mcpMoodHandler := mcptool.NewMoodHandler(r.store)
+	mcpAuth.Handle("POST /blog/mcp/mood", mcpMoodHandler)
+	mcpAuth.Handle("GET /blog/mcp/mood", mcpMoodHandler)
+
 	adminAuth := api.Use(middleware.NewAuthLogin(r.store, r.conf))
 	adminAuth.HandleFunc("POST /blog/admin/upload", r.admin.Article.Upload)
 	adminv1.RegisterArticleServiceHTTPServer(adminAuth, codec, r.admin.Article)

@@ -466,7 +466,7 @@ You should use the available tools to find accurate and up-to-date information.
 				mcpName := a.mcpManager.GetMCPDisplayName(toolCall.Function.Name)
 
 				// Update tip to show tool calling status
-				tipText := fmt.Sprintf("正在调用工具，%s", mcpName)
+				tipText := fmt.Sprintf("正在调用%s工具", mcpName)
 				if err := updater.UpdateTip(ctx, tipText); err != nil {
 					fmt.Printf("[Feishu Bot] Failed to update tip: %v\n", err)
 				}
