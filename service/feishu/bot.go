@@ -2,8 +2,10 @@ package feishu
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"strconv"
 	"strings"
 
@@ -160,29 +162,8 @@ func (b *Bot) handleCardAction(ctx context.Context, event *callback.CardActionTr
 
 // handleMessage handles incoming P2P and group messages.
 func (b *Bot) handleMessage(ctx context.Context, event *larkim.P2MessageReceiveV1) error {
-	// Skip non-text messages
 	msgType := event.Event.Message.MessageType
-	if msgType == nil || *msgType != "text" {
-		return nil
-	}
-
-	// Extract message content
-	content := event.Event.Message.Content
-	if content == nil {
-		return nil
-	}
-
-	// Parse text content
-	var textContent struct {
-		Text string `json:"text"`
-	}
-	if err := json.Unmarshal([]byte(*content), &textContent); err != nil {
-		fmt.Printf("[Feishu Bot] Failed to parse message content: %v\n", err)
-		return nil
-	}
-
-	text := strings.TrimSpace(textContent.Text)
-	if text == "" {
+	if msgType == nil {
 		return nil
 	}
 
@@ -197,14 +178,109 @@ func (b *Bot) handleMessage(ctx context.Context, event *larkim.P2MessageReceiveV
 		messageID = *event.Event.Message.MessageId
 	}
 
-	fmt.Printf("[Feishu Bot] Received message from %s: %s\n", senderID, text)
+	content := event.Event.Message.Content
+	if content == nil {
+		return nil
+	}
+
+	var userMessage string
+	var imageBase64 string
+
+	switch *msgType {
+	case "text":
+		// Parse text content
+		var textContent struct {
+			Text string `json:"text"`
+		}
+		if err := json.Unmarshal([]byte(*content), &textContent); err != nil {
+			fmt.Printf("[Feishu Bot] Failed to parse text message content: %v\n", err)
+			return nil
+		}
+		userMessage = strings.TrimSpace(textContent.Text)
+
+	case "image":
+		// Parse image content to get image_key
+		var imageContent struct {
+			ImageKey string `json:"image_key"`
+		}
+		if err := json.Unmarshal([]byte(*content), &imageContent); err != nil {
+			fmt.Printf("[Feishu Bot] Failed to parse image message content: %v\n", err)
+			return nil
+		}
+
+		// Download image and convert to base64
+		base64Data, err := b.downloadImageAsBase64(ctx, messageID, imageContent.ImageKey)
+		if err != nil {
+			fmt.Printf("[Feishu Bot] Failed to download image: %v\n", err)
+			return nil
+		}
+		imageBase64 = base64Data
+		userMessage = "[User sent an image, please describe or analyze this image]"
+
+	case "location":
+		// Parse location content
+		var locationContent struct {
+			Name      string `json:"name"`
+			Longitude string `json:"longitude"`
+			Latitude  string `json:"latitude"`
+		}
+		if err := json.Unmarshal([]byte(*content), &locationContent); err != nil {
+			fmt.Printf("[Feishu Bot] Failed to parse location message content: %v\n", err)
+			return nil
+		}
+
+		// Build location context message - make it clear this is supplementary info to the conversation
+		userMessage = fmt.Sprintf("[User shared a location - this may be context for the previous question or a new request]\nLocation: %s\nLongitude: %s\nLatitude: %s\n\nPlease use this location information in the context of our conversation. If I asked about something location-related before (like weather, restaurants, etc.), please answer based on this location.",
+			locationContent.Name,
+			locationContent.Longitude,
+			locationContent.Latitude,
+		)
+
+	default:
+		// Unsupported message types
+		return nil
+	}
+
+	if userMessage == "" && imageBase64 == "" {
+		return nil
+	}
+
+	fmt.Printf("[Feishu Bot] Received %s message from %s\n", *msgType, senderID)
 
 	// Handle AI chat in a goroutine to not block the event handler
 	go func() {
-		if err := b.aiChat.HandleMessage(context.Background(), senderID, messageID, text); err != nil {
+		if err := b.aiChat.HandleMessage(context.Background(), senderID, messageID, userMessage, imageBase64); err != nil {
 			fmt.Printf("[Feishu Bot] Failed to handle AI chat: %v\n", err)
 		}
 	}()
 
 	return nil
+}
+
+// downloadImageAsBase64 downloads an image from Feishu and returns it as base64 encoded string
+func (b *Bot) downloadImageAsBase64(ctx context.Context, messageID, imageKey string) (string, error) {
+	req := larkim.NewGetMessageResourceReqBuilder().
+		MessageId(messageID).
+		FileKey(imageKey).
+		Type("image").
+		Build()
+
+	resp, err := b.larkClient.Im.V1.MessageResource.Get(ctx, req)
+	if err != nil {
+		return "", fmt.Errorf("failed to get message resource: %w", err)
+	}
+
+	if !resp.Success() {
+		return "", fmt.Errorf("get message resource failed: code=%d, msg=%s", resp.Code, resp.Msg)
+	}
+
+	// Read image data
+	imageData, err := io.ReadAll(resp.File)
+	if err != nil {
+		return "", fmt.Errorf("failed to read image data: %w", err)
+	}
+
+	// Convert to base64
+	base64Data := base64.StdEncoding.EncodeToString(imageData)
+	return base64Data, nil
 }

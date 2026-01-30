@@ -186,7 +186,8 @@ func (u *CardUpdater) CloseStreaming(ctx context.Context) error {
 // HandleMessage processes a user message and responds with AI-generated content
 // using streaming card updates for typewriter effect.
 // senderID is used as the cache key for conversation context (typically user's OpenId).
-func (a *AIChat) HandleMessage(ctx context.Context, senderID, messageID, userMessage string) error {
+// imageBase64 is optional - if provided, it will be sent to the AI as a vision input.
+func (a *AIChat) HandleMessage(ctx context.Context, senderID, messageID, userMessage, imageBase64 string) error {
 	// Step 1: Create a streaming card with initial loading state
 	cardID, msgID, err := a.createStreamingCard(ctx, messageID)
 	if err != nil {
@@ -197,7 +198,7 @@ func (a *AIChat) HandleMessage(ctx context.Context, senderID, messageID, userMes
 	updater := NewCardUpdater(cardID, a.larkClient)
 
 	// Step 2: Call AI streaming API and update card content progressively
-	if err := a.streamAIResponse(ctx, updater, senderID, userMessage); err != nil {
+	if err := a.streamAIResponse(ctx, updater, senderID, userMessage, imageBase64); err != nil {
 		// Update card with error message and final tip
 		_ = updater.UpdateContent(ctx, fmt.Sprintf("❌ AI 响应失败: %v", err))
 		_ = updater.UpdateTip(ctx, "以上内容由 AI 生成，仅供参考")
@@ -373,7 +374,8 @@ func (a *AIChat) executeTool(ctx context.Context, name string, arguments string)
 
 // streamAIResponse calls the AI API and streams the response to the card.
 // senderID is used to maintain conversation context across messages.
-func (a *AIChat) streamAIResponse(ctx context.Context, updater *CardUpdater, senderID, userMessage string) error {
+// imageBase64 is optional - if provided, it will be included as a vision input.
+func (a *AIChat) streamAIResponse(ctx context.Context, updater *CardUpdater, senderID, userMessage, imageBase64 string) error {
 	// Periodically clean expired contexts
 	a.cleanExpiredContexts()
 
@@ -388,7 +390,7 @@ When you encounter questions that you cannot answer directly, such as:
 
 You should use the available tools to find accurate and up-to-date information.
 
-请用简洁友好的方式回答用户的问题。`, time.Now().Format(time.DateTime))
+Please answer the user's questions in a concise and friendly manner.`, time.Now().Format(time.DateTime))
 
 	// Get existing context messages or create new context
 	contextMessages := a.getOrCreateContext(senderID)
@@ -397,7 +399,27 @@ You should use the available tools to find accurate and up-to-date information.
 	messages := make([]openai.ChatCompletionMessageParamUnion, 0, len(contextMessages)+2)
 	messages = append(messages, openai.SystemMessage(prompt))
 	messages = append(messages, contextMessages...)
-	messages = append(messages, openai.UserMessage(userMessage))
+
+	// If image is provided, create a multi-modal message with image
+	if imageBase64 != "" {
+		// Build user message with image content using SDK helper functions
+		imageURL := fmt.Sprintf("data:image/jpeg;base64,%s", imageBase64)
+		messages = append(messages, openai.ChatCompletionMessageParamUnion{
+			OfUser: &openai.ChatCompletionUserMessageParam{
+				Content: openai.ChatCompletionUserMessageParamContentUnion{
+					OfArrayOfContentParts: []openai.ChatCompletionContentPartUnionParam{
+						openai.TextContentPart(userMessage),
+						openai.ImageContentPart(openai.ChatCompletionContentPartImageImageURLParam{
+							URL:    imageURL,
+							Detail: "auto",
+						}),
+					},
+				},
+			},
+		})
+	} else {
+		messages = append(messages, openai.UserMessage(userMessage))
+	}
 
 	// Get tools from all MCP clients
 	tools := a.getMCPTools(ctx)
