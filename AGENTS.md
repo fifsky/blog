@@ -205,6 +205,15 @@ import { articleListApi } from "@/service";
 - Use dbunit fixtures in `testdata/` directory
 - Linter configuration: `.golangci.yml`
 
+#### Table-Driven Tests
+
+All Golang unit tests should prioritize the table-driven style to enhance readability and maintainability:
+**Principles:**
+
+- Each test case should have a clear `name` to describe the scenario
+- Test cases should cover: success paths, failure paths, and boundary conditions
+- Use `t.Run()` to make each sub-test independently executable
+
 ### General
 
 - Commit messages should follow conventional commit format
