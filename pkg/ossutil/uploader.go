@@ -30,6 +30,7 @@ func NewAliyunUploader(conf *config.Config) *AliyunUploader {
 		if len(parts) > 0 {
 			region = strings.TrimPrefix(parts[0], "oss-")
 		}
+		region = strings.TrimSuffix(region, "-internal")
 	}
 
 	// Create OSS client using new SDK v2
