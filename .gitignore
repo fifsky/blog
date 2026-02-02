@@ -17,6 +17,7 @@
 /bin
 /.shared/
 /.trae/
+/.claude/
 config.yml
 .envrc
 .buf-deps
