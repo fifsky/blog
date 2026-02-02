@@ -72,10 +72,10 @@ export default function Archive() {
     return <SkeletonArchive />;
   }
   const siteName = settings?.kv?.site_name || "無處告別";
-
+  const pageTitle = `文章归档 - ${siteName}`;
   return (
     <div>
-      <title>文章归档 - {siteName}</title>
+      <title>{pageTitle}</title>
       <meta name="description" content={settings?.kv?.site_desc || ""} />
       <meta name="keywords" content={settings?.kv?.site_keyword || ""} />
 

@@ -166,6 +166,7 @@ export default function TravelMap() {
 
   return (
     <>
+      <title>山海漫记</title>
       <div className="w-full h-[800px]">
         <div ref={chartRef} className="w-full h-full bg-white overflow-hidden" />
       </div>
