@@ -57,6 +57,14 @@ export function CHeader() {
           </li>
           <li className="bg-white">
             <a
+              href="https://windiness.fifsky.com"
+              className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+            >
+              有风
+            </a>
+          </li>
+          <li className="bg-white">
+            <a
               href="https://caixudong.com"
               className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
             >
