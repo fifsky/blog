@@ -23,7 +23,7 @@ func NewGuestbook(s *store.Store) *Guestbook {
 }
 
 func (g *Guestbook) List(ctx context.Context, req *apiv1.GuestbookListRequest) (*apiv1.GuestbookListResponse, error) {
-	num := 10
+	num := 5
 	guestbooks, err := g.store.ListGuestbook(ctx, req.Keyword, int(req.Page), num)
 	if err != nil {
 		return nil, err
