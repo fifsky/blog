@@ -21,3 +21,29 @@
 3、用户可以手动添加、删除标签
 4、在文章的底部使用徽章组件展示标签，点击标签可以过滤文章列表
 5、你需要实现所有功能，请不要中途退出，不要留任何优化给我，帮我直接优化
+
+内容没有提取到，以下是提取规则
+带有MOD参数的页面
+昵称从 <img src="/web/20100716211623im_/http://www.windiness.com/guestbook/images/oicq.gif" alt="婷婷 的 QQ 号码：353534350" hspace="2" border="0"> 中提取,alt属性里面" 的"之前就是昵称
+日期从 <font style="font-size:10px ; color:#000000;">Time: 2010-06-13 20:13:45</font> 中提取,Time: 后面就是日期
+正文从 <td width="421" align="left" valign="top">随风而逝在那一年！</td> 中提取
+
+不带MOD参数的页面
+昵称从 <span class="name">莫一哲</span> 中提取
+日期从<span class="input_time">2007-05-11 21:31:08</span>中提取
+正文从 <div class="content" style="height:100px">
+呵呵，突然想到，一只爬在窗玻璃上的蜗牛，从早晨的阳光爬到晚上的阳光，它和玻璃都有着晶莹剔透的美。呵，慢慢爬吧小蜗牛！</div> 中提取
+
+
+带MOD参数的页面第一套留言提取之后
+https://web.archive.org/web/20100716211639/http://www.windiness.com:80/guestbook/index.php?MOD=main&P=16
+昵称：五月的雪
+时间：2010-06-04 22:10:29
+内容：真的 身处在这个网络时代 &nbsp; 每次面对屏幕总有一种无处藏身的感觉 &nbsp; 直到我来到这里 &nbsp;终于找到了一片净土 &nbsp;花火流年 &nbsp; 愿你越来越好
+
+不带MOD参数的页面第一套留言提取之后
+https://web.archive.org/web/20071012080740/http://windiness.com:80/guestbook/index.php?page=1
+昵称：皇家澜澜
+时间：2007-10-12 09:48:38
+内容：<b>很佩服你，希望认识你．．．</b><br>　　　看了你的站感觉好美，很佩服有如此深的感受，我想认识你．．．
+

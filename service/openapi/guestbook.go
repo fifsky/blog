@@ -24,7 +24,7 @@ func NewGuestbook(s *store.Store) *Guestbook {
 
 func (g *Guestbook) List(ctx context.Context, req *apiv1.GuestbookListRequest) (*apiv1.GuestbookListResponse, error) {
 	num := 10
-	guestbooks, err := g.store.ListGuestbook(ctx, int(req.Page), num)
+	guestbooks, err := g.store.ListGuestbook(ctx, req.Keyword, int(req.Page), num)
 	if err != nil {
 		return nil, err
 	}
@@ -37,11 +37,12 @@ func (g *Guestbook) List(ctx context.Context, req *apiv1.GuestbookListRequest) (
 			Content:   gb.Content,
 			Ip:        gb.Ip,
 			CreatedAt: gb.CreatedAt.Format(time.DateTime),
+			Top:       int32(gb.Top),
 		}
 		items = append(items, item)
 	}
 
-	total, err := g.store.CountGuestbookTotal(ctx)
+	total, err := g.store.CountGuestbookTotal(ctx, req.Keyword)
 	if err != nil {
 		return nil, err
 	}

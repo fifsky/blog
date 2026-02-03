@@ -1415,6 +1415,9 @@ components:
                     type: string
                 created_at:
                     type: string
+                top:
+                    type: integer
+                    format: int32
             description: GuestbookItem 留言项
         GuestbookListRequest:
             type: object
@@ -1422,6 +1425,8 @@ components:
                 page:
                     type: integer
                     format: int32
+                keyword:
+                    type: string
             description: GuestbookListRequest 留言列表分页请求
         GuestbookListResponse:
             type: object

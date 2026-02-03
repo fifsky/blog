@@ -28,6 +28,7 @@ service GuestbookService {
 // GuestbookListRequest 留言列表分页请求
 message GuestbookListRequest {
   int32 page = 1 [(buf.validate.field).int32.gt = 0];
+  string keyword = 2;
 }
 
 // GuestbookItem 留言项
@@ -37,6 +38,7 @@ message GuestbookItem {
   string content = 3;
   string ip = 4;
   string created_at = 5;
+  int32 top = 6;
 }
 
 // GuestbookListResponse 留言列表响应

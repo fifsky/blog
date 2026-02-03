@@ -9,5 +9,6 @@ type Guestbook struct {
 	Name      string
 	Content   string
 	Ip        string
+	Top       int
 	CreatedAt time.Time
 }

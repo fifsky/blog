@@ -27,6 +27,7 @@ const (
 type GuestbookListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	Keyword       string                 `protobuf:"bytes,2,opt,name=keyword,proto3" json:"keyword,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -68,6 +69,13 @@ func (x *GuestbookListRequest) GetPage() int32 {
 	return 0
 }
 
+func (x *GuestbookListRequest) GetKeyword() string {
+	if x != nil {
+		return x.Keyword
+	}
+	return ""
+}
+
 // GuestbookItem 留言项
 type GuestbookItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -76,6 +84,7 @@ type GuestbookItem struct {
 	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
 	Ip            string                 `protobuf:"bytes,4,opt,name=ip,proto3" json:"ip,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Top           int32                  `protobuf:"varint,6,opt,name=top,proto3" json:"top,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -143,6 +152,13 @@ func (x *GuestbookItem) GetCreatedAt() string {
 		return x.CreatedAt
 	}
 	return ""
+}
+
+func (x *GuestbookItem) GetTop() int32 {
+	if x != nil {
+		return x.Top
+	}
+	return 0
 }
 
 // GuestbookListResponse 留言列表响应
@@ -300,16 +316,18 @@ var File_api_v1_guestbook_proto protoreflect.FileDescriptor
 
 const file_api_v1_guestbook_proto_rawDesc = "" +
 	"\n" +
-	"\x16api/v1/guestbook.proto\x12\x12fifsky.blog.api.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\"3\n" +
+	"\x16api/v1/guestbook.proto\x12\x12fifsky.blog.api.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\"M\n" +
 	"\x14GuestbookListRequest\x12\x1b\n" +
-	"\x04page\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02 \x00R\x04page\"|\n" +
+	"\x04page\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02 \x00R\x04page\x12\x18\n" +
+	"\akeyword\x18\x02 \x01(\tR\akeyword\"\x8e\x01\n" +
 	"\rGuestbookItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
 	"\acontent\x18\x03 \x01(\tR\acontent\x12\x0e\n" +
 	"\x02ip\x18\x04 \x01(\tR\x02ip\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\tR\tcreatedAt\"d\n" +
+	"created_at\x18\x05 \x01(\tR\tcreatedAt\x12\x10\n" +
+	"\x03top\x18\x06 \x01(\x05R\x03top\"d\n" +
 	"\x15GuestbookListResponse\x125\n" +
 	"\x04list\x18\x01 \x03(\v2!.fifsky.blog.api.v1.GuestbookItemR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\"]\n" +
