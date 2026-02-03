@@ -115,12 +115,12 @@ func TestGuestbook_Create(t *testing.T) {
 				afterResp, err := svc.List(ctx, &apiv1.GuestbookListRequest{Page: 1})
 				require.NoError(t, err)
 				assert.Equal(t, beforeCount+1, afterResp.Total)
-				
+
 				// 验证刚插入的数据是否被转义
 				// 由于 List 返回是按 ID 倒序，所以第一条应该是刚插入的
 				latest := afterResp.List[0]
 				assert.Equal(t, int32(resp.Id), latest.Id)
-				
+
 				if tt.name == "XSS防护" {
 					assert.Equal(t, "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;", latest.Name)
 					assert.Equal(t, "&lt;img src=x onerror=alert(&#39;xss&#39;)&gt;", latest.Content)
@@ -132,4 +132,3 @@ func TestGuestbook_Create(t *testing.T) {
 		})
 	}
 }
-
