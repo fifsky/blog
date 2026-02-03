@@ -1,8 +1,29 @@
 import { useEffect, useState } from "react";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+
+dayjs.extend(duration);
 
 export function CFooter() {
   const [showScroll, setShowScroll] = useState(false);
+  const [runTime, setRunTime] = useState("");
   const top = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const start = dayjs("2007-01-06T22:43:39+08:00");
+      const now = dayjs();
+      const diff = dayjs.duration(now.diff(start));
+      const days = Math.floor(diff.asDays());
+      const hours = diff.hours();
+      const minutes = diff.minutes();
+      const seconds = diff.seconds();
+      setRunTime(`时光流逝 ${days}天${hours}小时${minutes}分${seconds}秒`);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   useEffect(() => {
     const h = () => setShowScroll(document.documentElement.scrollTop > 300);
     window.addEventListener("scroll", h);
@@ -11,10 +32,6 @@ export function CFooter() {
   return (
     <div id="footer" className="py-[1em] text-center text-[13px]">
       <p className="my-[1em]">
-        <a href="https://fangyuan.love" target="_blank" rel="noreferrer">
-          最好的我们
-        </a>
-        <span className="mx-1">|</span>
         <a href="https://caishuyan.com/" target="_blank" rel="noreferrer">
           最好的她们
         </a>
@@ -22,6 +39,7 @@ export function CFooter() {
         <a href="https://github.com/fifsky/blog" target="_blank" rel="noreferrer">
           fifsky.com
         </a>
+        <span className="mx-1">{runTime}</span>
       </p>
       <p className="my-[1em] text-[#ccc]">
         <a
