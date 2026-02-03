@@ -7,7 +7,7 @@ import (
 
 func NewCors(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		origins := []string{"http://fifsky.com", "http://www.fifsky.com", "https://fifsky.com", "https://www.fifsky.com"}
+		origins := []string{"http://fifsky.com", "https://*.fifsky.com", "http://*.fifsky.com", "https://fifsky.com"}
 
 		if os.Getenv("APP_ENV") == "local" {
 			origins = []string{"*"}

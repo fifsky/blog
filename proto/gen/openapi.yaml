@@ -795,6 +795,44 @@ paths:
                     description: OK
                     content:
                         '*/*': {}
+    /blog/guestbook/create:
+        post:
+            tags:
+                - GuestbookService
+            description: Create 创建留言
+            operationId: GuestbookService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GuestbookCreateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GuestbookCreateResponse'
+    /blog/guestbook/list:
+        post:
+            tags:
+                - GuestbookService
+            description: List 获取留言列表
+            operationId: GuestbookService_List
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GuestbookListRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GuestbookListResponse'
     /blog/link/all:
         post:
             tags:
@@ -1001,25 +1039,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ListCityPhotosResponse'
-    /blog/weixin/message:
-        post:
-            tags:
-                - WeixinService
-            description: Message 发送模板消息
-            operationId: WeixinService_Message
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/MessageRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/WeixinResponse'
 components:
     schemas:
         ArchiveResponse:
@@ -1367,6 +1386,54 @@ components:
                 id:
                     type: integer
                     format: int32
+        GuestbookCreateRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                content:
+                    type: string
+            description: GuestbookCreateRequest 创建留言请求
+        GuestbookCreateResponse:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+            description: GuestbookCreateResponse 创建留言响应
+        GuestbookItem:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+                content:
+                    type: string
+                ip:
+                    type: string
+                created_at:
+                    type: string
+            description: GuestbookItem 留言项
+        GuestbookListRequest:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    format: int32
+            description: GuestbookListRequest 留言列表分页请求
+        GuestbookListResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GuestbookItem'
+                total:
+                    type: integer
+                    format: int32
+            description: GuestbookListResponse 留言列表响应
         IDResponse:
             type: object
             properties:
@@ -1480,29 +1547,6 @@ components:
                     type: string
                 user:
                     $ref: '#/components/schemas/UserItem'
-        MessageRequest:
-            required:
-                - touser
-                - template_id
-                - data
-            type: object
-            properties:
-                touser:
-                    type: string
-                    description: 接收人OpenID
-                template_id:
-                    type: string
-                    description: 模板ID
-                data:
-                    type: object
-                    additionalProperties:
-                        $ref: '#/components/schemas/MessageRequest_Value'
-                    description: 模板数据
-        MessageRequest_Value:
-            type: object
-            properties:
-                value:
-                    type: string
         MiniAppLoginRequest:
             type: object
             properties:
@@ -1986,9 +2030,6 @@ components:
                 type:
                     type: integer
                     format: int32
-        WeixinResponse:
-            type: object
-            properties: {}
 tags:
     - name: AIService
       description: AIService 提供 AI 相关的接口
@@ -2002,6 +2043,8 @@ tags:
       description: CateService 提供分类相关的接口
     - name: GeoService
       description: GeoService 提供地理位置相关的接口
+    - name: GuestbookService
+      description: GuestbookService 提供留言本相关的接口
     - name: LinkService
       description: LinkService 提供链接相关的接口
     - name: LinkService
@@ -2032,5 +2075,3 @@ tags:
       description: UserService 提供用户相关的接口
     - name: UserService
       description: UserService 提供用户相关的接口
-    - name: WeixinService
-      description: WeixinService 提供微信相关的接口
