@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"app/config"
+	"app/pkg/aiutil"
 	"app/pkg/mcp"
 
 	"github.com/google/uuid"
@@ -430,13 +431,7 @@ Please answer the user's questions in a concise and friendly manner.`, time.Now(
 		Tools:    tools,
 	}
 
-	if strings.HasPrefix(a.conf.Common.AIModel, "doubao") {
-		aiReq.SetExtraFields(map[string]any{
-			"thinking": map[string]any{
-				"type": "disabled",
-			},
-		})
-	}
+	aiutil.ConfigureModelParams(&aiReq, a.conf.Common.AIModel)
 
 	var content strings.Builder
 	updateInterval := 300 * time.Millisecond

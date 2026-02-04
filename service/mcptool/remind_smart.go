@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"app/config"
+	"app/pkg/aiutil"
 	"app/pkg/errors"
 	"app/pkg/promptutil"
 	"app/service/remind"
@@ -53,13 +54,7 @@ func SmartCreateRemind(ctx context.Context, conf *config.Config, aiClient openai
 			openai.UserMessage(userInput),
 		},
 	}
-	if strings.HasPrefix(conf.Common.AIModel, "doubao") {
-		aiReq.SetExtraFields(map[string]any{
-			"thinking": map[string]any{
-				"type": "disabled",
-			},
-		})
-	}
+	aiutil.ConfigureModelParams(&aiReq, conf.Common.AIModel)
 
 	completion, err := aiClient.Chat.Completions.New(ctx, aiReq)
 	if err != nil {

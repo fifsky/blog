@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"app/pkg/errors"
 	apiv1 "app/proto/gen/api/v1"
 	"app/store"
 	"app/testutil"
@@ -12,6 +13,27 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+// MockModerator 用于测试的模拟审核器
+type MockModerator struct {
+	ShouldPass bool
+	Reason     string
+	Err        error
+}
+
+func (m *MockModerator) Moderate(ctx context.Context, content string) error {
+	if m.Err != nil {
+		return m.Err
+	}
+	if !m.ShouldPass {
+		reason := m.Reason
+		if reason == "" {
+			reason = "内容包含违规信息"
+		}
+		return errors.BadRequest("CONTENT_MODERATION_FAILED", reason)
+	}
+	return nil
+}
 
 func TestGuestbook_List(t *testing.T) {
 	tests := []struct {
@@ -41,7 +63,7 @@ func TestGuestbook_List(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			dbunit.New(t, func(d *dbunit.DBUnit) {
 				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook")...)
-				svc := NewGuestbook(store.New(db))
+				svc := NewGuestbook(store.New(db), nil, WithModerator(&MockModerator{ShouldPass: true}))
 
 				resp, err := svc.List(context.Background(), &apiv1.GuestbookListRequest{Page: tt.page})
 				if tt.wantErr {
@@ -66,9 +88,11 @@ func TestGuestbook_List(t *testing.T) {
 
 func TestGuestbook_Create(t *testing.T) {
 	tests := []struct {
-		name    string
-		req     *apiv1.GuestbookCreateRequest
-		wantErr bool
+		name      string
+		req       *apiv1.GuestbookCreateRequest
+		moderator ContentModerator
+		wantErr   bool
+		errCode   string
 	}{
 		{
 			name: "创建成功",
@@ -76,7 +100,8 @@ func TestGuestbook_Create(t *testing.T) {
 				Name:    "张三",
 				Content: "这是测试留言",
 			},
-			wantErr: false,
+			moderator: &MockModerator{ShouldPass: true},
+			wantErr:   false,
 		},
 		{
 			name: "XSS防护",
@@ -84,7 +109,28 @@ func TestGuestbook_Create(t *testing.T) {
 				Name:    "<script>alert('xss')</script>",
 				Content: "<img src=x onerror=alert('xss')>",
 			},
-			wantErr: false,
+			moderator: &MockModerator{ShouldPass: true},
+			wantErr:   false,
+		},
+		{
+			name: "内容审核失败",
+			req: &apiv1.GuestbookCreateRequest{
+				Name:    "测试",
+				Content: "违规内容",
+			},
+			moderator: &MockModerator{ShouldPass: false, Reason: "检测到违规内容"},
+			wantErr:   true,
+			errCode:   "CONTENT_MODERATION_FAILED",
+		},
+		{
+			name: "内容审核服务异常",
+			req: &apiv1.GuestbookCreateRequest{
+				Name:    "测试",
+				Content: "正常内容",
+			},
+			moderator: &MockModerator{Err: errors.InternalServer("CONTENT_MODERATION_ERROR", "服务异常")},
+			wantErr:   true,
+			errCode:   "CONTENT_MODERATION_ERROR",
 		},
 	}
 
@@ -93,10 +139,9 @@ func TestGuestbook_Create(t *testing.T) {
 			dbunit.New(t, func(d *dbunit.DBUnit) {
 				// 加载schema，并加载guestbook fixtures
 				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook")...)
-				// 模拟带有 Context Header 的 Context
-				ctx := context.Background() // 这里可以根据需要构造 Context，目前 IP 逻辑在中间件中，这里可能取不到 IP 或取到空，暂不影响 XSS 测试
+				ctx := context.Background()
 
-				svc := NewGuestbook(store.New(db))
+				svc := NewGuestbook(store.New(db), nil, WithModerator(tt.moderator))
 
 				// 获取创建前的总数
 				beforeResp, err := svc.List(ctx, &apiv1.GuestbookListRequest{Page: 1})
@@ -106,6 +151,11 @@ func TestGuestbook_Create(t *testing.T) {
 				resp, err := svc.Create(ctx, tt.req)
 				if tt.wantErr {
 					require.Error(t, err)
+					if tt.errCode != "" {
+						appErr, ok := err.(*errors.Error)
+						require.True(t, ok, "expected *errors.Error type")
+						assert.Equal(t, tt.errCode, appErr.Reason)
+					}
 					return
 				}
 				require.NoError(t, err)
@@ -131,4 +181,21 @@ func TestGuestbook_Create(t *testing.T) {
 			})
 		})
 	}
+}
+
+func TestGuestbook_Create_WithoutModerator(t *testing.T) {
+	dbunit.New(t, func(d *dbunit.DBUnit) {
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook")...)
+		ctx := context.Background()
+
+		// 不设置审核器，应该也能正常创建
+		svc := NewGuestbook(store.New(db), nil)
+
+		resp, err := svc.Create(ctx, &apiv1.GuestbookCreateRequest{
+			Name:    "测试",
+			Content: "无审核器测试",
+		})
+		require.NoError(t, err)
+		assert.Greater(t, resp.Id, int32(0))
+	})
 }

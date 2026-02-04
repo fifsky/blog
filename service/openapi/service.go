@@ -33,6 +33,6 @@ func New(s *store.Store, conf *config.Config, httpClient *http.Client) *Service 
 		Travel:    NewTravel(s),
 		MiniApp:   NewMiniApp(s, conf, httpClient),
 		Geo:       NewGeo(s),
-		Guestbook: NewGuestbook(s),
+		Guestbook: NewGuestbook(s, conf),
 	}
 }

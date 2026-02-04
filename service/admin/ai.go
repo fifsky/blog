@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"app/config"
+	"app/pkg/aiutil"
 	"app/pkg/errors"
 	"app/pkg/mcp"
 	adminv1 "app/proto/gen/admin/v1"
@@ -153,13 +154,7 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 		Messages: openAIMessages,
 		Tools:    tools,
 	}
-	if strings.HasPrefix(a.conf.Common.AIModel, "doubao") {
-		aiReq.SetExtraFields(map[string]any{
-			"thinking": map[string]any{
-				"type": "disabled",
-			},
-		})
-	}
+	aiutil.ConfigureModelParams(&aiReq, a.conf.Common.AIModel)
 
 	// Tool calling loop - handle tool calls until we get a final response
 	for {
@@ -338,13 +333,7 @@ func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest)
 			openai.UserMessage(userInput),
 		},
 	}
-	if strings.HasPrefix(a.conf.Common.AIModel, "doubao") {
-		aiReq.SetExtraFields(map[string]any{
-			"thinking": map[string]any{
-				"type": "disabled",
-			},
-		})
-	}
+	aiutil.ConfigureModelParams(&aiReq, a.conf.Common.AIModel)
 
 	completion, err := a.client.Chat.Completions.New(ctx, aiReq)
 	if err != nil {
