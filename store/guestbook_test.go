@@ -160,12 +160,10 @@ func TestStore_CreateGuestbook(t *testing.T) {
 		assert.Equal(t, beforeTotal+1, afterTotal)
 
 		// 验证创建的数据
-		list, err := s.ListGuestbook(context.Background(), "", 1, 10)
+		got, err := s.GetGuestbook(context.Background(), id)
 		require.NoError(t, err)
-		require.GreaterOrEqual(t, len(list), 1)
-		// 新创建的数据应该在第一条（按ID降序）
-		assert.Equal(t, "测试用户", list[0].Name)
-		assert.Equal(t, "这是测试留言内容", list[0].Content)
-		assert.Equal(t, "127.0.0.1", list[0].Ip)
+		assert.Equal(t, "测试用户", got.Name)
+		assert.Equal(t, "这是测试留言内容", got.Content)
+		assert.Equal(t, "127.0.0.1", got.Ip)
 	})
 }

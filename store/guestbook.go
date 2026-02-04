@@ -62,6 +62,16 @@ func (s *Store) CreateGuestbook(ctx context.Context, g *model.Guestbook) (int64,
 	return res.LastInsertId()
 }
 
+func (s *Store) GetGuestbook(ctx context.Context, id int64) (*model.Guestbook, error) {
+	query := "select id,name,content,ip,top,created_at from guestbook where id = ?"
+	var g model.Guestbook
+	err := s.db.QueryRowContext(ctx, query, id).Scan(&g.Id, &g.Name, &g.Content, &g.Ip, &g.Top, &g.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return &g, nil
+}
+
 func (s *Store) DeleteGuestbook(ctx context.Context, id int) error {
 	_, err := s.db.ExecContext(ctx, "delete from guestbook where id = ?", id)
 	return err
