@@ -116,6 +116,7 @@ func (r *Router) Handler() http.Handler {
 	adminv1.RegisterOSSServiceHTTPServer(adminAuth, codec, r.admin.OSS)
 	adminv1.RegisterRegionServiceHTTPServer(adminAuth, codec, r.admin.Region)
 	adminv1.RegisterAIServiceHTTPServer(adminAuth, codec, r.admin.AI)
+	adminv1.RegisterGuestbookServiceHTTPServer(adminAuth, codec, r.admin.Guestbook)
 
 	// AI chat endpoint (SSE streaming)
 	adminAuth.HandleFunc("POST /blog/admin/ai/chat", r.admin.AI.Chat)

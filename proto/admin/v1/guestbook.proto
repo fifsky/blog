@@ -1,0 +1,57 @@
+syntax = "proto3";
+package fifsky.blog.admin.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "gen/admin/v1";
+
+// GuestbookService 提供留言相关的管理接口
+service GuestbookService {
+  // List 获取留言列表
+  rpc List(GuestbookListRequest) returns (GuestbookListResponse) {
+    option (google.api.http) = {
+      post: "/blog/admin/guestbook/list"
+      body: "*"
+    };
+  }
+  // Delete 删除留言
+  rpc Delete(GuestbookDeleteRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/blog/admin/guestbook/delete"
+      body: "*"
+    };
+  }
+}
+
+// GuestbookListRequest 获取留言列表请求
+message GuestbookListRequest {
+  int32 page = 1;
+  string keyword = 2;
+}
+
+// GuestbookListResponse 获取留言列表响应
+message GuestbookListResponse {
+  repeated GuestbookItem list = 1;
+  int32 total = 2;
+}
+
+// GuestbookItem 留言项
+message GuestbookItem {
+  int32 id = 1;
+  string name = 2;
+  string content = 3;
+  string ip = 4;
+  int32 top = 5;
+  string created_at = 6;
+}
+
+// GuestbookDeleteRequest 删除留言请求
+message GuestbookDeleteRequest {
+  int32 id = 1 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}

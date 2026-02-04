@@ -93,6 +93,9 @@ export function AdminLayout() {
               <AdminNavItem to="/admin/moods" isActive={isPage("/admin/moods")}>
                 心情
               </AdminNavItem>
+              <AdminNavItem to="/admin/guestbooks" isActive={isPage("/admin/guestbooks")}>
+                留言
+              </AdminNavItem>
               <AdminNavItem to="/admin/cates" isActive={isPage("/admin/cates")}>
                 分类
               </AdminNavItem>

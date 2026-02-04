@@ -329,3 +329,16 @@ export type CityPhotosResponse = { photos: TravelPhoto[] };
 // AI types
 export type GenerateTagsRequest = { title?: string; content: string };
 export type GenerateTagsResponse = { tags: string[] };
+
+// Guestbook types
+export type GuestbookItem = {
+  id: number;
+  name: string;
+  content: string;
+  ip: string;
+  top: number;
+  created_at: string;
+};
+export type GuestbookListRequest = { page?: number; keyword?: string };
+export type GuestbookListResponse = { list: GuestbookItem[]; total: number };
+export type GuestbookDeleteRequest = { id: number };

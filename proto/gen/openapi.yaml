@@ -226,6 +226,41 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
+    /blog/admin/guestbook/delete:
+        post:
+            tags:
+                - GuestbookService
+            description: Delete 删除留言
+            operationId: GuestbookService_Delete
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GuestbookDeleteRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /blog/admin/guestbook/list:
+        post:
+            tags:
+                - GuestbookService
+            description: List 获取留言列表
+            operationId: GuestbookService_List
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GuestbookListRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GuestbookListResponse'
     /blog/admin/link/create:
         post:
             tags:
@@ -1401,6 +1436,15 @@ components:
                     type: integer
                     format: int32
             description: GuestbookCreateResponse 创建留言响应
+        GuestbookDeleteRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+            description: GuestbookDeleteRequest 删除留言请求
         GuestbookItem:
             type: object
             properties:
@@ -1413,11 +1457,11 @@ components:
                     type: string
                 ip:
                     type: string
-                created_at:
-                    type: string
                 top:
                     type: integer
                     format: int32
+                created_at:
+                    type: string
             description: GuestbookItem 留言项
         GuestbookListRequest:
             type: object
@@ -1427,7 +1471,7 @@ components:
                     format: int32
                 keyword:
                     type: string
-            description: GuestbookListRequest 留言列表分页请求
+            description: GuestbookListRequest 获取留言列表请求
         GuestbookListResponse:
             type: object
             properties:
@@ -1438,7 +1482,7 @@ components:
                 total:
                     type: integer
                     format: int32
-            description: GuestbookListResponse 留言列表响应
+            description: GuestbookListResponse 获取留言列表响应
         IDResponse:
             type: object
             properties:
@@ -2048,6 +2092,8 @@ tags:
       description: CateService 提供分类相关的接口
     - name: GeoService
       description: GeoService 提供地理位置相关的接口
+    - name: GuestbookService
+      description: GuestbookService 提供留言相关的管理接口
     - name: GuestbookService
       description: GuestbookService 提供留言本相关的接口
     - name: LinkService

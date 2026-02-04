@@ -61,3 +61,8 @@ func (s *Store) CreateGuestbook(ctx context.Context, g *model.Guestbook) (int64,
 	}
 	return res.LastInsertId()
 }
+
+func (s *Store) DeleteGuestbook(ctx context.Context, id int) error {
+	_, err := s.db.ExecContext(ctx, "delete from guestbook where id = ?", id)
+	return err
+}

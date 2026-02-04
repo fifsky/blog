@@ -60,6 +60,9 @@ import type {
   CityPhotosResponse,
   GenerateTagsRequest,
   GenerateTagsResponse,
+  GuestbookListRequest,
+  GuestbookListResponse,
+  GuestbookDeleteRequest,
 } from "@/types/openapi";
 
 export const loginApi = (data: LoginRequest, errorHandler?: (e: AppError) => void) =>
@@ -197,3 +200,13 @@ export const footprintsApi = (errorHandler?: (e: AppError) => void) =>
   createApi<FootprintsResponse>("/blog/travel/footprints", undefined, errorHandler);
 export const cityPhotosApi = (data: CityPhotosRequest, errorHandler?: (e: AppError) => void) =>
   createApi<CityPhotosResponse>("/blog/travel/photos", data, errorHandler);
+
+// Guestbook APIs
+export const guestbookListApi = (
+  data: GuestbookListRequest,
+  errorHandler?: (e: AppError) => void,
+) => createApi<GuestbookListResponse>("/blog/admin/guestbook/list", data, errorHandler);
+export const guestbookDeleteApi = (
+  data: GuestbookDeleteRequest,
+  errorHandler?: (e: AppError) => void,
+) => createApi("/blog/admin/guestbook/delete", data, errorHandler);
