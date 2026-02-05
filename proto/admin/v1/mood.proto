@@ -36,8 +36,8 @@ service MoodService {
 
 // MoodDeleteRequest 删除心情请求
 message MoodDeleteRequest {
-  int32 id = 1 [
-    (buf.validate.field).int32.gt = 0,
+  repeated int32 ids = 1 [
+    (buf.validate.field).repeated.min_items = 1,
     (google.api.field_behavior) = REQUIRED
   ];
 }

@@ -1438,12 +1438,14 @@ components:
             description: GuestbookCreateResponse 创建留言响应
         GuestbookDeleteRequest:
             required:
-                - id
+                - ids
             type: object
             properties:
-                id:
-                    type: integer
-                    format: int32
+                ids:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
             description: GuestbookDeleteRequest 删除留言请求
         GuestbookItem:
             type: object
@@ -1617,12 +1619,14 @@ components:
                     type: string
         MoodDeleteRequest:
             required:
-                - id
+                - ids
             type: object
             properties:
-                id:
-                    type: integer
-                    format: int32
+                ids:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
             description: MoodDeleteRequest 删除心情请求
         MoodItem:
             type: object

@@ -50,7 +50,11 @@ func (m *Mood) Update(ctx context.Context, req *adminv1.MoodUpdateRequest) (*typ
 }
 
 func (m *Mood) Delete(ctx context.Context, req *adminv1.MoodDeleteRequest) (*emptypb.Empty, error) {
-	if err := m.store.DeleteMood(ctx, int(req.Id)); err != nil {
+	ids := make([]int, len(req.Ids))
+	for i, id := range req.Ids {
+		ids[i] = int(id)
+	}
+	if err := m.store.DeleteMood(ctx, ids); err != nil {
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil

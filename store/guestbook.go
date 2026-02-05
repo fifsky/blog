@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"strings"
 
 	"app/store/model"
 )
@@ -72,7 +73,17 @@ func (s *Store) GetGuestbook(ctx context.Context, id int64) (*model.Guestbook, e
 	return &g, nil
 }
 
-func (s *Store) DeleteGuestbook(ctx context.Context, id int) error {
-	_, err := s.db.ExecContext(ctx, "delete from guestbook where id = ?", id)
+func (s *Store) DeleteGuestbook(ctx context.Context, ids []int) error {
+	if len(ids) == 0 {
+		return nil
+	}
+	placeholders := make([]string, len(ids))
+	args := make([]any, len(ids))
+	for i, id := range ids {
+		placeholders[i] = "?"
+		args[i] = id
+	}
+	query := "delete from guestbook where id in (" + strings.Join(placeholders, ",") + ")"
+	_, err := s.db.ExecContext(ctx, query, args...)
 	return err
 }

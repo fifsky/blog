@@ -64,7 +64,17 @@ func (s *Store) UpdateMood(ctx context.Context, md *model.UpdateMood) error {
 	return err
 }
 
-func (s *Store) DeleteMood(ctx context.Context, id int) error {
-	_, err := s.db.ExecContext(ctx, "delete from moods where id = ?", id)
+func (s *Store) DeleteMood(ctx context.Context, ids []int) error {
+	if len(ids) == 0 {
+		return nil
+	}
+	placeholders := make([]string, len(ids))
+	args := make([]any, len(ids))
+	for i, id := range ids {
+		placeholders[i] = "?"
+		args[i] = id
+	}
+	query := "delete from moods where id in (" + strings.Join(placeholders, ",") + ")"
+	_, err := s.db.ExecContext(ctx, query, args...)
 	return err
 }

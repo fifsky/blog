@@ -51,7 +51,11 @@ func (g *Guestbook) List(ctx context.Context, req *adminv1.GuestbookListRequest)
 }
 
 func (g *Guestbook) Delete(ctx context.Context, req *adminv1.GuestbookDeleteRequest) (*emptypb.Empty, error) {
-	if err := g.store.DeleteGuestbook(ctx, int(req.Id)); err != nil {
+	ids := make([]int, len(req.Ids))
+	for i, id := range req.Ids {
+		ids[i] = int(id)
+	}
+	if err := g.store.DeleteGuestbook(ctx, ids); err != nil {
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil

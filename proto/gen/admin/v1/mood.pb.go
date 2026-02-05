@@ -28,7 +28,7 @@ const (
 // MoodDeleteRequest 删除心情请求
 type MoodDeleteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Ids           []int32                `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -63,11 +63,11 @@ func (*MoodDeleteRequest) Descriptor() ([]byte, []int) {
 	return file_admin_v1_mood_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *MoodDeleteRequest) GetId() int32 {
+func (x *MoodDeleteRequest) GetIds() []int32 {
 	if x != nil {
-		return x.Id
+		return x.Ids
 	}
-	return 0
+	return nil
 }
 
 type MoodCreateRequest struct {
@@ -170,10 +170,9 @@ var File_admin_v1_mood_proto protoreflect.FileDescriptor
 
 const file_admin_v1_mood_proto_rawDesc = "" +
 	"\n" +
-	"\x13admin/v1/mood.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"/\n" +
-	"\x11MoodDeleteRequest\x12\x1a\n" +
-	"\x02id\x18\x01 \x01(\x05B\n" +
-	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"8\n" +
+	"\x13admin/v1/mood.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"2\n" +
+	"\x11MoodDeleteRequest\x12\x1d\n" +
+	"\x03ids\x18\x01 \x03(\x05B\v\xe0A\x02\xbaH\x05\x92\x01\x02\b\x01R\x03ids\"8\n" +
 	"\x11MoodCreateRequest\x12#\n" +
 	"\acontent\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\acontent\"I\n" +
 	"\x11MoodUpdateRequest\x12\x1a\n" +

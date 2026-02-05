@@ -50,8 +50,8 @@ message GuestbookItem {
 
 // GuestbookDeleteRequest 删除留言请求
 message GuestbookDeleteRequest {
-  int32 id = 1 [
-    (buf.validate.field).int32.gt = 0,
+  repeated int32 ids = 1 [
+    (buf.validate.field).repeated.min_items = 1,
     (google.api.field_behavior) = REQUIRED
   ];
 }

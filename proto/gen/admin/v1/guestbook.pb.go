@@ -7,7 +7,6 @@
 package adminv1
 
 import (
-	_ "app/proto/gen/types"
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -219,7 +218,7 @@ func (x *GuestbookItem) GetCreatedAt() string {
 // GuestbookDeleteRequest 删除留言请求
 type GuestbookDeleteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Ids           []int32                `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -254,18 +253,18 @@ func (*GuestbookDeleteRequest) Descriptor() ([]byte, []int) {
 	return file_admin_v1_guestbook_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GuestbookDeleteRequest) GetId() int32 {
+func (x *GuestbookDeleteRequest) GetIds() []int32 {
 	if x != nil {
-		return x.Id
+		return x.Ids
 	}
-	return 0
+	return nil
 }
 
 var File_admin_v1_guestbook_proto protoreflect.FileDescriptor
 
 const file_admin_v1_guestbook_proto_rawDesc = "" +
 	"\n" +
-	"\x18admin/v1/guestbook.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"D\n" +
+	"\x18admin/v1/guestbook.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\"D\n" +
 	"\x14GuestbookListRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x18\n" +
 	"\akeyword\x18\x02 \x01(\tR\akeyword\"f\n" +
@@ -279,10 +278,9 @@ const file_admin_v1_guestbook_proto_rawDesc = "" +
 	"\x02ip\x18\x04 \x01(\tR\x02ip\x12\x10\n" +
 	"\x03top\x18\x05 \x01(\x05R\x03top\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\tR\tcreatedAt\"4\n" +
-	"\x16GuestbookDeleteRequest\x12\x1a\n" +
-	"\x02id\x18\x01 \x01(\x05B\n" +
-	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id2\x94\x02\n" +
+	"created_at\x18\x06 \x01(\tR\tcreatedAt\"7\n" +
+	"\x16GuestbookDeleteRequest\x12\x1d\n" +
+	"\x03ids\x18\x01 \x03(\x05B\v\xe0A\x02\xbaH\x05\x92\x01\x02\b\x01R\x03ids2\x94\x02\n" +
 	"\x10GuestbookService\x12\x86\x01\n" +
 	"\x04List\x12*.fifsky.blog.admin.v1.GuestbookListRequest\x1a+.fifsky.blog.admin.v1.GuestbookListResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/blog/admin/guestbook/list\x12w\n" +
 	"\x06Delete\x12,.fifsky.blog.admin.v1.GuestbookDeleteRequest\x1a\x16.google.protobuf.Empty\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/blog/admin/guestbook/deleteB\xbd\x01\n" +

@@ -45,7 +45,7 @@ export type UserStatusRequest = { id: number };
 export type RemindListRequest = { page?: number };
 export type RemindDeleteRequest = { id: number };
 export type MoodListRequest = { page?: number };
-export type MoodDeleteRequest = { id: number };
+export type MoodDeleteRequest = { ids: number[] };
 export type CateDeleteRequest = { id: number };
 export type LinkDeleteRequest = { id: number };
 
@@ -341,4 +341,4 @@ export type GuestbookItem = {
 };
 export type GuestbookListRequest = { page?: number; keyword?: string };
 export type GuestbookListResponse = { list: GuestbookItem[]; total: number };
-export type GuestbookDeleteRequest = { id: number };
+export type GuestbookDeleteRequest = { ids: number[] };

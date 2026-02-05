@@ -58,7 +58,6 @@ export function BatchHandle({
         defaultValue=""
       >
         <option value="">批量操作</option>
-        <option value="1">置顶</option>
         <option value="2">删除</option>
       </select>
     </div>
