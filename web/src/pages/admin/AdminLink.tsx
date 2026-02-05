@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { linkDeleteApi, linkListApi, linkCreateApi, linkUpdateApi } from "@/service";
-import { BatchHandle } from "@/components/BatchHandle";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -78,11 +77,6 @@ export default function AdminLink() {
   // 定义表格列配置
   const columns: Column<LinkItem>[] = [
     {
-      title: <div style={{ width: 20 }}></div>,
-      key: "id",
-      render: (_, record) => <input type="checkbox" name="ids" value={record.id} />,
-    },
-    {
       title: <div style={{ width: 120 }}>连接名</div>,
       key: "name",
       render: (value, record) => (
@@ -131,18 +125,12 @@ export default function AdminLink() {
     <div>
       <title>管理链接 - 無處告別</title>
       <h2 className="border-b border-b-[#cccccc] text-base">管理链接</h2>
-      <div className="flex justify-between">
+      <div className="flex justify-between mt-3">
         <div className="w-[700px]">
-          <div className="my-[10px] flex items-center">
-            <BatchHandle />
-          </div>
           {/* 使用自定义表格组件 */}
           <CTable data={list} columns={columns} />
-          <div className="my-[10px] flex items-center justify-between">
-            <BatchHandle />
-          </div>
         </div>
-        <div className="w-[250px]" style={{ paddingTop: 31 }}>
+        <div className="w-[250px]">
           <form
             className="w-full px-1"
             method="post"

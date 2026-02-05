@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { remindDeleteApi, remindListApi, remindCreateApi, remindUpdateApi } from "@/service";
-import { BatchHandle } from "@/components/BatchHandle";
 import { Pagination } from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
 import useDialog from "@/hooks/useDialog";
@@ -66,11 +65,6 @@ export default function AdminRemind() {
   // 定义表格列配置
   const columns: Column<RemindItem>[] = [
     {
-      title: <div style={{ width: 20 }}></div>,
-      key: "id",
-      render: (_, record) => <input type="checkbox" name="ids" value={record.id} />,
-    },
-    {
       title: <div style={{ width: 80 }}>提醒类别</div>,
       key: "type",
       render: (value) => <>{remindType[value as keyof typeof remindType]}</>,
@@ -129,17 +123,11 @@ export default function AdminRemind() {
           <span>新增提醒</span>
         </Button>
       </h2>
-      <div className="flex">
-        <div className="w-full">
-          <div className="my-[10px] flex items-center">
-            <BatchHandle />
-          </div>
-          {/* 使用自定义表格组件 */}
-          <CTable data={list} columns={columns} />
-          <div className="my-[10px] flex items-center justify-between">
-            <BatchHandle />
-            <Pagination page={page} total={total} pageSize={10} onChange={setPage} />
-          </div>
+      <div className="w-full mt-3">
+        {/* 使用自定义表格组件 */}
+        <CTable data={list} columns={columns} />
+        <div className="my-[10px] flex items-center justify-between">
+          <Pagination page={page} total={total} pageSize={10} onChange={setPage} />
         </div>
       </div>
 

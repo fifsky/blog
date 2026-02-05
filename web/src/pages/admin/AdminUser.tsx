@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { userListApi, userStatusApi } from "@/service";
-import { BatchHandle } from "@/components/BatchHandle";
 import { Pagination } from "@/components/Pagination";
 import { CTable, Column } from "@/components/CTable";
 import { Button } from "@/components/ui/button";
@@ -31,11 +30,6 @@ export default function AdminUser() {
 
   // 定义表格列配置
   const columns: Column<UserItem>[] = [
-    {
-      title: <div style={{ width: 20 }}></div>,
-      key: "id",
-      render: (_, record) => <input type="checkbox" name="ids" value={record.id} />,
-    },
     {
       title: <div style={{ width: 120 }}>用户名</div>,
       key: "name",
@@ -90,14 +84,11 @@ export default function AdminUser() {
           新增用户
         </Link>
       </h2>
-      <div className="my-[10px] flex items-center">
-        <BatchHandle />
-      </div>
-      {/* 使用自定义表格组件 */}
-      <CTable data={list} columns={columns} />
-      <div className="my-[10px] flex items-center justify-between">
-        <BatchHandle />
-        <Pagination page={page} total={total} pageSize={10} onChange={setPage} />
+      <div className="w-full mt-3">
+        <CTable data={list} columns={columns} />
+        <div className="my-[10px] flex items-center justify-between">
+          <Pagination page={page} total={total} pageSize={10} onChange={setPage} />
+        </div>
       </div>
     </div>
   );

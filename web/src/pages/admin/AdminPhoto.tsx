@@ -152,15 +152,10 @@ export default function AdminPhoto() {
           <span>新增照片</span>
         </Button>
       </h2>
-      <div className="flex">
-        <div className="w-full">
-          <div className="my-[10px]">
-            {/* 使用自定义表格组件 */}
-            <CTable data={list} columns={columns} />
-          </div>
-          <div className="my-[10px] flex items-center justify-end">
-            <Pagination page={page} total={total} pageSize={10} onChange={setPage} />
-          </div>
+      <div className="w-full mt-3">
+        <CTable data={list} columns={columns} />
+        <div className="my-[10px] flex items-center justify-end">
+          <Pagination page={page} total={total} pageSize={10} onChange={setPage} />
         </div>
       </div>
 
