@@ -18,6 +18,7 @@
 /.shared/
 /.trae/
 /.claude/
+/.agents/
 config.yml
 .envrc
 .buf-deps
