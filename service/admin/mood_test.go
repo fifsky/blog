@@ -21,7 +21,7 @@ func TestAdminMood_CreateDelete(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected err=%v", err)
 		}
-		_, err2 := svc.Delete(context.Background(), &adminv1.MoodDeleteRequest{Id: 1})
+		_, err2 := svc.Delete(context.Background(), &adminv1.MoodDeleteRequest{Ids: []int32{1}})
 		if err2 != nil {
 			t.Fatalf("unexpected err=%v", err2)
 		}
