@@ -56,9 +56,9 @@ func (o *OSS) GetPresignURL(ctx context.Context, req *adminv1.GetPresignURLReque
 	// Generate presigned PUT URL
 	expiration := 10 * time.Minute
 	result, err := client.Presign(ctx, &oss.PutObjectRequest{
-		Bucket:      oss.Ptr(o.conf.OSS.Bucket),
-		Key:         oss.Ptr(objectKey),
-		ContentType: oss.Ptr("text/plain;charset=utf8"), // 请确保在服务端生成该签名URL时设置的ContentType与在使用URL时设置的ContentType一致
+		Bucket:      new(o.conf.OSS.Bucket),
+		Key:         new(objectKey),
+		ContentType: new("text/plain;charset=utf8"), // 请确保在服务端生成该签名URL时设置的ContentType与在使用URL时设置的ContentType一致
 	}, oss.PresignExpires(expiration))
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate presign URL: %w", err)

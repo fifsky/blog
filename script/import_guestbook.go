@@ -230,10 +230,7 @@ func parseWithMODFormat(html string) ([]GuestbookEntry, error) {
 	log.Printf("  MOD format: found %d nicknames, %d times, %d contents", len(nicknames), len(times), len(contents))
 
 	// Match entries by position (same index)
-	minLen := len(nicknames)
-	if len(times) < minLen {
-		minLen = len(times)
-	}
+	minLen := min(len(times), len(nicknames))
 	if len(contents) < minLen {
 		minLen = len(contents)
 	}
@@ -291,10 +288,7 @@ func parseLegacyFormat(html string) ([]GuestbookEntry, error) {
 	log.Printf("  Legacy format: found %d nicknames, %d times, %d contents", len(nicknames), len(times), len(contents))
 
 	// Match entries by position (same index)
-	minLen := len(nicknames)
-	if len(times) < minLen {
-		minLen = len(times)
-	}
+	minLen := min(len(times), len(nicknames))
 	if len(contents) < minLen {
 		minLen = len(contents)
 	}

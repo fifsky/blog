@@ -11,8 +11,8 @@ import (
 )
 
 type Request struct {
-	Msgtype string                 `json:"msgtype"`
-	Text    map[string]interface{} `json:"text"`
+	Msgtype string         `json:"msgtype"`
+	Text    map[string]any `json:"text"`
 }
 
 type Response struct {
@@ -21,8 +21,8 @@ type Response struct {
 }
 
 type MarkdownRequest struct {
-	Msgtype  string                 `json:"msgtype"`
-	Markdown map[string]interface{} `json:"markdown"`
+	Msgtype  string         `json:"msgtype"`
+	Markdown map[string]any `json:"markdown"`
 }
 
 type JumpList struct {
@@ -67,7 +67,7 @@ func NewRobot(token string) *Robot {
 func (r *Robot) MarkdownMessage(md string, at ...string) error {
 	we := &MarkdownRequest{
 		Msgtype: "markdown",
-		Markdown: map[string]interface{}{
+		Markdown: map[string]any{
 			"content": md,
 		},
 	}
@@ -110,7 +110,7 @@ func (r *Robot) call(buf []byte) error {
 func (r *Robot) Message(content string, at ...string) error {
 	we := &Request{
 		Msgtype: "text",
-		Text: map[string]interface{}{
+		Text: map[string]any{
 			"content": content,
 		},
 	}

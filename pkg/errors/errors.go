@@ -3,6 +3,7 @@ package errors
 import (
 	"errors"
 	"fmt"
+	"maps"
 
 	httpstatus "app/pkg/status"
 	"app/proto/gen/types"
@@ -110,9 +111,7 @@ func Clone(err *Error) *Error {
 		return nil
 	}
 	metadata := make(map[string]string, len(err.Metadata))
-	for k, v := range err.Metadata {
-		metadata[k] = v
-	}
+	maps.Copy(metadata, err.Metadata)
 	return &Error{
 		cause: err.cause,
 		Status: types.Status{

@@ -10,7 +10,7 @@ import (
 func (s *Store) ListGuestbook(ctx context.Context, keyword string, start int, num int) ([]model.Guestbook, error) {
 	offset := (start - 1) * num
 	query := "select id,name,content,ip,top,created_at from guestbook"
-	args := []interface{}{}
+	args := []any{}
 
 	if keyword != "" {
 		query += " where (name like ? or content like ?)"
@@ -39,7 +39,7 @@ func (s *Store) ListGuestbook(ctx context.Context, keyword string, start int, nu
 
 func (s *Store) CountGuestbookTotal(ctx context.Context, keyword string) (int, error) {
 	query := "select count(*) from guestbook"
-	args := []interface{}{}
+	args := []any{}
 
 	if keyword != "" {
 		query += " where (name like ? or content like ?)"

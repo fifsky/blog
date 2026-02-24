@@ -26,7 +26,7 @@ func NewAuthLogin(s *store.Store, conf *config.Config) AuthLogin {
 				return
 			}
 
-			token, err := jwt.ParseWithClaims(accessToken, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+			token, err := jwt.ParseWithClaims(accessToken, &jwt.RegisteredClaims{}, func(token *jwt.Token) (any, error) {
 				return []byte(conf.Common.TokenSecret), nil
 			})
 

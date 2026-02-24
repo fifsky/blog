@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -151,14 +152,14 @@ func (c *Client) CallTool(ctx context.Context, name string, arguments map[string
 	}
 
 	// Extract text content from result
-	var content string
+	var content strings.Builder
 	for _, c := range result.Content {
 		if textContent, ok := c.(*mcp.TextContent); ok {
-			content += textContent.Text
+			content.WriteString(textContent.Text)
 		}
 	}
 
-	return content, nil
+	return content.String(), nil
 }
 
 // Close closes the MCP client connection

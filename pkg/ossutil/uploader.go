@@ -49,8 +49,8 @@ func NewAliyunUploader(conf *config.Config) *AliyunUploader {
 func (u *AliyunUploader) Put(ctx context.Context, filename string, body io.Reader) error {
 	// Create upload request
 	putRequest := &oss.PutObjectRequest{
-		Bucket: oss.Ptr(u.conf.OSS.Bucket),
-		Key:    oss.Ptr(filename),
+		Bucket: new(u.conf.OSS.Bucket),
+		Key:    new(filename),
 		Body:   body,
 	}
 
