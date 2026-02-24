@@ -1,4 +1,4 @@
-FROM registry.cn-shanghai.aliyuncs.com/fifsky/golang:1.25 AS builder
+FROM registry.cn-shanghai.aliyuncs.com/fifsky/golang:1.26 AS builder
 WORKDIR /build
 ENV GOPROXY=https://goproxy.cn,direct \
     GOPRIVATE="" \

@@ -6,7 +6,7 @@ Full-stack blog application with Go backend and React frontend.
 
 ### Tech Stack
 
-- **Go 1.25.5** - No framework, uses native `net/http`
+- **Go 1.26.0** - No framework, uses native `net/http`
 - **Protobuf** - API definitions with buf (googleapis)
 - **Validation** - buf protovalidate
 - **Database** - MySQL with native `database/sql` (no ORM)

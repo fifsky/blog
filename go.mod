@@ -1,10 +1,10 @@
 module app
 
-go 1.25.5
+go 1.26.0
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20251209175733-2a1774d88802.1
-	buf.build/go/protovalidate v1.1.0
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20260209202127-80ab13bee0bf.1
+	buf.build/go/protovalidate v1.1.3
 	github.com/aliyun/alibabacloud-oss-go-sdk-v2 v1.3.0
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/goapt/dbunit v0.0.5
@@ -16,8 +16,8 @@ require (
 	github.com/gorilla/feeds v1.2.0
 	github.com/gorilla/schema v1.4.1
 	github.com/larksuite/oapi-sdk-go/v3 v3.5.3
-	github.com/modelcontextprotocol/go-sdk v1.2.0
-	github.com/openai/openai-go/v3 v3.16.0
+	github.com/modelcontextprotocol/go-sdk v1.3.1
+	github.com/openai/openai-go/v3 v3.23.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/samber/lo v1.52.0
 	github.com/stretchr/testify v1.11.1
@@ -33,7 +33,7 @@ require (
 )
 
 require (
-	cel.dev/expr v0.24.0 // indirect
+	cel.dev/expr v0.25.1 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
@@ -42,11 +42,12 @@ require (
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/google/cel-go v0.26.1 // indirect
-	github.com/google/jsonschema-go v0.3.0 // indirect
+	github.com/google/cel-go v0.27.0 // indirect
+	github.com/google/jsonschema-go v0.4.2 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stoewer/go-strcase v1.3.1 // indirect
+	github.com/segmentio/asm v1.1.3 // indirect
+	github.com/segmentio/encoding v0.5.3 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
