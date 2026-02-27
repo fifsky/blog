@@ -28,6 +28,10 @@ export async function request<T = any>(option: RequestOptions): Promise<T> {
     return resp.data as T;
   }
 
+  if (resp.statusCode === 401) {
+    Taro.removeStorageSync("access_token");
+  }
+
   const payload: any = resp.data;
   if (
     payload &&
