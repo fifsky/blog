@@ -145,6 +145,7 @@ export type AdminArticleListRequest = {
   page?: number;
   type?: number;
   status?: number;
+  keyword?: string;
 };
 
 export type AdminArticleListResponse = {

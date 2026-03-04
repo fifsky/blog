@@ -177,7 +177,7 @@ func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*a
 	posts, err := a.store.ListPostForAdmin(ctx, &model.Post{
 		Type:   int(req.Type),
 		Status: int(req.Status),
-	}, page, num)
+	}, page, num, req.Keyword)
 	if err != nil {
 		return nil, err
 	}
@@ -222,7 +222,7 @@ func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*a
 	total, err := a.store.CountPostsForAdmin(ctx, &model.Post{
 		Type:   int(req.Type),
 		Status: int(req.Status),
-	})
+	}, req.Keyword)
 	if err != nil {
 		return nil, err
 	}

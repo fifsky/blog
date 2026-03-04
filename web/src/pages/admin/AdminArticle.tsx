@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { dialog } from "@/utils/dialog";
 
 const STATUS_MAP: Record<
@@ -32,10 +33,12 @@ export default function AdminArticle() {
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [statusFilter, setStatusFilter] = useState<number | undefined>(undefined);
+  const [keyword, setKeyword] = useState<string>("");
+  const [searchInput, setSearchInput] = useState<string>("");
   const [batchLoading, setBatchLoading] = useState(false);
 
   const loadList = async () => {
-    const ret = await articleListAdminApi({ page, status: statusFilter });
+    const ret = await articleListAdminApi({ page, status: statusFilter, keyword });
     setList(ret.list || []);
     setTotal(ret.total || 0);
   };
@@ -113,9 +116,20 @@ export default function AdminArticle() {
     setSelectedIds(newSelectedIds);
   };
 
+  const handleSearch = () => {
+    setPage(1);
+    setKeyword(searchInput);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   useEffect(() => {
     loadList();
-  }, [page, statusFilter]);
+  }, [page, statusFilter, keyword]);
 
   useEffect(() => {
     setSelectedIds(new Set());
@@ -242,20 +256,34 @@ export default function AdminArticle() {
           onBatchOperation={handleBatchOperation}
           disabled={batchLoading}
         />
-        <Select
-          value={statusFilter?.toString() || "all"}
-          onValueChange={(value) => setStatusFilter(value === "all" ? undefined : parseInt(value))}
-        >
-          <SelectTrigger className="w-[120px]" size={"sm"}>
-            <SelectValue placeholder="全部状态" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">全部状态</SelectItem>
-            <SelectItem value="1">已发布</SelectItem>
-            <SelectItem value="3">草稿</SelectItem>
-            <SelectItem value="2">已删除</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center space-x-2">
+          <Input
+            placeholder="搜索文章标题"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="w-[200px] h-8"
+          />
+          <Button size="sm" onClick={handleSearch}>
+            搜索
+          </Button>
+          <Select
+            value={statusFilter?.toString() || "all"}
+            onValueChange={(value) =>
+              setStatusFilter(value === "all" ? undefined : parseInt(value))
+            }
+          >
+            <SelectTrigger className="w-[120px]" size={"sm"}>
+              <SelectValue placeholder="全部状态" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">全部状态</SelectItem>
+              <SelectItem value="1">已发布</SelectItem>
+              <SelectItem value="3">草稿</SelectItem>
+              <SelectItem value="2">已删除</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* 使用自定义表格组件 */}

@@ -1196,6 +1196,8 @@ components:
                 status:
                     type: integer
                     format: int32
+                keyword:
+                    type: string
         ArticleListResponse:
             type: object
             properties:

@@ -357,6 +357,7 @@ type ArticleListRequest struct {
 	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	Type          int32                  `protobuf:"varint,2,opt,name=type,proto3" json:"type,omitempty"`
 	Status        int32                  `protobuf:"varint,3,opt,name=status,proto3" json:"status,omitempty"`
+	Keyword       string                 `protobuf:"bytes,4,opt,name=keyword,proto3" json:"keyword,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -410,6 +411,13 @@ func (x *ArticleListRequest) GetStatus() int32 {
 		return x.Status
 	}
 	return 0
+}
+
+func (x *ArticleListRequest) GetKeyword() string {
+	if x != nil {
+		return x.Keyword
+	}
+	return ""
 }
 
 type ArticleListResponse struct {
@@ -643,11 +651,12 @@ const file_admin_v1_article_proto_rawDesc = "" +
 	"\x03url\x18\x05 \x01(\tR\x03url\x12\x18\n" +
 	"\acontent\x18\x06 \x01(\tR\acontent\x12\x16\n" +
 	"\x06status\x18\a \x01(\x05R\x06status\x12\x12\n" +
-	"\x04tags\x18\b \x03(\tR\x04tags\"T\n" +
+	"\x04tags\x18\b \x03(\tR\x04tags\"n\n" +
 	"\x12ArticleListRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\x05R\x04type\x12\x16\n" +
-	"\x06status\x18\x03 \x01(\x05R\x06status\"b\n" +
+	"\x06status\x18\x03 \x01(\x05R\x06status\x12\x18\n" +
+	"\akeyword\x18\x04 \x01(\tR\akeyword\"b\n" +
 	"\x13ArticleListResponse\x125\n" +
 	"\x04list\x18\x01 \x03(\v2!.fifsky.blog.admin.v1.ArticleItemR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\"\x92\x03\n" +

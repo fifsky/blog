@@ -247,7 +247,7 @@ func (s *Store) RestorePost(ctx context.Context, id int) error {
 	return err
 }
 
-func (s *Store) ListPostForAdmin(ctx context.Context, p *model.Post, start int, num int) ([]model.Post, error) {
+func (s *Store) ListPostForAdmin(ctx context.Context, p *model.Post, start int, num int, keyword string) ([]model.Post, error) {
 	posts := make([]model.Post, 0)
 	offset := (start - 1) * num
 
@@ -265,6 +265,10 @@ func (s *Store) ListPostForAdmin(ctx context.Context, p *model.Post, start int, 
 	if p.Status > 0 {
 		where += " and status = ?"
 		args = append(args, p.Status)
+	}
+	if keyword != "" {
+		where += " and title like ?"
+		args = append(args, fmt.Sprintf("%%%s%%", keyword))
 	}
 	args = append(args, num, offset)
 
@@ -285,7 +289,7 @@ func (s *Store) ListPostForAdmin(ctx context.Context, p *model.Post, start int, 
 	return posts, nil
 }
 
-func (s *Store) CountPostsForAdmin(ctx context.Context, p *model.Post) (int, error) {
+func (s *Store) CountPostsForAdmin(ctx context.Context, p *model.Post, keyword string) (int, error) {
 	args := make([]any, 0)
 	where := "1=1"
 	if p.CateId > 0 {
@@ -299,6 +303,10 @@ func (s *Store) CountPostsForAdmin(ctx context.Context, p *model.Post) (int, err
 	if p.Status > 0 {
 		where += " and status = ?"
 		args = append(args, p.Status)
+	}
+	if keyword != "" {
+		where += " and title like ?"
+		args = append(args, fmt.Sprintf("%%%s%%", keyword))
 	}
 	q := "select count(*) from posts where " + where
 	var total int

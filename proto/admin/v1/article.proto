@@ -113,6 +113,7 @@ message ArticleListRequest {
   int32 page = 1;
   int32 type = 2;
   int32 status = 3;
+  string keyword = 4;
 }
 
 message ArticleListResponse {

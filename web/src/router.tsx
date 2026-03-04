@@ -14,7 +14,6 @@ const About = lazy(() => import("@/pages/About"));
 const Login = lazy(() => import("@/pages/Login"));
 const AdminIndex = lazy(() => import("@/pages/admin/AdminIndex"));
 const AdminArticle = lazy(() => import("@/pages/admin/AdminArticle"));
-const AdminComment = lazy(() => import("@/pages/admin/AdminComment"));
 const AdminMood = lazy(() => import("@/pages/admin/AdminMood"));
 const AdminCate = lazy(() => import("@/pages/admin/AdminCate"));
 const AdminLink = lazy(() => import("@/pages/admin/AdminLink"));
@@ -116,7 +115,6 @@ const routesConfig: RouteObject[] = [
           { path: "index", element: <AdminIndex /> },
           { path: "articles", element: <AdminArticle /> },
           { path: "post/article", element: <PostArticle /> },
-          { path: "comments", element: <AdminComment /> },
           { path: "moods", element: <AdminMood /> },
           { path: "cates", element: <AdminCate /> },
           { path: "links", element: <AdminLink /> },
