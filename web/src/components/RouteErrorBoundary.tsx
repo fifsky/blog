@@ -1,5 +1,6 @@
 import { AlertCircle, Home } from "lucide-react";
 import { isRouteErrorResponse, useRouteError, type ErrorResponse } from "react-router";
+import { AppError } from "@/utils/error";
 import { Button } from "./ui/button";
 
 export function RouteErrorBoundary() {
@@ -8,7 +9,6 @@ export function RouteErrorBoundary() {
   let errorMessage = "An unexpected error occurred";
   let errorTitle = "Something went wrong";
   let errorDetails: string | null = null;
-
   if (isRouteErrorResponse(error)) {
     const response = error as ErrorResponse;
     switch (response.status) {
@@ -33,6 +33,11 @@ export function RouteErrorBoundary() {
         errorMessage = response.statusText || errorMessage;
     }
     errorDetails = response.data?.toString() || null;
+  } else if (error instanceof AppError) {
+    const appError = error;
+    errorTitle = `Error: ${appError.code}`;
+    errorMessage = appError.message;
+    errorDetails = appError.details ? JSON.stringify(appError.details, null, 2) : null;
   } else if (error instanceof Error) {
     errorMessage = error.message;
     errorDetails = error.stack || null;
@@ -59,7 +64,9 @@ export function RouteErrorBoundary() {
         {errorDetails && (
           <details className="bg-muted p-3 rounded-md text-sm">
             <summary className="cursor-pointer font-medium">Error details</summary>
-            <pre className="whitespace-pre-wrap break-words text-xs text-foreground/60">{errorDetails}</pre>
+            <pre className="whitespace-pre-wrap break-words text-xs text-foreground/60">
+              {errorDetails}
+            </pre>
           </details>
         )}
 

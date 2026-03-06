@@ -31,7 +31,8 @@ func TestArticle_Calendar(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected err=%v", err)
 		}
-		if len(resp.Days) != 1 || resp.Days[0] != 10 {
+		// 移除 type = 1 过滤后，返回所有已发布文章的日期
+		if len(resp.Days) != 2 {
 			t.Fatalf("unexpected days=%v", resp.Days)
 		}
 	})

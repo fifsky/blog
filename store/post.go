@@ -36,7 +36,7 @@ func (s *Store) IncrementPostViewNum(ctx context.Context, id int) error {
 }
 
 func (s *Store) GetPostDaysInMonth(ctx context.Context, year, month int) ([]int32, error) {
-	query := "select distinct DAY(created_at) from posts where type = 1 and status = 1 and YEAR(created_at) = ? and MONTH(created_at) = ?"
+	query := "select distinct DAY(created_at) from posts where status = 1 and YEAR(created_at) = ? and MONTH(created_at) = ?"
 	rows, err := s.db.QueryContext(ctx, query, year, month)
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (s *Store) GetPostDaysInMonth(ctx context.Context, year, month int) ([]int3
 
 func (s *Store) PrevPost(ctx context.Context, id int) (*model.Post, error) {
 	var p model.Post
-	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where id < ? and status = 1 and type = 1 order by id desc limit 1", id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
+	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where id < ? and status = 1 order by id desc limit 1", id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (s *Store) PrevPost(ctx context.Context, id int) (*model.Post, error) {
 
 func (s *Store) NextPost(ctx context.Context, id int) (*model.Post, error) {
 	var p model.Post
-	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where id > ? and status = 1 and type = 1 order by id asc limit 1", id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
+	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where id > ? and status = 1 order by id asc limit 1", id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (s *Store) NextPost(ctx context.Context, id int) (*model.Post, error) {
 
 func (s *Store) PostArchive(ctx context.Context) ([]model.PostArchive, error) {
 	res := make([]model.PostArchive, 0)
-	rows, err := s.db.QueryContext(ctx, "select ym,count(ym) total from (select DATE_FORMAT(created_at,'%Y/%m') as ym from posts where type = 1 and status = 1) s group by ym order by ym desc")
+	rows, err := s.db.QueryContext(ctx, "select ym,count(ym) total from (select DATE_FORMAT(created_at,'%Y/%m') as ym from posts where status = 1) s group by ym order by ym desc")
 	if err != nil {
 		return nil, err
 	}

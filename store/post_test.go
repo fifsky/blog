@@ -29,7 +29,8 @@ func TestArticle_PostNext(t *testing.T) {
 		ret, err := s.NextPost(context.Background(), 4)
 		assert.NoError(t, err)
 		assert.NotNil(t, ret)
-		assert.Equal(t, ret.Id, 8)
+		// 移除 type = 1 过滤后，NextPost(4) 返回 id=7（之前因 type=2 被跳过）
+		assert.Equal(t, ret.Id, 7)
 	})
 }
 

@@ -83,10 +83,9 @@ func (a *Article) Update(ctx context.Context, req *adminv1.ArticleUpdateRequest)
 		v := req.Title
 		u.Title = &v
 	}
-	if req.Url != "" {
-		v := req.Url
-		u.Url = &v
-	}
+	// 始终更新 url 字段，允许清空自定义路径
+	urlVal := req.Url
+	u.Url = &urlVal
 	if req.Content != "" {
 		v := req.Content
 		u.Content = &v

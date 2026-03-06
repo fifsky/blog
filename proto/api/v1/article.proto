@@ -113,6 +113,7 @@ message PrevNextRequest {
 message PrevNextItem {
   int32 id = 1;
   string title = 2;
+  string url = 3;
 }
 message PrevNextResponse {
   PrevNextItem prev = 1;

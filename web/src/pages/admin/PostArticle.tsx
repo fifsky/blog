@@ -39,7 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { useAsyncEffect } from "@/hooks";
 import { Sparkles } from "lucide-react";
@@ -52,7 +52,7 @@ const articleSchema = z.object({
   url: z.string().optional(),
   content: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  type: z.union([z.literal(1), z.literal(2)]),
+  type: z.literal(1),
   status: z.number().optional(),
 });
 
@@ -96,6 +96,7 @@ export default function PostArticle() {
   const [cates, setCates] = useState<CateListItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [useCustomPath, setUseCustomPath] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -114,7 +115,6 @@ export default function PostArticle() {
   });
 
   const isEditing = !!form.watch("id");
-  const articleType = form.watch("type");
   const articleStatus = form.watch("status");
   const contentValue = form.watch("content");
   const tagsValue = form.watch("tags");
@@ -176,9 +176,13 @@ export default function PostArticle() {
         url: a.url || "",
         content: a.content || "",
         tags: a.tags || [],
-        type: a.type === 1 || a.type === 2 ? a.type : 1,
+        type: 1,
         status: a.status,
       });
+      // 如果文章有自定义路径，自动勾选 checkbox
+      if (a.url) {
+        setUseCustomPath(true);
+      }
     }
   }, []);
 
@@ -203,7 +207,7 @@ export default function PostArticle() {
       <div className="mt-3">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(submit)} className="space-y-6">
-            {/* 两行两列布局：第一行标题和类型，第二行分类和缩略名 */}
+            {/* 两行两列布局：第一行标题和自定义路径，第二行分类 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* 第一行：标题 */}
               <FormField
@@ -226,43 +230,52 @@ export default function PostArticle() {
                 )}
               />
 
-              {/* 第一行：类型 */}
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <Field>
-                    <FormLabel>
-                      类型 <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FieldContent>
-                      <FormItem>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={(value) => field.onChange(parseInt(value) as 1 | 2)}
-                            value={field.value.toString()}
-                            className="flex space-x-6"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="1" id="type-1" />
-                              <label htmlFor="type-1" className="cursor-pointer">
-                                文章
-                              </label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="2" id="type-2" />
-                              <label htmlFor="type-2" className="cursor-pointer">
-                                页面
-                              </label>
-                            </div>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    </FieldContent>
-                  </Field>
-                )}
-              />
+              {/* 第一行：自定义路径 */}
+              <Field>
+                <FormLabel>自定义路径</FormLabel>
+                <FieldContent>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="use-custom-path"
+                        checked={useCustomPath}
+                        onCheckedChange={(checked) => {
+                          setUseCustomPath(!!checked);
+                          if (!checked) {
+                            form.setValue("url", "");
+                          }
+                        }}
+                      />
+                      <label htmlFor="use-custom-path" className="cursor-pointer text-sm">
+                        启用自定义路径
+                      </label>
+                    </div>
+                    {useCustomPath && (
+                      <FormField
+                        control={form.control}
+                        name="url"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="请输入自定义路径"
+                                maxLength={200}
+                                className={cn("w-52")}
+                              />
+                            </FormControl>
+                            <FieldDescription>
+                              访问地址：http://domain.com/
+                              <span style={{ color: "red" }}>{field.value || "custom-path"}</span>
+                            </FieldDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+                </FieldContent>
+              </Field>
 
               {/* 第二行：分类 */}
               <FormField
@@ -299,35 +312,7 @@ export default function PostArticle() {
                 )}
               />
 
-              {/* 第二行：缩略名 */}
-              {articleType === 2 && (
-                <FormField
-                  control={form.control}
-                  name="url"
-                  render={({ field }) => (
-                    <Field>
-                      <FormLabel>缩略名</FormLabel>
-                      <FieldContent>
-                        <FormItem>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="请输入缩略名"
-                              maxLength={200}
-                              className={cn("w-52")}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      </FieldContent>
-                      <FieldDescription>
-                        页面的URL名称，如http://domain.com/
-                        <span style={{ color: "red" }}>about</span>
-                      </FieldDescription>
-                    </Field>
-                  )}
-                />
-              )}
+
             </div>
 
             <FormField

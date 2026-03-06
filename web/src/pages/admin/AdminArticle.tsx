@@ -164,7 +164,7 @@ export default function AdminArticle() {
       key: "title",
       render: (value, record) => (
         <a
-          href={record.type === 2 ? record.url : "/article/" + record.id}
+          href={record.url ? "/" + record.url : "/article/" + record.id}
           target="_blank"
           rel="noreferrer"
         >
@@ -185,11 +185,7 @@ export default function AdminArticle() {
         </a>
       ),
     },
-    {
-      title: <div style={{ width: 80 }}>类型</div>,
-      key: "type",
-      render: (value) => (value === 1 ? "文章" : "页面"),
-    },
+
     {
       title: <div style={{ width: 80 }}>状态</div>,
       key: "status",

@@ -574,6 +574,7 @@ type PrevNextItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Url           string                 `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -618,6 +619,13 @@ func (x *PrevNextItem) GetId() int32 {
 func (x *PrevNextItem) GetTitle() string {
 	if x != nil {
 		return x.Title
+	}
+	return ""
+}
+
+func (x *PrevNextItem) GetUrl() string {
+	if x != nil {
+		return x.Url
 	}
 	return ""
 }
@@ -774,10 +782,11 @@ const file_api_v1_article_proto_rawDesc = "" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\"-\n" +
 	"\x0fPrevNextRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
-	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"4\n" +
+	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"F\n" +
 	"\fPrevNextItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x14\n" +
-	"\x05title\x18\x02 \x01(\tR\x05title\"~\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12\x10\n" +
+	"\x03url\x18\x03 \x01(\tR\x03url\"~\n" +
 	"\x10PrevNextResponse\x124\n" +
 	"\x04prev\x18\x01 \x01(\v2 .fifsky.blog.api.v1.PrevNextItemR\x04prev\x124\n" +
 	"\x04next\x18\x02 \x01(\v2 .fifsky.blog.api.v1.PrevNextItemR\x04next\"S\n" +

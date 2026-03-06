@@ -153,7 +153,7 @@ export type AdminArticleListResponse = {
   total: number;
 };
 
-export type PrevNextItem = { id: number; title: string };
+export type PrevNextItem = { id: number; title: string; url?: string };
 export type PrevNextResponse = { prev?: PrevNextItem; next?: PrevNextItem };
 
 export type MoodItem = {

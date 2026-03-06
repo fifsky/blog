@@ -1779,6 +1779,8 @@ components:
                     format: int32
                 title:
                     type: string
+                url:
+                    type: string
         PrevNextRequest:
             required:
                 - id

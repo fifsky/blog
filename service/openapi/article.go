@@ -2,6 +2,7 @@ package openapi
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"strconv"
 	"time"
@@ -147,10 +148,10 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 func (a *Article) PrevNext(ctx context.Context, req *apiv1.PrevNextRequest) (*apiv1.PrevNextResponse, error) {
 	resp := &apiv1.PrevNextResponse{}
 	if prev, err := a.store.PrevPost(ctx, int(req.Id)); err == nil {
-		resp.Prev = &apiv1.PrevNextItem{Id: int32(prev.Id), Title: prev.Title}
+		resp.Prev = &apiv1.PrevNextItem{Id: int32(prev.Id), Title: prev.Title, Url: prev.Url}
 	}
 	if next, err := a.store.NextPost(ctx, int(req.Id)); err == nil {
-		resp.Next = &apiv1.PrevNextItem{Id: int32(next.Id), Title: next.Title}
+		resp.Next = &apiv1.PrevNextItem{Id: int32(next.Id), Title: next.Title, Url: next.Url}
 	}
 	return resp, nil
 }
@@ -158,6 +159,9 @@ func (a *Article) PrevNext(ctx context.Context, req *apiv1.PrevNextRequest) (*ap
 func (a *Article) Detail(ctx context.Context, req *apiv1.ArticleDetailRequest) (*apiv1.ArticleItem, error) {
 	post, err := a.store.GetPost(ctx, int(req.Id), req.Url)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errors.ErrArticleNotFound
+		}
 		return nil, errors.ErrSystem.WithCause(err)
 	}
 
@@ -207,7 +211,7 @@ func (a *Article) Feed(ctx context.Context, _ *emptypb.Empty) (*httpbody.HttpBod
 		Author:      &feeds.Author{Name: "fifsky", Email: "fifsky@gmail.com"},
 		Created:     now,
 	}
-	posts, err := a.store.ListPost(ctx, &model.Post{Type: 1}, 1, 10, "", "", "")
+	posts, err := a.store.ListPost(ctx, &model.Post{}, 1, 10, "", "", "")
 	if err != nil {
 		return nil, err
 	}
