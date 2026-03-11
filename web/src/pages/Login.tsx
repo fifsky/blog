@@ -1,6 +1,5 @@
 import { CHeader } from "@/components/CHeader";
 import { CFooter } from "@/components/CFooter";
-import { FollowBee } from "@/components/FollowBee";
 import { useStore } from "@/store/context";
 import { useNavigate } from "react-router";
 import { LoginRequest, Options } from "@/types/openapi";
@@ -52,13 +51,12 @@ export default function Login() {
   const pageTitle = `登录 - ${siteName}`;
   return (
     <div className="w-[1024px] mt-4 mx-auto min-h-[500px]">
-      <FollowBee />
       <title>{pageTitle}</title>
       <meta name="description" content={settings?.kv?.site_desc || ""} />
       <meta name="keywords" content={settings?.kv?.site_keyword || ""} />
       <CHeader />
-      <div className="p-5 border border-[#89d5ef] bg-white">
-        <div className="px-[30px]">
+      <div className="p-5 border border-[#89d5ef] bg-white relative overflow-hidden">
+        <div className="px-[30px] relative z-10">
           <h2 className="border-b border-b-[#cccccc] text-base">博客管理登录</h2>
           <form
             method="post"
