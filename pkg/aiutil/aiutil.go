@@ -16,5 +16,6 @@ func ConfigureModelParams(req *openai.ChatCompletionNewParams, model string) {
 				"type": "disabled",
 			},
 		})
+		req.ReasoningEffort = "low"
 	}
 }
