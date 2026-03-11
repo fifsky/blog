@@ -22,6 +22,8 @@ type ArticleServiceHTTPServer interface {
 	Create(context.Context, *ArticleCreateRequest) (*types.IDResponse, error)
 	// Delete 删除文章（支持批量）
 	Delete(context.Context, *ArticleDeleteRequest) (*emptypb.Empty, error)
+	// Destroy 物理删除文章（支持批量，仅限已删除状态）
+	Destroy(context.Context, *ArticleDestroyRequest) (*emptypb.Empty, error)
 	// Detail 获取文章详情（不限制文章状态）
 	Detail(context.Context, *ArticleDetailRequest) (*ArticleItem, error)
 	// List 获取文章列表
@@ -44,6 +46,7 @@ func (s *ArticleService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/admin/article/delete", s.Delete)
 	s.mux.HandleFunc("POST /blog/admin/article/list", s.List)
 	s.mux.HandleFunc("POST /blog/admin/article/restore", s.Restore)
+	s.mux.HandleFunc("POST /blog/admin/article/destroy", s.Destroy)
 	s.mux.HandleFunc("POST /blog/admin/article/detail", s.Detail)
 }
 
@@ -157,6 +160,26 @@ func (s *ArticleService) Restore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.codec.Encode(w, r, out)
+	return
+}
+
+func (s *ArticleService) Destroy(w http.ResponseWriter, r *http.Request) {
+	var in ArticleDestroyRequest
+	if err := s.codec.Decode(r, &in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	if err := s.codec.Validate(&in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	_, err := s.server.Destroy(r.Context(), &in)
+	if err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
 	return
 }
 

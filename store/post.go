@@ -316,3 +316,13 @@ func (s *Store) CountPostsForAdmin(ctx context.Context, p *model.Post, keyword s
 	}
 	return total, nil
 }
+
+func (s *Store) DestroyPost(ctx context.Context, ids []int) error {
+	if len(ids) == 0 {
+		return nil
+	}
+	placeholders, args := In(ids)
+	query := "delete from posts where status = 2 and id in (" + placeholders + ")"
+	_, err := s.db.ExecContext(ctx, query, args...)
+	return err
+}

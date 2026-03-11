@@ -46,6 +46,13 @@ service ArticleService {
       body: "*"
     };
   }
+  // Destroy 物理删除文章（支持批量，仅限已删除状态）
+  rpc Destroy(ArticleDestroyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/blog/admin/article/destroy"
+      body: "*"
+    };
+  }
   // Detail 获取文章详情（不限制文章状态）
   rpc Detail(ArticleDetailRequest) returns (ArticleItem) {
     option (google.api.http) = {
@@ -70,6 +77,11 @@ message ArticleDeleteRequest {
 
 // ArticleRestoreRequest 恢复文章请求（支持批量）
 message ArticleRestoreRequest {
+  repeated int32 ids = 1 [(buf.validate.field).repeated.min_items = 1];
+}
+
+// ArticleDestroyRequest 物理删除文章请求（支持批量）
+message ArticleDestroyRequest {
   repeated int32 ids = 1 [(buf.validate.field).repeated.min_items = 1];
 }
 

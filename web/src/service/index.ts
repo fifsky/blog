@@ -37,6 +37,7 @@ import type {
   AdminArticleListResponse,
   ArticleDeleteRequest,
   ArticleRestoreRequest,
+  ArticleDestroyRequest,
   UserListRequest,
   UserStatusRequest,
   RemindListRequest,
@@ -124,6 +125,10 @@ export const articleRestoreApi = (
   data: ArticleRestoreRequest,
   errorHandler?: (e: AppError) => void,
 ) => createApi<IDResponse>("/blog/admin/article/restore", data, errorHandler);
+export const articleDestroyApi = (
+  data: ArticleDestroyRequest,
+  errorHandler?: (e: AppError) => void,
+) => createApi("/blog/admin/article/destroy", data, errorHandler);
 export const articleListAdminApi = (
   data: AdminArticleListRequest,
   errorHandler?: (e: AppError) => void,

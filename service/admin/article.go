@@ -136,6 +136,22 @@ func (a *Article) Restore(ctx context.Context, req *adminv1.ArticleRestoreReques
 	return &types.IDResponse{Id: int32(ids[0])}, nil
 }
 
+func (a *Article) Destroy(ctx context.Context, req *adminv1.ArticleDestroyRequest) (*emptypb.Empty, error) {
+	ids := make([]int, 0, len(req.Ids))
+	for _, id := range req.Ids {
+		if id > 0 {
+			ids = append(ids, int(id))
+		}
+	}
+	if len(ids) == 0 {
+		return &emptypb.Empty{}, nil
+	}
+	if err := a.store.DestroyPost(ctx, ids); err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
+}
+
 func (a *Article) Detail(ctx context.Context, req *adminv1.ArticleDetailRequest) (*adminv1.ArticleItem, error) {
 	post, err := a.store.GetPost(ctx, int(req.Id), "")
 	if err != nil {

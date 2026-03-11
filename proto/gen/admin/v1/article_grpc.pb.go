@@ -26,6 +26,7 @@ const (
 	ArticleService_Delete_FullMethodName  = "/fifsky.blog.admin.v1.ArticleService/Delete"
 	ArticleService_List_FullMethodName    = "/fifsky.blog.admin.v1.ArticleService/List"
 	ArticleService_Restore_FullMethodName = "/fifsky.blog.admin.v1.ArticleService/Restore"
+	ArticleService_Destroy_FullMethodName = "/fifsky.blog.admin.v1.ArticleService/Destroy"
 	ArticleService_Detail_FullMethodName  = "/fifsky.blog.admin.v1.ArticleService/Detail"
 )
 
@@ -45,6 +46,8 @@ type ArticleServiceClient interface {
 	List(ctx context.Context, in *ArticleListRequest, opts ...grpc.CallOption) (*ArticleListResponse, error)
 	// Restore 恢复已删除文章（支持批量）
 	Restore(ctx context.Context, in *ArticleRestoreRequest, opts ...grpc.CallOption) (*types.IDResponse, error)
+	// Destroy 物理删除文章（支持批量，仅限已删除状态）
+	Destroy(ctx context.Context, in *ArticleDestroyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Detail 获取文章详情（不限制文章状态）
 	Detail(ctx context.Context, in *ArticleDetailRequest, opts ...grpc.CallOption) (*ArticleItem, error)
 }
@@ -107,6 +110,16 @@ func (c *articleServiceClient) Restore(ctx context.Context, in *ArticleRestoreRe
 	return out, nil
 }
 
+func (c *articleServiceClient) Destroy(ctx context.Context, in *ArticleDestroyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ArticleService_Destroy_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *articleServiceClient) Detail(ctx context.Context, in *ArticleDetailRequest, opts ...grpc.CallOption) (*ArticleItem, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ArticleItem)
@@ -133,6 +146,8 @@ type ArticleServiceServer interface {
 	List(context.Context, *ArticleListRequest) (*ArticleListResponse, error)
 	// Restore 恢复已删除文章（支持批量）
 	Restore(context.Context, *ArticleRestoreRequest) (*types.IDResponse, error)
+	// Destroy 物理删除文章（支持批量，仅限已删除状态）
+	Destroy(context.Context, *ArticleDestroyRequest) (*emptypb.Empty, error)
 	// Detail 获取文章详情（不限制文章状态）
 	Detail(context.Context, *ArticleDetailRequest) (*ArticleItem, error)
 	mustEmbedUnimplementedArticleServiceServer()
@@ -159,6 +174,9 @@ func (UnimplementedArticleServiceServer) List(context.Context, *ArticleListReque
 }
 func (UnimplementedArticleServiceServer) Restore(context.Context, *ArticleRestoreRequest) (*types.IDResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Restore not implemented")
+}
+func (UnimplementedArticleServiceServer) Destroy(context.Context, *ArticleDestroyRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method Destroy not implemented")
 }
 func (UnimplementedArticleServiceServer) Detail(context.Context, *ArticleDetailRequest) (*ArticleItem, error) {
 	return nil, status.Error(codes.Unimplemented, "method Detail not implemented")
@@ -274,6 +292,24 @@ func _ArticleService_Restore_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArticleService_Destroy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ArticleDestroyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArticleServiceServer).Destroy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArticleService_Destroy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArticleServiceServer).Destroy(ctx, req.(*ArticleDestroyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ArticleService_Detail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ArticleDetailRequest)
 	if err := dec(in); err != nil {
@@ -318,6 +354,10 @@ var ArticleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Restore",
 			Handler:    _ArticleService_Restore_Handler,
+		},
+		{
+			MethodName: "Destroy",
+			Handler:    _ArticleService_Destroy_Handler,
 		},
 		{
 			MethodName: "Detail",

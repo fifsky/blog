@@ -10,6 +10,7 @@ export type ArticleCalendarResponse = {
 
 export type ArticleDeleteRequest = { ids: number[] };
 export type ArticleRestoreRequest = { ids: number[] };
+export type ArticleDestroyRequest = { ids: number[] };
 
 // 通用响应
 export type IDResponse = { id: number };

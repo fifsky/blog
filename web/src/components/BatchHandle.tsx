@@ -1,3 +1,8 @@
+interface BatchOption {
+  value: string;
+  label: string;
+}
+
 interface BatchHandleProps {
   selectedCount?: number;
   totalCount?: number;
@@ -5,7 +10,10 @@ interface BatchHandleProps {
   onInverseSelected?: () => void;
   onBatchOperation?: (operation: string) => void;
   disabled?: boolean;
+  options?: BatchOption[];
 }
+
+const DEFAULT_OPTIONS: BatchOption[] = [{ value: "2", label: "删除" }];
 
 export function BatchHandle({
   selectedCount = 0,
@@ -14,6 +22,7 @@ export function BatchHandle({
   onInverseSelected,
   onBatchOperation,
   disabled = false,
+  options = DEFAULT_OPTIONS,
 }: BatchHandleProps) {
   const handleOperationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -58,7 +67,11 @@ export function BatchHandle({
         defaultValue=""
       >
         <option value="">批量操作</option>
-        <option value="2">删除</option>
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
       </select>
     </div>
   );

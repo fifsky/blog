@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { articleDeleteApi, articleListAdminApi, articleRestoreApi } from "@/service";
+import { articleDeleteApi, articleDestroyApi, articleListAdminApi, articleRestoreApi } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Pagination } from "@/components/Pagination";
 import { CTable, Column } from "@/components/CTable";
@@ -58,6 +58,14 @@ export default function AdminArticle() {
       },
     });
   };
+  const destroyItem = (id: number) => {
+    dialog.confirm("确认要永久删除？此操作不可恢复！", {
+      onOk: async () => {
+        await articleDestroyApi({ ids: [id] });
+        loadList();
+      },
+    });
+  };
 
   // 批量删除
   const batchDelete = () => {
@@ -76,11 +84,31 @@ export default function AdminArticle() {
     });
   };
 
+  // 批量物理删除
+  const batchDestroy = () => {
+    if (selectedIds.size === 0) return;
+    dialog.confirm(`确认要永久删除选中的 ${selectedIds.size} 篇文章？此操作不可恢复！`, {
+      onOk: async () => {
+        setBatchLoading(true);
+        try {
+          await articleDestroyApi({ ids: Array.from(selectedIds) });
+          setSelectedIds(new Set());
+          await loadList();
+        } finally {
+          setBatchLoading(false);
+        }
+      },
+    });
+  };
+
   // 批量操作处理
   const handleBatchOperation = (operation: string) => {
     if (operation === "2") {
       // 删除
       batchDelete();
+    } else if (operation === "3") {
+      // 物理删除
+      batchDestroy();
     } else if (operation === "1") {
       // 置顶 - 暂未实现
       alert("置顶功能暂未实现");
@@ -134,6 +162,10 @@ export default function AdminArticle() {
   useEffect(() => {
     setSelectedIds(new Set());
   }, [page]);
+
+  const batchOptions = statusFilter === 2
+    ? [{ value: "3", label: "永久删除" }]
+    : [{ value: "2", label: "删除" }];
 
   // 定义表格列配置
   const columns: Column<ArticleItem>[] = [
@@ -199,7 +231,7 @@ export default function AdminArticle() {
       key: "updated_at",
     },
     {
-      title: <div style={{ width: 90 }}>操作</div>,
+      title: <div style={{ width: 130 }}>操作</div>,
       key: "id",
       render: (_, record) => (
         <>
@@ -210,13 +242,23 @@ export default function AdminArticle() {
             </>
           )}
           {record.status === 2 ? (
-            <Button
-              variant={"link"}
-              className={cn("p-0 m-0 h-auto text-[13px]")}
-              onClick={() => restoreItem(record.id)}
-            >
-              恢复
-            </Button>
+            <>
+              <Button
+                variant={"link"}
+                className={cn("p-0 m-0 h-auto text-[13px]")}
+                onClick={() => restoreItem(record.id)}
+              >
+                恢复
+              </Button>
+              <span className="px-1.5 text-[#ccc]">|</span>
+              <Button
+                variant={"link"}
+                className={cn("p-0 m-0 h-auto text-[13px] text-red-600")}
+                onClick={() => destroyItem(record.id)}
+              >
+                永久删除
+              </Button>
+            </>
           ) : (
             <Button
               variant={"link"}
@@ -251,6 +293,7 @@ export default function AdminArticle() {
           onInverseSelected={handleInverseSelected}
           onBatchOperation={handleBatchOperation}
           disabled={batchLoading}
+          options={batchOptions}
         />
         <div className="flex items-center space-x-2">
           <Input
@@ -293,6 +336,7 @@ export default function AdminArticle() {
           onInverseSelected={handleInverseSelected}
           onBatchOperation={handleBatchOperation}
           disabled={batchLoading}
+          options={batchOptions}
         />
         <Pagination page={page} total={total} pageSize={20} onChange={setPage} />
       </div>

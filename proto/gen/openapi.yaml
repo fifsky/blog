@@ -79,6 +79,22 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /blog/admin/article/destroy:
+        post:
+            tags:
+                - ArticleService
+            description: Destroy 物理删除文章（支持批量，仅限已删除状态）
+            operationId: ArticleService_Destroy
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ArticleDestroyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /blog/admin/article/detail:
         post:
             tags:
@@ -1136,6 +1152,15 @@ components:
                         type: integer
                         format: int32
             description: ArticleDeleteRequest 删除文章请求（支持批量）
+        ArticleDestroyRequest:
+            type: object
+            properties:
+                ids:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+            description: ArticleDestroyRequest 物理删除文章请求（支持批量）
         ArticleDetailRequest:
             required:
                 - id
