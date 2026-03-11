@@ -11,7 +11,7 @@ import (
 // For doubao models, it disables thinking mode.
 func ConfigureModelParams(req *openai.ChatCompletionNewParams, model string) {
 	if strings.HasPrefix(model, "doubao") {
-		req.ReasoningEffort = "low"
+		req.ReasoningEffort = "minimal"
 	}
 
 	if strings.HasPrefix(model, "kimi") {
