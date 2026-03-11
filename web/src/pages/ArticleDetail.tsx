@@ -46,6 +46,7 @@ export default function ArticleDetail() {
 
   const siteName = settings?.kv?.site_name || "無處告別";
   const pageTitle = `${article?.title ? article?.title + " - " : ""}${siteName}`;
+  const isAboutPage = article?.url === "about";
 
   // Show skeleton during initial load
   if (!article?.id) {
@@ -60,24 +61,26 @@ export default function ArticleDetail() {
       <PageTransition loading={loading}>
         <div className="mb-[10px]">
           <CArticle article={article} />
-          <div className="my-5 flex justify-between">
-            <div className="w-[400px] overflow-hidden text-ellipsis whitespace-nowrap">
-              <strong>上一篇：</strong>
-              {data.prev?.id ? (
-                <Link to={articleLink(data.prev)}>{data.prev.title}</Link>
-              ) : (
-                <span>嘿，这已经是最新的文章啦</span>
-              )}
+          {!isAboutPage && (
+            <div className="my-5 flex justify-between">
+              <div className="w-[400px] overflow-hidden text-ellipsis whitespace-nowrap">
+                <strong>上一篇：</strong>
+                {data.prev?.id ? (
+                  <Link to={articleLink(data.prev)}>{data.prev.title}</Link>
+                ) : (
+                  <span>嘿，这已经是最新的文章啦</span>
+                )}
+              </div>
+              <div className="w-[400px] overflow-hidden text-ellipsis whitespace-nowrap text-right">
+                <strong>下一篇：</strong>
+                {data.next?.id ? (
+                  <Link to={articleLink(data.next)}>{data.next.title}</Link>
+                ) : (
+                  <span>嘿，这已经是最后的文章啦</span>
+                )}
+              </div>
             </div>
-            <div className="w-[400px] overflow-hidden text-ellipsis whitespace-nowrap text-right">
-              <strong>下一篇：</strong>
-              {data.next?.id ? (
-                <Link to={articleLink(data.next)}>{data.next.title}</Link>
-              ) : (
-                <span>嘿，这已经是最后的文章啦</span>
-              )}
-            </div>
-          </div>
+          )}
         </div>
         <Comment />
       </PageTransition>
