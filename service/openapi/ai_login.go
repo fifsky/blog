@@ -131,27 +131,42 @@ type EvaluationResult struct {
 }
 
 func (a *AILogin) evaluateWithAI(ctx context.Context, profile *model.AuthProfile, session *model.AuthSession, userMessage string) (*EvaluationResult, error) {
-	prompt := fmt.Sprintf(`你是一个身份验证助手。用户需要通过对话证明自己的身份。
+	prompt := fmt.Sprintf(`你是一个严格的身份验证助手。用户需要通过对话证明自己的身份。
 
-用户身份特征: %s
+用户身份特征（保密，不可直接透露）:
+%s
 
-你的任务:
-1. 根据身份特征提出验证问题或评估用户的回答
-2. 评估用户回答的可信度，返回一个0-100的分数
-3. 当验证得分达到 %.0f%% 时，在回复最后输出 [VERIFIED]
-4. 如果用户明显不是本人，在回复最后输出 [REJECTED]
+验证规则：
+1. 从身份特征中识别独立的、具体的信息点（如：出生地具体到镇/村、职业具体技术栈、家庭成员的具体情况、具体日期、具体品牌等）
+2. 用户必须陈述具体的细节才能算答对，泛泛的陈述不计入
+3. 判断标准示例（以下回答只是举例，真是回答需要根据用户身份特征来判断）：
+   - 错误："有老婆"、"结婚了" → 这只是泛泛陈述
+   - 正确："老婆是湖北人"、"和大学同学结婚" → 陈述了具体细节
+   - 错误："有女儿"、"有孩子"
+   - 正确："女儿生日是0818"、"女儿08月18日出生" → 陈述了具体细节
+   - 错误："有车"、"开车"
+   - 正确："开奥迪"、"车是奥迪品牌" → 陈述了具体品牌
+   - 错误："去过旅游"
+   - 正确："去过新疆"、"最远去了新疆" → 陈述了具体地点
+4. 累计答对3条具体信息即验证通过，输出 [VERIFIED]
 
-当前验证进度: %.0f%%
-已尝试次数: %d/%d
+重要约束：
+- 绝对不能直接问用户问题
+- 绝对不能透露任何身份特征的具体内容
+- 绝对不能复述用户的身份信息
+- 只能通过模糊引导让用户多说，如"请继续"、"还有吗"等
+- 用户答对时只说"正确"，不能重复他说了什么
+- 对泛泛陈述要引导用户说更具体的内容，如"能说得更具体一些吗"
 
-回复格式要求:
-- 第一行必须是分数（纯数字，如：85）
-- 第二行开始是你的回复内容
-- 验证通过时在最后加上 [VERIFIED]
-- 验证失败时在最后加上 [REJECTED]`,
+回复格式要求：
+- 第一行：已答对的具体信息数量（纯数字，如：0、1、2、3）
+- 第二行开始：你的回复内容
+- 答对3条时，在最后加上 [VERIFIED]
+
+当前已答对: %d 条
+已尝试次数: %d/%d`,
 		profile.IdentityDescription,
-		profile.VerificationThreshold*100,
-		session.VerifiedScore*100,
+		int(session.VerifiedScore*10),
 		session.AttemptCount,
 		profile.MaxAttempts,
 	)
@@ -177,27 +192,25 @@ func (a *AILogin) evaluateWithAI(ctx context.Context, profile *model.AuthProfile
 	response := completion.Choices[0].Message.Content
 
 	lines := strings.SplitN(response, "\n", 2)
-	var score float64
+	var correctCount int
 	var content string
 
 	if len(lines) >= 2 {
-		fmt.Sscanf(lines[0], "%f", &score)
+		fmt.Sscanf(lines[0], "%d", &correctCount)
 		content = strings.TrimSpace(lines[1])
 	} else {
 		content = response
 	}
 
 	verified := strings.Contains(response, "[VERIFIED]")
-	rejected := strings.Contains(response, "[REJECTED]")
-
-	if rejected {
-		score = 0
-	}
 
 	if verified {
+		correctCount = 3
+	}
+
+	score := float64(correctCount) / 3.0
+	if score > 1.0 {
 		score = 1.0
-	} else {
-		score = score / 100.0
 	}
 
 	return &EvaluationResult{
@@ -208,5 +221,5 @@ func (a *AILogin) evaluateWithAI(ctx context.Context, profile *model.AuthProfile
 }
 
 func (a *AILogin) generateWelcomeMessage(profile *model.AuthProfile) string {
-	return fmt.Sprintf("你好！为了验证你的身份，请告诉我一些关于你自己的事情。\n\n提示：系统已记录了你的身份特征，请通过对话让我相信你就是本人。你有 %d 次尝试机会。", profile.MaxAttempts)
+	return "你好！为了验证你的身份，请告诉我一些关于你自己的事情。"
 }
