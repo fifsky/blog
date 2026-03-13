@@ -17,8 +17,8 @@ require (
 	github.com/gorilla/schema v1.4.1
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/larksuite/oapi-sdk-go/v3 v3.5.3
-	github.com/modelcontextprotocol/go-sdk v1.3.1
-	github.com/openai/openai-go/v3 v3.23.0
+	github.com/modelcontextprotocol/go-sdk v1.4.0
+	github.com/openai/openai-go/v3 v3.26.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/samber/lo v1.52.0
 	github.com/stretchr/testify v1.11.1
@@ -61,8 +61,8 @@ require (
 	go.opentelemetry.io/otel/trace v1.39.0 // indirect
 	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6 // indirect
 	golang.org/x/net v0.47.0 // indirect
-	golang.org/x/oauth2 v0.32.0 // indirect
-	golang.org/x/sys v0.39.0 // indirect
+	golang.org/x/oauth2 v0.34.0 // indirect
+	golang.org/x/sys v0.40.0 // indirect
 	golang.org/x/time v0.4.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
