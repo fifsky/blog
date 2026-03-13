@@ -10,7 +10,7 @@ const ArticleList = lazy(() => import("@/pages/ArticleList"));
 const ArticleDetail = lazy(() => import("@/pages/ArticleDetail"));
 const TravelMap = lazy(() => import("@/pages/TravelMap"));
 const Archive = lazy(() => import("@/pages/Archive"));
-const AILogin = lazy(() => import("@/pages/AILogin"));
+const Login = lazy(() => import("@/pages/Login"));
 const AdminIndex = lazy(() => import("@/pages/admin/AdminIndex"));
 const AdminArticle = lazy(() => import("@/pages/admin/AdminArticle"));
 const AdminMood = lazy(() => import("@/pages/admin/AdminMood"));
@@ -106,7 +106,7 @@ const routesConfig: RouteObject[] = [
           },
         ],
       },
-      { path: "/login", element: <AILogin /> },
+      { path: "/login", element: <Login /> },
       {
         path: "/admin",
         element: <AdminLayout />,

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"app/config"
@@ -14,17 +15,25 @@ import (
 	"app/store/model"
 
 	"github.com/google/uuid"
+	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/option"
 )
 
 var _ apiv1.AILoginServiceServer = (*AILogin)(nil)
 
+type chatMessage struct {
+	Role    string
+	Content string
+}
+
 type AILogin struct {
 	apiv1.UnimplementedAILoginServiceServer
-	store  *store.Store
-	conf   *config.Config
-	client openai.Client
+	store     *store.Store
+	conf      *config.Config
+	client    openai.Client
+	cache     *lru.Cache[string, []chatMessage]
+	cacheLock sync.Mutex
 }
 
 func NewAILogin(s *store.Store, conf *config.Config) *AILogin {
@@ -32,10 +41,12 @@ func NewAILogin(s *store.Store, conf *config.Config) *AILogin {
 		option.WithAPIKey(conf.Common.AIToken),
 		option.WithBaseURL(conf.Common.AIEndpoint),
 	)
+	cache, _ := lru.New[string, []chatMessage](100)
 	return &AILogin{
 		store:  s,
 		conf:   conf,
 		client: client,
+		cache:  cache,
 	}
 }
 
@@ -171,12 +182,24 @@ func (a *AILogin) evaluateWithAI(ctx context.Context, profile *model.AuthProfile
 		profile.MaxAttempts,
 	)
 
+	messages := []openai.ChatCompletionMessageParamUnion{
+		openai.SystemMessage(prompt),
+	}
+
+	history := a.getChatHistory(session.SessionId)
+	for _, msg := range history {
+		if msg.Role == "user" {
+			messages = append(messages, openai.UserMessage(msg.Content))
+		} else {
+			messages = append(messages, openai.AssistantMessage(msg.Content))
+		}
+	}
+
+	messages = append(messages, openai.UserMessage(userMessage))
+
 	aiReq := openai.ChatCompletionNewParams{
-		Model: a.conf.Common.AIModel,
-		Messages: []openai.ChatCompletionMessageParamUnion{
-			openai.SystemMessage(prompt),
-			openai.UserMessage(userMessage),
-		},
+		Model:    a.conf.Common.AIModel,
+		Messages: messages,
 	}
 	aiutil.ConfigureModelParams(&aiReq, a.conf.Common.AIModel)
 
@@ -213,6 +236,9 @@ func (a *AILogin) evaluateWithAI(ctx context.Context, profile *model.AuthProfile
 		score = 1.0
 	}
 
+	a.addChatMessage(session.SessionId, "user", userMessage)
+	a.addChatMessage(session.SessionId, "assistant", content)
+
 	return &EvaluationResult{
 		Content:  strings.ReplaceAll(content, "[VERIFIED]", ""),
 		Score:    score,
@@ -222,4 +248,27 @@ func (a *AILogin) evaluateWithAI(ctx context.Context, profile *model.AuthProfile
 
 func (a *AILogin) generateWelcomeMessage(profile *model.AuthProfile) string {
 	return "你好！为了验证你的身份，请告诉我一些关于你自己的事情。"
+}
+
+func (a *AILogin) getChatHistory(sessionID string) []chatMessage {
+	a.cacheLock.Lock()
+	defer a.cacheLock.Unlock()
+	if history, ok := a.cache.Get(sessionID); ok {
+		return history
+	}
+	return []chatMessage{}
+}
+
+func (a *AILogin) addChatMessage(sessionID string, role, content string) {
+	a.cacheLock.Lock()
+	defer a.cacheLock.Unlock()
+	history, _ := a.cache.Get(sessionID)
+	history = append(history, chatMessage{Role: role, Content: content})
+	a.cache.Add(sessionID, history)
+}
+
+func (a *AILogin) clearChatHistory(sessionID string) {
+	a.cacheLock.Lock()
+	defer a.cacheLock.Unlock()
+	a.cache.Remove(sessionID)
 }
