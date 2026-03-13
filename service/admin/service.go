@@ -18,6 +18,7 @@ type Service struct {
 	OSS       *OSS
 	Region    *Region
 	Guestbook *Guestbook
+	AIAuth    *AIAuth
 }
 
 func New(s *store.Store, conf *config.Config) *Service {
@@ -34,5 +35,6 @@ func New(s *store.Store, conf *config.Config) *Service {
 		OSS:       NewOSS(conf),
 		Region:    NewRegion(s),
 		Guestbook: NewGuestbook(s),
+		AIAuth:    NewAIAuth(s, conf),
 	}
 }

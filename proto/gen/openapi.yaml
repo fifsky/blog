@@ -6,6 +6,44 @@ info:
     title: API文档
     version: 0.0.1
 paths:
+    /blog/admin/ai-auth/profile:
+        post:
+            tags:
+                - AIAuthService
+            description: SetupProfile 设置身份特征
+            operationId: AIAuthService_SetupProfile
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ProfileSetupRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/IDResponse'
+    /blog/admin/ai-auth/profile/get:
+        post:
+            tags:
+                - AIAuthService
+            description: GetProfile 获取身份特征
+            operationId: AIAuthService_GetProfile
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GetProfileRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ProfileResponse'
     /blog/admin/ai/remind/create:
         post:
             tags:
@@ -714,6 +752,44 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
+    /blog/ai-login/chat:
+        post:
+            tags:
+                - AILoginService
+            description: Chat AI对话验证
+            operationId: AILoginService_Chat
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AILoginChatRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AILoginChatResponse'
+    /blog/ai-login/init:
+        post:
+            tags:
+                - AILoginService
+            description: Init 初始化AI登录会话
+            operationId: AILoginService_Init
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AILoginInitRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AILoginInitResponse'
     /blog/article/archive:
         post:
             tags:
@@ -1092,6 +1168,61 @@ paths:
                                 $ref: '#/components/schemas/ListCityPhotosResponse'
 components:
     schemas:
+        AILoginChatRequest:
+            required:
+                - session_id
+                - message
+            type: object
+            properties:
+                session_id:
+                    type: string
+                    description: 会话ID
+                message:
+                    type: string
+                    description: 用户消息
+            description: AILoginChatRequest 对话请求
+        AILoginChatResponse:
+            type: object
+            properties:
+                content:
+                    type: string
+                    description: AI回复内容
+                score:
+                    type: number
+                    description: 验证得分(0-1)
+                    format: double
+                verified:
+                    type: boolean
+                    description: 是否验证通过
+                access_token:
+                    type: string
+                    description: 访问令牌（验证通过时返回）
+                failed:
+                    type: boolean
+                    description: 是否失败
+                error_message:
+                    type: string
+                    description: 错误消息
+            description: AILoginChatResponse 对话响应
+        AILoginInitRequest:
+            required:
+                - user_name
+            type: object
+            properties:
+                user_name:
+                    type: string
+                    description: 用户名
+            description: AILoginInitRequest 初始化请求
+        AILoginInitResponse:
+            type: object
+            properties:
+                session_id:
+                    type: string
+                    description: 会话ID
+                welcome_message:
+                    type: string
+                    description: 欢迎消息
+            description: AILoginInitResponse 初始化响应
         ArchiveResponse:
             type: object
             properties:
@@ -1440,6 +1571,10 @@ components:
                 cdn_url:
                     type: string
             description: GetPresignURLResponse 预签名URL响应
+        GetProfileRequest:
+            type: object
+            properties: {}
+            description: GetProfileRequest 获取身份特征请求
         GetUserRequest:
             required:
                 - id
@@ -1821,6 +1956,48 @@ components:
                     $ref: '#/components/schemas/PrevNextItem'
                 next:
                     $ref: '#/components/schemas/PrevNextItem'
+        ProfileResponse:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: ID
+                    format: int32
+                identity_description:
+                    type: string
+                    description: 身份特征描述
+                verification_threshold:
+                    type: number
+                    description: 验证阈值
+                    format: double
+                max_attempts:
+                    type: integer
+                    description: 最大尝试次数
+                    format: int32
+                created_at:
+                    type: string
+                    description: 创建时间
+                updated_at:
+                    type: string
+                    description: 更新时间
+            description: ProfileResponse 身份特征响应
+        ProfileSetupRequest:
+            required:
+                - identity_description
+            type: object
+            properties:
+                identity_description:
+                    type: string
+                    description: 身份特征描述
+                verification_threshold:
+                    type: number
+                    description: 验证阈值(0-1)
+                    format: double
+                max_attempts:
+                    type: integer
+                    description: 最大尝试次数
+                    format: int32
+            description: ProfileSetupRequest 设置身份特征请求
         RegionItem:
             type: object
             properties:
@@ -2113,6 +2290,10 @@ components:
                     type: integer
                     format: int32
 tags:
+    - name: AIAuthService
+      description: AIAuthService AI认证管理服务（需登录）
+    - name: AILoginService
+      description: AILoginService AI登录服务
     - name: AIService
       description: AIService 提供 AI 相关的接口
     - name: ArticleService

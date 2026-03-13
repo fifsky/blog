@@ -172,3 +172,41 @@ CREATE TABLE `guestbook` (
   `created_at` datetime NOT NULL COMMENT '留言时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+# Dump of table user_auth_profiles
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `user_auth_profiles`;
+
+CREATE TABLE `user_auth_profiles` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL COMMENT '用户ID',
+  `identity_description` text NOT NULL COMMENT '用户身份特征描述',
+  `verification_threshold` decimal(3,2) DEFAULT '0.80' COMMENT '验证阈值',
+  `max_attempts` int DEFAULT '3' COMMENT '最大尝试次数',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `un_user_id` (`user_id`),
+  KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户身份验证特征表';
+
+# Dump of table auth_sessions
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `auth_sessions`;
+
+CREATE TABLE `auth_sessions` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `session_id` varchar(64) NOT NULL COMMENT '会话ID',
+  `user_id` int NOT NULL COMMENT '用户ID',
+  `attempt_count` int DEFAULT '0' COMMENT '尝试次数',
+  `verified_score` decimal(3,2) DEFAULT '0.00' COMMENT '验证得分',
+  `status` enum('active','success','failed','expired') DEFAULT 'active' COMMENT '会话状态',
+  `expires_at` datetime NOT NULL COMMENT '过期时间',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `un_session_id` (`session_id`),
+  KEY `idx_session_id` (`session_id`),
+  KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='AI验证会话表';

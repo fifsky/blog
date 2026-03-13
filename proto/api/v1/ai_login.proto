@@ -1,0 +1,126 @@
+syntax = "proto3";
+package fifsky.blog.api.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "types/common.proto";
+
+option go_package = "gen/api/v1";
+
+// AILoginService AI登录服务
+service AILoginService {
+  // Init 初始化AI登录会话
+  rpc Init(AILoginInitRequest) returns (AILoginInitResponse) {
+    option (google.api.http) = {
+      post: "/blog/ai-login/init"
+      body: "*"
+    };
+  }
+  
+  // Chat AI对话验证
+  rpc Chat(AILoginChatRequest) returns (AILoginChatResponse) {
+    option (google.api.http) = {
+      post: "/blog/ai-login/chat"
+      body: "*"
+    };
+  }
+}
+
+// AIAuthService AI认证管理服务（需登录）
+service AIAuthService {
+  // SetupProfile 设置身份特征
+  rpc SetupProfile(ProfileSetupRequest) returns (fifsky.blog.types.IDResponse) {
+    option (google.api.http) = {
+      post: "/blog/admin/ai-auth/profile"
+      body: "*"
+    };
+  }
+  
+  // GetProfile 获取身份特征
+  rpc GetProfile(GetProfileRequest) returns (ProfileResponse) {
+    option (google.api.http) = {
+      post: "/blog/admin/ai-auth/profile/get"
+      body: "*"
+    };
+  }
+}
+
+// AILoginInitRequest 初始化请求
+message AILoginInitRequest {
+  // 用户名
+  string user_name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// AILoginInitResponse 初始化响应
+message AILoginInitResponse {
+  // 会话ID
+  string session_id = 1;
+  // 欢迎消息
+  string welcome_message = 2;
+}
+
+// AILoginChatRequest 对话请求
+message AILoginChatRequest {
+  // 会话ID
+  string session_id = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+  // 用户消息
+  string message = 2 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// AILoginChatResponse 对话响应
+message AILoginChatResponse {
+  // AI回复内容
+  string content = 1;
+  // 验证得分(0-1)
+  double score = 2;
+  // 是否验证通过
+  bool verified = 3;
+  // 访问令牌（验证通过时返回）
+  string access_token = 4;
+  // 是否失败
+  bool failed = 5;
+  // 错误消息
+  string error_message = 6;
+}
+
+// ProfileSetupRequest 设置身份特征请求
+message ProfileSetupRequest {
+  // 身份特征描述
+  string identity_description = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+  // 验证阈值(0-1)
+  double verification_threshold = 2;
+  // 最大尝试次数
+  int32 max_attempts = 3;
+}
+
+// GetProfileRequest 获取身份特征请求
+message GetProfileRequest {}
+
+// ProfileResponse 身份特征响应
+message ProfileResponse {
+  // ID
+  int32 id = 1;
+  // 身份特征描述
+  string identity_description = 2;
+  // 验证阈值
+  double verification_threshold = 3;
+  // 最大尝试次数
+  int32 max_attempts = 4;
+  // 创建时间
+  string created_at = 5;
+  // 更新时间
+  string updated_at = 6;
+}

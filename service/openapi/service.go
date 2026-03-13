@@ -19,6 +19,7 @@ type Service struct {
 	MiniApp   *MiniApp
 	Geo       *Geo
 	Guestbook *Guestbook
+	AILogin   *AILogin
 }
 
 func New(s *store.Store, conf *config.Config, httpClient *http.Client) *Service {
@@ -34,5 +35,6 @@ func New(s *store.Store, conf *config.Config, httpClient *http.Client) *Service 
 		MiniApp:   NewMiniApp(s, conf, httpClient),
 		Geo:       NewGeo(s),
 		Guestbook: NewGuestbook(s, conf),
+		AILogin:   NewAILogin(s, conf),
 	}
 }
