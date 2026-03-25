@@ -63,6 +63,25 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
+    /blog/admin/ai/skills:
+        post:
+            tags:
+                - AIService
+            description: ListSkills 获取所有可用的技能列表
+            operationId: AIService_ListSkills
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ListSkillsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListSkillsResponse'
     /blog/admin/ai/tags:
         post:
             tags:
@@ -1743,6 +1762,18 @@ components:
                     items:
                         $ref: '#/components/schemas/TravelPhoto'
             description: ListCityPhotosResponse 城市照片列表响应
+        ListSkillsRequest:
+            type: object
+            properties: {}
+            description: ListSkillsRequest 获取技能列表请求
+        ListSkillsResponse:
+            type: object
+            properties:
+                skills:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SkillInfo'
+            description: ListSkillsResponse 获取技能列表响应
         LoginRequest:
             required:
                 - user_name
@@ -2155,6 +2186,14 @@ components:
                 minute:
                     type: integer
                     format: int32
+        SkillInfo:
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+            description: SkillInfo 技能信息
         TextResponse:
             type: object
             properties:

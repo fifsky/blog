@@ -369,6 +369,20 @@ func (a *AI) RemindSmartCreate(ctx context.Context, req *adminv1.RemindSmartCrea
 	return &types.IDResponse{Id: int32(lastID)}, nil
 }
 
+func (a *AI) ListSkills(ctx context.Context, req *adminv1.ListSkillsRequest) (*adminv1.ListSkillsResponse, error) {
+	skills := a.skillManager.GetSkills()
+	res := &adminv1.ListSkillsResponse{
+		Skills: make([]*adminv1.SkillInfo, 0, len(skills)),
+	}
+	for name, s := range skills {
+		res.Skills = append(res.Skills, &adminv1.SkillInfo{
+			Name:        name,
+			Description: s.Description(),
+		})
+	}
+	return res, nil
+}
+
 func parseTagsFromAIResponse(text string) []string {
 	if tags, ok := parseTagsFromJSONArray(text); ok {
 		return normalizeTags(tags)

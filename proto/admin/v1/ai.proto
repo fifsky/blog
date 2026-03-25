@@ -24,6 +24,13 @@ service AIService {
       body: "*"
     };
   }
+  // ListSkills 获取所有可用的技能列表
+  rpc ListSkills(ListSkillsRequest) returns (ListSkillsResponse) {
+    option (google.api.http) = {
+      post: "/blog/admin/ai/skills"
+      body: "*"
+    };
+  }
 }
 
 // GenerateTagsRequest 生成标签请求
@@ -46,4 +53,18 @@ message RemindSmartCreateRequest {
     (buf.validate.field).required = true,
     (google.api.field_behavior) = REQUIRED
   ];
+}
+
+// ListSkillsRequest 获取技能列表请求
+message ListSkillsRequest {}
+
+// SkillInfo 技能信息
+message SkillInfo {
+  string name = 1;
+  string description = 2;
+}
+
+// ListSkillsResponse 获取技能列表响应
+message ListSkillsResponse {
+  repeated SkillInfo skills = 1;
 }

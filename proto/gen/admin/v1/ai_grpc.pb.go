@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	AIService_GenerateTags_FullMethodName      = "/fifsky.blog.admin.v1.AIService/GenerateTags"
 	AIService_RemindSmartCreate_FullMethodName = "/fifsky.blog.admin.v1.AIService/RemindSmartCreate"
+	AIService_ListSkills_FullMethodName        = "/fifsky.blog.admin.v1.AIService/ListSkills"
 )
 
 // AIServiceClient is the client API for AIService service.
@@ -34,6 +35,8 @@ type AIServiceClient interface {
 	GenerateTags(ctx context.Context, in *GenerateTagsRequest, opts ...grpc.CallOption) (*GenerateTagsResponse, error)
 	// RemindSmartCreate 智能创建提醒
 	RemindSmartCreate(ctx context.Context, in *RemindSmartCreateRequest, opts ...grpc.CallOption) (*types.IDResponse, error)
+	// ListSkills 获取所有可用的技能列表
+	ListSkills(ctx context.Context, in *ListSkillsRequest, opts ...grpc.CallOption) (*ListSkillsResponse, error)
 }
 
 type aIServiceClient struct {
@@ -64,6 +67,16 @@ func (c *aIServiceClient) RemindSmartCreate(ctx context.Context, in *RemindSmart
 	return out, nil
 }
 
+func (c *aIServiceClient) ListSkills(ctx context.Context, in *ListSkillsRequest, opts ...grpc.CallOption) (*ListSkillsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListSkillsResponse)
+	err := c.cc.Invoke(ctx, AIService_ListSkills_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AIServiceServer is the server API for AIService service.
 // All implementations must embed UnimplementedAIServiceServer
 // for forward compatibility.
@@ -74,6 +87,8 @@ type AIServiceServer interface {
 	GenerateTags(context.Context, *GenerateTagsRequest) (*GenerateTagsResponse, error)
 	// RemindSmartCreate 智能创建提醒
 	RemindSmartCreate(context.Context, *RemindSmartCreateRequest) (*types.IDResponse, error)
+	// ListSkills 获取所有可用的技能列表
+	ListSkills(context.Context, *ListSkillsRequest) (*ListSkillsResponse, error)
 	mustEmbedUnimplementedAIServiceServer()
 }
 
@@ -89,6 +104,9 @@ func (UnimplementedAIServiceServer) GenerateTags(context.Context, *GenerateTagsR
 }
 func (UnimplementedAIServiceServer) RemindSmartCreate(context.Context, *RemindSmartCreateRequest) (*types.IDResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RemindSmartCreate not implemented")
+}
+func (UnimplementedAIServiceServer) ListSkills(context.Context, *ListSkillsRequest) (*ListSkillsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListSkills not implemented")
 }
 func (UnimplementedAIServiceServer) mustEmbedUnimplementedAIServiceServer() {}
 func (UnimplementedAIServiceServer) testEmbeddedByValue()                   {}
@@ -147,6 +165,24 @@ func _AIService_RemindSmartCreate_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AIService_ListSkills_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListSkillsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AIServiceServer).ListSkills(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AIService_ListSkills_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AIServiceServer).ListSkills(ctx, req.(*ListSkillsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AIService_ServiceDesc is the grpc.ServiceDesc for AIService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -161,6 +197,10 @@ var AIService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RemindSmartCreate",
 			Handler:    _AIService_RemindSmartCreate_Handler,
+		},
+		{
+			MethodName: "ListSkills",
+			Handler:    _AIService_ListSkills_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

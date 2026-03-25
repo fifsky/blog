@@ -167,6 +167,141 @@ func (x *RemindSmartCreateRequest) GetContent() string {
 	return ""
 }
 
+// ListSkillsRequest 获取技能列表请求
+type ListSkillsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListSkillsRequest) Reset() {
+	*x = ListSkillsRequest{}
+	mi := &file_admin_v1_ai_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListSkillsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSkillsRequest) ProtoMessage() {}
+
+func (x *ListSkillsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_ai_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListSkillsRequest.ProtoReflect.Descriptor instead.
+func (*ListSkillsRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_ai_proto_rawDescGZIP(), []int{3}
+}
+
+// SkillInfo 技能信息
+type SkillInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SkillInfo) Reset() {
+	*x = SkillInfo{}
+	mi := &file_admin_v1_ai_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SkillInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SkillInfo) ProtoMessage() {}
+
+func (x *SkillInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_ai_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SkillInfo.ProtoReflect.Descriptor instead.
+func (*SkillInfo) Descriptor() ([]byte, []int) {
+	return file_admin_v1_ai_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *SkillInfo) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *SkillInfo) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+// ListSkillsResponse 获取技能列表响应
+type ListSkillsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Skills        []*SkillInfo           `protobuf:"bytes,1,rep,name=skills,proto3" json:"skills,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListSkillsResponse) Reset() {
+	*x = ListSkillsResponse{}
+	mi := &file_admin_v1_ai_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListSkillsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSkillsResponse) ProtoMessage() {}
+
+func (x *ListSkillsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_ai_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListSkillsResponse.ProtoReflect.Descriptor instead.
+func (*ListSkillsResponse) Descriptor() ([]byte, []int) {
+	return file_admin_v1_ai_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ListSkillsResponse) GetSkills() []*SkillInfo {
+	if x != nil {
+		return x.Skills
+	}
+	return nil
+}
+
 var File_admin_v1_ai_proto protoreflect.FileDescriptor
 
 const file_admin_v1_ai_proto_rawDesc = "" +
@@ -178,10 +313,18 @@ const file_admin_v1_ai_proto_rawDesc = "" +
 	"\x14GenerateTagsResponse\x12\x12\n" +
 	"\x04tags\x18\x01 \x03(\tR\x04tags\"?\n" +
 	"\x18RemindSmartCreateRequest\x12#\n" +
-	"\acontent\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\acontent2\xa1\x02\n" +
+	"\acontent\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\acontent\"\x13\n" +
+	"\x11ListSkillsRequest\"A\n" +
+	"\tSkillInfo\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\"M\n" +
+	"\x12ListSkillsResponse\x127\n" +
+	"\x06skills\x18\x01 \x03(\v2\x1f.fifsky.blog.admin.v1.SkillInfoR\x06skills2\xa5\x03\n" +
 	"\tAIService\x12\x85\x01\n" +
 	"\fGenerateTags\x12).fifsky.blog.admin.v1.GenerateTagsRequest\x1a*.fifsky.blog.admin.v1.GenerateTagsResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/blog/admin/ai/tags\x12\x8b\x01\n" +
-	"\x11RemindSmartCreate\x12..fifsky.blog.admin.v1.RemindSmartCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/blog/admin/ai/remind/createB\xb6\x01\n" +
+	"\x11RemindSmartCreate\x12..fifsky.blog.admin.v1.RemindSmartCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/blog/admin/ai/remind/create\x12\x81\x01\n" +
+	"\n" +
+	"ListSkills\x12'.fifsky.blog.admin.v1.ListSkillsRequest\x1a(.fifsky.blog.admin.v1.ListSkillsResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/blog/admin/ai/skillsB\xb6\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\aAiProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var (
@@ -196,23 +339,29 @@ func file_admin_v1_ai_proto_rawDescGZIP() []byte {
 	return file_admin_v1_ai_proto_rawDescData
 }
 
-var file_admin_v1_ai_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_admin_v1_ai_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_admin_v1_ai_proto_goTypes = []any{
 	(*GenerateTagsRequest)(nil),      // 0: fifsky.blog.admin.v1.GenerateTagsRequest
 	(*GenerateTagsResponse)(nil),     // 1: fifsky.blog.admin.v1.GenerateTagsResponse
 	(*RemindSmartCreateRequest)(nil), // 2: fifsky.blog.admin.v1.RemindSmartCreateRequest
-	(*types.IDResponse)(nil),         // 3: fifsky.blog.types.IDResponse
+	(*ListSkillsRequest)(nil),        // 3: fifsky.blog.admin.v1.ListSkillsRequest
+	(*SkillInfo)(nil),                // 4: fifsky.blog.admin.v1.SkillInfo
+	(*ListSkillsResponse)(nil),       // 5: fifsky.blog.admin.v1.ListSkillsResponse
+	(*types.IDResponse)(nil),         // 6: fifsky.blog.types.IDResponse
 }
 var file_admin_v1_ai_proto_depIdxs = []int32{
-	0, // 0: fifsky.blog.admin.v1.AIService.GenerateTags:input_type -> fifsky.blog.admin.v1.GenerateTagsRequest
-	2, // 1: fifsky.blog.admin.v1.AIService.RemindSmartCreate:input_type -> fifsky.blog.admin.v1.RemindSmartCreateRequest
-	1, // 2: fifsky.blog.admin.v1.AIService.GenerateTags:output_type -> fifsky.blog.admin.v1.GenerateTagsResponse
-	3, // 3: fifsky.blog.admin.v1.AIService.RemindSmartCreate:output_type -> fifsky.blog.types.IDResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	4, // 0: fifsky.blog.admin.v1.ListSkillsResponse.skills:type_name -> fifsky.blog.admin.v1.SkillInfo
+	0, // 1: fifsky.blog.admin.v1.AIService.GenerateTags:input_type -> fifsky.blog.admin.v1.GenerateTagsRequest
+	2, // 2: fifsky.blog.admin.v1.AIService.RemindSmartCreate:input_type -> fifsky.blog.admin.v1.RemindSmartCreateRequest
+	3, // 3: fifsky.blog.admin.v1.AIService.ListSkills:input_type -> fifsky.blog.admin.v1.ListSkillsRequest
+	1, // 4: fifsky.blog.admin.v1.AIService.GenerateTags:output_type -> fifsky.blog.admin.v1.GenerateTagsResponse
+	6, // 5: fifsky.blog.admin.v1.AIService.RemindSmartCreate:output_type -> fifsky.blog.types.IDResponse
+	5, // 6: fifsky.blog.admin.v1.AIService.ListSkills:output_type -> fifsky.blog.admin.v1.ListSkillsResponse
+	4, // [4:7] is the sub-list for method output_type
+	1, // [1:4] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_admin_v1_ai_proto_init() }
@@ -226,7 +375,7 @@ func file_admin_v1_ai_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_ai_proto_rawDesc), len(file_admin_v1_ai_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

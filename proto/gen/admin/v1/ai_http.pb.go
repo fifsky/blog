@@ -19,6 +19,8 @@ import (
 type AIServiceHTTPServer interface {
 	// GenerateTags 根据文章标题和内容生成标签
 	GenerateTags(context.Context, *GenerateTagsRequest) (*GenerateTagsResponse, error)
+	// ListSkills 获取所有可用的技能列表
+	ListSkills(context.Context, *ListSkillsRequest) (*ListSkillsResponse, error)
 	// RemindSmartCreate 智能创建提醒
 	RemindSmartCreate(context.Context, *RemindSmartCreateRequest) (*types.IDResponse, error)
 }
@@ -32,6 +34,7 @@ type AIService struct {
 func (s *AIService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/admin/ai/tags", s.GenerateTags)
 	s.mux.HandleFunc("POST /blog/admin/ai/remind/create", s.RemindSmartCreate)
+	s.mux.HandleFunc("POST /blog/admin/ai/skills", s.ListSkills)
 }
 
 func RegisterAIServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv AIServiceHTTPServer) {
@@ -77,6 +80,27 @@ func (s *AIService) RemindSmartCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	out, err := s.server.RemindSmartCreate(r.Context(), &in)
+	if err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+	s.codec.Encode(w, r, out)
+	return
+}
+
+func (s *AIService) ListSkills(w http.ResponseWriter, r *http.Request) {
+	var in ListSkillsRequest
+	if err := s.codec.Decode(r, &in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	if err := s.codec.Validate(&in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	out, err := s.server.ListSkills(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
 		return
