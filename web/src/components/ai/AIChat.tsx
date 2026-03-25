@@ -27,6 +27,15 @@ import {
 import { ToolCallCard } from "./ToolCallCard";
 import type { ToolCall, DisplayMessage, MessageBlock } from "./types";
 import { AgentChatIndicator } from "@/components/agents-ui/agent-chat-indicator";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { aiListSkillsApi } from "@/service";
 
 // ByteMD plugins for rendering
 const plugins = [gfm(), breaks(), highlightPlugin()];
@@ -48,7 +57,73 @@ export function AIChat() {
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const [skills, setSkills] = useState<{ name: string; description: string }[]>([]);
+  const [showSkillPopover, setShowSkillPopover] = useState(false);
+  const [skillSearchQuery, setSkillSearchQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch skills on mount
+  useEffect(() => {
+    aiListSkillsApi()
+      .then((res: any) => {
+        if (res?.skills) {
+          setSkills(res.skills);
+        }
+      })
+      .catch((err: any) => {
+        console.error("Failed to fetch skills:", err);
+      });
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setInput(val);
+
+    // Check for skill trigger '/' at the end of the input or after a space
+    if (val.endsWith("/")) {
+      setShowSkillPopover(true);
+      setSkillSearchQuery("");
+    } else if (showSkillPopover) {
+      const lastSlashIndex = val.lastIndexOf("/");
+      if (lastSlashIndex !== -1) {
+        setSkillSearchQuery(val.slice(lastSlashIndex + 1));
+      } else {
+        setShowSkillPopover(false);
+      }
+    }
+  };
+
+  const handleSkillSelect = (skillName: string) => {
+    const lastSlashIndex = input.lastIndexOf("/");
+    if (lastSlashIndex !== -1) {
+      const newInput = input.slice(0, lastSlashIndex) + skillName + " ";
+      setInput(newInput);
+    } else {
+      setInput(input + skillName + " ");
+    }
+    setShowSkillPopover(false);
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  // Handle Enter key
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (showSkillPopover) {
+      if (e.key === "Escape") {
+        setShowSkillPopover(false);
+        e.preventDefault();
+        return;
+      }
+    }
+
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (!showSkillPopover) {
+        sendMessage();
+      }
+    }
+  };
 
   // Draggable button state
   const [buttonPosition, setButtonPosition] = useState<ButtonPosition>(DEFAULT_POSITION);
@@ -383,14 +458,6 @@ export function AIChat() {
     }
   }, [input, isLoading, messages]);
 
-  // Handle Enter key
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
   return (
     <>
       {/* Floating Button - Draggable */}
@@ -597,16 +664,51 @@ export function AIChat() {
             {/* Input Area */}
             <div className="px-4 py-3 bg-white border-t border-gray-200">
               <div className="flex items-center gap-2">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="输入您的问题..."
-                  disabled={isLoading}
-                  className="flex-1 px-4 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all disabled:opacity-50"
-                />
+                <Popover open={showSkillPopover} onOpenChange={setShowSkillPopover}>
+                  <PopoverTrigger asChild>
+                    <div className="flex-1 relative">
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        value={input}
+                        onChange={handleInputChange}
+                        onKeyDown={handleInputKeyDown}
+                        placeholder="输入您的问题..."
+                        disabled={isLoading}
+                        className="w-full px-4 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all disabled:opacity-50"
+                      />
+                    </div>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-64 p-0"
+                    align="start"
+                    onOpenAutoFocus={(e) => e.preventDefault()}
+                  >
+                    <Command>
+                      <CommandList>
+                        <CommandEmpty>No skill found.</CommandEmpty>
+                        <CommandGroup heading="Skills">
+                          {skills
+                            .filter((skill) =>
+                              skill.name.toLowerCase().includes(skillSearchQuery.toLowerCase()),
+                            )
+                            .map((skill) => (
+                              <CommandItem
+                                key={skill.name}
+                                onSelect={() => handleSkillSelect(skill.name)}
+                                className="flex flex-col items-start px-2 py-1 cursor-pointer"
+                              >
+                                <div className="font-medium text-sm">{skill.name}</div>
+                                <div className="text-xs text-gray-500 line-clamp-1">
+                                  {skill.description}
+                                </div>
+                              </CommandItem>
+                            ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 <Button
                   onClick={sendMessage}
                   disabled={!input.trim() || isLoading}

@@ -215,3 +215,7 @@ export const guestbookDeleteApi = (
   data: GuestbookDeleteRequest,
   errorHandler?: (e: AppError) => void,
 ) => createApi("/blog/admin/guestbook/delete", data, errorHandler);
+
+// AI APIs
+export const aiListSkillsApi = (errorHandler?: (e: AppError) => void) => 
+  createApi<{ skills: { name: string; description: string }[] }>("/blog/admin/ai/skills", {}, errorHandler);
