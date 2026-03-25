@@ -9,9 +9,9 @@ import {
   RotateCcw,
   Maximize2,
   Minimize2,
-  Sparkles,
   ChevronDown,
   ChevronRight,
+  Brain,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Viewer } from "@bytemd/react";
@@ -676,7 +676,7 @@ export function AIChat() {
                               } else if (block.type === "thinking") {
                                 const tId = block.thinking.id || `think-${idx}`;
                                 return (
-                                  <div key={tId} className="mb-3">
+                                  <div key={tId}>
                                     <button
                                       onClick={() => toggleThinking(tId)}
                                       className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 transition-colors font-medium select-none"
@@ -686,7 +686,7 @@ export function AIChat() {
                                       ) : (
                                         <ChevronRight className="w-3.5 h-3.5" />
                                       )}
-                                      <Sparkles className="w-3.5 h-3.5" />
+                                      <Brain className="w-3.5 h-3.5" />
                                       <span>
                                         {block.thinking.isThinking
                                           ? "思考中..."
