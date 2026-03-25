@@ -13,6 +13,7 @@ import (
 	"app/pkg/aiutil"
 	"app/pkg/errors"
 	"app/pkg/mcp"
+	"app/pkg/skill"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
 	"app/server/response"
@@ -27,10 +28,11 @@ var _ adminv1.AIServiceServer = (*AI)(nil)
 
 type AI struct {
 	adminv1.UnimplementedAIServiceServer
-	conf       *config.Config
-	client     openai.Client
-	mcpManager *mcp.Manager
-	store      *store.Store
+	conf         *config.Config
+	client       openai.Client
+	mcpManager   *mcp.Manager
+	skillManager *skill.Manager
+	store        *store.Store
 }
 
 func NewAI(conf *config.Config, s *store.Store) *AI {
@@ -51,11 +53,15 @@ func NewAI(conf *config.Config, s *store.Store) *AI {
 		}
 	}
 
+	skillManager := skill.NewManager(conf.Common.SkillsPath)
+	_ = skillManager.Load()
+
 	return &AI{
-		conf:       conf,
-		client:     client,
-		mcpManager: mcpManager,
-		store:      s,
+		conf:         conf,
+		client:       client,
+		mcpManager:   mcpManager,
+		skillManager: skillManager,
+		store:        s,
 	}
 }
 
@@ -145,14 +151,26 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Get tools from all MCP clients
+	// Get tools from all MCP clients and skills
 	tools := a.getMCPTools(ctx)
+	if tools == nil {
+		tools = make([]openai.ChatCompletionToolUnionParam, 0)
+	}
+	tools = append(tools, a.getSkillTools()...)
 
 	// Create streaming chat completion using OpenAI SDK v3
-	aiReq := openai.ChatCompletionNewParams{
-		Model:    a.conf.Common.AIModel,
-		Messages: openAIMessages,
-		Tools:    tools,
+	var aiReq openai.ChatCompletionNewParams
+	if len(tools) > 0 {
+		aiReq = openai.ChatCompletionNewParams{
+			Model:    a.conf.Common.AIModel,
+			Messages: openAIMessages,
+			Tools:    tools,
+		}
+	} else {
+		aiReq = openai.ChatCompletionNewParams{
+			Model:    a.conf.Common.AIModel,
+			Messages: openAIMessages,
+		}
 	}
 	aiutil.ConfigureModelParams(&aiReq, a.conf.Common.AIModel)
 
@@ -208,12 +226,46 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 					MCPName:   a.mcpManager.GetMCPDisplayName(toolCall.Function.Name),
 					Arguments: toolCall.Function.Arguments,
 				}
+				if toolCall.Function.Name == "Skill" || toolCall.Function.Name == "run_skill_script" {
+					toolStartEvent.MCPName = "Skill"
+				}
 				toolStartJSON, _ := json.Marshal(toolStartEvent)
 				fmt.Fprintf(w, "data: [TOOL_START] %s\n\n", toolStartJSON)
 				flusher.Flush()
 
 				// Execute tool
-				toolResult := a.executeTool(ctx, toolCall.Function.Name, toolCall.Function.Arguments)
+				var toolResult string
+				if toolCall.Function.Name == "Skill" {
+					var args map[string]any
+					if err := json.Unmarshal([]byte(toolCall.Function.Arguments), &args); err == nil {
+						if name, ok := args["name"].(string); ok {
+							if s, ok := a.skillManager.GetSkill(name); ok {
+								toolResult = s.Content
+							} else {
+								toolResult = fmt.Sprintf("Skill %s not found", name)
+							}
+						} else {
+							toolResult = "Invalid arguments: name is required"
+						}
+					} else {
+						toolResult = fmt.Sprintf("Invalid arguments: %v", err)
+					}
+				} else if toolCall.Function.Name == "run_skill_script" {
+					var args struct {
+						SkillName      string            `json:"skill_name"`
+						ScriptPath     string            `json:"script_path"`
+						Args           []string          `json:"args"`
+						Env            map[string]string `json:"env"`
+						TimeoutSeconds int               `json:"timeout_seconds"`
+					}
+					if err := json.Unmarshal([]byte(toolCall.Function.Arguments), &args); err == nil {
+						toolResult = a.skillManager.ExecuteScript(ctx, args.SkillName, args.ScriptPath, args.Args, args.Env, args.TimeoutSeconds)
+					} else {
+						toolResult = fmt.Sprintf("Invalid arguments: %v", err)
+					}
+				} else {
+					toolResult = a.executeTool(ctx, toolCall.Function.Name, toolCall.Function.Arguments)
+				}
 
 				// Send tool end event to frontend
 				toolEndEvent := ToolEndEvent{
@@ -290,6 +342,79 @@ func (a *AI) getMCPTools(ctx context.Context) []openai.ChatCompletionToolUnionPa
 	}
 
 	return tools
+}
+
+// getSkillTools returns the available skill tools as OpenAI tool params
+func (a *AI) getSkillTools() []openai.ChatCompletionToolUnionParam {
+	skills := a.skillManager.GetSkills()
+	if len(skills) == 0 {
+		return nil
+	}
+
+	var availableSkills strings.Builder
+	availableSkills.WriteString("Execute a skill within the main conversation\n<skills_instructions>\nWhen users ask you to perform tasks, check if any of the available skills below can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge.\nHow to use skills:\n- Invoke skills using this tool with the skill name only (no arguments)\n</skills_instructions>\n<available_skills>\n")
+	for _, s := range skills {
+		availableSkills.WriteString(fmt.Sprintf("<skill>\n<name>\n%s\n</name>\n<description>\n%s\n</description>\n</skill>\n", s.Name(), s.Description()))
+	}
+	availableSkills.WriteString("</available_skills>")
+
+	return []openai.ChatCompletionToolUnionParam{
+		{
+			OfFunction: &openai.ChatCompletionFunctionToolParam{
+				Function: openai.FunctionDefinitionParam{
+					Name:        "Skill",
+					Description: openai.String(availableSkills.String()),
+					Parameters: openai.FunctionParameters{
+						"type": "object",
+						"properties": map[string]any{
+							"name": map[string]any{
+								"type":        "string",
+								"description": "The skill name (no arguments). E.g., \"pdf\" or \"xlsx\"",
+							},
+						},
+						"required": []string{"name"},
+					},
+				},
+			},
+		},
+		{
+			OfFunction: &openai.ChatCompletionFunctionToolParam{
+				Function: openai.FunctionDefinitionParam{
+					Name:        "run_skill_script",
+					Description: openai.String("Executes a script from scripts/ in a skill. Use this when the skill instructions ask you to run a script."),
+					Parameters: openai.FunctionParameters{
+						"type": "object",
+						"properties": map[string]any{
+							"skill_name": map[string]any{
+								"type":        "string",
+								"description": "The name of the skill.",
+							},
+							"script_path": map[string]any{
+								"type":        "string",
+								"description": "Script path under scripts/.",
+							},
+							"args": map[string]any{
+								"type":        "array",
+								"description": "Optional script args.",
+								"items": map[string]any{
+									"type": "string",
+								},
+							},
+							"env": map[string]any{
+								"type":        "object",
+								"description": "Optional environment variables.",
+							},
+							"timeout_seconds": map[string]any{
+								"type":        "integer",
+								"description": "Optional timeout in seconds. Default: 300.",
+							},
+						},
+						"required": []string{"skill_name", "script_path"},
+					},
+				},
+			},
+		},
+	}
 }
 
 // executeTool executes a tool call via MCP manager and returns the result

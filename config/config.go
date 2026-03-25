@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"go.yaml.in/yaml/v3"
 )
@@ -18,6 +19,7 @@ type common struct {
 	AIEndpoint  string `yaml:"ai_endpoint"`
 	AIModel     string `yaml:"ai_model"`
 	MCPToken    string `yaml:"mcp_token"`
+	SkillsPath  string `yaml:"skills_path"`
 }
 
 type ossConf struct {
@@ -70,6 +72,20 @@ func New() *Config {
 	}
 
 	_ = os.Setenv("APP_ENV", conf.Env)
+
+	if conf.Common.SkillsPath == "" {
+		homeDir, err := os.UserHomeDir()
+		if err == nil {
+			conf.Common.SkillsPath = filepath.Join(homeDir, ".agents", "skills")
+		} else {
+			conf.Common.SkillsPath = "~/.agents/skills"
+		}
+	} else if strings.HasPrefix(conf.Common.SkillsPath, "~/") {
+		homeDir, err := os.UserHomeDir()
+		if err == nil {
+			conf.Common.SkillsPath = filepath.Join(homeDir, conf.Common.SkillsPath[2:])
+		}
+	}
 
 	return conf
 }
