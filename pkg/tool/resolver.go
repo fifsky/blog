@@ -18,7 +18,7 @@ func (r Resolvers) Resolve(ctx context.Context) ([]Tool, error) {
 	for _, resolver := range r {
 		tools, err := resolver.Resolve(ctx)
 		if err != nil {
-			// In a production system, we might log and continue, 
+			// In a production system, we might log and continue,
 			// but here we follow simple aggregate logic.
 			continue
 		}

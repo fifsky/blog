@@ -450,6 +450,14 @@ func (m *Manager) ExecuteScript(ctx context.Context, skillName, scriptPath strin
 		})
 	}
 
+	// AI may pass "scripts/xxx.py" or just "xxx.py", we need to normalize to relative path within scripts dir
+	resType, resName, err := normalizeResourcePath(scriptPath)
+	if err == nil && resType == "scripts" {
+		scriptPath = resName
+	} else if strings.HasPrefix(scriptPath, "scripts/") {
+		scriptPath = strings.TrimPrefix(scriptPath, "scripts/")
+	}
+
 	_, ok = skill.Resources.Scripts[scriptPath]
 	if !ok {
 		return mustJSON(map[string]any{
