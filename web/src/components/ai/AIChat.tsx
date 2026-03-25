@@ -60,7 +60,7 @@ export function AIChat() {
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
   // Track which thinking blocks are expanded
-  const [expandedThinking, setExpandedThinking] = useState<Record<number, boolean>>({});
+  const [expandedThinking, setExpandedThinking] = useState<Record<string | number, boolean>>({});
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -345,6 +345,7 @@ export function AIChat() {
       let accumulatedThinking = "";
       let isThinkingActive = false;
       let thinkingDuration = "";
+      let currentThinkingId = ""; // Track the current thinking block ID
       let currentToolCalls: ToolCall[] = [];
       let currentBlocks: MessageBlock[] = [];
       // Track the current text block content
@@ -366,19 +367,68 @@ export function AIChat() {
             // Handle thinking event
             if (data.startsWith("[THINKING] ")) {
               const thinkData = JSON.parse(data.slice(11));
+
+              if (thinkData.thinking && !isThinkingActive) {
+                // Thinking just started
+                isThinkingActive = true;
+                accumulatedThinking = "";
+                currentThinkingId = `think-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+                // Push any pending text block first
+                if (currentTextBlock) {
+                  currentBlocks = [...currentBlocks, { type: "text", content: currentTextBlock }];
+                  currentTextBlock = "";
+                }
+
+                // Add new thinking block
+                currentBlocks = [
+                  ...currentBlocks,
+                  {
+                    type: "thinking",
+                    thinking: {
+                      content: "",
+                      isThinking: true,
+                      id: currentThinkingId,
+                    },
+                  },
+                ];
+              }
+
               if (thinkData.content) {
                 const c = thinkData.content.replace(/\\n/g, "\n");
                 accumulatedThinking += c;
               }
-              isThinkingActive = thinkData.thinking;
-              if (thinkData.duration) {
-                thinkingDuration = thinkData.duration;
+
+              if (!thinkData.thinking && isThinkingActive) {
+                // Thinking just finished
+                isThinkingActive = false;
+                if (thinkData.duration) {
+                  thinkingDuration = thinkData.duration;
+                }
               }
+
+              // Update the current thinking block in the blocks array
+              currentBlocks = currentBlocks.map((block) =>
+                block.type === "thinking" && block.thinking.id === currentThinkingId
+                  ? {
+                      type: "thinking",
+                      thinking: {
+                        content: accumulatedThinking,
+                        isThinking: isThinkingActive,
+                        duration: thinkingDuration,
+                        id: currentThinkingId,
+                      },
+                    }
+                  : block,
+              );
+
               setMessages((prev) =>
                 prev.map((msg) =>
                   msg.id === assistantMsg.id
                     ? {
                         ...msg,
+                        blocks: currentBlocks,
+                        // Legacy single thinking state update (optional)
                         thinking: {
                           content: accumulatedThinking,
                           isThinking: isThinkingActive,
@@ -496,7 +546,7 @@ export function AIChat() {
     }
   }, [input, isLoading, messages]);
 
-  const toggleThinking = (id: number) => {
+  const toggleThinking = (id: string | number) => {
     setExpandedThinking((prev) => ({
       ...prev,
       [id]: !prev[id],
@@ -615,38 +665,6 @@ export function AIChat() {
                   >
                     {message.role === "assistant" ? (
                       <div className="relative">
-                        {/* Thinking Process UI */}
-                        {message.thinking && message.thinking.content && (
-                          <div className="mb-3">
-                            <button
-                              onClick={() => toggleThinking(message.id)}
-                              className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 transition-colors font-medium select-none"
-                            >
-                              {expandedThinking[message.id] || message.thinking.isThinking ? (
-                                <ChevronDown className="w-3.5 h-3.5" />
-                              ) : (
-                                <ChevronRight className="w-3.5 h-3.5" />
-                              )}
-                              <Sparkles className="w-3.5 h-3.5" />
-                              <span>
-                                {message.thinking.isThinking
-                                  ? "思考中..."
-                                  : message.thinking.duration
-                                    ? `思考完成 (${message.thinking.duration}s)`
-                                    : "思考完成"}
-                              </span>
-                            </button>
-
-                            {(expandedThinking[message.id] || message.thinking.isThinking) && (
-                              <div className="mt-1.5 pl-3 border-l-2 border-gray-200">
-                                <div className="text-xs text-gray-500 whitespace-pre-wrap font-mono">
-                                  {message.thinking.content}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
                         {/* Render interleaved blocks if they exist */}
                         {message.blocks && message.blocks.length > 0 ? (
                           <div className="flex flex-col gap-2">
@@ -654,6 +672,39 @@ export function AIChat() {
                               if (block.type === "tool") {
                                 return (
                                   <ToolCallCard key={block.toolCall.id} toolCall={block.toolCall} />
+                                );
+                              } else if (block.type === "thinking") {
+                                const tId = block.thinking.id || `think-${idx}`;
+                                return (
+                                  <div key={tId} className="mb-3">
+                                    <button
+                                      onClick={() => toggleThinking(tId)}
+                                      className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 transition-colors font-medium select-none"
+                                    >
+                                      {expandedThinking[tId] || block.thinking.isThinking ? (
+                                        <ChevronDown className="w-3.5 h-3.5" />
+                                      ) : (
+                                        <ChevronRight className="w-3.5 h-3.5" />
+                                      )}
+                                      <Sparkles className="w-3.5 h-3.5" />
+                                      <span>
+                                        {block.thinking.isThinking
+                                          ? "思考中..."
+                                          : block.thinking.duration
+                                            ? `思考完成 (${block.thinking.duration}s)`
+                                            : "思考完成"}
+                                      </span>
+                                    </button>
+
+                                    {(expandedThinking[tId] || block.thinking.isThinking) &&
+                                      block.thinking.content && (
+                                        <div className="mt-1.5 pl-3 border-l-2 border-gray-200">
+                                          <div className="text-xs text-gray-500 whitespace-pre-wrap font-mono">
+                                            {block.thinking.content}
+                                          </div>
+                                        </div>
+                                      )}
+                                  </div>
                                 );
                               } else {
                                 return (
