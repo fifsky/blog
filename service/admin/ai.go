@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -94,6 +95,13 @@ type ToolEndEvent struct {
 	Result string `json:"result"`
 }
 
+// ThinkingEvent represents a reasoning/thinking state update
+type ThinkingEvent struct {
+	Content  string `json:"content"`
+	Thinking bool   `json:"thinking"`
+	Duration string `json:"duration,omitempty"`
+}
+
 // Chat handles SSE streaming AI chat responses
 func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 	// Parse request body
@@ -180,6 +188,9 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 		acc := openai.ChatCompletionAccumulator{}
 		hasToolCalls := false
 
+		var thinkStartTime time.Time
+		isThinking := false
+
 		// Stream the response
 		for stream.Next() {
 			chunk := stream.Current()
@@ -191,13 +202,56 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 
-			// Stream content to client
-			if len(chunk.Choices) > 0 && chunk.Choices[0].Delta.Content != "" {
-				content := chunk.Choices[0].Delta.Content
-				// Escape newlines for SSE
-				escapedContent := strings.ReplaceAll(content, "\n", "\\n")
-				fmt.Fprintf(w, "data: %s\n\n", escapedContent)
-				flusher.Flush()
+			if len(chunk.Choices) > 0 {
+				// Handle thinking (reasoning_content)
+				reasoningContent, has := chunk.Choices[0].Delta.JSON.ExtraFields["reasoning_content"]
+				var rc string
+				if has {
+					if v, err := strconv.Unquote(reasoningContent.Raw()); err == nil {
+						rc = v
+					} else {
+						// Fallback if it's not a quoted string
+						rc = string(reasoningContent.Raw())
+					}
+				}
+
+				if rc != "" {
+					if !isThinking {
+						isThinking = true
+						thinkStartTime = time.Now()
+					}
+
+					// Stream thinking content
+					escapedRc := strings.ReplaceAll(rc, "\n", "\\n")
+					thinkEv := ThinkingEvent{
+						Content:  escapedRc,
+						Thinking: true,
+					}
+					evJSON, _ := json.Marshal(thinkEv)
+					fmt.Fprintf(w, "data: [THINKING] %s\n\n", evJSON)
+					flusher.Flush()
+					continue
+				} else if isThinking {
+					// We were thinking, but now we got a chunk without reasoning_content
+					// This means thinking is done.
+					isThinking = false
+					thinkEv := ThinkingEvent{
+						Thinking: false,
+						Duration: fmt.Sprintf("%.1f", time.Since(thinkStartTime).Seconds()),
+					}
+					evJSON, _ := json.Marshal(thinkEv)
+					fmt.Fprintf(w, "data: [THINKING] %s\n\n", evJSON)
+					flusher.Flush()
+				}
+
+				// Stream regular content to client
+				if chunk.Choices[0].Delta.Content != "" {
+					content := chunk.Choices[0].Delta.Content
+					// Escape newlines for SSE
+					escapedContent := strings.ReplaceAll(content, "\n", "\\n")
+					fmt.Fprintf(w, "data: %s\n\n", escapedContent)
+					flusher.Flush()
+				}
 			}
 		}
 
