@@ -481,12 +481,7 @@ Please answer the user's questions in a concise and friendly manner.`, time.Now(
 			// Execute all tool calls and add results
 			for _, toolCall := range acc.Choices[0].Message.ToolCalls {
 				// Get display name for the tool
-				var mcpName string
-				if toolCall.Function.Name == "Skill" || toolCall.Function.Name == "run_skill_script" {
-					mcpName = "Skill"
-				} else {
-					mcpName = a.mcpManager.GetMCPDisplayName(toolCall.Function.Name)
-				}
+				mcpName := a.mcpManager.GetMCPDisplayName(toolCall.Function.Name)
 
 				// Update tip to show tool calling status
 				tipText := fmt.Sprintf("正在调用%s工具", mcpName)
