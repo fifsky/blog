@@ -15,6 +15,7 @@ import (
 	"app/pkg/mcp"
 	"app/pkg/skill"
 	"app/pkg/tool"
+	"app/pkg/tool/bash"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
 	"app/server/response"
@@ -63,7 +64,7 @@ func NewAI(conf *config.Config, s *store.Store) *AI {
 		client:       client,
 		mcpManager:   mcpManager,
 		skillManager: skillManager,
-		resolver:     tool.Resolvers{skillManager, mcpManager},
+		resolver:     tool.Resolvers{skillManager, mcpManager, tool.WrapSingleResolver(bash.New())},
 		store:        s,
 	}
 }

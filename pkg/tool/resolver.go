@@ -18,11 +18,23 @@ func (r Resolvers) Resolve(ctx context.Context) ([]Tool, error) {
 	for _, resolver := range r {
 		tools, err := resolver.Resolve(ctx)
 		if err != nil {
-			// In a production system, we might log and continue,
+			// In a production system, we might log and continue, 
 			// but here we follow simple aggregate logic.
 			continue
 		}
 		all = append(all, tools...)
 	}
 	return all, nil
+}
+
+// SingleResolver is a helper to treat a single Tool as a Resolver.
+type SingleResolver []Tool
+
+func (s SingleResolver) Resolve(ctx context.Context) ([]Tool, error) {
+	return s, nil
+}
+
+// WrapSingleResolver wraps a single Tool into a Resolver.
+func WrapSingleResolver(t Tool) Resolver {
+	return SingleResolver{t}
 }

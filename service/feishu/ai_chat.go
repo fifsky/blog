@@ -14,6 +14,7 @@ import (
 	"app/pkg/mcp"
 	"app/pkg/skill"
 	"app/pkg/tool"
+	"app/pkg/tool/bash"
 
 	"github.com/google/uuid"
 	lark "github.com/larksuite/oapi-sdk-go/v3"
@@ -74,7 +75,7 @@ func NewAIChat(conf *config.Config, larkClient *lark.Client) *AIChat {
 		aiClient:     aiClient,
 		mcpManager:   mcpManager,
 		skillManager: skillManager,
-		resolver:     tool.Resolvers{skillManager, mcpManager},
+		resolver:     tool.Resolvers{skillManager, mcpManager, tool.WrapSingleResolver(bash.New())},
 	}
 }
 
