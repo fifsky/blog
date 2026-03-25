@@ -110,7 +110,7 @@ func (c *Client) ListTools(ctx context.Context) ([]tool.Tool, error) {
 	var tools []tool.Tool
 	for _, t := range result.Tools {
 		schemaBytes, _ := json.Marshal(t.InputSchema)
-		
+
 		originalName := t.Name
 		handler := tool.HandleFunc(func(ctx context.Context, arguments string) (string, error) {
 			var args map[string]any
@@ -121,7 +121,7 @@ func (c *Client) ListTools(ctx context.Context) ([]tool.Tool, error) {
 			}
 			return c.CallTool(ctx, originalName, args)
 		})
-		
+
 		tools = append(tools, tool.NewTool(t.Name, t.Description, schemaBytes, handler))
 	}
 
@@ -214,7 +214,7 @@ func (m *Manager) ListAllTools(ctx context.Context) ([]tool.Tool, error) {
 			// Create unique tool name: mcpKey:originalName
 			uniqueName := mcpKey + ":" + t.Name()
 			m.toolToMCP[uniqueName] = mcpKey
-			
+
 			// Create a wrapped tool with the unique name
 			wrappedTool := tool.NewTool(
 				uniqueName,
@@ -224,7 +224,7 @@ func (m *Manager) ListAllTools(ctx context.Context) ([]tool.Tool, error) {
 					return t.Handle(ctx, arguments)
 				}),
 			)
-			
+
 			allTools = append(allTools, wrappedTool)
 		}
 	}
@@ -262,7 +262,10 @@ func (m *Manager) CallTool(ctx context.Context, toolName string, arguments map[s
 func (m *Manager) GetMCPDisplayName(toolName string) string {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	mcpKey := m.toolToMCP[toolName]
+	mcpKey, exists := m.toolToMCP[toolName]
+	if !exists {
+		return toolName
+	}
 	if displayName, ok := m.mcpDisplayNames[mcpKey]; ok {
 		return displayName
 	}

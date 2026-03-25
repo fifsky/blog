@@ -218,9 +218,11 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 
 			// Execute all tool calls and add results
 			for _, toolCall := range acc.Choices[0].Message.ToolCalls {
-				mcpName := a.mcpManager.GetMCPDisplayName(toolCall.Function.Name)
-				if mcpName == toolCall.Function.Name && (toolCall.Function.Name == "Skill" || toolCall.Function.Name == "run_skill_script") {
+				var mcpName string
+				if toolCall.Function.Name == "Skill" || toolCall.Function.Name == "run_skill_script" {
 					mcpName = "Skill"
+				} else {
+					mcpName = a.mcpManager.GetMCPDisplayName(toolCall.Function.Name)
 				}
 
 				// Send tool start event to frontend
