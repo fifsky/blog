@@ -14,4 +14,10 @@ export interface DisplayMessage {
   content: string;
   isStreaming?: boolean;
   toolCalls?: ToolCall[];
+  // messages array allows interleaving content and tool calls
+  blocks?: MessageBlock[];
 }
+
+export type MessageBlock = 
+  | { type: "text"; content: string }
+  | { type: "tool"; toolCall: ToolCall };

@@ -25,7 +25,7 @@ import {
   clearAllMessages,
 } from "@/lib/chat-db";
 import { ToolCallCard } from "./ToolCallCard";
-import type { ToolCall, DisplayMessage } from "./types";
+import type { ToolCall, DisplayMessage, MessageBlock } from "./types";
 import { AgentChatIndicator } from "@/components/agents-ui/agent-chat-indicator";
 
 // ByteMD plugins for rendering
@@ -222,6 +222,7 @@ export function AIChat() {
       content: "",
       isStreaming: true,
       toolCalls: [],
+      blocks: [],
     };
 
     setMessages((prev) => [...prev, newUserMessage, newAssistantMessage]);
@@ -260,6 +261,9 @@ export function AIChat() {
       const decoder = new TextDecoder();
       let accumulatedContent = "";
       let currentToolCalls: ToolCall[] = [];
+      let currentBlocks: MessageBlock[] = [];
+      // Track the current text block content
+      let currentTextBlock = "";
 
       while (true) {
         const { done, value } = await reader.read();
@@ -285,9 +289,19 @@ export function AIChat() {
                 isLoading: true,
               };
               currentToolCalls = [...currentToolCalls, newToolCall];
+
+              // If there's accumulated text, push it as a block before the tool call
+              if (currentTextBlock) {
+                currentBlocks = [...currentBlocks, { type: "text", content: currentTextBlock }];
+                currentTextBlock = ""; // Reset for next text segment
+              }
+              currentBlocks = [...currentBlocks, { type: "tool", toolCall: newToolCall }];
+
               setMessages((prev) =>
                 prev.map((msg) =>
-                  msg.id === assistantMsg.id ? { ...msg, toolCalls: currentToolCalls } : msg,
+                  msg.id === assistantMsg.id
+                    ? { ...msg, toolCalls: currentToolCalls, blocks: currentBlocks }
+                    : msg,
                 ),
               );
               continue;
@@ -299,9 +313,22 @@ export function AIChat() {
               currentToolCalls = currentToolCalls.map((tc) =>
                 tc.id === toolData.id ? { ...tc, result: toolData.result, isLoading: false } : tc,
               );
+
+              // Update the block as well
+              currentBlocks = currentBlocks.map((block) =>
+                block.type === "tool" && block.toolCall.id === toolData.id
+                  ? {
+                      type: "tool",
+                      toolCall: { ...block.toolCall, result: toolData.result, isLoading: false },
+                    }
+                  : block,
+              );
+
               setMessages((prev) =>
                 prev.map((msg) =>
-                  msg.id === assistantMsg.id ? { ...msg, toolCalls: currentToolCalls } : msg,
+                  msg.id === assistantMsg.id
+                    ? { ...msg, toolCalls: currentToolCalls, blocks: currentBlocks }
+                    : msg,
                 ),
               );
               continue;
@@ -310,10 +337,20 @@ export function AIChat() {
             // Handle regular content
             const content = data.replace(/\\n/g, "\n");
             accumulatedContent += content;
+            currentTextBlock += content;
+
+            // We update the last text block if it exists and is at the end, otherwise we don't add it yet
+            // Wait, to keep it simple and real-time:
+            let displayBlocks = [...currentBlocks];
+            if (currentTextBlock) {
+              displayBlocks.push({ type: "text", content: currentTextBlock });
+            }
 
             setMessages((prev) =>
               prev.map((msg) =>
-                msg.id === assistantMsg.id ? { ...msg, content: accumulatedContent } : msg,
+                msg.id === assistantMsg.id
+                  ? { ...msg, content: accumulatedContent, blocks: displayBlocks }
+                  : msg,
               ),
             );
           }
@@ -466,21 +503,54 @@ export function AIChat() {
                   >
                     {message.role === "assistant" ? (
                       <div className="relative">
-                        {/* Tool Calls UI */}
-                        {message.toolCalls && message.toolCalls.length > 0 && (
-                          <div className="mb-2">
-                            {message.toolCalls.map((toolCall) => (
-                              <ToolCallCard key={toolCall.id} toolCall={toolCall} />
-                            ))}
+                        {/* Render interleaved blocks if they exist */}
+                        {message.blocks && message.blocks.length > 0 ? (
+                          <div className="flex flex-col gap-2">
+                            {message.blocks.map((block, idx) => {
+                              if (block.type === "tool") {
+                                return (
+                                  <ToolCallCard key={block.toolCall.id} toolCall={block.toolCall} />
+                                );
+                              } else {
+                                return (
+                                  <div
+                                    key={`text-${idx}`}
+                                    className="markdown-body text-sm prose prose-sm max-w-none [&_pre]:bg-gray-100 [&_pre]:p-2 [&_pre]:rounded"
+                                  >
+                                    <Viewer value={block.content || ""} plugins={plugins} />
+                                  </div>
+                                );
+                              }
+                            })}
+                            {!message.content &&
+                              !message.toolCalls?.length &&
+                              message.isStreaming && (
+                                <div className="markdown-body text-sm prose prose-sm max-w-none [&_pre]:bg-gray-100 [&_pre]:p-2 [&_pre]:rounded">
+                                  <AgentChatIndicator size={"sm"} />
+                                </div>
+                              )}
                           </div>
+                        ) : (
+                          // Fallback to legacy rendering
+                          <>
+                            {/* Tool Calls UI */}
+                            {message.toolCalls && message.toolCalls.length > 0 && (
+                              <div className="mb-2">
+                                {message.toolCalls.map((toolCall) => (
+                                  <ToolCallCard key={toolCall.id} toolCall={toolCall} />
+                                ))}
+                              </div>
+                            )}
+                            <div className="markdown-body text-sm prose prose-sm max-w-none [&_pre]:bg-gray-100 [&_pre]:p-2 [&_pre]:rounded">
+                              {!message.content && !message.toolCalls?.length ? (
+                                <AgentChatIndicator size={"sm"} />
+                              ) : message.content ? (
+                                <Viewer value={message.content || ""} plugins={plugins} />
+                              ) : null}
+                            </div>
+                          </>
                         )}
-                        <div className="markdown-body text-sm prose prose-sm max-w-none [&_pre]:bg-gray-100 [&_pre]:p-2 [&_pre]:rounded">
-                          {!message.content && !message.toolCalls?.length ? (
-                            <AgentChatIndicator size={"sm"} />
-                          ) : message.content ? (
-                            <Viewer value={message.content || ""} plugins={plugins} />
-                          ) : null}
-                        </div>
+
                         {/* Copy button for assistant */}
                         {!message.isStreaming && message.content && (
                           <div className="absolute -bottom-11 -left-4 flex items-center gap-1">
