@@ -250,55 +250,100 @@ func (m *Manager) Resolve(ctx context.Context) ([]tool.Tool, error) {
 	}
 
 	var tools []tool.Tool
-
-	// 1. "load_skill" tool
-	skillSchema := json.RawMessage(`{"type":"object","properties":{"name":{"type":"string","description":"The skill name (no arguments). E.g., \"pdf\" or \"xlsx\""}},"required":["name"]}`)
-	tools = append(tools, tool.NewTool("load_skill", "Loads the SKILL.md instructions for a given skill.", skillSchema, tool.HandleFunc(func(ctx context.Context, arguments string) (string, error) {
-		var args map[string]any
-		if err := json.Unmarshal([]byte(arguments), &args); err != nil {
-			return mustJSON(map[string]any{"error": fmt.Sprintf("Invalid arguments: %v", err)}), nil
-		}
-		name, ok := args["name"].(string)
-		if !ok {
-			return mustJSON(map[string]any{"error": "Invalid arguments: name is required"}), nil
-		}
-		s, ok := m.GetSkill(name)
-		if !ok {
-			return mustJSON(map[string]any{"error": fmt.Sprintf("Skill %s not found", name)}), nil
-		}
-		return s.Content, nil
-	})))
-
-	// 2. "load_skill_resource" tool
-	loadResourceSchema := json.RawMessage(`{"type":"object","properties":{"skill_name":{"type":"string","description":"The name of the skill."},"path":{"type":"string","description":"Resource path under references/, assets/, or scripts/."}},"required":["skill_name","path"]}`)
-	tools = append(tools, tool.NewTool("load_skill_resource", "Loads a resource file from references/, assets/, or scripts/ in a skill.", loadResourceSchema, tool.HandleFunc(func(ctx context.Context, arguments string) (string, error) {
-		var args struct {
-			SkillName string `json:"skill_name"`
-			Path      string `json:"path"`
-		}
-		if err := json.Unmarshal([]byte(arguments), &args); err != nil {
-			return mustJSON(map[string]any{"error": fmt.Sprintf("Invalid arguments: %v", err)}), nil
-		}
-		return m.LoadResource(ctx, args.SkillName, args.Path), nil
-	})))
-
-	// 3. "run_skill_script" tool
-	runScriptSchema := json.RawMessage(`{"type":"object","properties":{"skill_name":{"type":"string","description":"The name of the skill."},"script_path":{"type":"string","description":"Script path under scripts/."},"args":{"type":"array","description":"Optional script args.","items":{"type":"string"}},"env":{"type":"object","description":"Optional environment variables."},"timeout_seconds":{"type":"integer","description":"Optional timeout in seconds. Default: 300."}},"required":["skill_name","script_path"]}`)
-	tools = append(tools, tool.NewTool("run_skill_script", "Executes a script from scripts/ in a skill. Use this when the skill instructions ask you to run a script.", runScriptSchema, tool.HandleFunc(func(ctx context.Context, arguments string) (string, error) {
-		var args struct {
-			SkillName      string            `json:"skill_name"`
-			ScriptPath     string            `json:"script_path"`
-			Args           []string          `json:"args"`
-			Env            map[string]string `json:"env"`
-			TimeoutSeconds int               `json:"timeout_seconds"`
-		}
-		if err := json.Unmarshal([]byte(arguments), &args); err != nil {
-			return "", fmt.Errorf("Invalid arguments: %v", err)
-		}
-		return m.ExecuteScript(ctx, args.SkillName, args.ScriptPath, args.Args, args.Env, args.TimeoutSeconds), nil
-	})))
+	tools = append(tools, &loadSkillTool{manager: m})
+	tools = append(tools, &loadSkillResourceTool{manager: m})
+	tools = append(tools, &runSkillScriptTool{manager: m})
 
 	return tools, nil
+}
+
+type loadSkillTool struct {
+	manager *Manager
+}
+
+func (t *loadSkillTool) Name() string {
+	return "load_skill"
+}
+
+func (t *loadSkillTool) Description() string {
+	return "Loads the SKILL.md instructions for a given skill."
+}
+
+func (t *loadSkillTool) InputSchema() json.RawMessage {
+	return json.RawMessage(`{"type":"object","properties":{"name":{"type":"string","description":"The skill name (no arguments). E.g., \"pdf\" or \"xlsx\""}},"required":["name"]}`)
+}
+
+func (t *loadSkillTool) Handle(ctx context.Context, arguments string) (string, error) {
+	var args map[string]any
+	if err := json.Unmarshal([]byte(arguments), &args); err != nil {
+		return mustJSON(map[string]any{"error": fmt.Sprintf("Invalid arguments: %v", err)}), nil
+	}
+	name, ok := args["name"].(string)
+	if !ok {
+		return mustJSON(map[string]any{"error": "Invalid arguments: name is required"}), nil
+	}
+	s, ok := t.manager.GetSkill(name)
+	if !ok {
+		return mustJSON(map[string]any{"error": fmt.Sprintf("Skill %s not found", name)}), nil
+	}
+	return s.Content, nil
+}
+
+type loadSkillResourceTool struct {
+	manager *Manager
+}
+
+func (t *loadSkillResourceTool) Name() string {
+	return "load_skill_resource"
+}
+
+func (t *loadSkillResourceTool) Description() string {
+	return "Loads a resource file from references/, assets/, or scripts/ in a skill."
+}
+
+func (t *loadSkillResourceTool) InputSchema() json.RawMessage {
+	return json.RawMessage(`{"type":"object","properties":{"skill_name":{"type":"string","description":"The name of the skill."},"path":{"type":"string","description":"Resource path under references/, assets/, or scripts/."}},"required":["skill_name","path"]}`)
+}
+
+func (t *loadSkillResourceTool) Handle(ctx context.Context, arguments string) (string, error) {
+	var args struct {
+		SkillName string `json:"skill_name"`
+		Path      string `json:"path"`
+	}
+	if err := json.Unmarshal([]byte(arguments), &args); err != nil {
+		return mustJSON(map[string]any{"error": fmt.Sprintf("Invalid arguments: %v", err)}), nil
+	}
+	return t.manager.LoadResource(ctx, args.SkillName, args.Path), nil
+}
+
+type runSkillScriptTool struct {
+	manager *Manager
+}
+
+func (t *runSkillScriptTool) Name() string {
+	return "run_skill_script"
+}
+
+func (t *runSkillScriptTool) Description() string {
+	return "Executes a script from scripts/ in a skill. Use this when the skill instructions ask you to run a script."
+}
+
+func (t *runSkillScriptTool) InputSchema() json.RawMessage {
+	return json.RawMessage(`{"type":"object","properties":{"skill_name":{"type":"string","description":"The name of the skill."},"script_path":{"type":"string","description":"Script path under scripts/."},"args":{"type":"array","description":"Optional script args.","items":{"type":"string"}},"env":{"type":"object","description":"Optional environment variables."},"timeout_seconds":{"type":"integer","description":"Optional timeout in seconds. Default: 300."}},"required":["skill_name","script_path"]}`)
+}
+
+func (t *runSkillScriptTool) Handle(ctx context.Context, arguments string) (string, error) {
+	var args struct {
+		SkillName      string            `json:"skill_name"`
+		ScriptPath     string            `json:"script_path"`
+		Args           []string          `json:"args"`
+		Env            map[string]string `json:"env"`
+		TimeoutSeconds int               `json:"timeout_seconds"`
+	}
+	if err := json.Unmarshal([]byte(arguments), &args); err != nil {
+		return "", fmt.Errorf("Invalid arguments: %v", err)
+	}
+	return t.manager.ExecuteScript(ctx, args.SkillName, args.ScriptPath, args.Args, args.Env, args.TimeoutSeconds), nil
 }
 
 func (m *Manager) GetSkill(name string) (*Skill, bool) {
