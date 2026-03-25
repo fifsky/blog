@@ -25,6 +25,7 @@ import (
 
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/option"
+	"github.com/openai/openai-go/v3/packages/ssestream"
 )
 
 var _ adminv1.AIServiceServer = (*AI)(nil)
@@ -102,6 +103,11 @@ type ThinkingEvent struct {
 	Duration string `json:"duration,omitempty"`
 }
 
+func (a *AI) sendEvent(w http.ResponseWriter, format string, args ...any) {
+	fmt.Fprintf(w, format+"\n\n", args...)
+	w.(http.Flusher).Flush()
+}
+
 // Chat handles SSE streaming AI chat responses
 func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 	// Parse request body
@@ -135,23 +141,57 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Connection", "keep-alive")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	flusher, ok := w.(http.Flusher)
-	if !ok {
+	if _, ok := w.(http.Flusher); !ok {
 		response.Fail(w, errors.InternalServer("STREAMING_ERROR", "Streaming not supported"))
 		return
 	}
 
 	ctx := r.Context()
 
-	// Build system prompt
-	prompt := a.buildSystemPrompt()
-
 	// Build OpenAI messages from request history
+	openAIMessages := a.buildMessages(req.Messages)
+
+	// Get tools from resolver
+	toolsList, toolsParams := a.getTools(ctx)
+
+	// Create streaming chat completion using OpenAI SDK v3
+	aiReq := a.buildAIRequest(openAIMessages, toolsParams)
+
+	// Tool calling loop - handle tool calls until we get a final response
+	for {
+		stream := a.client.Chat.Completions.NewStreaming(ctx, aiReq)
+
+		hasToolCalls, acc, err := a.processStream(ctx, w, stream)
+		if err != nil {
+			if err == context.Canceled {
+				return
+			}
+			// Send error as SSE event
+			a.sendEvent(w, "data: [ERROR] %s", err.Error())
+			return
+		}
+
+		// Handle tool calls if any
+		if hasToolCalls && len(acc.Choices) > 0 && len(acc.Choices[0].Message.ToolCalls) > 0 {
+			a.handleToolCalls(ctx, w, &aiReq, acc.Choices[0].Message, toolsList)
+			continue
+		}
+
+		// No tool calls, we're done
+		break
+	}
+
+	// Send done event
+	a.sendEvent(w, "data: [DONE]")
+}
+
+func (a *AI) buildMessages(reqMessages []ChatMessage) []openai.ChatCompletionMessageParamUnion {
+	prompt := a.buildSystemPrompt()
 	openAIMessages := []openai.ChatCompletionMessageParamUnion{
 		openai.SystemMessage(prompt),
 	}
 
-	for _, msg := range req.Messages {
+	for _, msg := range reqMessages {
 		if strings.TrimSpace(msg.Content) == "" {
 			continue // skip empty messages
 		}
@@ -162,172 +202,148 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 			openAIMessages = append(openAIMessages, openai.AssistantMessage(msg.Content))
 		}
 	}
+	return openAIMessages
+}
 
-	// Get tools from resolver
-	toolsList, toolsParams := a.getTools(ctx)
-
-	// Create streaming chat completion using OpenAI SDK v3
-	var aiReq openai.ChatCompletionNewParams
+func (a *AI) buildAIRequest(messages []openai.ChatCompletionMessageParamUnion, toolsParams []openai.ChatCompletionToolUnionParam) openai.ChatCompletionNewParams {
+	aiReq := openai.ChatCompletionNewParams{
+		Model:    a.conf.Common.AIModel,
+		Messages: messages,
+	}
 	if len(toolsParams) > 0 {
-		aiReq = openai.ChatCompletionNewParams{
-			Model:    a.conf.Common.AIModel,
-			Messages: openAIMessages,
-			Tools:    toolsParams,
-		}
-	} else {
-		aiReq = openai.ChatCompletionNewParams{
-			Model:    a.conf.Common.AIModel,
-			Messages: openAIMessages,
-		}
+		aiReq.Tools = toolsParams
 	}
 	aiutil.ConfigureModelParams(&aiReq, a.conf.Common.AIModel)
+	return aiReq
+}
 
-	// Tool calling loop - handle tool calls until we get a final response
-	for {
-		stream := a.client.Chat.Completions.NewStreaming(ctx, aiReq)
-		acc := openai.ChatCompletionAccumulator{}
-		hasToolCalls := false
+func (a *AI) processStream(
+	ctx context.Context,
+	w http.ResponseWriter,
+	stream *ssestream.Stream[openai.ChatCompletionChunk],
+) (bool, openai.ChatCompletionAccumulator, error) {
+	acc := openai.ChatCompletionAccumulator{}
+	hasToolCalls := false
 
-		var thinkStartTime time.Time
-		isThinking := false
+	var thinkStartTime time.Time
+	isThinking := false
 
-		// Stream the response
-		for stream.Next() {
-			chunk := stream.Current()
-			acc.AddChunk(chunk)
+	for stream.Next() {
+		chunk := stream.Current()
+		acc.AddChunk(chunk)
 
-			// Check if stream finished with tool_calls (compatible with DeepSeek, Doubao, Qwen, etc.)
-			if len(chunk.Choices) > 0 && chunk.Choices[0].FinishReason == "tool_calls" {
-				hasToolCalls = true
-				break
-			}
-
-			if len(chunk.Choices) > 0 {
-				// Handle thinking (reasoning_content)
-				reasoningContent, has := chunk.Choices[0].Delta.JSON.ExtraFields["reasoning_content"]
-				var rc string
-				if has {
-					if v, err := strconv.Unquote(reasoningContent.Raw()); err == nil {
-						rc = v
-					} else {
-						// Fallback if it's not a quoted string
-						rc = string(reasoningContent.Raw())
-					}
-				}
-
-				if rc != "" {
-					if !isThinking {
-						isThinking = true
-						thinkStartTime = time.Now()
-					}
-
-					// Stream thinking content
-					escapedRc := strings.ReplaceAll(rc, "\n", "\\n")
-					thinkEv := ThinkingEvent{
-						Content:  escapedRc,
-						Thinking: true,
-					}
-					evJSON, _ := json.Marshal(thinkEv)
-					fmt.Fprintf(w, "data: [THINKING] %s\n\n", evJSON)
-					flusher.Flush()
-					continue
-				} else if isThinking {
-					// We were thinking, but now we got a chunk without reasoning_content
-					// This means thinking is done.
-					isThinking = false
-					thinkEv := ThinkingEvent{
-						Thinking: false,
-						Duration: fmt.Sprintf("%.1f", time.Since(thinkStartTime).Seconds()),
-					}
-					evJSON, _ := json.Marshal(thinkEv)
-					fmt.Fprintf(w, "data: [THINKING] %s\n\n", evJSON)
-					flusher.Flush()
-				}
-
-				// Stream regular content to client
-				if chunk.Choices[0].Delta.Content != "" {
-					content := chunk.Choices[0].Delta.Content
-					// Escape newlines for SSE
-					escapedContent := strings.ReplaceAll(content, "\n", "\\n")
-					fmt.Fprintf(w, "data: %s\n\n", escapedContent)
-					flusher.Flush()
-				}
-			}
+		if len(chunk.Choices) > 0 && chunk.Choices[0].FinishReason == "tool_calls" {
+			hasToolCalls = true
+			break
 		}
 
-		if err := stream.Err(); err != nil {
-			// Check if context was cancelled
-			if ctx.Err() == context.Canceled {
-				return
+		if len(chunk.Choices) > 0 {
+			a.processChunkThinking(chunk, w, &isThinking, &thinkStartTime)
+
+			// Stream regular content to client
+			if chunk.Choices[0].Delta.Content != "" {
+				content := chunk.Choices[0].Delta.Content
+				escapedContent := strings.ReplaceAll(content, "\n", "\\n")
+				a.sendEvent(w, "data: %s", escapedContent)
 			}
-			// Send error as SSE event
-			fmt.Fprintf(w, "data: [ERROR] %s\n\n", err.Error())
-			flusher.Flush()
-			return
 		}
-
-		// Handle tool calls if any
-		if hasToolCalls && len(acc.Choices) > 0 && len(acc.Choices[0].Message.ToolCalls) > 0 {
-			// Add assistant message with tool calls
-			aiReq.Messages = append(aiReq.Messages, acc.Choices[0].Message.ToParam())
-
-			// Execute all tool calls and add results
-			for _, toolCall := range acc.Choices[0].Message.ToolCalls {
-				mcpName := a.mcpManager.GetMCPDisplayName(toolCall.Function.Name)
-
-				// Send tool start event to frontend
-				toolStartEvent := ToolStartEvent{
-					ID:        toolCall.ID,
-					Name:      toolCall.Function.Name,
-					MCPName:   mcpName,
-					Arguments: toolCall.Function.Arguments,
-				}
-				toolStartJSON, _ := json.Marshal(toolStartEvent)
-				fmt.Fprintf(w, "data: [TOOL_START] %s\n\n", toolStartJSON)
-				flusher.Flush()
-
-				// Execute tool using toolsList
-				var toolResult string
-				var found bool
-				for _, t := range toolsList {
-					if t.Name() == toolCall.Function.Name {
-						res, err := t.Handle(ctx, toolCall.Function.Arguments)
-						if err != nil {
-							toolResult = fmt.Sprintf("Tool execution failed: %v", err)
-						} else {
-							toolResult = res
-						}
-						found = true
-						break
-					}
-				}
-				if !found {
-					toolResult = fmt.Sprintf("Tool execution failed: tool %s not found", toolCall.Function.Name)
-				}
-
-				// Send tool end event to frontend
-				toolEndEvent := ToolEndEvent{
-					ID:     toolCall.ID,
-					Result: toolResult,
-				}
-				toolEndJSON, _ := json.Marshal(toolEndEvent)
-				fmt.Fprintf(w, "data: [TOOL_END] %s\n\n", toolEndJSON)
-				flusher.Flush()
-
-				aiReq.Messages = append(aiReq.Messages, openai.ToolMessage(toolResult, toolCall.ID))
-			}
-
-			// Continue the loop to get the next response
-			continue
-		}
-
-		// No tool calls, we're done
-		break
 	}
 
-	// Send done event
-	fmt.Fprintf(w, "data: [DONE]\n\n")
-	flusher.Flush()
+	return hasToolCalls, acc, stream.Err()
+}
+
+func (a *AI) processChunkThinking(
+	chunk openai.ChatCompletionChunk,
+	w http.ResponseWriter,
+	isThinking *bool,
+	thinkStartTime *time.Time,
+) {
+	reasoningContent, has := chunk.Choices[0].Delta.JSON.ExtraFields["reasoning_content"]
+	var rc string
+	if has {
+		if v, err := strconv.Unquote(reasoningContent.Raw()); err == nil {
+			rc = v
+		} else {
+			rc = string(reasoningContent.Raw())
+		}
+	}
+
+	if rc != "" {
+		if !*isThinking {
+			*isThinking = true
+			*thinkStartTime = time.Now()
+		}
+
+		escapedRc := strings.ReplaceAll(rc, "\n", "\\n")
+		thinkEv := ThinkingEvent{
+			Content:  escapedRc,
+			Thinking: true,
+		}
+		evJSON, _ := json.Marshal(thinkEv)
+		a.sendEvent(w, "data: [THINKING] %s", evJSON)
+	} else if *isThinking {
+		*isThinking = false
+		thinkEv := ThinkingEvent{
+			Thinking: false,
+			Duration: fmt.Sprintf("%.1f", time.Since(*thinkStartTime).Seconds()),
+		}
+		evJSON, _ := json.Marshal(thinkEv)
+		a.sendEvent(w, "data: [THINKING] %s", evJSON)
+	}
+}
+
+func (a *AI) handleToolCalls(
+	ctx context.Context,
+	w http.ResponseWriter,
+	aiReq *openai.ChatCompletionNewParams,
+	message openai.ChatCompletionMessage,
+	toolsList []tool.Tool,
+) {
+	// Add assistant message with tool calls
+	aiReq.Messages = append(aiReq.Messages, message.ToParam())
+
+	for _, toolCall := range message.ToolCalls {
+		mcpName := a.mcpManager.GetMCPDisplayName(toolCall.Function.Name)
+
+		// Send tool start event to frontend
+		toolStartEvent := ToolStartEvent{
+			ID:        toolCall.ID,
+			Name:      toolCall.Function.Name,
+			MCPName:   mcpName,
+			Arguments: toolCall.Function.Arguments,
+		}
+		toolStartJSON, _ := json.Marshal(toolStartEvent)
+		a.sendEvent(w, "data: [TOOL_START] %s", toolStartJSON)
+
+		// Execute tool using toolsList
+		var toolResult string
+		var found bool
+		for _, t := range toolsList {
+			if t.Name() == toolCall.Function.Name {
+				res, err := t.Handle(ctx, toolCall.Function.Arguments)
+				if err != nil {
+					toolResult = fmt.Sprintf("Tool execution failed: %v", err)
+				} else {
+					toolResult = res
+				}
+				found = true
+				break
+			}
+		}
+		if !found {
+			toolResult = fmt.Sprintf("Tool execution failed: tool %s not found", toolCall.Function.Name)
+		}
+
+		// Send tool end event to frontend
+		toolEndEvent := ToolEndEvent{
+			ID:     toolCall.ID,
+			Result: toolResult,
+		}
+		toolEndJSON, _ := json.Marshal(toolEndEvent)
+		a.sendEvent(w, "data: [TOOL_END] %s", toolEndJSON)
+
+		aiReq.Messages = append(aiReq.Messages, openai.ToolMessage(toolResult, toolCall.ID))
+	}
 }
 
 // buildSystemPrompt builds the system prompt with tool usage instructions
