@@ -454,8 +454,8 @@ func (m *Manager) ExecuteScript(ctx context.Context, skillName, scriptPath strin
 	resType, resName, err := normalizeResourcePath(scriptPath)
 	if err == nil && resType == "scripts" {
 		scriptPath = resName
-	} else if strings.HasPrefix(scriptPath, "scripts/") {
-		scriptPath = strings.TrimPrefix(scriptPath, "scripts/")
+	} else if after, ok0 := strings.CutPrefix(scriptPath, "scripts/"); ok0 {
+		scriptPath = after
 	}
 
 	_, ok = skill.Resources.Scripts[scriptPath]
