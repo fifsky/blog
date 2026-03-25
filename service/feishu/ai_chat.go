@@ -12,6 +12,7 @@ import (
 	"app/config"
 	"app/pkg/aiutil"
 	"app/pkg/mcp"
+	"app/pkg/skill"
 	"app/pkg/tool"
 
 	"github.com/google/uuid"
@@ -40,6 +41,7 @@ type AIChat struct {
 	larkClient   *lark.Client
 	aiClient     openai.Client
 	mcpManager   *mcp.Manager
+	skillManager *skill.Manager
 	contextCache sync.Map // map[string]*chatContext, key is senderID
 	resolver     tool.Resolver
 }
@@ -63,12 +65,16 @@ func NewAIChat(conf *config.Config, larkClient *lark.Client) *AIChat {
 		}
 	}
 
+	skillManager := skill.NewManager(conf.Common.SkillsPath)
+	_ = skillManager.Load()
+
 	return &AIChat{
-		conf:       conf,
-		larkClient: larkClient,
-		aiClient:   aiClient,
-		mcpManager: mcpManager,
-		resolver:   tool.Resolvers{mcpManager},
+		conf:         conf,
+		larkClient:   larkClient,
+		aiClient:     aiClient,
+		mcpManager:   mcpManager,
+		skillManager: skillManager,
+		resolver:     tool.Resolvers{skillManager, mcpManager},
 	}
 }
 
@@ -352,26 +358,6 @@ func (a *AIChat) getTools(ctx context.Context) ([]tool.Tool, []openai.ChatComple
 	return allTools, params
 }
 
-// executeTool executes a tool call via MCP manager and returns the result
-func (a *AIChat) executeTool(ctx context.Context, name string, arguments string) string {
-	if !a.mcpManager.HasClients() {
-		return "Tool execution failed: no MCP clients available"
-	}
-
-	// Parse arguments
-	var args map[string]any
-	if err := json.Unmarshal([]byte(arguments), &args); err != nil {
-		return fmt.Sprintf("Tool execution failed: invalid arguments: %v", err)
-	}
-
-	result, err := a.mcpManager.CallTool(ctx, name, args)
-	if err != nil {
-		return fmt.Sprintf("Tool execution failed: %v", err)
-	}
-
-	return result
-}
-
 // streamAIResponse calls the AI API and streams the response to the card.
 // senderID is used to maintain conversation context across messages.
 // imageBase64 is optional - if provided, it will be included as a vision input.
@@ -390,7 +376,9 @@ When you encounter questions that you cannot answer directly, such as:
 
 You should use the available tools to find accurate and up-to-date information.
 
-Please answer the user's questions in a concise and friendly manner.`, time.Now().Format(time.DateTime))
+%s
+
+Please answer the user's questions in a concise and friendly manner.`, time.Now().Format(time.DateTime), skill.SkillsPrompt(a.skillManager.GetSkills()))
 
 	// Get existing context messages or create new context
 	contextMessages := a.getOrCreateContext(senderID)

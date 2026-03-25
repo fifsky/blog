@@ -174,7 +174,7 @@ func (c *Client) Close() error {
 // Manager manages multiple MCP clients and provides aggregated tool access
 type Manager struct {
 	clients         map[string]*Client
-	toolToMCP       map[string]string // maps tool name to MCP client key
+	toolToMCP       map[string]string // maps tool unique name (mcpKey:originalName) to mcpKey
 	mcpDisplayNames map[string]string // maps MCP client key to display name
 	mu              sync.RWMutex
 }

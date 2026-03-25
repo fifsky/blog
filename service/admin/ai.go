@@ -218,12 +218,7 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 
 			// Execute all tool calls and add results
 			for _, toolCall := range acc.Choices[0].Message.ToolCalls {
-				var mcpName string
-				if toolCall.Function.Name == "Skill" || toolCall.Function.Name == "run_skill_script" {
-					mcpName = "Skill"
-				} else {
-					mcpName = a.mcpManager.GetMCPDisplayName(toolCall.Function.Name)
-				}
+				mcpName := a.mcpManager.GetMCPDisplayName(toolCall.Function.Name)
 
 				// Send tool start event to frontend
 				toolStartEvent := ToolStartEvent{
@@ -291,7 +286,9 @@ When you encounter questions that you cannot answer directly, such as:
 - Specific facts you are uncertain about
 - Information that may have changed after your training data cutoff
 
-You should use the available tools to find accurate and up-to-date information.`, time.Now().Format(time.DateTime))
+You should use the available tools to find accurate and up-to-date information.
+
+%s`, time.Now().Format(time.DateTime), skill.SkillsPrompt(a.skillManager.GetSkills()))
 
 	return basePrompt
 }
@@ -325,99 +322,6 @@ func (a *AI) getTools(ctx context.Context) ([]tool.Tool, []openai.ChatCompletion
 	}
 
 	return allTools, params
-}
-
-// getSkillTools returns the available skill tools as OpenAI tool params
-func (a *AI) getSkillTools() []openai.ChatCompletionToolUnionParam {
-	skills := a.skillManager.GetSkills()
-	if len(skills) == 0 {
-		return nil
-	}
-
-	var availableSkills strings.Builder
-	availableSkills.WriteString("Execute a skill within the main conversation\n<skills_instructions>\nWhen users ask you to perform tasks, check if any of the available skills below can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge.\nHow to use skills:\n- Invoke skills using this tool with the skill name only (no arguments)\n</skills_instructions>\n<available_skills>\n")
-	for _, s := range skills {
-		availableSkills.WriteString(fmt.Sprintf("<skill>\n<name>\n%s\n</name>\n<description>\n%s\n</description>\n</skill>\n", s.Name(), s.Description()))
-	}
-	availableSkills.WriteString("</available_skills>")
-
-	return []openai.ChatCompletionToolUnionParam{
-		{
-			OfFunction: &openai.ChatCompletionFunctionToolParam{
-				Function: openai.FunctionDefinitionParam{
-					Name:        "Skill",
-					Description: openai.String(availableSkills.String()),
-					Parameters: openai.FunctionParameters{
-						"type": "object",
-						"properties": map[string]any{
-							"name": map[string]any{
-								"type":        "string",
-								"description": "The skill name (no arguments). E.g., \"pdf\" or \"xlsx\"",
-							},
-						},
-						"required": []string{"name"},
-					},
-				},
-			},
-		},
-		{
-			OfFunction: &openai.ChatCompletionFunctionToolParam{
-				Function: openai.FunctionDefinitionParam{
-					Name:        "run_skill_script",
-					Description: openai.String("Executes a script from scripts/ in a skill. Use this when the skill instructions ask you to run a script."),
-					Parameters: openai.FunctionParameters{
-						"type": "object",
-						"properties": map[string]any{
-							"skill_name": map[string]any{
-								"type":        "string",
-								"description": "The name of the skill.",
-							},
-							"script_path": map[string]any{
-								"type":        "string",
-								"description": "Script path under scripts/.",
-							},
-							"args": map[string]any{
-								"type":        "array",
-								"description": "Optional script args.",
-								"items": map[string]any{
-									"type": "string",
-								},
-							},
-							"env": map[string]any{
-								"type":        "object",
-								"description": "Optional environment variables.",
-							},
-							"timeout_seconds": map[string]any{
-								"type":        "integer",
-								"description": "Optional timeout in seconds. Default: 300.",
-							},
-						},
-						"required": []string{"skill_name", "script_path"},
-					},
-				},
-			},
-		},
-	}
-}
-
-// executeTool executes a tool call via MCP manager and returns the result
-func (a *AI) executeTool(ctx context.Context, name string, arguments string) string {
-	if !a.mcpManager.HasClients() {
-		return "Tool execution failed: no MCP clients available"
-	}
-
-	// Parse arguments
-	var args map[string]any
-	if err := json.Unmarshal([]byte(arguments), &args); err != nil {
-		return fmt.Sprintf("Tool execution failed: invalid arguments: %v", err)
-	}
-
-	result, err := a.mcpManager.CallTool(ctx, name, args)
-	if err != nil {
-		return fmt.Sprintf("Tool execution failed: %v", err)
-	}
-
-	return result
 }
 
 func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest) (*adminv1.GenerateTagsResponse, error) {

@@ -4,6 +4,7 @@ import (
 	"app/pkg/tool"
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -248,34 +249,40 @@ func (m *Manager) Resolve(ctx context.Context) ([]tool.Tool, error) {
 		return nil, nil
 	}
 
-	var availableSkills strings.Builder
-	availableSkills.WriteString("Execute a skill within the main conversation\n<skills_instructions>\nWhen users ask you to perform tasks, check if any of the available skills below can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge.\nHow to use skills:\n- Invoke skills using this tool with the skill name only (no arguments)\n</skills_instructions>\n<available_skills>\n")
-	for _, s := range skills {
-		availableSkills.WriteString(fmt.Sprintf("<skill>\n<name>\n%s\n</name>\n<description>\n%s\n</description>\n</skill>\n", s.Name(), s.Description()))
-	}
-	availableSkills.WriteString("</available_skills>")
-
 	var tools []tool.Tool
 
-	// 1. "Skill" tool
+	// 1. "load_skill" tool
 	skillSchema := json.RawMessage(`{"type":"object","properties":{"name":{"type":"string","description":"The skill name (no arguments). E.g., \"pdf\" or \"xlsx\""}},"required":["name"]}`)
-	tools = append(tools, tool.NewTool("Skill", availableSkills.String(), skillSchema, tool.HandleFunc(func(ctx context.Context, arguments string) (string, error) {
+	tools = append(tools, tool.NewTool("load_skill", "Loads the SKILL.md instructions for a given skill.", skillSchema, tool.HandleFunc(func(ctx context.Context, arguments string) (string, error) {
 		var args map[string]any
 		if err := json.Unmarshal([]byte(arguments), &args); err != nil {
-			return "", fmt.Errorf("Invalid arguments: %v", err)
+			return mustJSON(map[string]any{"error": fmt.Sprintf("Invalid arguments: %v", err)}), nil
 		}
 		name, ok := args["name"].(string)
 		if !ok {
-			return "", fmt.Errorf("Invalid arguments: name is required")
+			return mustJSON(map[string]any{"error": "Invalid arguments: name is required"}), nil
 		}
 		s, ok := m.GetSkill(name)
 		if !ok {
-			return "", fmt.Errorf("Skill %s not found", name)
+			return mustJSON(map[string]any{"error": fmt.Sprintf("Skill %s not found", name)}), nil
 		}
 		return s.Content, nil
 	})))
 
-	// 2. "run_skill_script" tool
+	// 2. "load_skill_resource" tool
+	loadResourceSchema := json.RawMessage(`{"type":"object","properties":{"skill_name":{"type":"string","description":"The name of the skill."},"path":{"type":"string","description":"Resource path under references/, assets/, or scripts/."}},"required":["skill_name","path"]}`)
+	tools = append(tools, tool.NewTool("load_skill_resource", "Loads a resource file from references/, assets/, or scripts/ in a skill.", loadResourceSchema, tool.HandleFunc(func(ctx context.Context, arguments string) (string, error) {
+		var args struct {
+			SkillName string `json:"skill_name"`
+			Path      string `json:"path"`
+		}
+		if err := json.Unmarshal([]byte(arguments), &args); err != nil {
+			return mustJSON(map[string]any{"error": fmt.Sprintf("Invalid arguments: %v", err)}), nil
+		}
+		return m.LoadResource(ctx, args.SkillName, args.Path), nil
+	})))
+
+	// 3. "run_skill_script" tool
 	runScriptSchema := json.RawMessage(`{"type":"object","properties":{"skill_name":{"type":"string","description":"The name of the skill."},"script_path":{"type":"string","description":"Script path under scripts/."},"args":{"type":"array","description":"Optional script args.","items":{"type":"string"}},"env":{"type":"object","description":"Optional environment variables."},"timeout_seconds":{"type":"integer","description":"Optional timeout in seconds. Default: 300."}},"required":["skill_name","script_path"]}`)
 	tools = append(tools, tool.NewTool("run_skill_script", "Executes a script from scripts/ in a skill. Use this when the skill instructions ask you to run a script.", runScriptSchema, tool.HandleFunc(func(ctx context.Context, arguments string) (string, error) {
 		var args struct {
@@ -297,6 +304,96 @@ func (m *Manager) Resolve(ctx context.Context) ([]tool.Tool, error) {
 func (m *Manager) GetSkill(name string) (*Skill, bool) {
 	s, ok := m.skills[name]
 	return s, ok
+}
+
+func (m *Manager) LoadResource(ctx context.Context, skillName string, resourcePath string) string {
+	skill, ok := m.GetSkill(skillName)
+	if !ok {
+		return mustJSON(map[string]any{
+			"error":      fmt.Sprintf("Skill %q not found", skillName),
+			"error_code": "SKILL_NOT_FOUND",
+		})
+	}
+
+	resType, resName, err := normalizeResourcePath(resourcePath)
+	if err != nil {
+		return mustJSON(map[string]any{
+			"error":      fmt.Sprintf("Invalid resource path: %v", err),
+			"error_code": "INVALID_RESOURCE_PATH",
+		})
+	}
+
+	var raw []byte
+	var found bool
+
+	switch resType {
+	case "references":
+		content, ok := skill.Resources.References[resName]
+		found = ok
+		if ok {
+			raw = []byte(content)
+		}
+	case "assets":
+		raw, found = skill.Resources.Assets[resName]
+	case "scripts":
+		content, ok := skill.Resources.Scripts[resName]
+		found = ok
+		if ok {
+			raw = []byte(content)
+		}
+	default:
+		return mustJSON(map[string]any{
+			"error":      "Invalid resource type",
+			"error_code": "INVALID_RESOURCE_TYPE",
+		})
+	}
+
+	if !found {
+		return mustJSON(map[string]any{
+			"error":      fmt.Sprintf("Resource %q not found in skill %q.", resourcePath, skillName),
+			"error_code": "RESOURCE_NOT_FOUND",
+		})
+	}
+
+	return mustJSON(map[string]any{
+		"skill_name":     skillName,
+		"path":           resourcePath,
+		"encoding":       "base64",
+		"content_base64": base64.StdEncoding.EncodeToString(raw),
+	})
+}
+
+func normalizeResourcePath(resourcePath string) (resourceType string, resourceName string, err error) {
+	resourcePath = strings.TrimSpace(resourcePath)
+	resourcePath = strings.ReplaceAll(resourcePath, "\\", "/")
+	switch {
+	case strings.HasPrefix(resourcePath, "references/"):
+		resourceType = "references"
+		resourcePath = strings.TrimPrefix(resourcePath, "references/")
+	case strings.HasPrefix(resourcePath, "assets/"):
+		resourceType = "assets"
+		resourcePath = strings.TrimPrefix(resourcePath, "assets/")
+	case strings.HasPrefix(resourcePath, "scripts/"):
+		resourceType = "scripts"
+		resourcePath = strings.TrimPrefix(resourcePath, "scripts/")
+	default:
+		return "", "", fmt.Errorf("resource path must start with references/, assets/, or scripts/")
+	}
+	resourceName, err = normalizeSkillRelativePath(resourcePath)
+	if err != nil {
+		return "", "", fmt.Errorf("resource path must be a relative path within %s/", resourceType)
+	}
+	return resourceType, resourceName, nil
+}
+
+func normalizeSkillRelativePath(rel string) (string, error) {
+	rel = strings.TrimSpace(rel)
+	rel = strings.ReplaceAll(rel, "\\", "/")
+	clean := path.Clean(rel)
+	if clean == "" || clean == "." || clean == ".." || strings.HasPrefix(clean, "../") || path.IsAbs(clean) {
+		return "", fmt.Errorf("invalid relative path")
+	}
+	return clean, nil
 }
 
 func (m *Manager) ExecuteScript(ctx context.Context, skillName, scriptPath string, args []string, env map[string]string, timeoutSeconds int) string {
