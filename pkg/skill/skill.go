@@ -1,6 +1,7 @@
 package skill
 
 import (
+	"app/pkg/tool"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -238,6 +239,59 @@ func trimTrailingCarriageReturn(line string) string {
 
 func (m *Manager) GetSkills() map[string]*Skill {
 	return m.skills
+}
+
+// Resolve implements tool.Resolver
+func (m *Manager) Resolve(ctx context.Context) ([]tool.Tool, error) {
+	skills := m.GetSkills()
+	if len(skills) == 0 {
+		return nil, nil
+	}
+
+	var availableSkills strings.Builder
+	availableSkills.WriteString("Execute a skill within the main conversation\n<skills_instructions>\nWhen users ask you to perform tasks, check if any of the available skills below can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge.\nHow to use skills:\n- Invoke skills using this tool with the skill name only (no arguments)\n</skills_instructions>\n<available_skills>\n")
+	for _, s := range skills {
+		availableSkills.WriteString(fmt.Sprintf("<skill>\n<name>\n%s\n</name>\n<description>\n%s\n</description>\n</skill>\n", s.Name(), s.Description()))
+	}
+	availableSkills.WriteString("</available_skills>")
+
+	var tools []tool.Tool
+
+	// 1. "Skill" tool
+	skillSchema := json.RawMessage(`{"type":"object","properties":{"name":{"type":"string","description":"The skill name (no arguments). E.g., \"pdf\" or \"xlsx\""}},"required":["name"]}`)
+	tools = append(tools, tool.NewTool("Skill", availableSkills.String(), skillSchema, tool.HandleFunc(func(ctx context.Context, arguments string) (string, error) {
+		var args map[string]any
+		if err := json.Unmarshal([]byte(arguments), &args); err != nil {
+			return "", fmt.Errorf("Invalid arguments: %v", err)
+		}
+		name, ok := args["name"].(string)
+		if !ok {
+			return "", fmt.Errorf("Invalid arguments: name is required")
+		}
+		s, ok := m.GetSkill(name)
+		if !ok {
+			return "", fmt.Errorf("Skill %s not found", name)
+		}
+		return s.Content, nil
+	})))
+
+	// 2. "run_skill_script" tool
+	runScriptSchema := json.RawMessage(`{"type":"object","properties":{"skill_name":{"type":"string","description":"The name of the skill."},"script_path":{"type":"string","description":"Script path under scripts/."},"args":{"type":"array","description":"Optional script args.","items":{"type":"string"}},"env":{"type":"object","description":"Optional environment variables."},"timeout_seconds":{"type":"integer","description":"Optional timeout in seconds. Default: 300."}},"required":["skill_name","script_path"]}`)
+	tools = append(tools, tool.NewTool("run_skill_script", "Executes a script from scripts/ in a skill. Use this when the skill instructions ask you to run a script.", runScriptSchema, tool.HandleFunc(func(ctx context.Context, arguments string) (string, error) {
+		var args struct {
+			SkillName      string            `json:"skill_name"`
+			ScriptPath     string            `json:"script_path"`
+			Args           []string          `json:"args"`
+			Env            map[string]string `json:"env"`
+			TimeoutSeconds int               `json:"timeout_seconds"`
+		}
+		if err := json.Unmarshal([]byte(arguments), &args); err != nil {
+			return "", fmt.Errorf("Invalid arguments: %v", err)
+		}
+		return m.ExecuteScript(ctx, args.SkillName, args.ScriptPath, args.Args, args.Env, args.TimeoutSeconds), nil
+	})))
+
+	return tools, nil
 }
 
 func (m *Manager) GetSkill(name string) (*Skill, bool) {

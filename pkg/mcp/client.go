@@ -9,17 +9,10 @@ import (
 	"sync"
 	"time"
 
+	"app/pkg/tool"
+
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
-
-// Tool represents a tool available from the MCP server
-type Tool struct {
-	Name         string          `json:"name"`         // Unique name (mcpKey:originalName)
-	OriginalName string          `json:"originalName"` // Original tool name from MCP
-	MCPKey       string          `json:"mcpKey"`       // MCP client key
-	Description  string          `json:"description"`
-	InputSchema  json.RawMessage `json:"inputSchema"`
-}
 
 // Client wraps the MCP SDK client for MCP functionality
 type Client struct {
@@ -30,7 +23,6 @@ type Client struct {
 
 	mu      sync.Mutex
 	session *mcp.ClientSession
-	tools   []Tool
 }
 
 // NewClient creates a new MCP client
@@ -104,7 +96,7 @@ func (c *Client) ensureSession(ctx context.Context) (*mcp.ClientSession, error) 
 }
 
 // ListTools returns the list of available tools from the MCP server
-func (c *Client) ListTools(ctx context.Context) ([]Tool, error) {
+func (c *Client) ListTools(ctx context.Context) ([]tool.Tool, error) {
 	session, err := c.ensureSession(ctx)
 	if err != nil {
 		return nil, err
@@ -115,19 +107,23 @@ func (c *Client) ListTools(ctx context.Context) ([]Tool, error) {
 		return nil, fmt.Errorf("failed to list tools from %s: %w", c.name, err)
 	}
 
-	tools := make([]Tool, 0, len(result.Tools))
+	var tools []tool.Tool
 	for _, t := range result.Tools {
 		schemaBytes, _ := json.Marshal(t.InputSchema)
-		tools = append(tools, Tool{
-			Name:        t.Name,
-			Description: t.Description,
-			InputSchema: schemaBytes,
+		
+		originalName := t.Name
+		handler := tool.HandleFunc(func(ctx context.Context, arguments string) (string, error) {
+			var args map[string]any
+			if arguments != "" {
+				if err := json.Unmarshal([]byte(arguments), &args); err != nil {
+					return "", fmt.Errorf("invalid arguments json: %w", err)
+				}
+			}
+			return c.CallTool(ctx, originalName, args)
 		})
+		
+		tools = append(tools, tool.NewTool(t.Name, t.Description, schemaBytes, handler))
 	}
-
-	c.mu.Lock()
-	c.tools = tools
-	c.mu.Unlock()
 
 	return tools, nil
 }
@@ -201,11 +197,11 @@ func (m *Manager) AddClient(key, displayName, url, token string) {
 }
 
 // ListAllTools returns all tools from all MCP clients
-func (m *Manager) ListAllTools(ctx context.Context) ([]Tool, error) {
+func (m *Manager) ListAllTools(ctx context.Context) ([]tool.Tool, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	var allTools []Tool
+	var allTools []tool.Tool
 	m.toolToMCP = make(map[string]string) // reset mapping
 
 	for mcpKey, client := range m.clients {
@@ -214,21 +210,31 @@ func (m *Manager) ListAllTools(ctx context.Context) ([]Tool, error) {
 			// Log error but continue with other clients
 			continue
 		}
-		for _, tool := range tools {
+		for _, t := range tools {
 			// Create unique tool name: mcpKey:originalName
-			uniqueName := mcpKey + ":" + tool.Name
+			uniqueName := mcpKey + ":" + t.Name()
 			m.toolToMCP[uniqueName] = mcpKey
-			allTools = append(allTools, Tool{
-				Name:         uniqueName,
-				OriginalName: tool.Name,
-				MCPKey:       mcpKey,
-				Description:  tool.Description,
-				InputSchema:  tool.InputSchema,
-			})
+			
+			// Create a wrapped tool with the unique name
+			wrappedTool := tool.NewTool(
+				uniqueName,
+				t.Description(),
+				t.InputSchema(),
+				tool.HandleFunc(func(ctx context.Context, arguments string) (string, error) {
+					return t.Handle(ctx, arguments)
+				}),
+			)
+			
+			allTools = append(allTools, wrappedTool)
 		}
 	}
 
 	return allTools, nil
+}
+
+// Resolve implements tool.Resolver
+func (m *Manager) Resolve(ctx context.Context) ([]tool.Tool, error) {
+	return m.ListAllTools(ctx)
 }
 
 // CallTool calls a tool, routing to the correct MCP client

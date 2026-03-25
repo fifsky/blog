@@ -12,6 +12,7 @@ import (
 	"app/config"
 	"app/pkg/aiutil"
 	"app/pkg/mcp"
+	"app/pkg/tool"
 
 	"github.com/google/uuid"
 	lark "github.com/larksuite/oapi-sdk-go/v3"
@@ -40,6 +41,7 @@ type AIChat struct {
 	aiClient     openai.Client
 	mcpManager   *mcp.Manager
 	contextCache sync.Map // map[string]*chatContext, key is senderID
+	resolver     tool.Resolver
 }
 
 // NewAIChat creates a new AIChat instance.
@@ -66,6 +68,7 @@ func NewAIChat(conf *config.Config, larkClient *lark.Client) *AIChat {
 		larkClient: larkClient,
 		aiClient:   aiClient,
 		mcpManager: mcpManager,
+		resolver:   tool.Resolvers{mcpManager},
 	}
 }
 
@@ -317,40 +320,36 @@ func (a *AIChat) getCardID(ctx context.Context, messageID string) (string, error
 	return *resp.Data.CardId, nil
 }
 
-// getMCPTools returns the available tools from all MCP clients as OpenAI tool params
-func (a *AIChat) getMCPTools(ctx context.Context) []openai.ChatCompletionToolUnionParam {
-	if !a.mcpManager.HasClients() {
-		return nil
+// getTools returns the available tools as OpenAI tool params
+func (a *AIChat) getTools(ctx context.Context) ([]tool.Tool, []openai.ChatCompletionToolUnionParam) {
+	allTools, err := a.resolver.Resolve(ctx)
+	if err != nil || len(allTools) == 0 {
+		return nil, nil
 	}
 
-	mcpTools, err := a.mcpManager.ListAllTools(ctx)
-	if err != nil {
-		return nil
-	}
-
-	tools := make([]openai.ChatCompletionToolUnionParam, 0, len(mcpTools))
-	for _, t := range mcpTools {
-		// Convert MCP tool InputSchema to OpenAI FunctionParameters
-		var params openai.FunctionParameters
-		if len(t.InputSchema) > 0 {
-			_ = json.Unmarshal(t.InputSchema, &params)
-		}
-		if params == nil {
-			params = openai.FunctionParameters{"type": "object"}
+	params := make([]openai.ChatCompletionToolUnionParam, 0, len(allTools))
+	for _, t := range allTools {
+		var p openai.FunctionParameters
+		if schema := t.InputSchema(); len(schema) > 0 {
+			_ = json.Unmarshal(schema, &p)
 		}
 
-		tools = append(tools, openai.ChatCompletionToolUnionParam{
+		if p == nil {
+			p = openai.FunctionParameters{"type": "object"}
+		}
+
+		params = append(params, openai.ChatCompletionToolUnionParam{
 			OfFunction: &openai.ChatCompletionFunctionToolParam{
 				Function: openai.FunctionDefinitionParam{
-					Name:        t.Name,
-					Description: openai.String(t.Description),
-					Parameters:  params,
+					Name:        t.Name(),
+					Description: openai.String(t.Description()),
+					Parameters:  p,
 				},
 			},
 		})
 	}
 
-	return tools
+	return allTools, params
 }
 
 // executeTool executes a tool call via MCP manager and returns the result
@@ -423,12 +422,14 @@ Please answer the user's questions in a concise and friendly manner.`, time.Now(
 	}
 
 	// Get tools from all MCP clients
-	tools := a.getMCPTools(ctx)
+	toolsList, toolsParams := a.getTools(ctx)
 
 	aiReq := openai.ChatCompletionNewParams{
 		Model:    a.conf.Common.AIModel,
 		Messages: messages,
-		Tools:    tools,
+	}
+	if len(toolsParams) > 0 {
+		aiReq.Tools = toolsParams
 	}
 
 	aiutil.ConfigureModelParams(&aiReq, a.conf.Common.AIModel)
@@ -491,7 +492,23 @@ Please answer the user's questions in a concise and friendly manner.`, time.Now(
 				fmt.Printf("[Feishu Bot] Calling tool: %s (%s)\n", toolCall.Function.Name, mcpName)
 
 				// Execute tool
-				toolResult := a.executeTool(ctx, toolCall.Function.Name, toolCall.Function.Arguments)
+				var toolResult string
+				var found bool
+				for _, t := range toolsList {
+					if t.Name() == toolCall.Function.Name {
+						res, err := t.Handle(ctx, toolCall.Function.Arguments)
+						if err != nil {
+							toolResult = fmt.Sprintf("Tool execution failed: %v", err)
+						} else {
+							toolResult = res
+						}
+						found = true
+						break
+					}
+				}
+				if !found {
+					toolResult = fmt.Sprintf("Tool execution failed: tool %s not found", toolCall.Function.Name)
+				}
 
 				// Restore tip to default
 				if err := updater.UpdateTip(ctx, "努力回答中…"); err != nil {

@@ -14,6 +14,7 @@ import (
 	"app/pkg/errors"
 	"app/pkg/mcp"
 	"app/pkg/skill"
+	"app/pkg/tool"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
 	"app/server/response"
@@ -32,6 +33,7 @@ type AI struct {
 	client       openai.Client
 	mcpManager   *mcp.Manager
 	skillManager *skill.Manager
+	resolver     tool.Resolver
 	store        *store.Store
 }
 
@@ -61,6 +63,7 @@ func NewAI(conf *config.Config, s *store.Store) *AI {
 		client:       client,
 		mcpManager:   mcpManager,
 		skillManager: skillManager,
+		resolver:     tool.Resolvers{skillManager, mcpManager},
 		store:        s,
 	}
 }
@@ -151,20 +154,16 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Get tools from all MCP clients and skills
-	tools := a.getMCPTools(ctx)
-	if tools == nil {
-		tools = make([]openai.ChatCompletionToolUnionParam, 0)
-	}
-	tools = append(tools, a.getSkillTools()...)
+	// Get tools from resolver
+	toolsList, toolsParams := a.getTools(ctx)
 
 	// Create streaming chat completion using OpenAI SDK v3
 	var aiReq openai.ChatCompletionNewParams
-	if len(tools) > 0 {
+	if len(toolsParams) > 0 {
 		aiReq = openai.ChatCompletionNewParams{
 			Model:    a.conf.Common.AIModel,
 			Messages: openAIMessages,
-			Tools:    tools,
+			Tools:    toolsParams,
 		}
 	} else {
 		aiReq = openai.ChatCompletionNewParams{
@@ -219,52 +218,39 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 
 			// Execute all tool calls and add results
 			for _, toolCall := range acc.Choices[0].Message.ToolCalls {
+				mcpName := a.mcpManager.GetMCPDisplayName(toolCall.Function.Name)
+				if mcpName == toolCall.Function.Name && (toolCall.Function.Name == "Skill" || toolCall.Function.Name == "run_skill_script") {
+					mcpName = "Skill"
+				}
+
 				// Send tool start event to frontend
 				toolStartEvent := ToolStartEvent{
 					ID:        toolCall.ID,
 					Name:      toolCall.Function.Name,
-					MCPName:   a.mcpManager.GetMCPDisplayName(toolCall.Function.Name),
+					MCPName:   mcpName,
 					Arguments: toolCall.Function.Arguments,
-				}
-				if toolCall.Function.Name == "Skill" || toolCall.Function.Name == "run_skill_script" {
-					toolStartEvent.MCPName = "Skill"
 				}
 				toolStartJSON, _ := json.Marshal(toolStartEvent)
 				fmt.Fprintf(w, "data: [TOOL_START] %s\n\n", toolStartJSON)
 				flusher.Flush()
 
-				// Execute tool
+				// Execute tool using toolsList
 				var toolResult string
-				if toolCall.Function.Name == "Skill" {
-					var args map[string]any
-					if err := json.Unmarshal([]byte(toolCall.Function.Arguments), &args); err == nil {
-						if name, ok := args["name"].(string); ok {
-							if s, ok := a.skillManager.GetSkill(name); ok {
-								toolResult = s.Content
-							} else {
-								toolResult = fmt.Sprintf("Skill %s not found", name)
-							}
+				var found bool
+				for _, t := range toolsList {
+					if t.Name() == toolCall.Function.Name {
+						res, err := t.Handle(ctx, toolCall.Function.Arguments)
+						if err != nil {
+							toolResult = fmt.Sprintf("Tool execution failed: %v", err)
 						} else {
-							toolResult = "Invalid arguments: name is required"
+							toolResult = res
 						}
-					} else {
-						toolResult = fmt.Sprintf("Invalid arguments: %v", err)
+						found = true
+						break
 					}
-				} else if toolCall.Function.Name == "run_skill_script" {
-					var args struct {
-						SkillName      string            `json:"skill_name"`
-						ScriptPath     string            `json:"script_path"`
-						Args           []string          `json:"args"`
-						Env            map[string]string `json:"env"`
-						TimeoutSeconds int               `json:"timeout_seconds"`
-					}
-					if err := json.Unmarshal([]byte(toolCall.Function.Arguments), &args); err == nil {
-						toolResult = a.skillManager.ExecuteScript(ctx, args.SkillName, args.ScriptPath, args.Args, args.Env, args.TimeoutSeconds)
-					} else {
-						toolResult = fmt.Sprintf("Invalid arguments: %v", err)
-					}
-				} else {
-					toolResult = a.executeTool(ctx, toolCall.Function.Name, toolCall.Function.Arguments)
+				}
+				if !found {
+					toolResult = fmt.Sprintf("Tool execution failed: tool %s not found", toolCall.Function.Name)
 				}
 
 				// Send tool end event to frontend
@@ -308,40 +294,35 @@ You should use the available tools to find accurate and up-to-date information.`
 	return basePrompt
 }
 
-// getMCPTools returns the available tools from all MCP clients as OpenAI tool params
-func (a *AI) getMCPTools(ctx context.Context) []openai.ChatCompletionToolUnionParam {
-	if !a.mcpManager.HasClients() {
-		return nil
+// getTools returns the available tools as OpenAI tool params
+func (a *AI) getTools(ctx context.Context) ([]tool.Tool, []openai.ChatCompletionToolUnionParam) {
+	allTools, err := a.resolver.Resolve(ctx)
+	if err != nil || len(allTools) == 0 {
+		return nil, nil
 	}
 
-	mcpTools, err := a.mcpManager.ListAllTools(ctx)
-	if err != nil {
-		return nil
-	}
-
-	tools := make([]openai.ChatCompletionToolUnionParam, 0, len(mcpTools))
-	for _, t := range mcpTools {
-		// Convert MCP tool InputSchema to OpenAI FunctionParameters
-		var params openai.FunctionParameters
-		if len(t.InputSchema) > 0 {
-			_ = json.Unmarshal(t.InputSchema, &params)
+	params := make([]openai.ChatCompletionToolUnionParam, 0, len(allTools))
+	for _, t := range allTools {
+		var p openai.FunctionParameters
+		if schema := t.InputSchema(); len(schema) > 0 {
+			_ = json.Unmarshal(schema, &p)
 		}
-		if params == nil {
-			params = openai.FunctionParameters{"type": "object"}
+		if p == nil {
+			p = openai.FunctionParameters{"type": "object"}
 		}
 
-		tools = append(tools, openai.ChatCompletionToolUnionParam{
+		params = append(params, openai.ChatCompletionToolUnionParam{
 			OfFunction: &openai.ChatCompletionFunctionToolParam{
 				Function: openai.FunctionDefinitionParam{
-					Name:        t.Name,
-					Description: openai.String(t.Description),
-					Parameters:  params,
+					Name:        t.Name(),
+					Description: openai.String(t.Description()),
+					Parameters:  p,
 				},
 			},
 		})
 	}
 
-	return tools
+	return allTools, params
 }
 
 // getSkillTools returns the available skill tools as OpenAI tool params
