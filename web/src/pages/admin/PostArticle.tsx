@@ -311,8 +311,6 @@ export default function PostArticle() {
                   </Field>
                 )}
               />
-
-
             </div>
 
             <FormField

@@ -43,7 +43,7 @@ export default function Login() {
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [aiLoading, setAILoading] = useState(false);
   const [session, setSession] = useState<{ sessionId: string; welcomeMessage: string } | null>(
-    null
+    null,
   );
   const [error, setError] = useState("");
   const [settings, setSettings] = useState<any>();
@@ -130,12 +130,7 @@ export default function Login() {
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor={field.name}>用户名</FieldLabel>
-                        <Input
-                          {...field}
-                          id={field.name}
-                          type="text"
-                          autoComplete="username"
-                        />
+                        <Input {...field} id={field.name} type="text" autoComplete="username" />
                         {fieldState.invalid && (
                           <div className="text-red-500 text-sm">{fieldState.error?.message}</div>
                         )}
@@ -186,7 +181,9 @@ export default function Login() {
                               placeholder="请输入用户名"
                             />
                             {fieldState.invalid && (
-                              <div className="text-red-500 text-sm">{fieldState.error?.message}</div>
+                              <div className="text-red-500 text-sm">
+                                {fieldState.error?.message}
+                              </div>
                             )}
                           </Field>
                         )}

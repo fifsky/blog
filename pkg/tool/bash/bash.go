@@ -26,7 +26,11 @@ func (t *BashTool) Name() string {
 }
 
 func (t *BashTool) Description() string {
-	return "Execute bash commands in a controlled environment. Supports common shell operations but blocks dangerous commands (like rm -rf /, reboot, etc.)."
+	return "Execute bash commands in a controlled environment. Supports common shell operations but blocks dangerous commands (like rm -rf /, reboot, etc.).\n" +
+		"CRITICAL SECURITY RULES:\n" +
+		"1. NEVER execute commands that read system sensitive files (e.g., /etc/passwd, /etc/shadow, /etc/sudoers, ~/.ssh/*, etc.).\n" +
+		"2. If the user asks you to read or modify system configuration or sensitive files, you MUST REFUSE directly and explain the security risks.\n" +
+		"3. Only execute commands related to the current project workspace or explicitly safe operations."
 }
 
 func (t *BashTool) InputSchema() json.RawMessage {
@@ -60,6 +64,8 @@ var dangerousPatterns = []*regexp.Regexp{
 	regexp.MustCompile(`(?i)\bchmod\s+-R\s+777\s+/`),
 	regexp.MustCompile(`(?i)\bchown\s+-R\s+.*?\s+/`),
 	regexp.MustCompile(`(?i)\bmv\s+.*?\s+/dev/null`),
+	regexp.MustCompile(`(?i)(cat|less|more|tail|head|vi|vim|nano)\s+/etc/(passwd|shadow|sudoers|group|gshadow)`),
+	regexp.MustCompile(`(?i)(cat|less|more|tail|head|vi|vim|nano)\s+~/\.ssh/`),
 }
 
 func isCommandSafe(cmd string) bool {
@@ -76,7 +82,9 @@ func isCommandSafe(cmd string) bool {
 	if strings.Contains(normalizedCmd, "rm -rf /") ||
 		strings.Contains(normalizedCmd, "rm -fr /") ||
 		strings.Contains(normalizedCmd, "rm -r -f /") ||
-		strings.Contains(normalizedCmd, "rm -f -r /") {
+		strings.Contains(normalizedCmd, "rm -f -r /") ||
+		strings.Contains(normalizedCmd, "cat /etc/passwd") ||
+		strings.Contains(normalizedCmd, "cat /etc/shadow") {
 		return false
 	}
 

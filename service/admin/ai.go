@@ -104,7 +104,7 @@ type ThinkingEvent struct {
 }
 
 func (a *AI) sendEvent(w http.ResponseWriter, format string, args ...any) {
-	fmt.Fprintf(w, format+"\n\n", args...)
+	fmt.Fprintf(w, "data: "+format+"\n\n", args...)
 	w.(http.Flusher).Flush()
 }
 
@@ -167,7 +167,7 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			// Send error as SSE event
-			a.sendEvent(w, "data: [ERROR] %s", err.Error())
+			a.sendEvent(w, "[ERROR] %s", err.Error())
 			return
 		}
 
@@ -182,7 +182,7 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send done event
-	a.sendEvent(w, "data: [DONE]")
+	a.sendEvent(w, "[DONE]")
 }
 
 func (a *AI) buildMessages(reqMessages []ChatMessage) []openai.ChatCompletionMessageParamUnion {
@@ -244,7 +244,7 @@ func (a *AI) processStream(
 			if chunk.Choices[0].Delta.Content != "" {
 				content := chunk.Choices[0].Delta.Content
 				escapedContent := strings.ReplaceAll(content, "\n", "\\n")
-				a.sendEvent(w, "data: %s", escapedContent)
+				a.sendEvent(w, "%s", escapedContent)
 			}
 		}
 	}
@@ -280,7 +280,7 @@ func (a *AI) processChunkThinking(
 			Thinking: true,
 		}
 		evJSON, _ := json.Marshal(thinkEv)
-		a.sendEvent(w, "data: [THINKING] %s", evJSON)
+		a.sendEvent(w, "[THINKING] %s", evJSON)
 	} else if *isThinking {
 		*isThinking = false
 		thinkEv := ThinkingEvent{
@@ -288,7 +288,7 @@ func (a *AI) processChunkThinking(
 			Duration: fmt.Sprintf("%.1f", time.Since(*thinkStartTime).Seconds()),
 		}
 		evJSON, _ := json.Marshal(thinkEv)
-		a.sendEvent(w, "data: [THINKING] %s", evJSON)
+		a.sendEvent(w, "[THINKING] %s", evJSON)
 	}
 }
 
@@ -313,7 +313,7 @@ func (a *AI) handleToolCalls(
 			Arguments: toolCall.Function.Arguments,
 		}
 		toolStartJSON, _ := json.Marshal(toolStartEvent)
-		a.sendEvent(w, "data: [TOOL_START] %s", toolStartJSON)
+		a.sendEvent(w, "[TOOL_START] %s", toolStartJSON)
 
 		// Execute tool using toolsList
 		var toolResult string
@@ -340,7 +340,7 @@ func (a *AI) handleToolCalls(
 			Result: toolResult,
 		}
 		toolEndJSON, _ := json.Marshal(toolEndEvent)
-		a.sendEvent(w, "data: [TOOL_END] %s", toolEndJSON)
+		a.sendEvent(w, "[TOOL_END] %s", toolEndJSON)
 
 		aiReq.Messages = append(aiReq.Messages, openai.ToolMessage(toolResult, toolCall.ID))
 	}

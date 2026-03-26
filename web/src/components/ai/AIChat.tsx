@@ -87,16 +87,25 @@ export function AIChat() {
     setInput(val);
 
     // Check for skill trigger '/' at the end of the input or after a space
-    if (val.endsWith("/")) {
+    if (val === "/" || val.endsWith(" /")) {
       setShowSkillPopover(true);
       setSkillSearchQuery("");
     } else if (showSkillPopover) {
       const lastSlashIndex = val.lastIndexOf("/");
       if (lastSlashIndex !== -1) {
-        setSkillSearchQuery(val.slice(lastSlashIndex + 1));
+        // Only keep popover open if the slash was intended as a command
+        // (i.e. it's the first char or preceded by a space)
+        if (lastSlashIndex === 0 || val[lastSlashIndex - 1] === " ") {
+          setSkillSearchQuery(val.slice(lastSlashIndex + 1));
+        } else {
+          setShowSkillPopover(false);
+        }
       } else {
         setShowSkillPopover(false);
       }
+    } else {
+      // Not showing popover and no active trigger
+      setShowSkillPopover(false);
     }
   };
 
@@ -122,13 +131,34 @@ export function AIChat() {
         e.preventDefault();
         return;
       }
+
+      // Let the Command component handle up/down navigation
+      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        return;
+      }
     }
 
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      if (!showSkillPopover) {
-        sendMessage();
+      // If popover is open, we need to decide whether to submit the form or let Command handle selection
+      if (showSkillPopover) {
+        // Find if there are matching skills
+        const matchingSkills = skills.filter((s) =>
+          s.name.toLowerCase().includes(skillSearchQuery.toLowerCase()),
+        );
+
+        // If there are no matching skills, we assume the user is just typing a path and wants to submit
+        if (matchingSkills.length === 0) {
+          e.preventDefault();
+          setShowSkillPopover(false);
+          sendMessage();
+        }
+        // Otherwise, we let the event bubble down so Command can handle the Enter key for selection
+        return;
       }
+
+      // Normal submission when popover is closed
+      e.preventDefault();
+      sendMessage();
     }
   };
 
@@ -792,7 +822,13 @@ export function AIChat() {
             {/* Input Area */}
             <div className="px-4 py-3 bg-white border-t border-gray-200">
               <div className="flex items-center gap-2">
-                <Popover open={showSkillPopover} onOpenChange={setShowSkillPopover}>
+                <Popover
+                  open={showSkillPopover}
+                  onOpenChange={(open) => {
+                    // Only allow programmatic closing, prevent auto-opening on click
+                    if (!open) setShowSkillPopover(false);
+                  }}
+                >
                   <PopoverTrigger asChild>
                     <div className="flex-1 relative">
                       <input
@@ -801,6 +837,12 @@ export function AIChat() {
                         value={input}
                         onChange={handleInputChange}
                         onKeyDown={handleInputKeyDown}
+                        onClick={(e) => {
+                          // Prevent popover from opening just by clicking the input
+                          if (!input.endsWith("/") && !input.endsWith(" /") && input !== "/") {
+                            e.stopPropagation();
+                          }
+                        }}
                         placeholder="输入您的问题..."
                         disabled={isLoading}
                         className="w-full px-4 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all disabled:opacity-50"
@@ -812,7 +854,7 @@ export function AIChat() {
                     align="start"
                     onOpenAutoFocus={(e) => e.preventDefault()}
                   >
-                    <Command>
+                    <Command shouldFilter={false}>
                       <CommandList>
                         <CommandEmpty>No skill found.</CommandEmpty>
                         <CommandGroup heading="Skills">
@@ -824,7 +866,7 @@ export function AIChat() {
                               <CommandItem
                                 key={skill.name}
                                 onSelect={() => handleSkillSelect(skill.name)}
-                                className="flex flex-col items-start px-2 py-1 cursor-pointer"
+                                className="flex flex-col items-start px-2 py-1 cursor-pointer aria-selected:bg-accent aria-selected:text-accent-foreground data-[selected=true]:bg-accent"
                               >
                                 <div className="font-medium text-sm">{skill.name}</div>
                                 <div className="text-xs text-gray-500 line-clamp-1">

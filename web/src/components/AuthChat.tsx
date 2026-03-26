@@ -66,7 +66,9 @@ export function AuthChat({ sessionId, welcomeMessage, onSuccess, onFailed }: Aut
   return (
     <div className="flex flex-col h-[400px]">
       <div className="mb-2">
-        <div className="text-sm text-gray-500 mb-1">验证进度：已答对 {Math.round(score * 3)} / 3 条</div>
+        <div className="text-sm text-gray-500 mb-1">
+          验证进度：已答对 {Math.round(score * 3)} / 3 条
+        </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
             className="bg-blue-500 h-2 rounded-full transition-all duration-300"

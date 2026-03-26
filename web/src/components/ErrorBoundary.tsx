@@ -46,13 +46,16 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
 
             <p className="text-foreground/70">
-              An unexpected error occurred. This could be due to a network issue or a problem with the application.
+              An unexpected error occurred. This could be due to a network issue or a problem with
+              the application.
             </p>
 
             {this.state.error && (
               <details className="bg-muted p-3 rounded-md text-sm">
                 <summary className="cursor-pointer font-medium mb-2">Error details</summary>
-                <pre className="whitespace-pre-wrap break-words text-xs text-foreground/60">{this.state.error.message}</pre>
+                <pre className="whitespace-pre-wrap break-words text-xs text-foreground/60">
+                  {this.state.error.message}
+                </pre>
               </details>
             )}
 

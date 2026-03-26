@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { articleDeleteApi, articleDestroyApi, articleListAdminApi, articleRestoreApi } from "@/service";
+import {
+  articleDeleteApi,
+  articleDestroyApi,
+  articleListAdminApi,
+  articleRestoreApi,
+} from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Pagination } from "@/components/Pagination";
 import { CTable, Column } from "@/components/CTable";
@@ -163,9 +168,8 @@ export default function AdminArticle() {
     setSelectedIds(new Set());
   }, [page]);
 
-  const batchOptions = statusFilter === 2
-    ? [{ value: "3", label: "永久删除" }]
-    : [{ value: "2", label: "删除" }];
+  const batchOptions =
+    statusFilter === 2 ? [{ value: "3", label: "永久删除" }] : [{ value: "2", label: "删除" }];
 
   // 定义表格列配置
   const columns: Column<ArticleItem>[] = [
