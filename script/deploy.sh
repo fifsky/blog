@@ -44,11 +44,7 @@ _rundeploy() {
 
   log::info "$(date "+%Y-%m-%d %H:%M:%S") 开始部署: $1"
   uname=$(uname -m)
-  if [ "$uname" == "arm64" ]; then
-    skaffold run -f "$1/skaffold.yaml" $2 --platform=linux/arm64
-  else
-    skaffold run -f "$1/skaffold.yaml" $2 --platform=linux/amd64
-  fi
+  skaffold run -f "$1/skaffold.yaml" $2 --platform=linux/amd64
 }
 
 main() {

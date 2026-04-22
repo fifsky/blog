@@ -62,4 +62,4 @@ lint:
 
 .PHONY: buildui
 buildui:
-	cd web && pnpm run build && ossutil --recursive  cp ./dist/assets oss://fifsky/assets -f -e oss-cn-shanghai.aliyuncs.com -i ${FIFSKY_ALIYUN_KEY} -k ${FIFSKY_ALIYUN_SECRET}
+	cd web && pnpm run build && ossutil cp ./dist/assets oss://fifsky/assets -r -f
