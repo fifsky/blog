@@ -23,11 +23,6 @@ export function AuthChat({ sessionId, welcomeMessage, onSuccess, onFailed }: Aut
   const [loading, setLoading] = useState(false);
   const [score, setScore] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -59,20 +54,20 @@ export function AuthChat({ sessionId, welcomeMessage, onSuccess, onFailed }: Aut
       setMessages((prev) => [...prev, { role: "assistant", content: "发生错误，请重试。" }]);
     } finally {
       setLoading(false);
-      setTimeout(() => inputRef.current?.focus(), 100);
     }
   };
 
   return (
     <div className="flex flex-col h-[400px]">
       <div className="mb-2">
-        <div className="text-sm text-gray-500 mb-1">验证进度：已答对 {Math.round(score * 3)} / 3 条</div>
+        <div className="text-sm text-gray-500 mb-1">验证进度</div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
             className="bg-blue-500 h-2 rounded-full transition-all duration-300"
             style={{ width: `${score * 100}%` }}
           />
         </div>
+        <div className="text-right text-sm text-gray-500">{Math.round(score * 100)}%</div>
       </div>
 
       <div className="flex-1 overflow-y-auto border rounded p-4 mb-4 space-y-3">
@@ -92,7 +87,6 @@ export function AuthChat({ sessionId, welcomeMessage, onSuccess, onFailed }: Aut
 
       <div className="flex gap-2">
         <Input
-          ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
