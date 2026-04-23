@@ -1,7 +1,7 @@
 GO ?= go
 GOFMT ?= gofmt "-s"
-GOFILES := $(shell find . -name "*.go" -type f -not -path "./vendor/*")
-VETPACKAGES ?= $(shell $(GO) list ./... | grep -v /vendor/ | grep -v /examples/)
+GOFILES = $(shell find . -name "*.go" -type f -not -path "./vendor/*")
+VETPACKAGES = $(shell $(GO) list ./... | grep -v /vendor/ | grep -v /examples/)
 
 .PHONY: build
 build: fmt-check
@@ -52,7 +52,6 @@ proto:
 
 .PHONY: docker
 docker:
-	docker login --username=${ALIYUN_DOCKER_USERNAME} --password=${ALIYUN_DOCKER_PASSWORD} registry.cn-shanghai.aliyuncs.com
 	docker build . --file Dockerfile --tag registry.cn-shanghai.aliyuncs.com/fifsky/blog
 	docker push registry.cn-shanghai.aliyuncs.com/fifsky/blog
 
