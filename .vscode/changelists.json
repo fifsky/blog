@@ -1,0 +1,13 @@
+{
+  "changelists": [
+    {
+      "name": "Default",
+      "files": [
+        "go.mod",
+        "go.sum",
+        ".vscode/changelists.json"
+      ]
+    }
+  ],
+  "active": "Default"
+}
