@@ -6,7 +6,6 @@ package apiv1
 
 import (
 	context "context"
-	contract "github.com/goapt/grpc-http/contract"
 	httpbody "google.golang.org/genproto/googleapis/api/httpbody"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	http "net/http"
@@ -14,7 +13,7 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the kratos package it is being compiled against.
-// context.contract.http.
+// context.http.
 
 // ArticleService 提供文章相关的接口
 type ArticleServiceHTTPServer interface {
@@ -34,8 +33,8 @@ type ArticleServiceHTTPServer interface {
 
 type ArticleService struct {
 	server ArticleServiceHTTPServer
-	mux    contract.ServeMux
-	codec  contract.Codec
+	mux    ServeMux
+	codec  Codec
 }
 
 func (s *ArticleService) RegisterService() {
@@ -47,7 +46,7 @@ func (s *ArticleService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/article/calendar", s.Calendar)
 }
 
-func RegisterArticleServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv ArticleServiceHTTPServer) {
+func RegisterArticleServiceHTTPServer(mux ServeMux, codec Codec, srv ArticleServiceHTTPServer) {
 	s := &ArticleService{
 		server: srv,
 		mux:    mux,

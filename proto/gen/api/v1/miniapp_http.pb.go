@@ -6,13 +6,12 @@ package apiv1
 
 import (
 	context "context"
-	contract "github.com/goapt/grpc-http/contract"
 	http "net/http"
 )
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the kratos package it is being compiled against.
-// context.contract.http.
+// context.http.
 
 // MiniAppService 提供微信小程序相关接口
 type MiniAppServiceHTTPServer interface {
@@ -22,15 +21,15 @@ type MiniAppServiceHTTPServer interface {
 
 type MiniAppService struct {
 	server MiniAppServiceHTTPServer
-	mux    contract.ServeMux
-	codec  contract.Codec
+	mux    ServeMux
+	codec  Codec
 }
 
 func (s *MiniAppService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/miniapp/login", s.LoginCode)
 }
 
-func RegisterMiniAppServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv MiniAppServiceHTTPServer) {
+func RegisterMiniAppServiceHTTPServer(mux ServeMux, codec Codec, srv MiniAppServiceHTTPServer) {
 	s := &MiniAppService{
 		server: srv,
 		mux:    mux,

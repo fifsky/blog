@@ -6,13 +6,12 @@ package apiv1
 
 import (
 	context "context"
-	contract "github.com/goapt/grpc-http/contract"
 	http "net/http"
 )
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the kratos package it is being compiled against.
-// context.contract.http.
+// context.http.
 
 // UserService 提供用户相关的接口
 type UserServiceHTTPServer interface {
@@ -22,15 +21,15 @@ type UserServiceHTTPServer interface {
 
 type UserService struct {
 	server UserServiceHTTPServer
-	mux    contract.ServeMux
-	codec  contract.Codec
+	mux    ServeMux
+	codec  Codec
 }
 
 func (s *UserService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/login", s.Login)
 }
 
-func RegisterUserServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv UserServiceHTTPServer) {
+func RegisterUserServiceHTTPServer(mux ServeMux, codec Codec, srv UserServiceHTTPServer) {
 	s := &UserService{
 		server: srv,
 		mux:    mux,

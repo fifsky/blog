@@ -17,11 +17,8 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 
 	"buf.build/go/protovalidate"
-	"github.com/goapt/grpc-http/contract"
 	"google.golang.org/protobuf/proto"
 )
-
-var _ contract.Codec = (*Codec)(nil)
 
 type Codec struct {
 	formDecoder *schema.Decoder
@@ -135,18 +132,5 @@ func (c *Codec) Validate(v any) error {
 			return err
 		}
 	}
-	// else {
-	// 兼容指针与非指针结构体
-	// t := reflect.TypeOf(v)
-	// if t.Kind() == reflect.Pointer {
-	// 	t = t.Elem()
-	// }
-	// if t.Kind() == reflect.Struct {
-	// 	// 传入实际对象（指针或结构体均可），内部 validator 能正确处理
-	// 	if err := validate.Validate(v); err != nil {
-	// 		return err
-	// 	}
-	// }
-	// }
 	return nil
 }

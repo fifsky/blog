@@ -6,13 +6,12 @@ package adminv1
 
 import (
 	context "context"
-	contract "github.com/goapt/grpc-http/contract"
 	http "net/http"
 )
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the kratos package it is being compiled against.
-// context.contract.http.
+// context.http.
 
 // RegionService 提供区域查询相关的接口
 type RegionServiceHTTPServer interface {
@@ -22,15 +21,15 @@ type RegionServiceHTTPServer interface {
 
 type RegionService struct {
 	server RegionServiceHTTPServer
-	mux    contract.ServeMux
-	codec  contract.Codec
+	mux    ServeMux
+	codec  Codec
 }
 
 func (s *RegionService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/admin/region/list", s.ListByParent)
 }
 
-func RegisterRegionServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv RegionServiceHTTPServer) {
+func RegisterRegionServiceHTTPServer(mux ServeMux, codec Codec, srv RegionServiceHTTPServer) {
 	s := &RegionService{
 		server: srv,
 		mux:    mux,

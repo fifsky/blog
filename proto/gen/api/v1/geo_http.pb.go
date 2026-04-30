@@ -6,13 +6,12 @@ package apiv1
 
 import (
 	context "context"
-	contract "github.com/goapt/grpc-http/contract"
 	http "net/http"
 )
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the kratos package it is being compiled against.
-// context.contract.http.
+// context.http.
 
 // GeoService 提供地理位置相关的接口
 type GeoServiceHTTPServer interface {
@@ -22,15 +21,15 @@ type GeoServiceHTTPServer interface {
 
 type GeoService struct {
 	server GeoServiceHTTPServer
-	mux    contract.ServeMux
-	codec  contract.Codec
+	mux    ServeMux
+	codec  Codec
 }
 
 func (s *GeoService) RegisterService() {
 	s.mux.HandleFunc("GET /blog/region/nearest", s.GetNearestRegion)
 }
 
-func RegisterGeoServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv GeoServiceHTTPServer) {
+func RegisterGeoServiceHTTPServer(mux ServeMux, codec Codec, srv GeoServiceHTTPServer) {
 	s := &GeoService{
 		server: srv,
 		mux:    mux,

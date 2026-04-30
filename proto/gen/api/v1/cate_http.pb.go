@@ -6,14 +6,13 @@ package apiv1
 
 import (
 	context "context"
-	contract "github.com/goapt/grpc-http/contract"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	http "net/http"
 )
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the kratos package it is being compiled against.
-// context.contract.http.
+// context.http.
 
 // CateService 提供分类相关的接口
 type CateServiceHTTPServer interface {
@@ -23,15 +22,15 @@ type CateServiceHTTPServer interface {
 
 type CateService struct {
 	server CateServiceHTTPServer
-	mux    contract.ServeMux
-	codec  contract.Codec
+	mux    ServeMux
+	codec  Codec
 }
 
 func (s *CateService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/cate/all", s.All)
 }
 
-func RegisterCateServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv CateServiceHTTPServer) {
+func RegisterCateServiceHTTPServer(mux ServeMux, codec Codec, srv CateServiceHTTPServer) {
 	s := &CateService{
 		server: srv,
 		mux:    mux,

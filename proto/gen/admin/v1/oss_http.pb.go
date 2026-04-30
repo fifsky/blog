@@ -6,13 +6,12 @@ package adminv1
 
 import (
 	context "context"
-	contract "github.com/goapt/grpc-http/contract"
 	http "net/http"
 )
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the kratos package it is being compiled against.
-// context.contract.http.
+// context.http.
 
 // OSSService 提供OSS相关的接口
 type OSSServiceHTTPServer interface {
@@ -22,15 +21,15 @@ type OSSServiceHTTPServer interface {
 
 type OSSService struct {
 	server OSSServiceHTTPServer
-	mux    contract.ServeMux
-	codec  contract.Codec
+	mux    ServeMux
+	codec  Codec
 }
 
 func (s *OSSService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/admin/oss/presign", s.GetPresignURL)
 }
 
-func RegisterOSSServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv OSSServiceHTTPServer) {
+func RegisterOSSServiceHTTPServer(mux ServeMux, codec Codec, srv OSSServiceHTTPServer) {
 	s := &OSSService{
 		server: srv,
 		mux:    mux,

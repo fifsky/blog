@@ -6,13 +6,12 @@ package apiv1
 
 import (
 	context "context"
-	contract "github.com/goapt/grpc-http/contract"
 	http "net/http"
 )
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the kratos package it is being compiled against.
-// context.contract.http.
+// context.http.
 
 // GuestbookService 提供留言本相关的接口
 type GuestbookServiceHTTPServer interface {
@@ -24,8 +23,8 @@ type GuestbookServiceHTTPServer interface {
 
 type GuestbookService struct {
 	server GuestbookServiceHTTPServer
-	mux    contract.ServeMux
-	codec  contract.Codec
+	mux    ServeMux
+	codec  Codec
 }
 
 func (s *GuestbookService) RegisterService() {
@@ -33,7 +32,7 @@ func (s *GuestbookService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/guestbook/create", s.Create)
 }
 
-func RegisterGuestbookServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv GuestbookServiceHTTPServer) {
+func RegisterGuestbookServiceHTTPServer(mux ServeMux, codec Codec, srv GuestbookServiceHTTPServer) {
 	s := &GuestbookService{
 		server: srv,
 		mux:    mux,

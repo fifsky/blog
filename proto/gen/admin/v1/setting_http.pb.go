@@ -7,13 +7,12 @@ package adminv1
 import (
 	types "app/proto/gen/types"
 	context "context"
-	contract "github.com/goapt/grpc-http/contract"
 	http "net/http"
 )
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the kratos package it is being compiled against.
-// context.contract.http.
+// context.http.
 
 // SettingService 提供设置相关的接口
 type SettingServiceHTTPServer interface {
@@ -23,15 +22,15 @@ type SettingServiceHTTPServer interface {
 
 type SettingService struct {
 	server SettingServiceHTTPServer
-	mux    contract.ServeMux
-	codec  contract.Codec
+	mux    ServeMux
+	codec  Codec
 }
 
 func (s *SettingService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/admin/setting/update", s.Update)
 }
 
-func RegisterSettingServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv SettingServiceHTTPServer) {
+func RegisterSettingServiceHTTPServer(mux ServeMux, codec Codec, srv SettingServiceHTTPServer) {
 	s := &SettingService{
 		server: srv,
 		mux:    mux,

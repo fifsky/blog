@@ -7,13 +7,12 @@ package adminv1
 import (
 	types "app/proto/gen/types"
 	context "context"
-	contract "github.com/goapt/grpc-http/contract"
 	http "net/http"
 )
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the kratos package it is being compiled against.
-// context.contract.http.
+// context.http.
 
 // AIService 提供 AI 相关的接口
 type AIServiceHTTPServer interface {
@@ -25,8 +24,8 @@ type AIServiceHTTPServer interface {
 
 type AIService struct {
 	server AIServiceHTTPServer
-	mux    contract.ServeMux
-	codec  contract.Codec
+	mux    ServeMux
+	codec  Codec
 }
 
 func (s *AIService) RegisterService() {
@@ -34,7 +33,7 @@ func (s *AIService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/admin/ai/remind/create", s.RemindSmartCreate)
 }
 
-func RegisterAIServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv AIServiceHTTPServer) {
+func RegisterAIServiceHTTPServer(mux ServeMux, codec Codec, srv AIServiceHTTPServer) {
 	s := &AIService{
 		server: srv,
 		mux:    mux,

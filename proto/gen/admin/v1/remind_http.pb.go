@@ -7,14 +7,13 @@ package adminv1
 import (
 	types "app/proto/gen/types"
 	context "context"
-	contract "github.com/goapt/grpc-http/contract"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	http "net/http"
 )
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the kratos package it is being compiled against.
-// context.contract.http.
+// context.http.
 
 // RemindService 提供提醒相关的接口
 type RemindServiceHTTPServer interface {
@@ -30,8 +29,8 @@ type RemindServiceHTTPServer interface {
 
 type RemindService struct {
 	server RemindServiceHTTPServer
-	mux    contract.ServeMux
-	codec  contract.Codec
+	mux    ServeMux
+	codec  Codec
 }
 
 func (s *RemindService) RegisterService() {
@@ -41,7 +40,7 @@ func (s *RemindService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/admin/remind/delete", s.Delete)
 }
 
-func RegisterRemindServiceHTTPServer(mux contract.ServeMux, codec contract.Codec, srv RemindServiceHTTPServer) {
+func RegisterRemindServiceHTTPServer(mux ServeMux, codec Codec, srv RemindServiceHTTPServer) {
 	s := &RemindService{
 		server: srv,
 		mux:    mux,
