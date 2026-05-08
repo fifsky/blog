@@ -52,10 +52,7 @@ func (n *NotFoundHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (r *Router) Handler() http.Handler {
 	conf := sloghttp.Config{
-		DefaultLevel:       slog.LevelInfo,
-		ClientErrorLevel:   slog.LevelWarn,
-		ServerErrorLevel:   slog.LevelError,
-		WithRequestID:      true,
+		Level:              slog.LevelInfo,
 		WithUserAgent:      true,
 		WithRequestHeader:  true,
 		WithRequestBody:    true,
