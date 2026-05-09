@@ -60,7 +60,6 @@ spec:
   tls:
     - hosts:
         - api.fifsky.com
-      secretName: api-fifsky-com-tls
   rules:
     - host: api.fifsky.com
       http:

@@ -48,7 +48,6 @@ spec:
   tls:
     - hosts:
         - fifsky.com
-      secretName: fifsky-com-tls # 证书会自动存到这个 Secret 里
   rules:
     - host: fifsky.com
       http:
