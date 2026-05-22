@@ -9,7 +9,6 @@ import (
 
 	"app/config"
 	"app/pkg/bark"
-	"app/pkg/doubao"
 	"app/store"
 	"app/store/model"
 
@@ -41,14 +40,18 @@ type OpenAIProvider struct {
 	mu      sync.Mutex
 }
 
-func NewOpenAIProvider(token, endpoint, model string) *OpenAIProvider {
+func NewOpenAIProvider(s *store.Store) *OpenAIProvider {
+	aiConfig := s.GetAIConfig(context.Background())
+	if aiConfig == nil {
+		return nil
+	}
 	client := openai.NewClient(
-		option.WithAPIKey(token),
-		option.WithBaseURL(endpoint),
+		option.WithAPIKey(aiConfig.Token),
+		option.WithBaseURL(aiConfig.Endpoint),
 	)
 	return &OpenAIProvider{
 		client: &client,
-		model:  model,
+		model:  aiConfig.Model,
 	}
 }
 
@@ -56,8 +59,6 @@ func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
-	// 构造消息上下文：系统提示词 + 历史记录 + 当前用户输入
-	// 构造消息上下文：系统提示词 + 历史记录 + 当前用户输入
 	messages := []openai.ChatCompletionMessageParamUnion{
 		openai.SystemMessage(prompt),
 	}
@@ -79,64 +80,6 @@ func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (
 		p.history = append(p.history, openai.UserMessage(content))
 		p.history = append(p.history, openai.AssistantMessage(response))
 		return response, nil
-	}
-	return "", nil
-}
-
-type DoubaoProvider struct {
-	client *doubao.Client
-	model  string
-}
-
-func NewDoubaoProvider(apiKey, model string) *DoubaoProvider {
-	return &DoubaoProvider{
-		client: doubao.NewClient(apiKey),
-		model:  model,
-	}
-}
-
-func (p *DoubaoProvider) Generate(ctx context.Context, prompt, content string) (string, error) {
-	resp, err := p.client.CreateChatCompletion(ctx, &doubao.ChatRequest{
-		Model: p.model,
-		Tools: []doubao.Tool{
-			{
-				Type:       "web_search",
-				MaxKeyword: 2,
-				Limit:      2,
-			},
-		},
-		MaxToolCalls: 1,
-		Thinking: &doubao.Thinking{
-			Type: "disabled",
-		},
-		Input: []doubao.Message{
-			{
-				Role: "system",
-				Content: []doubao.MessageContent{
-					{
-						Type: "input_text",
-						Text: prompt,
-					},
-				},
-			},
-			{
-				Role: "user",
-				Content: []doubao.MessageContent{
-					{
-						Type: "input_text",
-						Text: fmt.Sprintf("城市：%s, 日期：%s", content, time.Now().Format("2006-01-02")),
-					},
-				},
-			},
-		},
-	})
-	if err != nil {
-		return "", err
-	}
-	for _, choice := range resp.Output {
-		if choice.Type == "message" && len(choice.Content) > 0 {
-			return choice.Content[0].Text, nil
-		}
 	}
 	return "", nil
 }

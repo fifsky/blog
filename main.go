@@ -49,7 +49,7 @@ func main() {
 	r := remind.New(s, conf, multiSender)
 	go r.Start()
 
-	ai := motto.NewDoubaoProvider(conf.Common.AIToken, conf.Common.AIModel)
+	ai := motto.NewOpenAIProvider(s)
 	m := motto.New(s, conf, barkClient, ai)
 	go m.Start("0 7 * * *")
 
