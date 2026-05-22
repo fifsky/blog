@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"app/config"
+	"app/pkg/aiagent"
 	"app/pkg/aiutil"
 	"app/pkg/errors"
-	"app/pkg/mcp"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
 	"app/server/response"
@@ -20,49 +20,21 @@ import (
 	"app/store"
 
 	"github.com/openai/openai-go/v3"
-	"github.com/openai/openai-go/v3/option"
 )
 
 var _ adminv1.AIServiceServer = (*AI)(nil)
 
 type AI struct {
 	adminv1.UnimplementedAIServiceServer
-	conf       *config.Config
-	mcpManager *mcp.Manager
-	store      *store.Store
+	agent *aiagent.Agent
+	store *store.Store
 }
 
 func NewAI(conf *config.Config, s *store.Store) *AI {
-	// Create MCP manager with all configured MCP clients
-	mcpManager := mcp.NewManager()
-	for key, mcpConf := range conf.MCP {
-		if mcpConf.URL != "" {
-			displayName := mcpConf.Name
-			if displayName == "" {
-				displayName = key
-			}
-			mcpManager.AddClient(key, displayName, mcpConf.URL, mcpConf.Token)
-		}
-	}
-
 	return &AI{
-		conf:       conf,
-		mcpManager: mcpManager,
-		store:      s,
+		agent: aiagent.New(conf, s),
+		store: s,
 	}
-}
-
-// getAIClient 按需创建 OpenAI client，优先使用数据库配置
-func (a *AI) getAIClient(ctx context.Context) (openai.Client, string, error) {
-	aiCfg := a.store.GetAIConfig(ctx)
-	if aiCfg.Token == "" {
-		return openai.Client{}, "", fmt.Errorf("ai token is empty")
-	}
-	client := openai.NewClient(
-		option.WithAPIKey(aiCfg.Token),
-		option.WithBaseURL(aiCfg.Endpoint),
-	)
-	return client, aiCfg.Model, nil
 }
 
 // ChatMessage represents a single message in the conversation
@@ -135,10 +107,7 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 	prompt := a.buildSystemPrompt()
 
 	// Build OpenAI messages from request history
-	openAIMessages := []openai.ChatCompletionMessageParamUnion{
-		openai.SystemMessage(prompt),
-	}
-
+	openAIMessages := make([]openai.ChatCompletionMessageParamUnion, 0, len(req.Messages))
 	for _, msg := range req.Messages {
 		if strings.TrimSpace(msg.Content) == "" {
 			continue // skip empty messages
@@ -151,102 +120,47 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Get AI client from database config
-	aiClient, aiModel, err := a.getAIClient(ctx)
+	_, err := a.agent.Run(ctx, aiagent.Request{
+		SystemPrompt: prompt,
+		Messages:     openAIMessages,
+		UseTools:     true,
+	}, aiagent.EventHandler{
+		OnContent: func(_ context.Context, content string) error {
+			escapedContent := strings.ReplaceAll(content, "\n", "\\n")
+			fmt.Fprintf(w, "data: %s\n\n", escapedContent)
+			flusher.Flush()
+			return nil
+		},
+		OnToolStart: func(_ context.Context, event aiagent.ToolEvent) error {
+			toolStartEvent := ToolStartEvent{
+				ID:        event.ID,
+				Name:      event.Name,
+				MCPName:   event.MCPName,
+				Arguments: event.Arguments,
+			}
+			toolStartJSON, _ := json.Marshal(toolStartEvent)
+			fmt.Fprintf(w, "data: [TOOL_START] %s\n\n", toolStartJSON)
+			flusher.Flush()
+			return nil
+		},
+		OnToolEnd: func(_ context.Context, event aiagent.ToolEvent) error {
+			toolEndEvent := ToolEndEvent{
+				ID:     event.ID,
+				Result: event.Result,
+			}
+			toolEndJSON, _ := json.Marshal(toolEndEvent)
+			fmt.Fprintf(w, "data: [TOOL_END] %s\n\n", toolEndJSON)
+			flusher.Flush()
+			return nil
+		},
+	})
 	if err != nil {
+		if ctx.Err() == context.Canceled {
+			return
+		}
 		fmt.Fprintf(w, "data: [ERROR] %s\n\n", err.Error())
 		flusher.Flush()
 		return
-	}
-
-	// Get tools from all MCP clients
-	tools := a.getMCPTools(ctx)
-
-	// Create streaming chat completion using OpenAI SDK v3
-	aiReq := openai.ChatCompletionNewParams{
-		Model:    aiModel,
-		Messages: openAIMessages,
-		Tools:    tools,
-	}
-	aiutil.ConfigureModelParams(&aiReq, aiModel)
-
-	// Tool calling loop - handle tool calls until we get a final response
-	for {
-		stream := aiClient.Chat.Completions.NewStreaming(ctx, aiReq)
-		acc := openai.ChatCompletionAccumulator{}
-		hasToolCalls := false
-
-		// Stream the response
-		for stream.Next() {
-			chunk := stream.Current()
-			acc.AddChunk(chunk)
-
-			// Check if stream finished with tool_calls (compatible with DeepSeek, Doubao, Qwen, etc.)
-			if len(chunk.Choices) > 0 && chunk.Choices[0].FinishReason == "tool_calls" {
-				hasToolCalls = true
-				break
-			}
-
-			// Stream content to client
-			if len(chunk.Choices) > 0 && chunk.Choices[0].Delta.Content != "" {
-				content := chunk.Choices[0].Delta.Content
-				// Escape newlines for SSE
-				escapedContent := strings.ReplaceAll(content, "\n", "\\n")
-				fmt.Fprintf(w, "data: %s\n\n", escapedContent)
-				flusher.Flush()
-			}
-		}
-
-		if err := stream.Err(); err != nil {
-			// Check if context was cancelled
-			if ctx.Err() == context.Canceled {
-				return
-			}
-			// Send error as SSE event
-			fmt.Fprintf(w, "data: [ERROR] %s\n\n", err.Error())
-			flusher.Flush()
-			return
-		}
-
-		// Handle tool calls if any
-		if hasToolCalls && len(acc.Choices) > 0 && len(acc.Choices[0].Message.ToolCalls) > 0 {
-			// Add assistant message with tool calls
-			aiReq.Messages = append(aiReq.Messages, acc.Choices[0].Message.ToParam())
-
-			// Execute all tool calls and add results
-			for _, toolCall := range acc.Choices[0].Message.ToolCalls {
-				// Send tool start event to frontend
-				toolStartEvent := ToolStartEvent{
-					ID:        toolCall.ID,
-					Name:      toolCall.Function.Name,
-					MCPName:   a.mcpManager.GetMCPDisplayName(toolCall.Function.Name),
-					Arguments: toolCall.Function.Arguments,
-				}
-				toolStartJSON, _ := json.Marshal(toolStartEvent)
-				fmt.Fprintf(w, "data: [TOOL_START] %s\n\n", toolStartJSON)
-				flusher.Flush()
-
-				// Execute tool
-				toolResult := a.executeTool(ctx, toolCall.Function.Name, toolCall.Function.Arguments)
-
-				// Send tool end event to frontend
-				toolEndEvent := ToolEndEvent{
-					ID:     toolCall.ID,
-					Result: toolResult,
-				}
-				toolEndJSON, _ := json.Marshal(toolEndEvent)
-				fmt.Fprintf(w, "data: [TOOL_END] %s\n\n", toolEndJSON)
-				flusher.Flush()
-
-				aiReq.Messages = append(aiReq.Messages, openai.ToolMessage(toolResult, toolCall.ID))
-			}
-
-			// Continue the loop to get the next response
-			continue
-		}
-
-		// No tool calls, we're done
-		break
 	}
 
 	// Send done event
@@ -270,69 +184,13 @@ You should use the available tools to find accurate and up-to-date information.`
 	return basePrompt
 }
 
-// getMCPTools returns the available tools from all MCP clients as OpenAI tool params
-func (a *AI) getMCPTools(ctx context.Context) []openai.ChatCompletionToolUnionParam {
-	if !a.mcpManager.HasClients() {
-		return nil
-	}
-
-	mcpTools, err := a.mcpManager.ListAllTools(ctx)
-	if err != nil {
-		return nil
-	}
-
-	tools := make([]openai.ChatCompletionToolUnionParam, 0, len(mcpTools))
-	for _, t := range mcpTools {
-		// Convert MCP tool InputSchema to OpenAI FunctionParameters
-		var params openai.FunctionParameters
-		if len(t.InputSchema) > 0 {
-			_ = json.Unmarshal(t.InputSchema, &params)
-		}
-		if params == nil {
-			params = openai.FunctionParameters{"type": "object"}
-		}
-
-		tools = append(tools, openai.ChatCompletionToolUnionParam{
-			OfFunction: &openai.ChatCompletionFunctionToolParam{
-				Function: openai.FunctionDefinitionParam{
-					Name:        t.Name,
-					Description: openai.String(t.Description),
-					Parameters:  params,
-				},
-			},
-		})
-	}
-
-	return tools
-}
-
-// executeTool executes a tool call via MCP manager and returns the result
-func (a *AI) executeTool(ctx context.Context, name string, arguments string) string {
-	if !a.mcpManager.HasClients() {
-		return "Tool execution failed: no MCP clients available"
-	}
-
-	// Parse arguments
-	var args map[string]any
-	if err := json.Unmarshal([]byte(arguments), &args); err != nil {
-		return fmt.Sprintf("Tool execution failed: invalid arguments: %v", err)
-	}
-
-	result, err := a.mcpManager.CallTool(ctx, name, args)
-	if err != nil {
-		return fmt.Sprintf("Tool execution failed: %v", err)
-	}
-
-	return result
-}
-
 func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest) (*adminv1.GenerateTagsResponse, error) {
 	content := strings.TrimSpace(req.Content)
 	if content == "" {
 		return nil, errors.BadRequest("EMPTY_CONTENT", "Content cannot be empty")
 	}
 
-	aiClient, aiModel, err := a.getAIClient(ctx)
+	aiClient, aiModel, err := a.agent.Client(ctx)
 	if err != nil {
 		return nil, errors.InternalServer("AI_CONFIG_ERROR", err.Error())
 	}
@@ -368,7 +226,7 @@ func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest)
 }
 
 func (a *AI) RemindSmartCreate(ctx context.Context, req *adminv1.RemindSmartCreateRequest) (*types.IDResponse, error) {
-	aiClient, aiModel, err := a.getAIClient(ctx)
+	aiClient, aiModel, err := a.agent.Client(ctx)
 	if err != nil {
 		return nil, errors.InternalServer("AI_CONFIG_ERROR", err.Error())
 	}

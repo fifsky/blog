@@ -4,18 +4,18 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strings"
 	"sync"
 	"time"
 
 	"app/config"
+	"app/pkg/aiagent"
 	"app/pkg/bark"
 	"app/store"
 	"app/store/model"
 
 	"github.com/goapt/logger"
 	"github.com/openai/openai-go/v3"
-	"github.com/openai/openai-go/v3/option"
-	"github.com/openai/openai-go/v3/shared"
 	"github.com/robfig/cron/v3"
 )
 
@@ -34,24 +34,14 @@ type AIProvider interface {
 }
 
 type OpenAIProvider struct {
-	client  *openai.Client
-	model   string
+	agent   *aiagent.Agent
 	history []openai.ChatCompletionMessageParamUnion
 	mu      sync.Mutex
 }
 
-func NewOpenAIProvider(s *store.Store) *OpenAIProvider {
-	aiConfig := s.GetAIConfig(context.Background())
-	if aiConfig == nil {
-		return nil
-	}
-	client := openai.NewClient(
-		option.WithAPIKey(aiConfig.Token),
-		option.WithBaseURL(aiConfig.Endpoint),
-	)
+func NewOpenAIProvider(conf *config.Config, s *store.Store) *OpenAIProvider {
 	return &OpenAIProvider{
-		client: &client,
-		model:  aiConfig.Model,
+		agent: aiagent.New(conf, s),
 	}
 }
 
@@ -59,29 +49,35 @@ func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
-	messages := []openai.ChatCompletionMessageParamUnion{
-		openai.SystemMessage(prompt),
-	}
+	messages := make([]openai.ChatCompletionMessageParamUnion, 0, len(p.history)+1)
 	messages = append(messages, p.history...)
 	messages = append(messages, openai.UserMessage(content))
 
-	completion, err := p.client.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
-		Messages: messages,
-		Model:    shared.ChatModel(p.model),
+	var response strings.Builder
+	result, err := p.agent.Run(ctx, aiagent.Request{
+		SystemPrompt: prompt,
+		Messages:     messages,
+		UseTools:     true,
+	}, aiagent.EventHandler{
+		OnContent: func(_ context.Context, delta string) error {
+			response.WriteString(delta)
+			return nil
+		},
 	})
-
 	if err != nil {
 		return "", err
 	}
 
-	if len(completion.Choices) > 0 {
-		response := completion.Choices[0].Message.Content
-		// 记录历史消息：用户输入和AI输出
-		p.history = append(p.history, openai.UserMessage(content))
-		p.history = append(p.history, openai.AssistantMessage(response))
-		return response, nil
+	answer := response.String()
+	if answer == "" {
+		answer = result.Content
 	}
-	return "", nil
+	if answer != "" {
+		// 记录历史消息：用户输入和 AI 输出
+		p.history = append(p.history, openai.UserMessage(content))
+		p.history = append(p.history, openai.AssistantMessage(answer))
+	}
+	return answer, nil
 }
 
 type Motto struct {
