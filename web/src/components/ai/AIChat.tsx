@@ -159,6 +159,7 @@ export function AIChat() {
         role: m.role,
         content: m.content,
         contextMessages: m.contextMessages,
+        toolCalls: m.toolCalls,
         isStreaming: false,
       })),
     );
@@ -239,7 +240,7 @@ export function AIChat() {
         .filter((m) => m.content.trim() !== "")
         .map((m) => ({
           role: m.role,
-          content: m.content,
+          content: m.content.replace(/<tool_call id="[^"]+"><\/tool_call>/g, ""),
           contextMessages: m.contextMessages,
         }));
 
@@ -292,9 +293,10 @@ export function AIChat() {
                 isLoading: true,
               };
               currentToolCalls = [...currentToolCalls, newToolCall];
+              accumulatedContent += `\n<tool_call id="${toolData.id}"></tool_call>\n`;
               setMessages((prev) =>
                 prev.map((msg) =>
-                  msg.id === assistantMsg.id ? { ...msg, toolCalls: currentToolCalls } : msg,
+                  msg.id === assistantMsg.id ? { ...msg, content: accumulatedContent, toolCalls: currentToolCalls } : msg,
                 ),
               );
               continue;
@@ -333,7 +335,7 @@ export function AIChat() {
       }
 
       // Save final content to Dexie
-      await updateAssistantMessage(assistantMsg.id!, accumulatedContent);
+      await updateAssistantMessage(assistantMsg.id!, accumulatedContent, currentToolCalls);
       if (responseContextMessages.length > 0) {
         await updateAssistantContextMessages(assistantMsg.id!, responseContextMessages);
       }
@@ -371,6 +373,62 @@ export function AIChat() {
       e.preventDefault();
       sendMessage();
     }
+  };
+
+  const renderAssistantMessage = (message: DisplayMessage) => {
+    if (!message.content && !message.toolCalls?.length) {
+      return (
+        <div className="markdown-body text-sm prose prose-sm max-w-none [&_pre]:bg-gray-100 [&_pre]:p-2 [&_pre]:rounded">
+          <AgentChatIndicator size={"sm"} />
+        </div>
+      );
+    }
+
+    const content = message.content || "";
+    // Regex to split by <tool_call id="..."></tool_call>
+    const parts = content.split(/(<tool_call id="[^"]+"><\/tool_call>)/);
+
+    // Keep track of which tool calls have been rendered inline
+    const renderedToolCallIds = new Set<string>();
+
+    const renderedParts = parts.map((part, index) => {
+      const match = part.match(/<tool_call id="([^"]+)"><\/tool_call>/);
+      if (match) {
+        const id = match[1];
+        const toolCall = message.toolCalls?.find((tc) => tc.id === id);
+        if (toolCall) {
+          renderedToolCallIds.add(id);
+          return <ToolCallCard key={`tc-${id}-${index}`} toolCall={toolCall} />;
+        }
+        return null;
+      }
+
+      // Render text part with Viewer if it's not empty
+      if (part.trim()) {
+        return (
+          <div key={`text-${index}`} className="markdown-body text-sm prose prose-sm max-w-none [&_pre]:bg-gray-100 [&_pre]:p-2 [&_pre]:rounded mb-2 last:mb-0">
+            <Viewer value={part} plugins={plugins} />
+          </div>
+        );
+      }
+      return null;
+    });
+
+    // Render any remaining tool calls at the top (for backwards compatibility)
+    const unrenderedToolCalls = message.toolCalls?.filter((tc) => !renderedToolCallIds.has(tc.id)) || [];
+
+    return (
+      <>
+        {unrenderedToolCalls.length > 0 && (
+          <div className="mb-2">
+            {unrenderedToolCalls.map((toolCall) => (
+              <ToolCallCard key={toolCall.id} toolCall={toolCall} />
+            ))}
+          </div>
+        )}
+        {renderedParts}
+      </>
+    );
   };
 
   return (
@@ -485,21 +543,7 @@ export function AIChat() {
                   >
                     {message.role === "assistant" ? (
                       <div className="relative">
-                        {/* Tool Calls UI */}
-                        {message.toolCalls && message.toolCalls.length > 0 && (
-                          <div className="mb-2">
-                            {message.toolCalls.map((toolCall) => (
-                              <ToolCallCard key={toolCall.id} toolCall={toolCall} />
-                            ))}
-                          </div>
-                        )}
-                        <div className="markdown-body text-sm prose prose-sm max-w-none [&_pre]:bg-gray-100 [&_pre]:p-2 [&_pre]:rounded">
-                          {!message.content && !message.toolCalls?.length ? (
-                            <AgentChatIndicator size={"sm"} />
-                          ) : message.content ? (
-                            <Viewer value={message.content || ""} plugins={plugins} />
-                          ) : null}
-                        </div>
+                        {renderAssistantMessage(message)}
                         {/* Copy button for assistant */}
                         {!message.isStreaming && message.content && (
                           <div className="absolute -bottom-11 -left-4 flex items-center gap-1">

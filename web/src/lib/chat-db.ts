@@ -7,6 +7,7 @@ export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   contextMessages?: Array<Record<string, unknown>>;
+  toolCalls?: any[]; // Array of ToolCall objects
   createdAt: Date;
 }
 
@@ -68,8 +69,12 @@ export async function addMessagePair(
 /**
  * Update assistant message content
  */
-export async function updateAssistantMessage(id: number, content: string): Promise<void> {
-  await chatDB.messages.update(id, { content });
+export async function updateAssistantMessage(id: number, content: string, toolCalls?: any[]): Promise<void> {
+  const updateData: any = { content };
+  if (toolCalls !== undefined) {
+    updateData.toolCalls = toolCalls;
+  }
+  await chatDB.messages.update(id, updateData);
 }
 
 export async function updateAssistantContextMessages(
@@ -103,7 +108,7 @@ export function messagesToApiFormat(
     .filter((m) => m.content.trim() !== "") // exclude empty messages
     .map((m) => ({
       role: m.role,
-      content: m.content,
+      content: m.content.replace(/<tool_call id="[^"]+"><\/tool_call>/g, ""),
       contextMessages: m.contextMessages,
     }));
 }
