@@ -10,13 +10,13 @@ import (
 // ConfigureModelParams 按模型厂商配置 ChatCompletion 请求参数。
 func ConfigureModelParams(req *openai.ChatCompletionNewParams, model string) {
 	if strings.HasPrefix(model, "doubao") {
-		req.ReasoningEffort = "minimal"
+		req.ReasoningEffort = "high"
 	}
 
 	if strings.HasPrefix(model, "kimi") {
 		req.SetExtraFields(map[string]any{
 			"thinking": map[string]any{
-				"type": "disabled",
+				"type": "enabled",
 			},
 		})
 	}
