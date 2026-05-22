@@ -79,6 +79,7 @@ type ToolEvent struct {
 // EventHandler 允许业务层处理流式文本与工具调用事件。
 type EventHandler struct {
 	OnContent   func(ctx context.Context, delta string) error
+	OnReasoning func(ctx context.Context, delta string) error
 	OnToolStart func(ctx context.Context, event ToolEvent) error
 	OnToolEnd   func(ctx context.Context, event ToolEvent) error
 }
@@ -216,6 +217,11 @@ func (a *Agent) runStream(ctx context.Context, streamFactory chatStreamFactory, 
 
 		if reasoningDelta := reasoningContentFromDelta(chunk.Choices[0].Delta); reasoningDelta != "" {
 			reasoningContent.WriteString(reasoningDelta)
+			if handler.OnReasoning != nil {
+				if err := handler.OnReasoning(ctx, reasoningDelta); err != nil {
+					return streamResult{acc: acc, reasoningContent: reasoningContent.String()}, err
+				}
+			}
 		}
 
 		if chunk.Choices[0].Delta.Content != "" {

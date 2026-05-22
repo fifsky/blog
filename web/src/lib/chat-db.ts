@@ -6,6 +6,7 @@ export interface ChatMessage {
   pairId: string; // links user message with assistant response
   role: "user" | "assistant";
   content: string;
+  reasoningContent?: string;
   contextMessages?: Array<Record<string, unknown>>;
   toolCalls?: any[]; // Array of ToolCall objects
   createdAt: Date;
@@ -69,10 +70,13 @@ export async function addMessagePair(
 /**
  * Update assistant message content
  */
-export async function updateAssistantMessage(id: number, content: string, toolCalls?: any[]): Promise<void> {
+export async function updateAssistantMessage(id: number, content: string, toolCalls?: any[], reasoningContent?: string): Promise<void> {
   const updateData: any = { content };
   if (toolCalls !== undefined) {
     updateData.toolCalls = toolCalls;
+  }
+  if (reasoningContent !== undefined) {
+    updateData.reasoningContent = reasoningContent;
   }
   await chatDB.messages.update(id, updateData);
 }

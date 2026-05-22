@@ -9,7 +9,10 @@ import {
   RotateCcw,
   Maximize2,
   Minimize2,
+  BrainCircuit,
+  ChevronRight,
 } from "lucide-react";
+import { AgentChatIndicator } from "@/components/agents-ui/agent-chat-indicator";
 import { Button } from "@/components/ui/button";
 import { Viewer } from "@bytemd/react";
 import gfm from "@bytemd/plugin-gfm";
@@ -26,8 +29,8 @@ import {
   clearAllMessages,
 } from "@/lib/chat-db";
 import { ToolCallCard } from "./ToolCallCard";
-import type { ToolCall, DisplayMessage } from "./types";
-import { AgentChatIndicator } from "@/components/agents-ui/agent-chat-indicator";
+import type { ToolCall, DisplayMessage, StreamEvent } from "./types";
+
 
 // ByteMD plugins for rendering
 const plugins = [gfm(), breaks(), highlightPlugin()];
@@ -38,6 +41,39 @@ const DEFAULT_POSITION = { bottom: 24, right: 80 };
 interface ButtonPosition {
   bottom: number;
   right: number;
+}
+
+function ReasoningBlock({ content, isFinished, isStreaming }: { content: string; isFinished: boolean; isStreaming?: boolean }) {
+  const [isOpen, setIsOpen] = useState(!isFinished);
+  const [hasAutoClosed, setHasAutoClosed] = useState(false);
+
+  useEffect(() => {
+    if (isFinished && !hasAutoClosed) {
+      setIsOpen(false);
+      setHasAutoClosed(true);
+    }
+  }, [isFinished, hasAutoClosed]);
+
+  return (
+    <div className="mb-3 border border-gray-200 rounded-lg bg-gray-50 overflow-hidden">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-3 py-2 flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-100 text-gray-600 font-medium select-none"
+      >
+        <BrainCircuit className="w-4 h-4 text-purple-500" />
+        深度思考
+        {!isFinished && isStreaming && (
+          <AgentChatIndicator size="sm" className="ml-1" />
+        )}
+        <ChevronRight className={`w-4 h-4 ml-auto text-gray-400 transition-transform ${isOpen ? "rotate-90" : ""}`} />
+      </button>
+      {isOpen && (
+        <div className="px-3 py-2 border-t border-gray-200 bg-white text-xs text-gray-500 whitespace-pre-wrap font-mono leading-relaxed">
+          {content}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function AIChat() {
@@ -153,15 +189,21 @@ export function AIChat() {
   const loadMessages = async () => {
     const dbMessages = await getAllMessages();
     setMessages(
-      dbMessages.map((m) => ({
-        id: m.id!,
-        pairId: m.pairId,
-        role: m.role,
-        content: m.content,
-        contextMessages: m.contextMessages,
-        toolCalls: m.toolCalls,
-        isStreaming: false,
-      })),
+      dbMessages.map((m) => {
+        let content = m.content;
+        if (m.reasoningContent) {
+          content = `<think>\n${m.reasoningContent}\n</think>\n` + content;
+        }
+        return {
+          id: m.id!,
+          pairId: m.pairId,
+          role: m.role,
+          content: content,
+          contextMessages: m.contextMessages,
+          toolCalls: m.toolCalls,
+          isStreaming: false,
+        };
+      }),
     );
   };
 
@@ -240,7 +282,7 @@ export function AIChat() {
         .filter((m) => m.content.trim() !== "")
         .map((m) => ({
           role: m.role,
-          content: m.content.replace(/<tool_call id="[^"]+"><\/tool_call>/g, ""),
+          content: m.content.replace(/<tool_call id="[^"]+"><\/tool_call>/g, "").replace(/<think>[\s\S]*?<\/think>/g, ""),
           contextMessages: m.contextMessages,
         }));
 
@@ -268,6 +310,7 @@ export function AIChat() {
       let accumulatedContent = "";
       let currentToolCalls: ToolCall[] = [];
       let responseContextMessages: Array<Record<string, unknown>> = [];
+      let isThinking = false;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -278,58 +321,106 @@ export function AIChat() {
 
         for (const line of lines) {
           if (line.startsWith("data: ")) {
-            const data = line.slice(6);
+            const dataStr = line.slice(6);
+            if (!dataStr.trim()) continue;
 
-            if (data === "[DONE]") continue;
+            try {
+              const event = JSON.parse(dataStr) as StreamEvent;
 
-            // Handle tool start event
-            if (data.startsWith("[TOOL_START] ")) {
-              const toolData = JSON.parse(data.slice(13));
-              const newToolCall: ToolCall = {
-                id: toolData.id,
-                name: toolData.name,
-                mcpName: toolData.mcpName,
-                arguments: toolData.arguments,
-                isLoading: true,
-              };
-              currentToolCalls = [...currentToolCalls, newToolCall];
-              accumulatedContent += `\n<tool_call id="${toolData.id}"></tool_call>\n`;
-              setMessages((prev) =>
-                prev.map((msg) =>
-                  msg.id === assistantMsg.id ? { ...msg, content: accumulatedContent, toolCalls: currentToolCalls } : msg,
-                ),
-              );
-              continue;
+              if (event.type === "done") {
+                if (isThinking) {
+                  isThinking = false;
+                  accumulatedContent += "</think>";
+                  setMessages((prev) =>
+                    prev.map((msg) =>
+                      msg.id === assistantMsg.id ? { ...msg, content: accumulatedContent } : msg,
+                    ),
+                  );
+                }
+                continue;
+              }
+
+              if (event.type === "tool_start") {
+                if (isThinking) {
+                  isThinking = false;
+                  accumulatedContent += "</think>";
+                }
+                const toolData = event.data;
+                const newToolCall: ToolCall = {
+                  id: toolData.id,
+                  name: toolData.name,
+                  mcpName: toolData.mcpName,
+                  arguments: toolData.arguments,
+                  isLoading: true,
+                };
+                currentToolCalls = [...currentToolCalls, newToolCall];
+                accumulatedContent += `\n<tool_call id="${toolData.id}"></tool_call>\n`;
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === assistantMsg.id ? { ...msg, content: accumulatedContent, toolCalls: currentToolCalls } : msg,
+                  ),
+                );
+                continue;
+              }
+
+              if (event.type === "tool_end") {
+                const toolData = event.data;
+                currentToolCalls = currentToolCalls.map((tc) =>
+                  tc.id === toolData.id ? { ...tc, result: toolData.result, isLoading: false } : tc,
+                );
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === assistantMsg.id ? { ...msg, toolCalls: currentToolCalls } : msg,
+                  ),
+                );
+                continue;
+              }
+
+              if (event.type === "context") {
+                responseContextMessages = event.data;
+                continue;
+              }
+
+              if (event.type === "error") {
+                throw new Error(event.content || "Unknown error from server");
+              }
+
+              if (event.type === "content") {
+                if (isThinking) {
+                  isThinking = false;
+                  accumulatedContent += "</think>";
+                }
+                const content = event.content || "";
+                accumulatedContent += content;
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === assistantMsg.id ? { ...msg, content: accumulatedContent } : msg,
+                  ),
+                );
+                continue;
+              }
+
+              if (event.type === "reasoning") {
+                if (!isThinking) {
+                  isThinking = true;
+                  accumulatedContent += "<think>";
+                }
+                const reasoning = event.content || "";
+                accumulatedContent += reasoning;
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === assistantMsg.id ? { ...msg, content: accumulatedContent } : msg,
+                  ),
+                );
+                continue;
+              }
+            } catch (e) {
+              // If it's a JSON parse error, ignore or log it, but if it's our thrown error, rethrow it
+              if (e instanceof Error && e.message !== "Unexpected end of JSON input" && !e.message.includes("JSON")) {
+                throw e;
+              }
+              console.error("Failed to parse SSE event:", e);
             }
-
-            // Handle tool end event
-            if (data.startsWith("[TOOL_END] ")) {
-              const toolData = JSON.parse(data.slice(11));
-              currentToolCalls = currentToolCalls.map((tc) =>
-                tc.id === toolData.id ? { ...tc, result: toolData.result, isLoading: false } : tc,
-              );
-              setMessages((prev) =>
-                prev.map((msg) =>
-                  msg.id === assistantMsg.id ? { ...msg, toolCalls: currentToolCalls } : msg,
-                ),
-              );
-              continue;
-            }
-
-            if (data.startsWith("[CONTEXT] ")) {
-              responseContextMessages = JSON.parse(data.slice(10));
-              continue;
-            }
-
-            // Handle regular content
-            const content = data.replace(/\\n/g, "\n");
-            accumulatedContent += content;
-
-            setMessages((prev) =>
-              prev.map((msg) =>
-                msg.id === assistantMsg.id ? { ...msg, content: accumulatedContent } : msg,
-              ),
-            );
           }
         }
       }
@@ -385,22 +476,36 @@ export function AIChat() {
     }
 
     const content = message.content || "";
-    // Regex to split by <tool_call id="..."></tool_call>
-    const parts = content.split(/(<tool_call id="[^"]+"><\/tool_call>)/);
+    // Regex to split by <tool_call id="..."></tool_call> or <think>...</think>
+    const parts = content.split(/(<tool_call id="[^"]+"><\/tool_call>|<think>[\s\S]*?<\/think>|<think>[\s\S]*$)/);
 
     // Keep track of which tool calls have been rendered inline
     const renderedToolCallIds = new Set<string>();
 
     const renderedParts = parts.map((part, index) => {
-      const match = part.match(/<tool_call id="([^"]+)"><\/tool_call>/);
-      if (match) {
-        const id = match[1];
+      const matchTool = part.match(/<tool_call id="([^"]+)"><\/tool_call>/);
+      if (matchTool) {
+        const id = matchTool[1];
         const toolCall = message.toolCalls?.find((tc) => tc.id === id);
         if (toolCall) {
           renderedToolCallIds.add(id);
           return <ToolCallCard key={`tc-${id}-${index}`} toolCall={toolCall} />;
         }
         return null;
+      }
+
+      const matchThink = part.match(/<think>([\s\S]*?)(?:<\/think>|$)/);
+      if (matchThink) {
+        const thinkContent = matchThink[1];
+        const isFinished = part.endsWith("</think>");
+        return (
+          <ReasoningBlock 
+            key={`think-${index}`} 
+            content={thinkContent} 
+            isFinished={isFinished} 
+            isStreaming={message.isStreaming} 
+          />
+        );
       }
 
       // Render text part with Viewer if it's not empty

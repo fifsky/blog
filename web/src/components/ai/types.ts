@@ -12,7 +12,14 @@ export interface DisplayMessage {
   pairId: string;
   role: "user" | "assistant";
   content: string;
+  reasoningContent?: string;
   contextMessages?: Array<Record<string, unknown>>;
   isStreaming?: boolean;
   toolCalls?: ToolCall[];
+}
+
+export interface StreamEvent {
+  type: "content" | "reasoning" | "tool_start" | "tool_end" | "context" | "error" | "done";
+  content?: string;
+  data?: any;
 }

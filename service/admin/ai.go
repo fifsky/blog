@@ -63,6 +63,19 @@ type ToolEndEvent struct {
 	Result string `json:"result"`
 }
 
+// StreamEvent 表示发送给前端的 SSE 流事件
+type StreamEvent struct {
+	Type    string `json:"type"`              // content, reasoning, tool_start, tool_end, context, error, done
+	Content string `json:"content,omitempty"` // 用于 text content 和 error message
+	Data    any    `json:"data,omitempty"`    // 用于其他事件类型的数据载荷
+}
+
+func (a *AI) sendStreamEvent(w http.ResponseWriter, flusher http.Flusher, event StreamEvent) {
+	b, _ := json.Marshal(event)
+	fmt.Fprintf(w, "data: %s\n\n", string(b))
+	flusher.Flush()
+}
+
 // Chat 处理 SSE 流式 AI 聊天响应。
 func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 	// Parse request body
@@ -139,31 +152,33 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 		UseTools:     true,
 	}, aiagent.EventHandler{
 		OnContent: func(_ context.Context, content string) error {
-			escapedContent := strings.ReplaceAll(content, "\n", "\\n")
-			fmt.Fprintf(w, "data: %s\n\n", escapedContent)
-			flusher.Flush()
+			a.sendStreamEvent(w, flusher, StreamEvent{Type: "content", Content: content})
+			return nil
+		},
+		OnReasoning: func(_ context.Context, content string) error {
+			a.sendStreamEvent(w, flusher, StreamEvent{Type: "reasoning", Content: content})
 			return nil
 		},
 		OnToolStart: func(_ context.Context, event aiagent.ToolEvent) error {
-			toolStartEvent := ToolStartEvent{
-				ID:        event.ID,
-				Name:      event.Name,
-				MCPName:   event.MCPName,
-				Arguments: event.Arguments,
-			}
-			toolStartJSON, _ := json.Marshal(toolStartEvent)
-			fmt.Fprintf(w, "data: [TOOL_START] %s\n\n", toolStartJSON)
-			flusher.Flush()
+			a.sendStreamEvent(w, flusher, StreamEvent{
+				Type: "tool_start",
+				Data: ToolStartEvent{
+					ID:        event.ID,
+					Name:      event.Name,
+					MCPName:   event.MCPName,
+					Arguments: event.Arguments,
+				},
+			})
 			return nil
 		},
 		OnToolEnd: func(_ context.Context, event aiagent.ToolEvent) error {
-			toolEndEvent := ToolEndEvent{
-				ID:     event.ID,
-				Result: event.Result,
-			}
-			toolEndJSON, _ := json.Marshal(toolEndEvent)
-			fmt.Fprintf(w, "data: [TOOL_END] %s\n\n", toolEndJSON)
-			flusher.Flush()
+			a.sendStreamEvent(w, flusher, StreamEvent{
+				Type: "tool_end",
+				Data: ToolEndEvent{
+					ID:     event.ID,
+					Result: event.Result,
+				},
+			})
 			return nil
 		},
 	})
@@ -171,23 +186,14 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 		if ctx.Err() == context.Canceled {
 			return
 		}
-		fmt.Fprintf(w, "data: [ERROR] %s\n\n", err.Error())
-		flusher.Flush()
+		a.sendStreamEvent(w, flusher, StreamEvent{Type: "error", Content: err.Error()})
 		return
 	}
 
-	contextMessages, err := json.Marshal(result.Messages)
-	if err != nil {
-		fmt.Fprintf(w, "data: [ERROR] %s\n\n", err.Error())
-		flusher.Flush()
-		return
-	}
-	fmt.Fprintf(w, "data: [CONTEXT] %s\n\n", contextMessages)
-	flusher.Flush()
+	a.sendStreamEvent(w, flusher, StreamEvent{Type: "context", Data: result.Messages})
 
 	// Send done event
-	fmt.Fprintf(w, "data: [DONE]\n\n")
-	flusher.Flush()
+	a.sendStreamEvent(w, flusher, StreamEvent{Type: "done"})
 }
 
 // buildSystemPrompt 构造带工具调用说明的系统提示词。
