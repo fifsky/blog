@@ -5,13 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-	"sync"
 	"sync/atomic"
 	"time"
 
 	"app/config"
-	"app/pkg/aiutil"
-	"app/pkg/mcp"
+	"app/pkg/aiagent"
 	"app/store"
 
 	"github.com/google/uuid"
@@ -19,14 +17,7 @@ import (
 	larkcardkit "github.com/larksuite/oapi-sdk-go/v3/service/cardkit/v1"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
 	"github.com/openai/openai-go/v3"
-	"github.com/openai/openai-go/v3/option"
 )
-
-// chatContext stores conversation history with expiration time
-type chatContext struct {
-	messages  []openai.ChatCompletionMessageParamUnion
-	expiresAt time.Time
-}
 
 // contextCacheTTL is the duration for which chat context is cached (1 hour)
 const contextCacheTTL = 1 * time.Hour
@@ -36,46 +27,20 @@ const maxContextMessages = 20
 
 // AIChat handles AI chat interactions with streaming card updates.
 type AIChat struct {
-	conf         *config.Config
-	larkClient   *lark.Client
-	mcpManager   *mcp.Manager
-	contextCache sync.Map // map[string]*chatContext, key is senderID
-	store        *store.Store
+	larkClient *lark.Client
+	agent      *aiagent.Agent
+	memory     *aiagent.Memory
+	store      *store.Store
 }
 
 // NewAIChat creates a new AIChat instance.
 func NewAIChat(conf *config.Config, larkClient *lark.Client, s *store.Store) *AIChat {
-	// Create MCP manager with all configured MCP clients
-	mcpManager := mcp.NewManager()
-	for key, mcpConf := range conf.MCP {
-		if mcpConf.URL != "" {
-			displayName := mcpConf.Name
-			if displayName == "" {
-				displayName = key
-			}
-			mcpManager.AddClient(key, displayName, mcpConf.URL, mcpConf.Token)
-		}
-	}
-
 	return &AIChat{
-		conf:       conf,
 		larkClient: larkClient,
-		mcpManager: mcpManager,
+		agent:      aiagent.New(conf, s),
+		memory:     aiagent.NewMemory(contextCacheTTL, maxContextMessages),
 		store:      s,
 	}
-}
-
-// getAIClient 按需创建 OpenAI client，优先使用数据库配置
-func (a *AIChat) getAIClient(ctx context.Context) (openai.Client, string, error) {
-	aiCfg := a.store.GetAIConfig(ctx)
-	if aiCfg.Token == "" {
-		return openai.Client{}, "", fmt.Errorf("ai token is empty")
-	}
-	client := openai.NewClient(
-		option.WithAPIKey(aiCfg.Token),
-		option.WithBaseURL(aiCfg.Endpoint),
-	)
-	return client, aiCfg.Model, nil
 }
 
 // CardUpdater manages card element updates with auto-incrementing sequence numbers.
@@ -326,68 +291,12 @@ func (a *AIChat) getCardID(ctx context.Context, messageID string) (string, error
 	return *resp.Data.CardId, nil
 }
 
-// getMCPTools returns the available tools from all MCP clients as OpenAI tool params
-func (a *AIChat) getMCPTools(ctx context.Context) []openai.ChatCompletionToolUnionParam {
-	if !a.mcpManager.HasClients() {
-		return nil
-	}
-
-	mcpTools, err := a.mcpManager.ListAllTools(ctx)
-	if err != nil {
-		return nil
-	}
-
-	tools := make([]openai.ChatCompletionToolUnionParam, 0, len(mcpTools))
-	for _, t := range mcpTools {
-		// Convert MCP tool InputSchema to OpenAI FunctionParameters
-		var params openai.FunctionParameters
-		if len(t.InputSchema) > 0 {
-			_ = json.Unmarshal(t.InputSchema, &params)
-		}
-		if params == nil {
-			params = openai.FunctionParameters{"type": "object"}
-		}
-
-		tools = append(tools, openai.ChatCompletionToolUnionParam{
-			OfFunction: &openai.ChatCompletionFunctionToolParam{
-				Function: openai.FunctionDefinitionParam{
-					Name:        t.Name,
-					Description: openai.String(t.Description),
-					Parameters:  params,
-				},
-			},
-		})
-	}
-
-	return tools
-}
-
-// executeTool executes a tool call via MCP manager and returns the result
-func (a *AIChat) executeTool(ctx context.Context, name string, arguments string) string {
-	if !a.mcpManager.HasClients() {
-		return "Tool execution failed: no MCP clients available"
-	}
-
-	// Parse arguments
-	var args map[string]any
-	if err := json.Unmarshal([]byte(arguments), &args); err != nil {
-		return fmt.Sprintf("Tool execution failed: invalid arguments: %v", err)
-	}
-
-	result, err := a.mcpManager.CallTool(ctx, name, args)
-	if err != nil {
-		return fmt.Sprintf("Tool execution failed: %v", err)
-	}
-
-	return result
-}
-
 // streamAIResponse calls the AI API and streams the response to the card.
 // senderID is used to maintain conversation context across messages.
 // imageBase64 is optional - if provided, it will be included as a vision input.
 func (a *AIChat) streamAIResponse(ctx context.Context, updater *CardUpdater, senderID, userMessage, imageBase64 string) error {
 	// Periodically clean expired contexts
-	a.cleanExpiredContexts()
+	a.memory.CleanExpired()
 
 	prompt := fmt.Sprintf(`You are a helpful assistant. Respond in the same language as the user's message.
 Current Time: %s
@@ -403,11 +312,10 @@ You should use the available tools to find accurate and up-to-date information.
 Please answer the user's questions in a concise and friendly manner.`, time.Now().Format(time.DateTime))
 
 	// Get existing context messages or create new context
-	contextMessages := a.getOrCreateContext(senderID)
+	contextMessages := a.memory.Get(senderID)
 
-	// Build messages with system prompt, context, and new user message
-	messages := make([]openai.ChatCompletionMessageParamUnion, 0, len(contextMessages)+2)
-	messages = append(messages, openai.SystemMessage(prompt))
+	// Build messages with context and new user message
+	messages := make([]openai.ChatCompletionMessageParamUnion, 0, len(contextMessages)+1)
 	messages = append(messages, contextMessages...)
 
 	// If image is provided, create a multi-modal message with image
@@ -431,101 +339,50 @@ Please answer the user's questions in a concise and friendly manner.`, time.Now(
 		messages = append(messages, openai.UserMessage(userMessage))
 	}
 
-	// Get AI client from database config
-	aiClient, aiModel, err := a.getAIClient(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to get AI config: %w", err)
-	}
-
-	// Get tools from all MCP clients
-	tools := a.getMCPTools(ctx)
-
-	aiReq := openai.ChatCompletionNewParams{
-		Model:    aiModel,
-		Messages: messages,
-		Tools:    tools,
-	}
-
-	aiutil.ConfigureModelParams(&aiReq, aiModel)
-
 	var content strings.Builder
 	updateInterval := 300 * time.Millisecond
 	lastUpdate := time.Now()
 
-	// Tool calling loop - handle tool calls until we get a final response
-	for {
-		stream := aiClient.Chat.Completions.NewStreaming(ctx, aiReq)
-		acc := openai.ChatCompletionAccumulator{}
-		hasToolCalls := false
-
-		// Stream the response
-		for stream.Next() {
-			chunk := stream.Current()
-			acc.AddChunk(chunk)
-
-			// Check if stream finished with tool_calls
-			if len(chunk.Choices) > 0 && chunk.Choices[0].FinishReason == "tool_calls" {
-				hasToolCalls = true
-				break
-			}
-
-			// Stream content to card
-			if len(chunk.Choices) > 0 && chunk.Choices[0].Delta.Content != "" {
-				content.WriteString(chunk.Choices[0].Delta.Content)
-
-				// Update card at intervals to avoid rate limiting
-				if time.Since(lastUpdate) >= updateInterval {
-					if err := updater.UpdateContent(ctx, content.String()); err != nil {
-						fmt.Printf("[Feishu Bot] Failed to update card content: %v\n", err)
-					}
-					lastUpdate = time.Now()
+	result, err := a.agent.Run(ctx, aiagent.Request{
+		SystemPrompt: prompt,
+		Messages:     messages,
+		UseTools:     true,
+	}, aiagent.EventHandler{
+		OnContent: func(ctx context.Context, delta string) error {
+			content.WriteString(delta)
+			// Update card at intervals to avoid rate limiting
+			if time.Since(lastUpdate) >= updateInterval {
+				if err := updater.UpdateContent(ctx, content.String()); err != nil {
+					fmt.Printf("[Feishu Bot] Failed to update card content: %v\n", err)
 				}
+				lastUpdate = time.Now()
 			}
-		}
-
-		if err := stream.Err(); err != nil {
-			return fmt.Errorf("AI stream error: %w", err)
-		}
-
-		// Handle tool calls if any
-		if hasToolCalls && len(acc.Choices) > 0 && len(acc.Choices[0].Message.ToolCalls) > 0 {
-			// Add assistant message with tool calls
-			aiReq.Messages = append(aiReq.Messages, acc.Choices[0].Message.ToParam())
-
-			// Execute all tool calls and add results
-			for _, toolCall := range acc.Choices[0].Message.ToolCalls {
-				// Get MCP display name for the tool
-				mcpName := a.mcpManager.GetMCPDisplayName(toolCall.Function.Name)
-
-				// Update tip to show tool calling status
-				tipText := fmt.Sprintf("正在调用%s工具", mcpName)
-				if err := updater.UpdateTip(ctx, tipText); err != nil {
-					fmt.Printf("[Feishu Bot] Failed to update tip: %v\n", err)
-				}
-
-				fmt.Printf("[Feishu Bot] Calling tool: %s (%s)\n", toolCall.Function.Name, mcpName)
-
-				// Execute tool
-				toolResult := a.executeTool(ctx, toolCall.Function.Name, toolCall.Function.Arguments)
-
-				// Restore tip to default
-				if err := updater.UpdateTip(ctx, "努力回答中…"); err != nil {
-					fmt.Printf("[Feishu Bot] Failed to restore tip: %v\n", err)
-				}
-
-				aiReq.Messages = append(aiReq.Messages, openai.ToolMessage(toolResult, toolCall.ID))
+			return nil
+		},
+		OnToolStart: func(ctx context.Context, event aiagent.ToolEvent) error {
+			tipText := fmt.Sprintf("正在调用%s工具", event.MCPName)
+			if err := updater.UpdateTip(ctx, tipText); err != nil {
+				fmt.Printf("[Feishu Bot] Failed to update tip: %v\n", err)
 			}
-
-			// Continue the loop to get the next response
-			continue
-		}
-
-		// No tool calls, we're done
-		break
+			fmt.Printf("[Feishu Bot] Calling tool: %s (%s)\n", event.Name, event.MCPName)
+			return nil
+		},
+		OnToolEnd: func(ctx context.Context, event aiagent.ToolEvent) error {
+			if err := updater.UpdateTip(ctx, "努力回答中…"); err != nil {
+				fmt.Printf("[Feishu Bot] Failed to restore tip: %v\n", err)
+			}
+			return nil
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("AI stream error: %w", err)
 	}
 
 	// Final update with complete content
 	finalContent := content.String()
+	if finalContent == "" {
+		finalContent = result.Content
+	}
 	if finalContent == "" {
 		finalContent = "抱歉，我暂时无法回答您的问题。"
 	}
@@ -545,76 +402,7 @@ Please answer the user's questions in a concise and friendly manner.`, time.Now(
 	}
 
 	// Save context with the new user message and assistant response
-	a.saveContext(senderID, userMessage, finalContent)
+	a.memory.Append(senderID, openai.UserMessage(userMessage), openai.AssistantMessage(finalContent))
 
 	return nil
-}
-
-// getOrCreateContext retrieves cached context messages for a sender, or returns empty slice if not found/expired.
-func (a *AIChat) getOrCreateContext(senderID string) []openai.ChatCompletionMessageParamUnion {
-	if senderID == "" {
-		return nil
-	}
-
-	value, ok := a.contextCache.Load(senderID)
-	if !ok {
-		return nil
-	}
-
-	cached := value.(*chatContext)
-	if time.Now().After(cached.expiresAt) {
-		a.contextCache.Delete(senderID)
-		return nil
-	}
-
-	// Return a copy of messages to avoid mutation
-	result := make([]openai.ChatCompletionMessageParamUnion, len(cached.messages))
-	copy(result, cached.messages)
-	return result
-}
-
-// saveContext saves the conversation context for a sender with 1 hour expiration.
-func (a *AIChat) saveContext(senderID, userMessage, assistantResponse string) {
-	if senderID == "" {
-		return
-	}
-
-	// Get existing context or create new
-	var existingMessages []openai.ChatCompletionMessageParamUnion
-	if value, ok := a.contextCache.Load(senderID); ok {
-		cached := value.(*chatContext)
-		if time.Now().Before(cached.expiresAt) {
-			existingMessages = cached.messages
-		}
-	}
-
-	// Append new messages
-	newMessages := append(existingMessages,
-		openai.UserMessage(userMessage),
-		openai.AssistantMessage(assistantResponse),
-	)
-
-	// Trim to max context size (keep most recent messages)
-	if len(newMessages) > maxContextMessages {
-		newMessages = newMessages[len(newMessages)-maxContextMessages:]
-	}
-
-	// Save with new expiration time
-	a.contextCache.Store(senderID, &chatContext{
-		messages:  newMessages,
-		expiresAt: time.Now().Add(contextCacheTTL),
-	})
-}
-
-// cleanExpiredContexts removes expired entries from the context cache.
-// This is called periodically during message processing.
-func (a *AIChat) cleanExpiredContexts() {
-	now := time.Now()
-	a.contextCache.Range(func(key, value any) bool {
-		cached := value.(*chatContext)
-		if now.After(cached.expiresAt) {
-			a.contextCache.Delete(key)
-		}
-		return true
-	})
 }
