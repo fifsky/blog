@@ -45,7 +45,7 @@ func NewRemindHandler(s *store.Store) http.Handler {
 			return &mcp.CallToolResult{
 				IsError: true,
 				Content: []mcp.Content{
-					&mcp.TextContent{Text: err.Reason + ": " + err.Message},
+					&mcp.TextContent{Text: err.Error()},
 				},
 			}, nil, nil
 		}

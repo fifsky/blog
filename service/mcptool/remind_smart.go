@@ -31,7 +31,7 @@ type SmartRemindRule struct {
 //go:embed remind_prompt.md
 var remindPrompt string
 
-func SmartCreateRemind(ctx context.Context, aiClient openai.Client, aiModel string, s *store.Store, content string) (int64, *errors.Error) {
+func SmartCreateRemind(ctx context.Context, aiClient openai.Client, aiModel string, s *store.Store, content string) (int64, error) {
 	content = strings.TrimSpace(content)
 	if content == "" {
 		return 0, errors.BadRequest("EMPTY_CONTENT", "Content cannot be empty")
