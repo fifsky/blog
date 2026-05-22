@@ -1,4 +1,4 @@
-// Package aiutil provides utility functions for AI model configuration
+// Package aiutil 提供 AI 模型请求参数配置工具。
 package aiutil
 
 import (
@@ -7,8 +7,7 @@ import (
 	"github.com/openai/openai-go/v3"
 )
 
-// ConfigureModelParams configures model-specific parameters for ChatCompletionNewParams.
-// For doubao models, it disables thinking mode.
+// ConfigureModelParams 按模型厂商配置 ChatCompletion 请求参数。
 func ConfigureModelParams(req *openai.ChatCompletionNewParams, model string) {
 	if strings.HasPrefix(model, "doubao") {
 		req.ReasoningEffort = "minimal"
@@ -22,10 +21,11 @@ func ConfigureModelParams(req *openai.ChatCompletionNewParams, model string) {
 		})
 	}
 
-	if strings.HasPrefix(model, "kimi") {
+	if strings.HasPrefix(model, "deepseek") {
+		req.ReasoningEffort = "high"
 		req.SetExtraFields(map[string]any{
 			"thinking": map[string]any{
-				"type": "disabled",
+				"type": "enabled",
 			},
 		})
 	}

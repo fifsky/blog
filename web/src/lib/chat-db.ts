@@ -6,6 +6,7 @@ export interface ChatMessage {
   pairId: string; // links user message with assistant response
   role: "user" | "assistant";
   content: string;
+  contextMessages?: Array<Record<string, unknown>>;
   createdAt: Date;
 }
 
@@ -71,6 +72,13 @@ export async function updateAssistantMessage(id: number, content: string): Promi
   await chatDB.messages.update(id, { content });
 }
 
+export async function updateAssistantContextMessages(
+  id: number,
+  contextMessages: Array<Record<string, unknown>>,
+): Promise<void> {
+  await chatDB.messages.update(id, { contextMessages });
+}
+
 /**
  * Delete a message pair by pairId
  */
@@ -90,11 +98,12 @@ export async function clearAllMessages(): Promise<void> {
  */
 export function messagesToApiFormat(
   messages: ChatMessage[],
-): Array<{ role: string; content: string }> {
+): Array<{ role: string; content: string; contextMessages?: Array<Record<string, unknown>> }> {
   return messages
     .filter((m) => m.content.trim() !== "") // exclude empty messages
     .map((m) => ({
       role: m.role,
       content: m.content,
+      contextMessages: m.contextMessages,
     }));
 }

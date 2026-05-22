@@ -33,6 +33,11 @@ type chatStreamFactory interface {
 	NewStreaming(ctx context.Context, req openai.ChatCompletionNewParams) (chatStream, error)
 }
 
+type streamResult struct {
+	acc              openai.ChatCompletionAccumulator
+	reasoningContent string
+}
+
 type openAIStreamFactory struct {
 	client openai.Client
 }
@@ -58,7 +63,8 @@ type Request struct {
 
 // Result 描述 AI 编排完成后的最终结果。
 type Result struct {
-	Content string
+	Content  string
+	Messages []openai.ChatCompletionMessageParamUnion
 }
 
 // ToolEvent 描述一次 MCP 工具调用事件。
@@ -146,17 +152,24 @@ func (a *Agent) Run(ctx context.Context, request Request, handler EventHandler) 
 	aiutil.ConfigureModelParams(&aiReq, model)
 
 	var content strings.Builder
+	generatedMessages := make([]openai.ChatCompletionMessageParamUnion, 0, 2)
 	for {
-		acc, err := a.runStream(ctx, streamFactory, aiReq, handler, &content)
+		streamResult, err := a.runStream(ctx, streamFactory, aiReq, handler, &content)
 		if err != nil {
 			return Result{}, err
 		}
-		if len(acc.Choices) == 0 || len(acc.Choices[0].Message.ToolCalls) == 0 {
+		if len(streamResult.acc.Choices) == 0 {
 			break
 		}
 
-		aiReq.Messages = append(aiReq.Messages, acc.Choices[0].Message.ToParam())
-		for _, toolCall := range acc.Choices[0].Message.ToolCalls {
+		assistantMessage := assistantMessageWithReasoning(streamResult.acc.Choices[0].Message, streamResult.reasoningContent)
+		generatedMessages = append(generatedMessages, assistantMessage)
+		if len(streamResult.acc.Choices[0].Message.ToolCalls) == 0 {
+			break
+		}
+
+		aiReq.Messages = append(aiReq.Messages, assistantMessage)
+		for _, toolCall := range streamResult.acc.Choices[0].Message.ToolCalls {
 			event := ToolEvent{
 				ID:        toolCall.ID,
 				Name:      toolCall.Function.Name,
@@ -176,42 +189,106 @@ func (a *Agent) Run(ctx context.Context, request Request, handler EventHandler) 
 					return Result{}, err
 				}
 			}
-			aiReq.Messages = append(aiReq.Messages, openai.ToolMessage(result, toolCall.ID))
+			toolMessage := openai.ToolMessage(result, toolCall.ID)
+			generatedMessages = append(generatedMessages, toolMessage)
+			aiReq.Messages = append(aiReq.Messages, toolMessage)
 		}
 	}
 
-	return Result{Content: content.String()}, nil
+	return Result{Content: content.String(), Messages: generatedMessages}, nil
 }
 
-func (a *Agent) runStream(ctx context.Context, streamFactory chatStreamFactory, aiReq openai.ChatCompletionNewParams, handler EventHandler, content *strings.Builder) (openai.ChatCompletionAccumulator, error) {
+func (a *Agent) runStream(ctx context.Context, streamFactory chatStreamFactory, aiReq openai.ChatCompletionNewParams, handler EventHandler, content *strings.Builder) (streamResult, error) {
 	stream, err := streamFactory.NewStreaming(ctx, aiReq)
 	if err != nil {
-		return openai.ChatCompletionAccumulator{}, err
+		return streamResult{}, err
 	}
 
 	acc := openai.ChatCompletionAccumulator{}
+	var reasoningContent strings.Builder
 	for stream.Next() {
 		chunk := stream.Current()
 		acc.AddChunk(chunk)
 
-		if len(chunk.Choices) > 0 && chunk.Choices[0].Delta.Content != "" {
+		if len(chunk.Choices) == 0 {
+			continue
+		}
+
+		if reasoningDelta := reasoningContentFromDelta(chunk.Choices[0].Delta); reasoningDelta != "" {
+			reasoningContent.WriteString(reasoningDelta)
+		}
+
+		if chunk.Choices[0].Delta.Content != "" {
 			delta := chunk.Choices[0].Delta.Content
 			content.WriteString(delta)
 			if handler.OnContent != nil {
 				if err := handler.OnContent(ctx, delta); err != nil {
-					return acc, err
+					return streamResult{acc: acc, reasoningContent: reasoningContent.String()}, err
 				}
 			}
 		}
 
-		if len(chunk.Choices) > 0 && chunk.Choices[0].FinishReason == "tool_calls" {
+		if chunk.Choices[0].FinishReason == "tool_calls" {
 			break
 		}
 	}
 	if err := stream.Err(); err != nil {
-		return acc, err
+		return streamResult{}, err
 	}
-	return acc, nil
+	return streamResult{acc: acc, reasoningContent: reasoningContent.String()}, nil
+}
+
+func assistantMessageWithReasoning(message openai.ChatCompletionMessage, reasoningContent string) openai.ChatCompletionMessageParamUnion {
+	assistantMessage := message.ToAssistantMessageParam()
+	if reasoningContent != "" {
+		// DeepSeek 工具调用后的后续请求必须完整回传 reasoning_content。
+		setAssistantReasoningContent(&assistantMessage, reasoningContent)
+	}
+	return openai.ChatCompletionMessageParamUnion{OfAssistant: &assistantMessage}
+}
+
+// DecodeMessageParam 从 JSON 解码消息，并保留 OpenAI SDK 未建模的 DeepSeek 字段。
+func DecodeMessageParam(rawMessage []byte) (openai.ChatCompletionMessageParamUnion, error) {
+	var message openai.ChatCompletionMessageParamUnion
+	if err := json.Unmarshal(rawMessage, &message); err != nil {
+		return message, err
+	}
+
+	var extra struct {
+		Role             string `json:"role"`
+		ReasoningContent string `json:"reasoning_content"`
+	}
+	if err := json.Unmarshal(rawMessage, &extra); err != nil {
+		return message, nil
+	}
+	if extra.Role == "assistant" && extra.ReasoningContent != "" && message.OfAssistant != nil {
+		setAssistantReasoningContent(message.OfAssistant, extra.ReasoningContent)
+	}
+	return message, nil
+}
+
+func setAssistantReasoningContent(message *openai.ChatCompletionAssistantMessageParam, reasoningContent string) {
+	message.SetExtraFields(map[string]any{
+		"reasoning_content": reasoningContent,
+	})
+}
+
+func reasoningContentFromDelta(delta openai.ChatCompletionChunkChoiceDelta) string {
+	field, ok := delta.JSON.ExtraFields["reasoning_content"]
+	if ok && field.Valid() {
+		var content string
+		if err := json.Unmarshal([]byte(field.Raw()), &content); err == nil {
+			return content
+		}
+	}
+
+	var rawDelta struct {
+		ReasoningContent string `json:"reasoning_content"`
+	}
+	if err := json.Unmarshal([]byte(delta.RawJSON()), &rawDelta); err != nil {
+		return ""
+	}
+	return rawDelta.ReasoningContent
 }
 
 func (a *Agent) buildTools(ctx context.Context) []openai.ChatCompletionToolUnionParam {

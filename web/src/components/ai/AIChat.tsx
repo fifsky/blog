@@ -21,6 +21,7 @@ import {
   getAllMessages,
   addMessagePair,
   updateAssistantMessage,
+  updateAssistantContextMessages,
   deleteMessagePair,
   clearAllMessages,
 } from "@/lib/chat-db";
@@ -157,6 +158,7 @@ export function AIChat() {
         pairId: m.pairId,
         role: m.role,
         content: m.content,
+        contextMessages: m.contextMessages,
         isStreaming: false,
       })),
     );
@@ -235,7 +237,11 @@ export function AIChat() {
       // Build messages array for API (history + current)
       const historyMessages = messages
         .filter((m) => m.content.trim() !== "")
-        .map((m) => ({ role: m.role, content: m.content }));
+        .map((m) => ({
+          role: m.role,
+          content: m.content,
+          contextMessages: m.contextMessages,
+        }));
 
       // Add the new user message
       const apiMessages = [...historyMessages, { role: "user", content: userContent }];
@@ -260,6 +266,7 @@ export function AIChat() {
       const decoder = new TextDecoder();
       let accumulatedContent = "";
       let currentToolCalls: ToolCall[] = [];
+      let responseContextMessages: Array<Record<string, unknown>> = [];
 
       while (true) {
         const { done, value } = await reader.read();
@@ -307,6 +314,11 @@ export function AIChat() {
               continue;
             }
 
+            if (data.startsWith("[CONTEXT] ")) {
+              responseContextMessages = JSON.parse(data.slice(10));
+              continue;
+            }
+
             // Handle regular content
             const content = data.replace(/\\n/g, "\n");
             accumulatedContent += content;
@@ -322,10 +334,17 @@ export function AIChat() {
 
       // Save final content to Dexie
       await updateAssistantMessage(assistantMsg.id!, accumulatedContent);
+      if (responseContextMessages.length > 0) {
+        await updateAssistantContextMessages(assistantMsg.id!, responseContextMessages);
+      }
 
       // Mark streaming as complete
       setMessages((prev) =>
-        prev.map((msg) => (msg.id === assistantMsg.id ? { ...msg, isStreaming: false } : msg)),
+        prev.map((msg) =>
+          msg.id === assistantMsg.id
+            ? { ...msg, contextMessages: responseContextMessages, isStreaming: false }
+            : msg,
+        ),
       );
     } catch (err) {
       if ((err as Error).name !== "AbortError") {

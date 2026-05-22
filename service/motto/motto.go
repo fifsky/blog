@@ -75,7 +75,11 @@ func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (
 	if answer != "" {
 		// 记录历史消息：用户输入和 AI 输出
 		p.history = append(p.history, openai.UserMessage(content))
-		p.history = append(p.history, openai.AssistantMessage(answer))
+		if len(result.Messages) > 0 {
+			p.history = append(p.history, result.Messages...)
+		} else {
+			p.history = append(p.history, openai.AssistantMessage(answer))
+		}
 	}
 	return answer, nil
 }

@@ -215,8 +215,8 @@ func (m *Manager) ListAllTools(ctx context.Context) ([]Tool, error) {
 			continue
 		}
 		for _, tool := range tools {
-			// Create unique tool name: mcpKey:originalName
-			uniqueName := mcpKey + ":" + tool.Name
+			// Create unique tool name: mcpKey-originalName
+			uniqueName := mcpKey + "-" + tool.Name
 			m.toolToMCP[uniqueName] = mcpKey
 			allTools = append(allTools, Tool{
 				Name:         uniqueName,
@@ -232,7 +232,7 @@ func (m *Manager) ListAllTools(ctx context.Context) ([]Tool, error) {
 }
 
 // CallTool calls a tool, routing to the correct MCP client
-// toolName should be in format "mcpKey:originalToolName"
+// toolName should be in format "mcpKey-originalToolName"
 func (m *Manager) CallTool(ctx context.Context, toolName string, arguments map[string]any) (string, error) {
 	m.mu.RLock()
 	mcpKey, ok := m.toolToMCP[toolName]

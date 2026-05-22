@@ -12,6 +12,7 @@ export interface DisplayMessage {
   pairId: string;
   role: "user" | "assistant";
   content: string;
+  contextMessages?: Array<Record<string, unknown>>;
   isStreaming?: boolean;
   toolCalls?: ToolCall[];
 }

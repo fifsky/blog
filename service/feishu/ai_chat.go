@@ -401,8 +401,14 @@ Please answer the user's questions in a concise and friendly manner.`, time.Now(
 		fmt.Printf("[Feishu Bot] Failed to close streaming: %v\n", err)
 	}
 
-	// Save context with the new user message and assistant response
-	a.memory.Append(senderID, openai.UserMessage(userMessage), openai.AssistantMessage(finalContent))
+	// 保存本轮上下文，DeepSeek 工具调用历史中包含必须回传的 reasoning_content。
+	memoryMessages := []openai.ChatCompletionMessageParamUnion{openai.UserMessage(userMessage)}
+	if len(result.Messages) > 0 {
+		memoryMessages = append(memoryMessages, result.Messages...)
+	} else {
+		memoryMessages = append(memoryMessages, openai.AssistantMessage(finalContent))
+	}
+	a.memory.Append(senderID, memoryMessages...)
 
 	return nil
 }

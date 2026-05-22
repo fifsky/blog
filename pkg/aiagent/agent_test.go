@@ -244,6 +244,94 @@ func TestAgentRunStreamsContentAndExecutesTools(t *testing.T) {
 	}
 }
 
+func TestAgentRunReturnsReasoningContentAfterToolCalls(t *testing.T) {
+	toolProvider := &fakeToolProvider{
+		tools: []mcpclient.Tool{{
+			Name:        "blog:weather",
+			Description: "query weather",
+			InputSchema: json.RawMessage(`{"type":"object"}`),
+		}},
+		result: "sunny",
+	}
+	streamFactory := &fakeStreamFactory{
+		streams: []*fakeStream{
+			{
+				chunks: []openai.ChatCompletionChunk{
+					chunk(`{"choices":[{"index":0,"delta":{"role":"assistant","reasoning_content":"需要先查天气。"},"finish_reason":null}]}`),
+					chunk(`{"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_1","type":"function","function":{"name":"blog:weather","arguments":"{\"city\":\"上海\"}"}}]},"finish_reason":"tool_calls"}]}`),
+				},
+			},
+			{
+				chunks: []openai.ChatCompletionChunk{
+					chunk(`{"choices":[{"index":0,"delta":{"role":"assistant","reasoning_content":"工具结果可用。","content":"今日晴朗"},"finish_reason":null}]}`),
+					chunk(`{"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}`),
+				},
+			},
+		},
+	}
+	agent := &Agent{
+		clientProvider: func(context.Context) (openai.Client, string, error) {
+			return openai.Client{}, "deepseek-v4-pro", nil
+		},
+		streamFactory: streamFactory,
+		tools:         toolProvider,
+	}
+
+	result, err := agent.Run(context.Background(), Request{
+		Messages: []openai.ChatCompletionMessageParamUnion{openai.UserMessage("今天天气？")},
+		UseTools: true,
+	}, EventHandler{})
+	if err != nil {
+		t.Fatalf("Run() error = %v", err)
+	}
+
+	if len(streamFactory.requests[1].Messages) != 3 {
+		t.Fatalf("second request messages = %d, want user/assistant/tool", len(streamFactory.requests[1].Messages))
+	}
+	assertMessageReasoningContent(t, streamFactory.requests[1].Messages[1], "需要先查天气。")
+	if len(result.Messages) != 3 {
+		t.Fatalf("result messages = %d, want assistant/tool/assistant", len(result.Messages))
+	}
+	assertMessageReasoningContent(t, result.Messages[0], "需要先查天气。")
+	assertMessageReasoningContent(t, result.Messages[2], "工具结果可用。")
+}
+
+func TestAssistantMessageReasoningContentSurvivesJSONRoundTrip(t *testing.T) {
+	message := openai.ChatCompletionMessage{
+		Content: "查好了",
+	}
+	msg := assistantMessageWithReasoning(message, "需要保留。")
+
+	raw, err := json.Marshal(msg)
+	if err != nil {
+		t.Fatalf("marshal message: %v", err)
+	}
+	decoded, err := DecodeMessageParam(raw)
+	if err != nil {
+		t.Fatalf("unmarshal message: %v", err)
+	}
+
+	assertMessageReasoningContent(t, decoded, "需要保留。")
+}
+
+func assertMessageReasoningContent(t *testing.T, msg openai.ChatCompletionMessageParamUnion, want string) {
+	t.Helper()
+
+	raw, err := json.Marshal(msg)
+	if err != nil {
+		t.Fatalf("marshal message: %v", err)
+	}
+	var got struct {
+		ReasoningContent string `json:"reasoning_content"`
+	}
+	if err := json.Unmarshal(raw, &got); err != nil {
+		t.Fatalf("unmarshal message: %v", err)
+	}
+	if got.ReasoningContent != want {
+		t.Fatalf("reasoning_content = %q, want %q; raw=%s", got.ReasoningContent, want, raw)
+	}
+}
+
 func chunk(raw string) openai.ChatCompletionChunk {
 	var c openai.ChatCompletionChunk
 	if err := json.Unmarshal([]byte(raw), &c); err != nil {

@@ -37,18 +37,19 @@ func NewAI(conf *config.Config, s *store.Store) *AI {
 	}
 }
 
-// ChatMessage represents a single message in the conversation
+// ChatMessage 表示一次对话中的单条消息。
 type ChatMessage struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
+	Role            string            `json:"role"`
+	Content         string            `json:"content"`
+	ContextMessages []json.RawMessage `json:"contextMessages,omitempty"`
 }
 
-// ChatRequest represents the incoming chat request with message history
+// ChatRequest 表示携带历史消息的聊天请求。
 type ChatRequest struct {
 	Messages []ChatMessage `json:"messages"`
 }
 
-// ToolStartEvent represents a tool call start event sent to frontend
+// ToolStartEvent 表示发送给前端的工具调用开始事件。
 type ToolStartEvent struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
@@ -56,13 +57,13 @@ type ToolStartEvent struct {
 	Arguments string `json:"arguments"`
 }
 
-// ToolEndEvent represents a tool call end event sent to frontend
+// ToolEndEvent 表示发送给前端的工具调用结束事件。
 type ToolEndEvent struct {
 	ID     string `json:"id"`
 	Result string `json:"result"`
 }
 
-// Chat handles SSE streaming AI chat responses
+// Chat 处理 SSE 流式 AI 聊天响应。
 func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 	// Parse request body
 	var req ChatRequest
@@ -106,11 +107,23 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 	// Build system prompt
 	prompt := a.buildSystemPrompt()
 
-	// Build OpenAI messages from request history
+	// 根据请求历史构造 OpenAI 消息。
 	openAIMessages := make([]openai.ChatCompletionMessageParamUnion, 0, len(req.Messages))
 	for _, msg := range req.Messages {
+		if len(msg.ContextMessages) > 0 {
+			for _, rawMessage := range msg.ContextMessages {
+				openAIMessage, err := aiagent.DecodeMessageParam(rawMessage)
+				if err != nil {
+					response.Fail(w, errors.BadRequest("INVALID_CONTEXT_MESSAGE", "Invalid context message"))
+					return
+				}
+				openAIMessages = append(openAIMessages, openAIMessage)
+			}
+			continue
+		}
+
 		if strings.TrimSpace(msg.Content) == "" {
-			continue // skip empty messages
+			continue
 		}
 		switch msg.Role {
 		case "user":
@@ -120,7 +133,7 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	_, err := a.agent.Run(ctx, aiagent.Request{
+	result, err := a.agent.Run(ctx, aiagent.Request{
 		SystemPrompt: prompt,
 		Messages:     openAIMessages,
 		UseTools:     true,
@@ -163,12 +176,21 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	contextMessages, err := json.Marshal(result.Messages)
+	if err != nil {
+		fmt.Fprintf(w, "data: [ERROR] %s\n\n", err.Error())
+		flusher.Flush()
+		return
+	}
+	fmt.Fprintf(w, "data: [CONTEXT] %s\n\n", contextMessages)
+	flusher.Flush()
+
 	// Send done event
 	fmt.Fprintf(w, "data: [DONE]\n\n")
 	flusher.Flush()
 }
 
-// buildSystemPrompt builds the system prompt with tool usage instructions
+// buildSystemPrompt 构造带工具调用说明的系统提示词。
 func (a *AI) buildSystemPrompt() string {
 	basePrompt := fmt.Sprintf(`You are a helpful assistant. Respond in the same language as the user's message.
 Current Time: %s
