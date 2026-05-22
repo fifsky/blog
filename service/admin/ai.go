@@ -199,7 +199,7 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 // buildSystemPrompt 构造带工具调用说明的系统提示词。
 func (a *AI) buildSystemPrompt() string {
 	basePrompt := fmt.Sprintf(`You are a helpful assistant. Respond in the same language as the user's message.
-Current Time: %s
+IMPORTANT: Any deep thinking, reasoning, or thought processes MUST be output in the same language as the user's message.
 
 When you encounter questions that you cannot answer directly, such as:
 - Current events, news, or real-time information
@@ -207,7 +207,10 @@ When you encounter questions that you cannot answer directly, such as:
 - Specific facts you are uncertain about
 - Information that may have changed after your training data cutoff
 
-You should use the available tools to find accurate and up-to-date information.`, time.Now().Format(time.DateTime))
+You should use the available tools to find accurate and up-to-date information.
+
+Current Time: %s
+`, time.Now().Format(time.DateTime))
 
 	return basePrompt
 }
