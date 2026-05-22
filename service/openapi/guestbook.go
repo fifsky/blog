@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"app/config"
 	"app/pkg/aiutil"
 	"app/pkg/errors"
 	apiv1 "app/proto/gen/api/v1"
@@ -43,7 +42,7 @@ func WithModerator(m ContentModerator) GuestbookOption {
 	}
 }
 
-func NewGuestbook(s *store.Store, conf *config.Config, opts ...GuestbookOption) *Guestbook {
+func NewGuestbook(s *store.Store, opts ...GuestbookOption) *Guestbook {
 	g := &Guestbook{
 		store: s,
 	}
@@ -54,8 +53,8 @@ func NewGuestbook(s *store.Store, conf *config.Config, opts ...GuestbookOption) 
 	}
 
 	// 如果没有设置自定义审核器，使用默认的 AI 审核器
-	if g.moderator == nil && conf != nil {
-		g.moderator = NewAIModerator(conf)
+	if g.moderator == nil {
+		g.moderator = NewAIModerator(s)
 	}
 
 	return g
@@ -122,20 +121,13 @@ func (g *Guestbook) Create(ctx context.Context, req *apiv1.GuestbookCreateReques
 
 // AIModerator 基于 AI 的内容审核器
 type AIModerator struct {
-	aiClient openai.Client
-	aiModel  string
+	store *store.Store
 }
 
 // NewAIModerator 创建 AI 内容审核器
-func NewAIModerator(conf *config.Config) *AIModerator {
-	client := openai.NewClient(
-		option.WithAPIKey(conf.Common.AIToken),
-		option.WithBaseURL(conf.Common.AIEndpoint),
-	)
-
+func NewAIModerator(s *store.Store) *AIModerator {
 	return &AIModerator{
-		aiClient: client,
-		aiModel:  conf.Common.AIModel,
+		store: s,
 	}
 }
 
@@ -144,6 +136,15 @@ func (m *AIModerator) Moderate(ctx context.Context, content string) error {
 	if strings.TrimSpace(content) == "" {
 		return nil
 	}
+
+	aiCfg := m.store.GetAIConfig(ctx)
+	if aiCfg.Token == "" {
+		return nil // 没有配置 AI token 时跳过审核
+	}
+	aiClient := openai.NewClient(
+		option.WithAPIKey(aiCfg.Token),
+		option.WithBaseURL(aiCfg.Endpoint),
+	)
 
 	prompt := `你是一个内容安全审核助手。请审核以下用户提交的留言内容，判断是否包含以下任何一种违规内容：
 1. 色情、性感内容
@@ -162,15 +163,15 @@ func (m *AIModerator) Moderate(ctx context.Context, content string) error {
 不要输出任何其他内容。`
 
 	aiReq := openai.ChatCompletionNewParams{
-		Model: m.aiModel,
+		Model: aiCfg.Model,
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.SystemMessage(prompt),
 			openai.UserMessage(content),
 		},
 	}
-	aiutil.ConfigureModelParams(&aiReq, m.aiModel)
+	aiutil.ConfigureModelParams(&aiReq, aiCfg.Model)
 
-	completion, err := m.aiClient.Chat.Completions.New(ctx, aiReq)
+	completion, err := aiClient.Chat.Completions.New(ctx, aiReq)
 	if err != nil {
 		return errors.InternalServer("CONTENT_MODERATION_ERROR", "内容审核服务异常")
 	}

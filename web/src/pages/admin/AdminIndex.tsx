@@ -26,6 +26,9 @@ export default function AdminIndex() {
     site_desc: z.string().optional(),
     site_keyword: z.string().optional(),
     post_num: z.string().regex(/^\d+$/, "请输入数字"),
+    ai_token: z.string().optional(),
+    ai_endpoint: z.string().optional(),
+    ai_model: z.string().optional(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -35,6 +38,9 @@ export default function AdminIndex() {
       site_desc: "",
       site_keyword: "",
       post_num: "",
+      ai_token: "",
+      ai_endpoint: "",
+      ai_model: "",
     },
     mode: "onChange",
   });
@@ -58,6 +64,9 @@ export default function AdminIndex() {
       site_desc: data.kv?.site_desc || "",
       site_keyword: data.kv?.site_keyword || "",
       post_num: data.kv?.post_num || "",
+      ai_token: data.kv?.ai_token || "",
+      ai_endpoint: data.kv?.ai_endpoint || "",
+      ai_model: data.kv?.ai_model || "",
     });
   }, [form]);
   return (
@@ -123,6 +132,50 @@ export default function AdminIndex() {
                   <FieldLabel htmlFor={field.name}>每页显示文章数</FieldLabel>
                   <FieldContent>
                     <Input {...field} id={field.name} style={{ width: 80 }} />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </FieldContent>
+                </Field>
+              )}
+            />
+            <Controller
+              name="ai_token"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field orientation="vertical" data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>AI Token</FieldLabel>
+                  <FieldContent>
+                    <Input {...field} id={field.name} />
+                    <FieldDescription>AI 服务的 API Token，用于调用大语言模型。</FieldDescription>
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </FieldContent>
+                </Field>
+              )}
+            />
+            <Controller
+              name="ai_endpoint"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field orientation="vertical" data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>AI Endpoint</FieldLabel>
+                  <FieldContent>
+                    <Input {...field} id={field.name} />
+                    <FieldDescription>AI 服务的 API 地址，兼容 OpenAI 接口格式。</FieldDescription>
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </FieldContent>
+                </Field>
+              )}
+            />
+            <Controller
+              name="ai_model"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field orientation="vertical" data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>AI Model</FieldLabel>
+                  <FieldContent>
+                    <Input {...field} id={field.name} />
+                    <FieldDescription>
+                      AI 服务的模型名称，如 doubao-seed-2-0-lite-260215。
+                    </FieldDescription>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </FieldContent>
                 </Field>

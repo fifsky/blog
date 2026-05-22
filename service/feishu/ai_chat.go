@@ -12,6 +12,7 @@ import (
 	"app/config"
 	"app/pkg/aiutil"
 	"app/pkg/mcp"
+	"app/store"
 
 	"github.com/google/uuid"
 	lark "github.com/larksuite/oapi-sdk-go/v3"
@@ -37,18 +38,13 @@ const maxContextMessages = 20
 type AIChat struct {
 	conf         *config.Config
 	larkClient   *lark.Client
-	aiClient     openai.Client
 	mcpManager   *mcp.Manager
 	contextCache sync.Map // map[string]*chatContext, key is senderID
+	store        *store.Store
 }
 
 // NewAIChat creates a new AIChat instance.
-func NewAIChat(conf *config.Config, larkClient *lark.Client) *AIChat {
-	aiClient := openai.NewClient(
-		option.WithAPIKey(conf.Common.AIToken),
-		option.WithBaseURL(conf.Common.AIEndpoint),
-	)
-
+func NewAIChat(conf *config.Config, larkClient *lark.Client, s *store.Store) *AIChat {
 	// Create MCP manager with all configured MCP clients
 	mcpManager := mcp.NewManager()
 	for key, mcpConf := range conf.MCP {
@@ -64,9 +60,22 @@ func NewAIChat(conf *config.Config, larkClient *lark.Client) *AIChat {
 	return &AIChat{
 		conf:       conf,
 		larkClient: larkClient,
-		aiClient:   aiClient,
 		mcpManager: mcpManager,
+		store:      s,
 	}
+}
+
+// getAIClient 按需创建 OpenAI client，优先使用数据库配置
+func (a *AIChat) getAIClient(ctx context.Context) (openai.Client, string, error) {
+	aiCfg := a.store.GetAIConfig(ctx)
+	if aiCfg.Token == "" {
+		return openai.Client{}, "", fmt.Errorf("ai token is empty")
+	}
+	client := openai.NewClient(
+		option.WithAPIKey(aiCfg.Token),
+		option.WithBaseURL(aiCfg.Endpoint),
+	)
+	return client, aiCfg.Model, nil
 }
 
 // CardUpdater manages card element updates with auto-incrementing sequence numbers.
@@ -422,16 +431,22 @@ Please answer the user's questions in a concise and friendly manner.`, time.Now(
 		messages = append(messages, openai.UserMessage(userMessage))
 	}
 
+	// Get AI client from database config
+	aiClient, aiModel, err := a.getAIClient(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get AI config: %w", err)
+	}
+
 	// Get tools from all MCP clients
 	tools := a.getMCPTools(ctx)
 
 	aiReq := openai.ChatCompletionNewParams{
-		Model:    a.conf.Common.AIModel,
+		Model:    aiModel,
 		Messages: messages,
 		Tools:    tools,
 	}
 
-	aiutil.ConfigureModelParams(&aiReq, a.conf.Common.AIModel)
+	aiutil.ConfigureModelParams(&aiReq, aiModel)
 
 	var content strings.Builder
 	updateInterval := 300 * time.Millisecond
@@ -439,7 +454,7 @@ Please answer the user's questions in a concise and friendly manner.`, time.Now(
 
 	// Tool calling loop - handle tool calls until we get a final response
 	for {
-		stream := a.aiClient.Chat.Completions.NewStreaming(ctx, aiReq)
+		stream := aiClient.Chat.Completions.NewStreaming(ctx, aiReq)
 		acc := openai.ChatCompletionAccumulator{}
 		hasToolCalls := false
 

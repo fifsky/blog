@@ -45,7 +45,7 @@ func NewBot(conf *config.Config, s *store.Store) *Bot {
 	)
 
 	// Create AI chat handler
-	aiChat := NewAIChat(conf, larkClient)
+	aiChat := NewAIChat(conf, larkClient, s)
 
 	// Create remind service for card callback handling
 	remind := openapi.NewRemind(s, conf)

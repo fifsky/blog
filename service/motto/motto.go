@@ -57,6 +57,7 @@ func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (
 	defer p.mu.Unlock()
 
 	// 构造消息上下文：系统提示词 + 历史记录 + 当前用户输入
+	// 构造消息上下文：系统提示词 + 历史记录 + 当前用户输入
 	messages := []openai.ChatCompletionMessageParamUnion{
 		openai.SystemMessage(prompt),
 	}

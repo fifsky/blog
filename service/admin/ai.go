@@ -28,17 +28,11 @@ var _ adminv1.AIServiceServer = (*AI)(nil)
 type AI struct {
 	adminv1.UnimplementedAIServiceServer
 	conf       *config.Config
-	client     openai.Client
 	mcpManager *mcp.Manager
 	store      *store.Store
 }
 
 func NewAI(conf *config.Config, s *store.Store) *AI {
-	client := openai.NewClient(
-		option.WithAPIKey(conf.Common.AIToken),
-		option.WithBaseURL(conf.Common.AIEndpoint),
-	)
-
 	// Create MCP manager with all configured MCP clients
 	mcpManager := mcp.NewManager()
 	for key, mcpConf := range conf.MCP {
@@ -53,10 +47,22 @@ func NewAI(conf *config.Config, s *store.Store) *AI {
 
 	return &AI{
 		conf:       conf,
-		client:     client,
 		mcpManager: mcpManager,
 		store:      s,
 	}
+}
+
+// getAIClient 按需创建 OpenAI client，优先使用数据库配置
+func (a *AI) getAIClient(ctx context.Context) (openai.Client, string, error) {
+	aiCfg := a.store.GetAIConfig(ctx)
+	if aiCfg.Token == "" {
+		return openai.Client{}, "", fmt.Errorf("ai token is empty")
+	}
+	client := openai.NewClient(
+		option.WithAPIKey(aiCfg.Token),
+		option.WithBaseURL(aiCfg.Endpoint),
+	)
+	return client, aiCfg.Model, nil
 }
 
 // ChatMessage represents a single message in the conversation
@@ -145,20 +151,28 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Get AI client from database config
+	aiClient, aiModel, err := a.getAIClient(ctx)
+	if err != nil {
+		fmt.Fprintf(w, "data: [ERROR] %s\n\n", err.Error())
+		flusher.Flush()
+		return
+	}
+
 	// Get tools from all MCP clients
 	tools := a.getMCPTools(ctx)
 
 	// Create streaming chat completion using OpenAI SDK v3
 	aiReq := openai.ChatCompletionNewParams{
-		Model:    a.conf.Common.AIModel,
+		Model:    aiModel,
 		Messages: openAIMessages,
 		Tools:    tools,
 	}
-	aiutil.ConfigureModelParams(&aiReq, a.conf.Common.AIModel)
+	aiutil.ConfigureModelParams(&aiReq, aiModel)
 
 	// Tool calling loop - handle tool calls until we get a final response
 	for {
-		stream := a.client.Chat.Completions.NewStreaming(ctx, aiReq)
+		stream := aiClient.Chat.Completions.NewStreaming(ctx, aiReq)
 		acc := openai.ChatCompletionAccumulator{}
 		hasToolCalls := false
 
@@ -318,6 +332,11 @@ func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest)
 		return nil, errors.BadRequest("EMPTY_CONTENT", "Content cannot be empty")
 	}
 
+	aiClient, aiModel, err := a.getAIClient(ctx)
+	if err != nil {
+		return nil, errors.InternalServer("AI_CONFIG_ERROR", err.Error())
+	}
+
 	prompt := `你是一个博客写作助手。请根据用户提供的文章标题与正文，为文章生成 3-8 个中文标签。
 要求：
 1) 标签要简短（2-6 个字），可用中英文混合（如 Go、React、MySQL）。
@@ -327,15 +346,15 @@ func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest)
 	userInput := fmt.Sprintf("标题：%s\n正文：\n%s", strings.TrimSpace(req.Title), content)
 
 	aiReq := openai.ChatCompletionNewParams{
-		Model: a.conf.Common.AIModel,
+		Model: aiModel,
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.SystemMessage(prompt),
 			openai.UserMessage(userInput),
 		},
 	}
-	aiutil.ConfigureModelParams(&aiReq, a.conf.Common.AIModel)
+	aiutil.ConfigureModelParams(&aiReq, aiModel)
 
-	completion, err := a.client.Chat.Completions.New(ctx, aiReq)
+	completion, err := aiClient.Chat.Completions.New(ctx, aiReq)
 	if err != nil {
 		return nil, errors.InternalServer("AI_GENERATE_TAGS_ERROR", err.Error())
 	}
@@ -349,7 +368,11 @@ func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest)
 }
 
 func (a *AI) RemindSmartCreate(ctx context.Context, req *adminv1.RemindSmartCreateRequest) (*types.IDResponse, error) {
-	lastID, err := mcptool.SmartCreateRemind(ctx, a.conf, a.client, a.store, req.Content)
+	aiClient, aiModel, err := a.getAIClient(ctx)
+	if err != nil {
+		return nil, errors.InternalServer("AI_CONFIG_ERROR", err.Error())
+	}
+	lastID, err := mcptool.SmartCreateRemind(ctx, aiClient, aiModel, a.store, req.Content)
 	if err != nil {
 		return nil, err
 	}

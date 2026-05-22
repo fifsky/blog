@@ -4,6 +4,27 @@ import (
 	"context"
 )
 
+// AIConfig AI 服务配置
+type AIConfig struct {
+	Token    string
+	Endpoint string
+	Model    string
+}
+
+// GetAIConfig 获取 AI 配置，从数据库读取
+func (s *Store) GetAIConfig(ctx context.Context) *AIConfig {
+	opts, err := s.GetOptions(ctx)
+	if err != nil {
+		return &AIConfig{}
+	}
+
+	return &AIConfig{
+		Token:    opts["ai_token"],
+		Endpoint: opts["ai_endpoint"],
+		Model:    opts["ai_model"],
+	}
+}
+
 func (s *Store) GetOptions(ctx context.Context) (map[string]string, error) {
 	rows, err := s.db.QueryContext(ctx, "select id,option_key,option_value from options")
 	if err != nil {

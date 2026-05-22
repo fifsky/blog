@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"app/config"
 	"app/store"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -17,12 +16,7 @@ type RemindSmartCreateInput struct {
 	Content string `json:"content" jsonschema:"提醒内容，自然语言描述即可"`
 }
 
-func NewRemindHandler(conf *config.Config, s *store.Store) http.Handler {
-	aiClient := openai.NewClient(
-		option.WithAPIKey(conf.Common.AIToken),
-		option.WithBaseURL(conf.Common.AIEndpoint),
-	)
-
+func NewRemindHandler(s *store.Store) http.Handler {
 	server := mcp.NewServer(&mcp.Implementation{
 		Name:    "blog-remind-mcp",
 		Version: "v1.0.0",
@@ -32,7 +26,21 @@ func NewRemindHandler(conf *config.Config, s *store.Store) http.Handler {
 		Name:        "remind_smart_create",
 		Description: "根据自然语言创建提醒，返回 JSON：{\"id\":123}",
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, input RemindSmartCreateInput) (*mcp.CallToolResult, any, error) {
-		lastID, err := SmartCreateRemind(ctx, conf, aiClient, s, input.Content)
+		aiCfg := s.GetAIConfig(ctx)
+		if aiCfg.Token == "" {
+			return &mcp.CallToolResult{
+				IsError: true,
+				Content: []mcp.Content{
+					&mcp.TextContent{Text: "ai token is empty"},
+				},
+			}, nil, nil
+		}
+		aiClient := openai.NewClient(
+			option.WithAPIKey(aiCfg.Token),
+			option.WithBaseURL(aiCfg.Endpoint),
+		)
+
+		lastID, err := SmartCreateRemind(ctx, aiClient, aiCfg.Model, s, input.Content)
 		if err != nil {
 			return &mcp.CallToolResult{
 				IsError: true,

@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"app/config"
 	"app/pkg/aiutil"
 	"app/pkg/errors"
 	"app/pkg/promptutil"
@@ -32,7 +31,7 @@ type SmartRemindRule struct {
 //go:embed remind_prompt.md
 var remindPrompt string
 
-func SmartCreateRemind(ctx context.Context, conf *config.Config, aiClient openai.Client, s *store.Store, content string) (int64, *errors.Error) {
+func SmartCreateRemind(ctx context.Context, aiClient openai.Client, aiModel string, s *store.Store, content string) (int64, *errors.Error) {
 	content = strings.TrimSpace(content)
 	if content == "" {
 		return 0, errors.BadRequest("EMPTY_CONTENT", "Content cannot be empty")
@@ -48,13 +47,13 @@ func SmartCreateRemind(ctx context.Context, conf *config.Config, aiClient openai
 	userInput := fmt.Sprintf("提醒内容：%s", content)
 
 	aiReq := openai.ChatCompletionNewParams{
-		Model: conf.Common.AIModel,
+		Model: aiModel,
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.SystemMessage(prompt),
 			openai.UserMessage(userInput),
 		},
 	}
-	aiutil.ConfigureModelParams(&aiReq, conf.Common.AIModel)
+	aiutil.ConfigureModelParams(&aiReq, aiModel)
 
 	completion, err := aiClient.Chat.Completions.New(ctx, aiReq)
 	if err != nil {
