@@ -63,7 +63,7 @@ func TestGuestbook_List(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			dbunit.New(t, func(d *dbunit.DBUnit) {
 				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook")...)
-				svc := NewGuestbook(store.New(db), nil, WithModerator(&MockModerator{ShouldPass: true}))
+				svc := NewGuestbook(store.New(db), WithModerator(&MockModerator{ShouldPass: true}))
 
 				resp, err := svc.List(context.Background(), &apiv1.GuestbookListRequest{Page: tt.page})
 				if tt.wantErr {
@@ -141,7 +141,7 @@ func TestGuestbook_Create(t *testing.T) {
 				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook")...)
 				ctx := context.Background()
 
-				svc := NewGuestbook(store.New(db), nil, WithModerator(tt.moderator))
+				svc := NewGuestbook(store.New(db), WithModerator(tt.moderator))
 
 				// 获取创建前的总数
 				beforeResp, err := svc.List(ctx, &apiv1.GuestbookListRequest{Page: 1})
@@ -188,8 +188,8 @@ func TestGuestbook_Create_WithoutModerator(t *testing.T) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook")...)
 		ctx := context.Background()
 
-		// 不设置审核器，应该也能正常创建
-		svc := NewGuestbook(store.New(db), nil)
+		// 不设置自定义审核器，应该也能正常创建
+		svc := NewGuestbook(store.New(db))
 
 		resp, err := svc.Create(ctx, &apiv1.GuestbookCreateRequest{
 			Name:    "测试",
