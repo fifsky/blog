@@ -50,7 +50,11 @@ export default function AdminIndex() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
-      await settingUpdateApi({ kv: values });
+      const kv = { ...values };
+      if (!kv.ai_token?.trim()) {
+        delete kv.ai_token;
+      }
+      await settingUpdateApi({ kv });
       setShowMessage(true);
       setTimeout(() => setShowMessage(false), 3000);
     } finally {
@@ -145,7 +149,9 @@ export default function AdminIndex() {
                   <FieldLabel htmlFor={field.name}>AI Token</FieldLabel>
                   <FieldContent>
                     <Input {...field} id={field.name} />
-                    <FieldDescription>AI 服务的 API Token，用于调用大语言模型。</FieldDescription>
+                    <FieldDescription>
+                      AI 服务的 API Token，用于调用大语言模型；不修改时保持为空。
+                    </FieldDescription>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </FieldContent>
                 </Field>
@@ -174,7 +180,7 @@ export default function AdminIndex() {
                   <FieldContent>
                     <Input {...field} id={field.name} />
                     <FieldDescription>
-                      AI 服务的模型名称，如 doubao-seed-2-0-lite-260215。
+                      AI 服务的模型名称，如 deepseek-v4-flash。
                     </FieldDescription>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </FieldContent>

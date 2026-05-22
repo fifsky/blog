@@ -29,6 +29,7 @@ func (s *Setting) Get(ctx context.Context, _ *emptypb.Empty) (*types.Options, er
 	if err != nil {
 		return nil, err
 	}
+	delete(m, "ai_token")
 	return &types.Options{Kv: m}, nil
 }
 
