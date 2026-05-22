@@ -14,7 +14,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/feeds v1.2.0
 	github.com/gorilla/schema v1.4.1
-	github.com/larksuite/oapi-sdk-go/v3 v3.5.3
+	github.com/larksuite/oapi-sdk-go/v3 v3.9.2
 	github.com/modelcontextprotocol/go-sdk v1.4.0
 	github.com/openai/openai-go/v3 v3.26.0
 	github.com/robfig/cron/v3 v3.0.1
