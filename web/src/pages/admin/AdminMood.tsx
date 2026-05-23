@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { moodDeleteApi, moodListApi, moodCreateApi, moodUpdateApi } from "@/service";
+import { moodDeleteApi, moodListApi, moodCreateApi, moodUpdateApi, aiGenerateMoodApi } from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Pagination } from "@/components/Pagination";
 import { useForm, Controller } from "react-hook-form";
@@ -59,6 +59,18 @@ export default function AdminMood() {
       else await moodCreateApi({ content: values.content });
       cancel();
       loadList();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const autoGenerate = async () => {
+    setLoading(true);
+    try {
+      const ret = await aiGenerateMoodApi();
+      if (ret?.content) {
+        form.setValue("content", ret.content, { shouldValidate: true });
+      }
     } finally {
       setLoading(false);
     }
@@ -225,6 +237,18 @@ export default function AdminMood() {
               <Field orientation="horizontal">
                 <Button type="submit" size="sm" loading={loading}>
                   {item?.id ? "修改" : "添加"}
+                </Button>
+                <Button 
+                  type="button" 
+                  size="sm" 
+                  variant="outline" 
+                  loading={loading}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    autoGenerate();
+                  }}
+                >
+                  AI 生成
                 </Button>
                 {item?.id && (
                   <Button

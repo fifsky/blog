@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"app/config"
+	"app/pkg/aiagent"
 	"app/pkg/bark"
 	"app/store"
 	"app/testutil"
@@ -44,9 +45,6 @@ func TestMotto_GenerateDailyMotto(t *testing.T) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("moods", "users")...)
 		s := store.New(db)
 
-		// Prepare Config
-		conf := &config.Config{}
-
 		// Prepare Bark Client
 		barkClient := bark.New(http.DefaultClient, ts.URL, "test-token")
 
@@ -55,7 +53,7 @@ func TestMotto_GenerateDailyMotto(t *testing.T) {
 			Result: "Test Motto Content",
 		}
 
-		m := New(s, conf, barkClient, ai)
+		m := New(s, barkClient, ai)
 
 		// Execute
 		err := m.GenerateDailyMotto()
@@ -98,12 +96,14 @@ func TestOpenAIProvider_GenerateWrapsAgentRun(t *testing.T) {
 			(22, 'ai_model', 'test-model')`, ts.URL)
 		require.NoError(t, err)
 
-		provider := NewOpenAIProvider(&config.Config{}, store.New(db))
+		provider := NewOpenAIProvider(aiagent.New(
+			aiagent.WithClient(openai.NewClient(option.WithAPIKey("test"), option.WithBaseURL(ts.URL))),
+			aiagent.WithModel("test"),
+		))
 		got, err := provider.Generate(context.Background(), "system prompt", "2026-05-22")
 		require.NoError(t, err)
 		assert.Equal(t, "Test Motto", got)
 
-		require.Len(t, provider.history, 2)
 		require.Len(t, requests, 1)
 		assert.Equal(t, "system", requests[0].Messages[0].Role)
 		assert.Equal(t, "user", requests[0].Messages[1].Role)
@@ -112,27 +112,29 @@ func TestOpenAIProvider_GenerateWrapsAgentRun(t *testing.T) {
 }
 
 func TestOpenAIProvider_Generate(t *testing.T) {
-	// t.Skip("skip test")
+	if testing.Short() {
+		t.Skip("skip test")
+	}
+	if os.Getenv("AI_TOKEN") == "" {
+		t.Skip("skip test due to missing AI_TOKEN")
+	}
+
 	client := openai.NewClient(
 		option.WithAPIKey(os.Getenv("AI_TOKEN")),
 		option.WithBaseURL(os.Getenv("AI_ENDPOINT")),
 	)
-	req := openai.ChatCompletionNewParams{
-		Messages: []openai.ChatCompletionMessageParamUnion{
-			openai.SystemMessage(prompt),
-			openai.UserMessage(time.Now().Format(time.DateOnly)),
-		},
-		Model:           openai.ChatModel(os.Getenv("AI_MODEL")),
-		ReasoningEffort: "high",
-	}
+	ai := NewOpenAIProvider(aiagent.New(
+		aiagent.WithClient(client),
+		aiagent.WithModel(os.Getenv("AI_MODEL")),
+		aiagent.WithMCP(map[string]config.MCPConf{
+			"web_search": {
+				Name: "联网搜索",
+				URL:  os.Getenv("WEBSEARCH_MCP"),
+			},
+		}),
+	))
 
-	req.SetExtraFields(map[string]any{
-		"thinking": map[string]any{
-			"type": "enabled",
-		},
-	})
-
-	content, err := client.Chat.Completions.New(context.Background(), req)
+	content, err := ai.Generate(context.Background(), Prompt, time.Now().Format("2006-01-02"))
 	require.NoError(t, err)
-	fmt.Println(content.Choices[0].Message.Content)
+	fmt.Println(content)
 }

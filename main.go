@@ -8,6 +8,7 @@ import (
 
 	"app/cmd"
 	"app/config"
+	"app/pkg/aiagent"
 	"app/pkg/bark"
 	"app/pkg/messenger"
 	"app/service/feishu"
@@ -17,6 +18,8 @@ import (
 
 	"github.com/goapt/httpx"
 	"github.com/goapt/logger"
+	"github.com/openai/openai-go/v3"
+	"github.com/openai/openai-go/v3/option"
 
 	"github.com/urfave/cli/v3"
 )
@@ -49,22 +52,32 @@ func main() {
 	r := remind.New(s, conf, multiSender)
 	go r.Start()
 
-	ai := motto.NewOpenAIProvider(conf, s)
-	m := motto.New(s, conf, barkClient, ai)
+	aiCfg := s.GetAIConfig(context.Background())
+	client := openai.NewClient(
+		option.WithAPIKey(aiCfg.Token),
+		option.WithBaseURL(aiCfg.Endpoint),
+		option.WithHTTPClient(httpClient),
+	)
+	agent := aiagent.New(
+		aiagent.WithClient(client),
+		aiagent.WithModel(aiCfg.Model),
+		aiagent.WithMCP(conf.MCP),
+	)
+
+	ai := motto.NewOpenAIProvider(agent)
+	m := motto.New(s, barkClient, ai)
 	go m.Start("0 7 * * *")
 
 	// Feishu bot service
 	if conf.Feishu.Appid != "" {
-		feishuBot := feishu.NewBot(conf, s)
+		feishuBot := feishu.NewBot(conf, s, agent)
 		go feishuBot.Start(context.Background())
 	}
-
 	app := &cli.Command{
 		Name:  "blog",
 		Usage: "fifsky blog",
 		Commands: []*cli.Command{
-			cmd.NewHttp(db, conf, httpClient),
-			cmd.NewTmp(db, conf),
+			cmd.NewHttp(db, conf, httpClient, agent),
 		},
 	}
 

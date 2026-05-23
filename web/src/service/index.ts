@@ -108,6 +108,8 @@ export const aiGenerateTagsApi = (
   data: GenerateTagsRequest,
   errorHandler?: (e: AppError) => void,
 ) => createApi<GenerateTagsResponse>("/blog/admin/ai/tags", data, errorHandler);
+export const aiGenerateMoodApi = (errorHandler?: (e: AppError) => void) =>
+  createApi<{ content: string }>("/blog/admin/ai/mood", undefined, errorHandler);
 export const settingAdminApi = (errorHandler?: (e: AppError) => void) =>
   createApi<AdminSetting>("/blog/admin/setting", undefined, errorHandler);
 export const settingUpdateApi = (data: AdminSetting, errorHandler?: (e: AppError) => void) =>

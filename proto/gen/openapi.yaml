@@ -6,6 +6,23 @@ info:
     title: API文档
     version: 0.0.1
 paths:
+    /blog/admin/ai/mood:
+        post:
+            tags:
+                - AIService
+            description: GenerateMood 自动生成心情
+            operationId: AIService_GenerateMood
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GenerateMoodResponse'
     /blog/admin/ai/remind/create:
         post:
             tags:
@@ -1411,6 +1428,12 @@ components:
                     type: string
                 latitude:
                     type: string
+        GenerateMoodResponse:
+            type: object
+            properties:
+                content:
+                    type: string
+            description: GenerateMoodResponse 生成心情响应
         GenerateTagsRequest:
             required:
                 - content

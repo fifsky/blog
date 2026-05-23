@@ -11,6 +11,7 @@ import (
 
 	"app/config"
 	"app/pkg/aesutil"
+	"app/pkg/aiagent"
 	apiv1 "app/proto/gen/api/v1"
 	"app/service/openapi"
 	"app/store"
@@ -36,7 +37,7 @@ type Bot struct {
 }
 
 // NewBot creates a new Feishu bot instance.
-func NewBot(conf *config.Config, s *store.Store) *Bot {
+func NewBot(conf *config.Config, s *store.Store, agent *aiagent.Agent) *Bot {
 	// Create Lark client for API calls
 	larkClient := lark.NewClient(
 		conf.Feishu.Appid,
@@ -45,7 +46,7 @@ func NewBot(conf *config.Config, s *store.Store) *Bot {
 	)
 
 	// Create AI chat handler
-	aiChat := NewAIChat(conf, larkClient, s)
+	aiChat := NewAIChat(agent, larkClient, s)
 
 	// Create remind service for card callback handling
 	remind := openapi.NewRemind(s, conf)

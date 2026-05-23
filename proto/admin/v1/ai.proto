@@ -6,6 +6,8 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "types/common.proto";
 
+import "google/protobuf/empty.proto";
+
 option go_package = "gen/admin/v1";
 
 // AIService 提供 AI 相关的接口
@@ -21,6 +23,13 @@ service AIService {
   rpc RemindSmartCreate(RemindSmartCreateRequest) returns (fifsky.blog.types.IDResponse) {
     option (google.api.http) = {
       post: "/blog/admin/ai/remind/create"
+      body: "*"
+    };
+  }
+  // GenerateMood 自动生成心情
+  rpc GenerateMood(google.protobuf.Empty) returns (GenerateMoodResponse) {
+    option (google.api.http) = {
+      post: "/blog/admin/ai/mood"
       body: "*"
     };
   }
@@ -46,4 +55,9 @@ message RemindSmartCreateRequest {
     (buf.validate.field).required = true,
     (google.api.field_behavior) = REQUIRED
   ];
+}
+
+// GenerateMoodResponse 生成心情响应
+message GenerateMoodResponse {
+  string content = 1;
 }

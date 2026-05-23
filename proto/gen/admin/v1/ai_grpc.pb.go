@@ -12,6 +12,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -22,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	AIService_GenerateTags_FullMethodName      = "/fifsky.blog.admin.v1.AIService/GenerateTags"
 	AIService_RemindSmartCreate_FullMethodName = "/fifsky.blog.admin.v1.AIService/RemindSmartCreate"
+	AIService_GenerateMood_FullMethodName      = "/fifsky.blog.admin.v1.AIService/GenerateMood"
 )
 
 // AIServiceClient is the client API for AIService service.
@@ -34,6 +36,8 @@ type AIServiceClient interface {
 	GenerateTags(ctx context.Context, in *GenerateTagsRequest, opts ...grpc.CallOption) (*GenerateTagsResponse, error)
 	// RemindSmartCreate 智能创建提醒
 	RemindSmartCreate(ctx context.Context, in *RemindSmartCreateRequest, opts ...grpc.CallOption) (*types.IDResponse, error)
+	// GenerateMood 自动生成心情
+	GenerateMood(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GenerateMoodResponse, error)
 }
 
 type aIServiceClient struct {
@@ -64,6 +68,16 @@ func (c *aIServiceClient) RemindSmartCreate(ctx context.Context, in *RemindSmart
 	return out, nil
 }
 
+func (c *aIServiceClient) GenerateMood(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GenerateMoodResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GenerateMoodResponse)
+	err := c.cc.Invoke(ctx, AIService_GenerateMood_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AIServiceServer is the server API for AIService service.
 // All implementations must embed UnimplementedAIServiceServer
 // for forward compatibility.
@@ -74,6 +88,8 @@ type AIServiceServer interface {
 	GenerateTags(context.Context, *GenerateTagsRequest) (*GenerateTagsResponse, error)
 	// RemindSmartCreate 智能创建提醒
 	RemindSmartCreate(context.Context, *RemindSmartCreateRequest) (*types.IDResponse, error)
+	// GenerateMood 自动生成心情
+	GenerateMood(context.Context, *emptypb.Empty) (*GenerateMoodResponse, error)
 	mustEmbedUnimplementedAIServiceServer()
 }
 
@@ -89,6 +105,9 @@ func (UnimplementedAIServiceServer) GenerateTags(context.Context, *GenerateTagsR
 }
 func (UnimplementedAIServiceServer) RemindSmartCreate(context.Context, *RemindSmartCreateRequest) (*types.IDResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RemindSmartCreate not implemented")
+}
+func (UnimplementedAIServiceServer) GenerateMood(context.Context, *emptypb.Empty) (*GenerateMoodResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GenerateMood not implemented")
 }
 func (UnimplementedAIServiceServer) mustEmbedUnimplementedAIServiceServer() {}
 func (UnimplementedAIServiceServer) testEmbeddedByValue()                   {}
@@ -147,6 +166,24 @@ func _AIService_RemindSmartCreate_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AIService_GenerateMood_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AIServiceServer).GenerateMood(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AIService_GenerateMood_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AIServiceServer).GenerateMood(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AIService_ServiceDesc is the grpc.ServiceDesc for AIService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -161,6 +198,10 @@ var AIService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RemindSmartCreate",
 			Handler:    _AIService_RemindSmartCreate_Handler,
+		},
+		{
+			MethodName: "GenerateMood",
+			Handler:    _AIService_GenerateMood_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

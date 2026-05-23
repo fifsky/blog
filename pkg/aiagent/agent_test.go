@@ -11,6 +11,7 @@ import (
 	mcpclient "app/pkg/mcp"
 
 	"github.com/openai/openai-go/v3"
+	"github.com/openai/openai-go/v3/option"
 )
 
 type fakeToolProvider struct {
@@ -184,9 +185,8 @@ func TestAgentRunStreamsContentAndExecutesTools(t *testing.T) {
 		},
 	}
 	agent := &Agent{
-		clientProvider: func(context.Context) (openai.Client, string, error) {
-			return openai.Client{}, "test-model", nil
-		},
+		client:        openai.NewClient(option.WithAPIKey("test")),
+		model:         "test-model",
 		streamFactory: streamFactory,
 		tools:         toolProvider,
 	}
@@ -270,9 +270,8 @@ func TestAgentRunReturnsReasoningContentAfterToolCalls(t *testing.T) {
 		},
 	}
 	agent := &Agent{
-		clientProvider: func(context.Context) (openai.Client, string, error) {
-			return openai.Client{}, "deepseek-v4-pro", nil
-		},
+		client:        openai.NewClient(option.WithAPIKey("test")),
+		model:         "deepseek-v4-pro",
 		streamFactory: streamFactory,
 		tools:         toolProvider,
 	}

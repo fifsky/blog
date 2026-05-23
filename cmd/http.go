@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"app/config"
+	"app/pkg/aiagent"
 	"app/server"
 	"app/server/router"
 	"app/service/admin"
@@ -16,7 +17,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func NewHttp(db *sql.DB, conf *config.Config, httpClient *http.Client) *cli.Command {
+func NewHttp(db *sql.DB, conf *config.Config, httpClient *http.Client, agent *aiagent.Agent) *cli.Command {
 	return &cli.Command{
 		Name:  "http",
 		Usage: "http command eg: ./app http --addr=:8080",
@@ -32,8 +33,9 @@ func NewHttp(db *sql.DB, conf *config.Config, httpClient *http.Client) *cli.Comm
 			}
 			log.Println("[Env] Run profile:" + conf.Env)
 			s := store.New(db)
+
 			apiService := openapi.New(s, conf, httpClient)
-			adminService := admin.New(s, conf)
+			adminService := admin.New(s, conf, agent)
 			route := router.New(apiService, adminService, conf, s)
 			return server.New(
 				server.Handler(route.Handler()),

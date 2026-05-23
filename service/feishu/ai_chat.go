@@ -8,7 +8,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"app/config"
 	"app/pkg/aiagent"
 	"app/store"
 
@@ -34,10 +33,10 @@ type AIChat struct {
 }
 
 // NewAIChat creates a new AIChat instance.
-func NewAIChat(conf *config.Config, larkClient *lark.Client, s *store.Store) *AIChat {
+func NewAIChat(agent *aiagent.Agent, larkClient *lark.Client, s *store.Store) *AIChat {
 	return &AIChat{
 		larkClient: larkClient,
-		agent:      aiagent.New(conf, s),
+		agent:      agent,
 		memory:     aiagent.NewMemory(contextCacheTTL, maxContextMessages),
 		store:      s,
 	}

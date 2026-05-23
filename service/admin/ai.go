@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"app/config"
 	"app/pkg/aiagent"
 	"app/pkg/aiutil"
 	"app/pkg/errors"
@@ -17,9 +16,11 @@ import (
 	"app/proto/gen/types"
 	"app/server/response"
 	"app/service/mcptool"
+	"app/service/motto"
 	"app/store"
 
 	"github.com/openai/openai-go/v3"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var _ adminv1.AIServiceServer = (*AI)(nil)
@@ -30,9 +31,9 @@ type AI struct {
 	store *store.Store
 }
 
-func NewAI(conf *config.Config, s *store.Store) *AI {
+func NewAI(agent *aiagent.Agent, s *store.Store) *AI {
 	return &AI{
-		agent: aiagent.New(conf, s),
+		agent: agent,
 		store: s,
 	}
 }
@@ -221,10 +222,8 @@ func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest)
 		return nil, errors.BadRequest("EMPTY_CONTENT", "Content cannot be empty")
 	}
 
-	aiClient, aiModel, err := a.agent.Client(ctx)
-	if err != nil {
-		return nil, errors.InternalServer("AI_CONFIG_ERROR", err.Error())
-	}
+	aiClient := a.agent.GetClient()
+	aiModel := a.agent.GetModel()
 
 	prompt := `你是一个博客写作助手。请根据用户提供的文章标题与正文，为文章生成 3-8 个中文标签。
 要求：
@@ -235,7 +234,7 @@ func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest)
 	userInput := fmt.Sprintf("标题：%s\n正文：\n%s", strings.TrimSpace(req.Title), content)
 
 	aiReq := openai.ChatCompletionNewParams{
-		Model: aiModel,
+		Model: openai.ChatModel(aiModel),
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.SystemMessage(prompt),
 			openai.UserMessage(userInput),
@@ -257,15 +256,27 @@ func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest)
 }
 
 func (a *AI) RemindSmartCreate(ctx context.Context, req *adminv1.RemindSmartCreateRequest) (*types.IDResponse, error) {
-	aiClient, aiModel, err := a.agent.Client(ctx)
-	if err != nil {
-		return nil, errors.InternalServer("AI_CONFIG_ERROR", err.Error())
-	}
+	aiClient := a.agent.GetClient()
+	aiModel := a.agent.GetModel()
+
 	lastID, err := mcptool.SmartCreateRemind(ctx, aiClient, aiModel, a.store, req.Content)
 	if err != nil {
 		return nil, err
 	}
 	return &types.IDResponse{Id: int32(lastID)}, nil
+}
+
+func (a *AI) GenerateMood(ctx context.Context, _ *emptypb.Empty) (*adminv1.GenerateMoodResponse, error) {
+	dateStr := time.Now().Format("2006-01-02")
+	provider := motto.NewOpenAIProvider(a.agent)
+	content, err := provider.Generate(ctx, motto.Prompt, dateStr)
+	if err != nil {
+		return nil, err
+	}
+
+	return &adminv1.GenerateMoodResponse{
+		Content: content,
+	}, nil
 }
 
 func parseTagsFromAIResponse(text string) []string {

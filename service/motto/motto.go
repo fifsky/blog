@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
-	"sync"
 	"time"
 
-	"app/config"
 	"app/pkg/aiagent"
 	"app/pkg/bark"
 	"app/store"
@@ -20,12 +18,13 @@ import (
 )
 
 var (
-	prompt = `# 角色
+	Prompt = `# 角色
 根据我提供的日期，查询和我兴趣关注点相关的内容，生成一段符合意境的心情日志
 1. **信息准确性守护者**：确保提供的信息准确无误。
 2. 生成的心情日志必须符合我兴趣关注点相关的内容，不要以第一人称角度描述，避免包含政治、色情、暴力、广告等不适宜的内容。
 3. 控制字数在 100 字以内，不要写仅供参考等形式化的内容。
-4. **回答更生动活泼**：请在模型的回复中使用适当的 emoji 标签作为天气和心情的表示 🌟😊🎉
+4. **回答更生动活泼**：你可以在心情日志中使用适当的 emoji 表情来描述天气和心情，例如 🌟😊🎉
+5. **重要** 只需要输出心情日志的内容，不要输出其他内容。
 
 ## 我兴趣关注点相关的内容
 - 科技（人工智能、IT、编程）
@@ -42,24 +41,19 @@ type AIProvider interface {
 }
 
 type OpenAIProvider struct {
-	agent   *aiagent.Agent
-	history []openai.ChatCompletionMessageParamUnion
-	mu      sync.Mutex
+	agent *aiagent.Agent
 }
 
-func NewOpenAIProvider(conf *config.Config, s *store.Store) *OpenAIProvider {
+func NewOpenAIProvider(agent *aiagent.Agent) *OpenAIProvider {
 	return &OpenAIProvider{
-		agent: aiagent.New(conf, s),
+		agent: agent,
 	}
 }
 
 func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (string, error) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-
-	messages := make([]openai.ChatCompletionMessageParamUnion, 0, len(p.history)+1)
-	messages = append(messages, p.history...)
-	messages = append(messages, openai.UserMessage(content))
+	messages := []openai.ChatCompletionMessageParamUnion{
+		openai.UserMessage(content),
+	}
 
 	var response strings.Builder
 	result, err := p.agent.Run(ctx, aiagent.Request{
@@ -80,29 +74,19 @@ func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (
 	if answer == "" {
 		answer = result.Content
 	}
-	if answer != "" {
-		// 记录历史消息：用户输入和 AI 输出
-		p.history = append(p.history, openai.UserMessage(content))
-		if len(result.Messages) > 0 {
-			p.history = append(p.history, result.Messages...)
-		} else {
-			p.history = append(p.history, openai.AssistantMessage(answer))
-		}
-	}
+
 	return answer, nil
 }
 
 type Motto struct {
 	store      *store.Store
-	conf       *config.Config
 	barkClient *bark.Client
 	ai         AIProvider
 }
 
-func New(s *store.Store, conf *config.Config, barkClient *bark.Client, ai AIProvider) *Motto {
+func New(s *store.Store, barkClient *bark.Client, ai AIProvider) *Motto {
 	return &Motto{
 		store:      s,
-		conf:       conf,
 		barkClient: barkClient,
 		ai:         ai,
 	}
@@ -129,7 +113,7 @@ func (m *Motto) GenerateDailyMotto() error {
 	logger.Default().Info("start generate daily motto")
 	dateStr := time.Now().Format("2006-01-02")
 
-	content, err := m.ai.Generate(context.Background(), prompt, dateStr)
+	content, err := m.ai.Generate(context.Background(), Prompt, dateStr)
 	if err != nil {
 		return err
 	}

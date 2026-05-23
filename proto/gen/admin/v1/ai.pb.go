@@ -12,6 +12,7 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -167,21 +168,69 @@ func (x *RemindSmartCreateRequest) GetContent() string {
 	return ""
 }
 
+// GenerateMoodResponse 生成心情响应
+type GenerateMoodResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Content       string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GenerateMoodResponse) Reset() {
+	*x = GenerateMoodResponse{}
+	mi := &file_admin_v1_ai_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GenerateMoodResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateMoodResponse) ProtoMessage() {}
+
+func (x *GenerateMoodResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_ai_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateMoodResponse.ProtoReflect.Descriptor instead.
+func (*GenerateMoodResponse) Descriptor() ([]byte, []int) {
+	return file_admin_v1_ai_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GenerateMoodResponse) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
 var File_admin_v1_ai_proto protoreflect.FileDescriptor
 
 const file_admin_v1_ai_proto_rawDesc = "" +
 	"\n" +
-	"\x11admin/v1/ai.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x12types/common.proto\"P\n" +
+	"\x11admin/v1/ai.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x12types/common.proto\x1a\x1bgoogle/protobuf/empty.proto\"P\n" +
 	"\x13GenerateTagsRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12#\n" +
 	"\acontent\x18\x02 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\acontent\"*\n" +
 	"\x14GenerateTagsResponse\x12\x12\n" +
 	"\x04tags\x18\x01 \x03(\tR\x04tags\"?\n" +
 	"\x18RemindSmartCreateRequest\x12#\n" +
-	"\acontent\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\acontent2\xa1\x02\n" +
+	"\acontent\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\acontent\"0\n" +
+	"\x14GenerateMoodResponse\x12\x18\n" +
+	"\acontent\x18\x01 \x01(\tR\acontent2\x95\x03\n" +
 	"\tAIService\x12\x85\x01\n" +
 	"\fGenerateTags\x12).fifsky.blog.admin.v1.GenerateTagsRequest\x1a*.fifsky.blog.admin.v1.GenerateTagsResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/blog/admin/ai/tags\x12\x8b\x01\n" +
-	"\x11RemindSmartCreate\x12..fifsky.blog.admin.v1.RemindSmartCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/blog/admin/ai/remind/createB\xb6\x01\n" +
+	"\x11RemindSmartCreate\x12..fifsky.blog.admin.v1.RemindSmartCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"'\x82\xd3\xe4\x93\x02!:\x01*\"\x1c/blog/admin/ai/remind/create\x12r\n" +
+	"\fGenerateMood\x12\x16.google.protobuf.Empty\x1a*.fifsky.blog.admin.v1.GenerateMoodResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/blog/admin/ai/moodB\xb6\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\aAiProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var (
@@ -196,20 +245,24 @@ func file_admin_v1_ai_proto_rawDescGZIP() []byte {
 	return file_admin_v1_ai_proto_rawDescData
 }
 
-var file_admin_v1_ai_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_admin_v1_ai_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_admin_v1_ai_proto_goTypes = []any{
 	(*GenerateTagsRequest)(nil),      // 0: fifsky.blog.admin.v1.GenerateTagsRequest
 	(*GenerateTagsResponse)(nil),     // 1: fifsky.blog.admin.v1.GenerateTagsResponse
 	(*RemindSmartCreateRequest)(nil), // 2: fifsky.blog.admin.v1.RemindSmartCreateRequest
-	(*types.IDResponse)(nil),         // 3: fifsky.blog.types.IDResponse
+	(*GenerateMoodResponse)(nil),     // 3: fifsky.blog.admin.v1.GenerateMoodResponse
+	(*emptypb.Empty)(nil),            // 4: google.protobuf.Empty
+	(*types.IDResponse)(nil),         // 5: fifsky.blog.types.IDResponse
 }
 var file_admin_v1_ai_proto_depIdxs = []int32{
 	0, // 0: fifsky.blog.admin.v1.AIService.GenerateTags:input_type -> fifsky.blog.admin.v1.GenerateTagsRequest
 	2, // 1: fifsky.blog.admin.v1.AIService.RemindSmartCreate:input_type -> fifsky.blog.admin.v1.RemindSmartCreateRequest
-	1, // 2: fifsky.blog.admin.v1.AIService.GenerateTags:output_type -> fifsky.blog.admin.v1.GenerateTagsResponse
-	3, // 3: fifsky.blog.admin.v1.AIService.RemindSmartCreate:output_type -> fifsky.blog.types.IDResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	4, // 2: fifsky.blog.admin.v1.AIService.GenerateMood:input_type -> google.protobuf.Empty
+	1, // 3: fifsky.blog.admin.v1.AIService.GenerateTags:output_type -> fifsky.blog.admin.v1.GenerateTagsResponse
+	5, // 4: fifsky.blog.admin.v1.AIService.RemindSmartCreate:output_type -> fifsky.blog.types.IDResponse
+	3, // 5: fifsky.blog.admin.v1.AIService.GenerateMood:output_type -> fifsky.blog.admin.v1.GenerateMoodResponse
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -226,7 +279,7 @@ func file_admin_v1_ai_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_ai_proto_rawDesc), len(file_admin_v1_ai_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

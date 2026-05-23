@@ -10,10 +10,8 @@ import (
 	"app/config"
 	"app/pkg/aiutil"
 	mcpclient "app/pkg/mcp"
-	"app/store"
 
 	"github.com/openai/openai-go/v3"
-	"github.com/openai/openai-go/v3/option"
 )
 
 type toolProvider interface {
@@ -48,10 +46,10 @@ func (f openAIStreamFactory) NewStreaming(ctx context.Context, req openai.ChatCo
 
 // Agent 负责 OpenAI 初始化、MCP 工具绑定和工具调用循环。
 type Agent struct {
-	store          *store.Store
-	tools          toolProvider
-	clientProvider func(ctx context.Context) (openai.Client, string, error)
-	streamFactory  chatStreamFactory
+	client        openai.Client
+	model         string
+	tools         toolProvider
+	streamFactory chatStreamFactory
 }
 
 // Request 描述一次 AI 对话请求。
@@ -84,57 +82,67 @@ type EventHandler struct {
 	OnToolEnd   func(ctx context.Context, event ToolEvent) error
 }
 
-// New 创建带数据库 AI 配置与 MCP 配置的 Agent。
-func New(conf *config.Config, s *store.Store) *Agent {
-	manager := mcpclient.NewManager()
-	for key, mcpConf := range conf.MCP {
-		if mcpConf.URL == "" {
-			continue
-		}
-		displayName := mcpConf.Name
-		if displayName == "" {
-			displayName = key
-		}
-		manager.AddClient(key, displayName, mcpConf.URL, mcpConf.Token)
-	}
+// Option 定义 Agent 的配置选项
+type Option func(*Agent)
 
-	return &Agent{
-		store: s,
-		tools: manager,
+// WithClient 设置 OpenAI 客户端
+func WithClient(client openai.Client) Option {
+	return func(a *Agent) {
+		a.client = client
 	}
 }
 
-// Client 按需创建 OpenAI client，优先使用数据库配置。
-func (a *Agent) Client(ctx context.Context) (openai.Client, string, error) {
-	if a.clientProvider != nil {
-		return a.clientProvider(ctx)
+// WithModel 设置使用的模型名称
+func WithModel(model string) Option {
+	return func(a *Agent) {
+		a.model = model
 	}
-	if a.store == nil {
-		return openai.Client{}, "", fmt.Errorf("ai store is nil")
+}
+
+// WithMCP 设置 MCP 配置
+func WithMCP(mcp map[string]config.MCPConf) Option {
+	return func(a *Agent) {
+		manager := mcpclient.NewManager()
+		for key, mcpConf := range mcp {
+			if mcpConf.URL == "" {
+				continue
+			}
+			displayName := mcpConf.Name
+			if displayName == "" {
+				displayName = key
+			}
+			manager.AddClient(key, displayName, mcpConf.URL, mcpConf.Token)
+		}
+		a.tools = manager
+	}
+}
+
+// New 创建带配置的 Agent。
+func New(opts ...Option) *Agent {
+	a := &Agent{}
+
+	for _, opt := range opts {
+		opt(a)
 	}
 
-	aiCfg := a.store.GetAIConfig(ctx)
-	if aiCfg.Token == "" {
-		return openai.Client{}, "", fmt.Errorf("ai token is empty")
-	}
+	return a
+}
 
-	client := openai.NewClient(
-		option.WithAPIKey(aiCfg.Token),
-		option.WithBaseURL(aiCfg.Endpoint),
-	)
-	return client, aiCfg.Model, nil
+// GetClient 返回当前使用的 OpenAI 客户端
+func (a *Agent) GetClient() openai.Client {
+	return a.client
+}
+
+// GetModel 返回当前使用的模型名称
+func (a *Agent) GetModel() string {
+	return a.model
 }
 
 // Run 执行流式对话，并在模型请求工具时调用 MCP 后继续生成。
 func (a *Agent) Run(ctx context.Context, request Request, handler EventHandler) (Result, error) {
-	client, model, err := a.Client(ctx)
-	if err != nil {
-		return Result{}, err
-	}
-
 	streamFactory := a.streamFactory
 	if streamFactory == nil {
-		streamFactory = openAIStreamFactory{client: client}
+		streamFactory = openAIStreamFactory{client: a.client}
 	}
 
 	messages := make([]openai.ChatCompletionMessageParamUnion, 0, len(request.Messages)+1)
@@ -144,13 +152,13 @@ func (a *Agent) Run(ctx context.Context, request Request, handler EventHandler) 
 	messages = append(messages, request.Messages...)
 
 	aiReq := openai.ChatCompletionNewParams{
-		Model:    model,
+		Model:    openai.ChatModel(a.model),
 		Messages: messages,
 	}
 	if request.UseTools {
 		aiReq.Tools = a.buildTools(ctx)
 	}
-	aiutil.ConfigureModelParams(&aiReq, model)
+	aiutil.ConfigureModelParams(&aiReq, a.model)
 
 	var content strings.Builder
 	generatedMessages := make([]openai.ChatCompletionMessageParamUnion, 0, 2)

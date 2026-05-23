@@ -7,6 +7,7 @@ package adminv1
 import (
 	types "app/proto/gen/types"
 	context "context"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	http "net/http"
 )
 
@@ -16,6 +17,8 @@ import (
 
 // AIService 提供 AI 相关的接口
 type AIServiceHTTPServer interface {
+	// GenerateMood 自动生成心情
+	GenerateMood(context.Context, *emptypb.Empty) (*GenerateMoodResponse, error)
 	// GenerateTags 根据文章标题和内容生成标签
 	GenerateTags(context.Context, *GenerateTagsRequest) (*GenerateTagsResponse, error)
 	// RemindSmartCreate 智能创建提醒
@@ -31,6 +34,7 @@ type AIService struct {
 func (s *AIService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/admin/ai/tags", s.GenerateTags)
 	s.mux.HandleFunc("POST /blog/admin/ai/remind/create", s.RemindSmartCreate)
+	s.mux.HandleFunc("POST /blog/admin/ai/mood", s.GenerateMood)
 }
 
 func RegisterAIServiceHTTPServer(mux ServeMux, codec Codec, srv AIServiceHTTPServer) {
@@ -76,6 +80,18 @@ func (s *AIService) RemindSmartCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	out, err := s.server.RemindSmartCreate(r.Context(), &in)
+	if err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+	s.codec.Encode(w, r, out)
+	return
+}
+
+func (s *AIService) GenerateMood(w http.ResponseWriter, r *http.Request) {
+	var in emptypb.Empty
+
+	out, err := s.server.GenerateMood(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
 		return
