@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"app/pkg/aiutil"
 	"app/pkg/errors"
 	apiv1 "app/proto/gen/api/v1"
 	"app/server/middleware"
@@ -169,7 +168,11 @@ func (m *AIModerator) Moderate(ctx context.Context, content string) error {
 			openai.UserMessage(content),
 		},
 	}
-	aiutil.ConfigureModelParams(&aiReq, aiCfg.Model)
+	aiReq.SetExtraFields(map[string]any{
+		"thinking": map[string]any{
+			"type": "disabled",
+		},
+	})
 
 	completion, err := aiClient.Chat.Completions.New(ctx, aiReq)
 	if err != nil {

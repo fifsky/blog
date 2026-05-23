@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"app/pkg/aiagent"
-	"app/pkg/aiutil"
 	"app/pkg/errors"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
@@ -240,7 +239,6 @@ func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest)
 			openai.UserMessage(userInput),
 		},
 	}
-	aiutil.ConfigureModelParams(&aiReq, aiModel)
 
 	completion, err := aiClient.Chat.Completions.New(ctx, aiReq)
 	if err != nil {

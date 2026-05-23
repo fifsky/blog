@@ -8,10 +8,10 @@ import (
 	"strings"
 
 	"app/config"
-	"app/pkg/aiutil"
 	mcpclient "app/pkg/mcp"
 
 	"github.com/openai/openai-go/v3"
+	"github.com/openai/openai-go/v3/shared"
 )
 
 type toolProvider interface {
@@ -46,10 +46,12 @@ func (f openAIStreamFactory) NewStreaming(ctx context.Context, req openai.ChatCo
 
 // Agent 负责 OpenAI 初始化、MCP 工具绑定和工具调用循环。
 type Agent struct {
-	client        openai.Client
-	model         string
-	tools         toolProvider
-	streamFactory chatStreamFactory
+	client           openai.Client
+	model            string
+	tools            toolProvider
+	streamFactory    chatStreamFactory
+	disableReasoning bool
+	reasoningEffort  string
 }
 
 // Request 描述一次 AI 对话请求。
@@ -99,6 +101,23 @@ func WithModel(model string) Option {
 	}
 }
 
+// WithDisableReasoning 设置是否禁用深度思考
+func WithDisableReasoning() Option {
+	return func(a *Agent) {
+		a.disableReasoning = true
+	}
+}
+
+// WithReasoningEffort 设置深度思考级别，默认为 high
+func WithReasoningEffort(effort string) Option {
+	return func(a *Agent) {
+		if effort == "" {
+			effort = "high"
+		}
+		a.reasoningEffort = effort
+	}
+}
+
 // WithMCP 设置 MCP 配置
 func WithMCP(mcp map[string]config.MCPConf) Option {
 	return func(a *Agent) {
@@ -119,7 +138,9 @@ func WithMCP(mcp map[string]config.MCPConf) Option {
 
 // New 创建带配置的 Agent。
 func New(opts ...Option) *Agent {
-	a := &Agent{}
+	a := &Agent{
+		reasoningEffort: "high",
+	}
 
 	for _, opt := range opts {
 		opt(a)
@@ -155,10 +176,17 @@ func (a *Agent) Run(ctx context.Context, request Request, handler EventHandler) 
 		Model:    openai.ChatModel(a.model),
 		Messages: messages,
 	}
+	if !a.disableReasoning {
+		aiReq.ReasoningEffort = shared.ReasoningEffort(a.reasoningEffort)
+		aiReq.SetExtraFields(map[string]any{
+			"thinking": map[string]any{
+				"type": "enabled",
+			},
+		})
+	}
 	if request.UseTools {
 		aiReq.Tools = a.buildTools(ctx)
 	}
-	aiutil.ConfigureModelParams(&aiReq, a.model)
 
 	var content strings.Builder
 	generatedMessages := make([]openai.ChatCompletionMessageParamUnion, 0, 2)

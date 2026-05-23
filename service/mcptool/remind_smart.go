@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"app/pkg/aiutil"
 	"app/pkg/errors"
 	"app/pkg/promptutil"
 	"app/service/remind"
@@ -52,8 +51,8 @@ func SmartCreateRemind(ctx context.Context, aiClient openai.Client, aiModel stri
 			openai.SystemMessage(prompt),
 			openai.UserMessage(userInput),
 		},
+		ReasoningEffort: "high",
 	}
-	aiutil.ConfigureModelParams(&aiReq, aiModel)
 
 	completion, err := aiClient.Chat.Completions.New(ctx, aiReq)
 	if err != nil {
