@@ -7,7 +7,6 @@
 package adminv1
 
 import (
-	_ "app/proto/gen/types"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -120,7 +119,7 @@ var File_admin_v1_setting_proto protoreflect.FileDescriptor
 
 const file_admin_v1_setting_proto_rawDesc = "" +
 	"\n" +
-	"\x16admin/v1/setting.proto\x12\x14fifsky.blog.admin.v1\x1a\x12types/common.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xdd\x01\n" +
+	"\x16admin/v1/setting.proto\x12\x14fifsky.blog.admin.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xdd\x01\n" +
 	"\fAdminSetting\x12\x1b\n" +
 	"\tsite_name\x18\x01 \x01(\tR\bsiteName\x12\x1b\n" +
 	"\tsite_desc\x18\x02 \x01(\tR\bsiteDesc\x12!\n" +

@@ -7,7 +7,6 @@
 package types
 
 import (
-	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -66,50 +65,6 @@ func (x *IDResponse) GetId() int32 {
 	return 0
 }
 
-type Options struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Kv            map[string]string      `protobuf:"bytes,1,rep,name=kv,proto3" json:"kv,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Options) Reset() {
-	*x = Options{}
-	mi := &file_types_common_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Options) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Options) ProtoMessage() {}
-
-func (x *Options) ProtoReflect() protoreflect.Message {
-	mi := &file_types_common_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Options.ProtoReflect.Descriptor instead.
-func (*Options) Descriptor() ([]byte, []int) {
-	return file_types_common_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *Options) GetKv() map[string]string {
-	if x != nil {
-		return x.Kv
-	}
-	return nil
-}
-
 type UserSummary struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -121,7 +76,7 @@ type UserSummary struct {
 
 func (x *UserSummary) Reset() {
 	*x = UserSummary{}
-	mi := &file_types_common_proto_msgTypes[2]
+	mi := &file_types_common_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -133,7 +88,7 @@ func (x *UserSummary) String() string {
 func (*UserSummary) ProtoMessage() {}
 
 func (x *UserSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_types_common_proto_msgTypes[2]
+	mi := &file_types_common_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -146,7 +101,7 @@ func (x *UserSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserSummary.ProtoReflect.Descriptor instead.
 func (*UserSummary) Descriptor() ([]byte, []int) {
-	return file_types_common_proto_rawDescGZIP(), []int{2}
+	return file_types_common_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *UserSummary) GetId() int32 {
@@ -181,7 +136,7 @@ type CateSummary struct {
 
 func (x *CateSummary) Reset() {
 	*x = CateSummary{}
-	mi := &file_types_common_proto_msgTypes[3]
+	mi := &file_types_common_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -193,7 +148,7 @@ func (x *CateSummary) String() string {
 func (*CateSummary) ProtoMessage() {}
 
 func (x *CateSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_types_common_proto_msgTypes[3]
+	mi := &file_types_common_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -206,7 +161,7 @@ func (x *CateSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CateSummary.ProtoReflect.Descriptor instead.
 func (*CateSummary) Descriptor() ([]byte, []int) {
-	return file_types_common_proto_rawDescGZIP(), []int{3}
+	return file_types_common_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CateSummary) GetId() int32 {
@@ -241,7 +196,7 @@ type ErrorResponse struct {
 
 func (x *ErrorResponse) Reset() {
 	*x = ErrorResponse{}
-	mi := &file_types_common_proto_msgTypes[4]
+	mi := &file_types_common_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -253,7 +208,7 @@ func (x *ErrorResponse) String() string {
 func (*ErrorResponse) ProtoMessage() {}
 
 func (x *ErrorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_types_common_proto_msgTypes[4]
+	mi := &file_types_common_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -266,7 +221,7 @@ func (x *ErrorResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ErrorResponse.ProtoReflect.Descriptor instead.
 func (*ErrorResponse) Descriptor() ([]byte, []int) {
-	return file_types_common_proto_rawDescGZIP(), []int{4}
+	return file_types_common_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ErrorResponse) GetCode() string {
@@ -294,15 +249,10 @@ var File_types_common_proto protoreflect.FileDescriptor
 
 const file_types_common_proto_rawDesc = "" +
 	"\n" +
-	"\x12types/common.proto\x12\x11fifsky.blog.types\x1a\x1bbuf/validate/validate.proto\"\x1c\n" +
+	"\x12types/common.proto\x12\x11fifsky.blog.types\"\x1c\n" +
 	"\n" +
 	"IDResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\"~\n" +
-	"\aOptions\x12<\n" +
-	"\x02kv\x18\x01 \x03(\v2\".fifsky.blog.types.Options.KvEntryB\b\xbaH\x05\x9a\x01\x02\b\x01R\x02kv\x1a5\n" +
-	"\aKvEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"N\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"N\n" +
 	"\vUserSummary\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
@@ -332,24 +282,21 @@ func file_types_common_proto_rawDescGZIP() []byte {
 	return file_types_common_proto_rawDescData
 }
 
-var file_types_common_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_types_common_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_types_common_proto_goTypes = []any{
 	(*IDResponse)(nil),    // 0: fifsky.blog.types.IDResponse
-	(*Options)(nil),       // 1: fifsky.blog.types.Options
-	(*UserSummary)(nil),   // 2: fifsky.blog.types.UserSummary
-	(*CateSummary)(nil),   // 3: fifsky.blog.types.CateSummary
-	(*ErrorResponse)(nil), // 4: fifsky.blog.types.ErrorResponse
-	nil,                   // 5: fifsky.blog.types.Options.KvEntry
-	nil,                   // 6: fifsky.blog.types.ErrorResponse.DetailsEntry
+	(*UserSummary)(nil),   // 1: fifsky.blog.types.UserSummary
+	(*CateSummary)(nil),   // 2: fifsky.blog.types.CateSummary
+	(*ErrorResponse)(nil), // 3: fifsky.blog.types.ErrorResponse
+	nil,                   // 4: fifsky.blog.types.ErrorResponse.DetailsEntry
 }
 var file_types_common_proto_depIdxs = []int32{
-	5, // 0: fifsky.blog.types.Options.kv:type_name -> fifsky.blog.types.Options.KvEntry
-	6, // 1: fifsky.blog.types.ErrorResponse.details:type_name -> fifsky.blog.types.ErrorResponse.DetailsEntry
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	4, // 0: fifsky.blog.types.ErrorResponse.details:type_name -> fifsky.blog.types.ErrorResponse.DetailsEntry
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_types_common_proto_init() }
@@ -363,7 +310,7 @@ func file_types_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_types_common_proto_rawDesc), len(file_types_common_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

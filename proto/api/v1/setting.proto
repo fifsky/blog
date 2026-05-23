@@ -4,7 +4,6 @@ package fifsky.blog.api.v1;
 import "google/api/annotations.proto";
 import "google/api/httpbody.proto";
 import "google/protobuf/empty.proto";
-import "types/common.proto";
 
 option go_package = "gen/api/v1";
 

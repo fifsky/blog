@@ -7,7 +7,6 @@
 package apiv1
 
 import (
-	_ "app/proto/gen/types"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	httpbody "google.golang.org/genproto/googleapis/api/httpbody"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -97,7 +96,7 @@ var File_api_v1_setting_proto protoreflect.FileDescriptor
 
 const file_api_v1_setting_proto_rawDesc = "" +
 	"\n" +
-	"\x14api/v1/setting.proto\x12\x12fifsky.blog.api.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x19google/api/httpbody.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"\x81\x01\n" +
+	"\x14api/v1/setting.proto\x12\x12fifsky.blog.api.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x19google/api/httpbody.proto\x1a\x1bgoogle/protobuf/empty.proto\"\x81\x01\n" +
 	"\aSetting\x12\x1b\n" +
 	"\tsite_name\x18\x01 \x01(\tR\bsiteName\x12\x1b\n" +
 	"\tsite_desc\x18\x02 \x01(\tR\bsiteDesc\x12!\n" +
