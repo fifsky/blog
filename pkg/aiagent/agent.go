@@ -159,6 +159,28 @@ func (a *Agent) GetModel() string {
 	return a.model
 }
 
+// Clone 创建并返回当前 Agent 的副本，并应用新的配置选项
+func (a *Agent) Clone(opts ...Option) *Agent {
+	if a == nil {
+		return nil
+	}
+
+	clone := &Agent{
+		client:           a.client,
+		model:            a.model,
+		tools:            a.tools,
+		streamFactory:    a.streamFactory,
+		disableReasoning: a.disableReasoning,
+		reasoningEffort:  a.reasoningEffort,
+	}
+
+	for _, opt := range opts {
+		opt(clone)
+	}
+
+	return clone
+}
+
 // Run 执行流式对话，并在模型请求工具时调用 MCP 后继续生成。
 func (a *Agent) Run(ctx context.Context, request Request, handler EventHandler) (Result, error) {
 	streamFactory := a.streamFactory

@@ -18,6 +18,7 @@ export default function AdminMood() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
   const formSchema = z.object({
@@ -65,14 +66,14 @@ export default function AdminMood() {
   };
 
   const autoGenerate = async () => {
-    setLoading(true);
+    setAiLoading(true);
     try {
       const ret = await aiGenerateMoodApi();
       if (ret?.content) {
         form.setValue("content", ret.content, { shouldValidate: true });
       }
     } finally {
-      setLoading(false);
+      setAiLoading(false);
     }
   };
 
@@ -242,7 +243,7 @@ export default function AdminMood() {
                   type="button" 
                   size="sm" 
                   variant="outline" 
-                  loading={loading}
+                  loading={aiLoading}
                   onClick={(e) => {
                     e.preventDefault();
                     autoGenerate();

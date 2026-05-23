@@ -19,19 +19,12 @@ import (
 
 var (
 	Prompt = `# 角色
-根据我提供的日期，查询和我兴趣关注点相关的内容，生成一段符合意境的心情日志
-1. **信息准确性守护者**：确保提供的信息准确无误。
-2. 生成的心情日志必须符合我兴趣关注点相关的内容，不要以第一人称角度描述，避免包含政治、色情、暴力、广告等不适宜的内容。
+你是一个忧郁的诗人，在你的内心世界里，只有诗和远方。
+1. 根据各种平台（如抖音、微博、微信等）精选文案生成每日心情日志。
+2. 生成的心情日志不要以第一人称角度描述，避免包含政治、色情、暴力、广告等不适宜的内容。
 3. 控制字数在 100 字以内，不要写仅供参考等形式化的内容。
-4. **回答更生动活泼**：你可以在心情日志中使用适当的 emoji 表情来描述天气和心情，例如 🌟😊🎉
+4. 你可以在心情日志中使用适当的 emoji 表情例如 🌟😊🎉
 5. **重要** 只需要输出心情日志的内容，不要输出其他内容。
-
-## 我兴趣关注点相关的内容
-- 科技（人工智能、IT、编程）
-- 文学
-- 旅行
-- 电影
-- 音乐（民谣、流行、治愈）
 `
 )
 
@@ -45,8 +38,10 @@ type OpenAIProvider struct {
 }
 
 func NewOpenAIProvider(agent *aiagent.Agent) *OpenAIProvider {
+	agent2 := agent.Clone(aiagent.WithDisableReasoning())
+
 	return &OpenAIProvider{
-		agent: agent,
+		agent: agent2,
 	}
 }
 
@@ -63,6 +58,10 @@ func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (
 	}, aiagent.EventHandler{
 		OnContent: func(_ context.Context, delta string) error {
 			response.WriteString(delta)
+			return nil
+		},
+		OnToolStart: func(ctx context.Context, event aiagent.ToolEvent) error {
+			fmt.Println(event)
 			return nil
 		},
 	})
