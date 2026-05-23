@@ -60,11 +60,18 @@ export type UserUpdateRequest = {
 };
 export type GetUserRequest = { id: number };
 // 站点设置
-// site_name: 站点名称
-// site_desc: 站点描述
-// site_keyword: 站点关键字
-// post_num: 每页显示文章数
-export type Options = { kv: Record<string, string> };
+export type Setting = {
+  site_name: string;
+  site_desc: string;
+  site_keyword: string;
+  post_num: number;
+};
+
+export type AdminSetting = Setting & {
+  ai_endpoint: string;
+  ai_model: string;
+  ai_token: string;
+};
 
 export type CateMenuItem = { url: string; content: string };
 export type CateMenuResponse = { list: CateMenuItem[] };

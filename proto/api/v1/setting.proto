@@ -1,17 +1,24 @@
 syntax = "proto3";
 package fifsky.blog.api.v1;
 
-import "types/common.proto";
 import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
 import "google/api/httpbody.proto";
+import "google/protobuf/empty.proto";
+import "types/common.proto";
 
 option go_package = "gen/api/v1";
+
+message Setting {
+  string site_name = 1;
+  string site_desc = 2;
+  string site_keyword = 3;
+  int32 post_num = 4;
+}
 
 // SettingService 提供设置相关的接口
 service SettingService {
   // Get 获取设置
-  rpc Get(google.protobuf.Empty) returns (fifsky.blog.types.Options) {
+  rpc Get(google.protobuf.Empty) returns (Setting) {
     option (google.api.http) = {
       post: "/blog/setting"
       body: "*"
@@ -20,8 +27,6 @@ service SettingService {
 
   // GetChinaMap 获取中国地图数据
   rpc GetChinaMap(google.protobuf.Empty) returns (google.api.HttpBody) {
-    option (google.api.http) = {
-      get: "/blog/china_map"
-    };
+    option (google.api.http) = {get: "/blog/china_map"};
   }
 }

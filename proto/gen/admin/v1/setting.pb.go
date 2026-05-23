@@ -7,12 +7,13 @@
 package adminv1
 
 import (
-	types "app/proto/gen/types"
+	_ "app/proto/gen/types"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/known/emptypb"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
+	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -23,23 +24,141 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type AdminSetting struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SiteName      string                 `protobuf:"bytes,1,opt,name=site_name,json=siteName,proto3" json:"site_name,omitempty"`
+	SiteDesc      string                 `protobuf:"bytes,2,opt,name=site_desc,json=siteDesc,proto3" json:"site_desc,omitempty"`
+	SiteKeyword   string                 `protobuf:"bytes,3,opt,name=site_keyword,json=siteKeyword,proto3" json:"site_keyword,omitempty"`
+	PostNum       int32                  `protobuf:"varint,4,opt,name=post_num,json=postNum,proto3" json:"post_num,omitempty"`
+	AiEndpoint    string                 `protobuf:"bytes,5,opt,name=ai_endpoint,json=aiEndpoint,proto3" json:"ai_endpoint,omitempty"`
+	AiModel       string                 `protobuf:"bytes,6,opt,name=ai_model,json=aiModel,proto3" json:"ai_model,omitempty"`
+	AiToken       string                 `protobuf:"bytes,7,opt,name=ai_token,json=aiToken,proto3" json:"ai_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminSetting) Reset() {
+	*x = AdminSetting{}
+	mi := &file_admin_v1_setting_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminSetting) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminSetting) ProtoMessage() {}
+
+func (x *AdminSetting) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_setting_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminSetting.ProtoReflect.Descriptor instead.
+func (*AdminSetting) Descriptor() ([]byte, []int) {
+	return file_admin_v1_setting_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *AdminSetting) GetSiteName() string {
+	if x != nil {
+		return x.SiteName
+	}
+	return ""
+}
+
+func (x *AdminSetting) GetSiteDesc() string {
+	if x != nil {
+		return x.SiteDesc
+	}
+	return ""
+}
+
+func (x *AdminSetting) GetSiteKeyword() string {
+	if x != nil {
+		return x.SiteKeyword
+	}
+	return ""
+}
+
+func (x *AdminSetting) GetPostNum() int32 {
+	if x != nil {
+		return x.PostNum
+	}
+	return 0
+}
+
+func (x *AdminSetting) GetAiEndpoint() string {
+	if x != nil {
+		return x.AiEndpoint
+	}
+	return ""
+}
+
+func (x *AdminSetting) GetAiModel() string {
+	if x != nil {
+		return x.AiModel
+	}
+	return ""
+}
+
+func (x *AdminSetting) GetAiToken() string {
+	if x != nil {
+		return x.AiToken
+	}
+	return ""
+}
+
 var File_admin_v1_setting_proto protoreflect.FileDescriptor
 
 const file_admin_v1_setting_proto_rawDesc = "" +
 	"\n" +
-	"\x16admin/v1/setting.proto\x12\x14fifsky.blog.admin.v1\x1a\x12types/common.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto2y\n" +
-	"\x0eSettingService\x12g\n" +
-	"\x06Update\x12\x1a.fifsky.blog.types.Options\x1a\x1a.fifsky.blog.types.Options\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/blog/admin/setting/updateB\xbb\x01\n" +
+	"\x16admin/v1/setting.proto\x12\x14fifsky.blog.admin.v1\x1a\x12types/common.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xdd\x01\n" +
+	"\fAdminSetting\x12\x1b\n" +
+	"\tsite_name\x18\x01 \x01(\tR\bsiteName\x12\x1b\n" +
+	"\tsite_desc\x18\x02 \x01(\tR\bsiteDesc\x12!\n" +
+	"\fsite_keyword\x18\x03 \x01(\tR\vsiteKeyword\x12\x19\n" +
+	"\bpost_num\x18\x04 \x01(\x05R\apostNum\x12\x1f\n" +
+	"\vai_endpoint\x18\x05 \x01(\tR\n" +
+	"aiEndpoint\x12\x19\n" +
+	"\bai_model\x18\x06 \x01(\tR\aaiModel\x12\x19\n" +
+	"\bai_token\x18\a \x01(\tR\aaiToken2\xec\x01\n" +
+	"\x0eSettingService\x12a\n" +
+	"\x03Get\x12\x16.google.protobuf.Empty\x1a\".fifsky.blog.admin.v1.AdminSetting\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/blog/admin/setting\x12w\n" +
+	"\x06Update\x12\".fifsky.blog.admin.v1.AdminSetting\x1a\".fifsky.blog.admin.v1.AdminSetting\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/blog/admin/setting/updateB\xbb\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\fSettingProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
+var (
+	file_admin_v1_setting_proto_rawDescOnce sync.Once
+	file_admin_v1_setting_proto_rawDescData []byte
+)
+
+func file_admin_v1_setting_proto_rawDescGZIP() []byte {
+	file_admin_v1_setting_proto_rawDescOnce.Do(func() {
+		file_admin_v1_setting_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_admin_v1_setting_proto_rawDesc), len(file_admin_v1_setting_proto_rawDesc)))
+	})
+	return file_admin_v1_setting_proto_rawDescData
+}
+
+var file_admin_v1_setting_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_admin_v1_setting_proto_goTypes = []any{
-	(*types.Options)(nil), // 0: fifsky.blog.types.Options
+	(*AdminSetting)(nil),  // 0: fifsky.blog.admin.v1.AdminSetting
+	(*emptypb.Empty)(nil), // 1: google.protobuf.Empty
 }
 var file_admin_v1_setting_proto_depIdxs = []int32{
-	0, // 0: fifsky.blog.admin.v1.SettingService.Update:input_type -> fifsky.blog.types.Options
-	0, // 1: fifsky.blog.admin.v1.SettingService.Update:output_type -> fifsky.blog.types.Options
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	1, // 0: fifsky.blog.admin.v1.SettingService.Get:input_type -> google.protobuf.Empty
+	0, // 1: fifsky.blog.admin.v1.SettingService.Update:input_type -> fifsky.blog.admin.v1.AdminSetting
+	0, // 2: fifsky.blog.admin.v1.SettingService.Get:output_type -> fifsky.blog.admin.v1.AdminSetting
+	0, // 3: fifsky.blog.admin.v1.SettingService.Update:output_type -> fifsky.blog.admin.v1.AdminSetting
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -56,12 +175,13 @@ func file_admin_v1_setting_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_setting_proto_rawDesc), len(file_admin_v1_setting_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   0,
+			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_admin_v1_setting_proto_goTypes,
 		DependencyIndexes: file_admin_v1_setting_proto_depIdxs,
+		MessageInfos:      file_admin_v1_setting_proto_msgTypes,
 	}.Build()
 	File_admin_v1_setting_proto = out.File
 	file_admin_v1_setting_proto_goTypes = nil

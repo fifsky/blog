@@ -11,7 +11,8 @@ import type {
   MoodListRequest,
   MoodListResponse,
   MoodItem,
-  Options,
+  Setting,
+  AdminSetting,
   CateMenuResponse,
   ArchiveResponse,
   LinkMenuResponse,
@@ -89,7 +90,7 @@ export const commentListApi = (data: any, errorHandler?: (e: AppError) => void) 
 export const commentPostApi = (data: any, errorHandler?: (e: AppError) => void) =>
   createApi("/blog/comment/post", data, errorHandler);
 export const settingApi = (errorHandler?: (e: AppError) => void) =>
-  createApi<Options>("/blog/setting", undefined, errorHandler);
+  createApi<Setting>("/blog/setting", undefined, errorHandler);
 export const settingChinaMapApi = (errorHandler?: (e: AppError) => void) =>
   request<any>({ url: getApiUrl("/blog/china_map") }, errorHandler);
 export const cateAllApi = (errorHandler?: (e: AppError) => void) =>
@@ -107,8 +108,10 @@ export const aiGenerateTagsApi = (
   data: GenerateTagsRequest,
   errorHandler?: (e: AppError) => void,
 ) => createApi<GenerateTagsResponse>("/blog/admin/ai/tags", data, errorHandler);
-export const settingUpdateApi = (data: Options, errorHandler?: (e: AppError) => void) =>
-  createApi<Options>("/blog/admin/setting/update", data, errorHandler);
+export const settingAdminApi = (errorHandler?: (e: AppError) => void) =>
+  createApi<AdminSetting>("/blog/admin/setting", undefined, errorHandler);
+export const settingUpdateApi = (data: AdminSetting, errorHandler?: (e: AppError) => void) =>
+  createApi<AdminSetting>("/blog/admin/setting/update", data, errorHandler);
 export const articleCreateApi = (
   data: ArticleCreateRequest,
   errorHandler?: (e: AppError) => void,

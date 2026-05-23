@@ -7,13 +7,14 @@
 package apiv1
 
 import (
-	types "app/proto/gen/types"
+	_ "app/proto/gen/types"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	httpbody "google.golang.org/genproto/googleapis/api/httpbody"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
+	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -24,25 +25,111 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Setting struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SiteName      string                 `protobuf:"bytes,1,opt,name=site_name,json=siteName,proto3" json:"site_name,omitempty"`
+	SiteDesc      string                 `protobuf:"bytes,2,opt,name=site_desc,json=siteDesc,proto3" json:"site_desc,omitempty"`
+	SiteKeyword   string                 `protobuf:"bytes,3,opt,name=site_keyword,json=siteKeyword,proto3" json:"site_keyword,omitempty"`
+	PostNum       int32                  `protobuf:"varint,4,opt,name=post_num,json=postNum,proto3" json:"post_num,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Setting) Reset() {
+	*x = Setting{}
+	mi := &file_api_v1_setting_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Setting) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Setting) ProtoMessage() {}
+
+func (x *Setting) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_setting_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Setting.ProtoReflect.Descriptor instead.
+func (*Setting) Descriptor() ([]byte, []int) {
+	return file_api_v1_setting_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *Setting) GetSiteName() string {
+	if x != nil {
+		return x.SiteName
+	}
+	return ""
+}
+
+func (x *Setting) GetSiteDesc() string {
+	if x != nil {
+		return x.SiteDesc
+	}
+	return ""
+}
+
+func (x *Setting) GetSiteKeyword() string {
+	if x != nil {
+		return x.SiteKeyword
+	}
+	return ""
+}
+
+func (x *Setting) GetPostNum() int32 {
+	if x != nil {
+		return x.PostNum
+	}
+	return 0
+}
+
 var File_api_v1_setting_proto protoreflect.FileDescriptor
 
 const file_api_v1_setting_proto_rawDesc = "" +
 	"\n" +
-	"\x14api/v1/setting.proto\x12\x12fifsky.blog.api.v1\x1a\x12types/common.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x19google/api/httpbody.proto2\xbb\x01\n" +
-	"\x0eSettingService\x12S\n" +
-	"\x03Get\x12\x16.google.protobuf.Empty\x1a\x1a.fifsky.blog.types.Options\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/blog/setting\x12T\n" +
+	"\x14api/v1/setting.proto\x12\x12fifsky.blog.api.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x19google/api/httpbody.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"\x81\x01\n" +
+	"\aSetting\x12\x1b\n" +
+	"\tsite_name\x18\x01 \x01(\tR\bsiteName\x12\x1b\n" +
+	"\tsite_desc\x18\x02 \x01(\tR\bsiteDesc\x12!\n" +
+	"\fsite_keyword\x18\x03 \x01(\tR\vsiteKeyword\x12\x19\n" +
+	"\bpost_num\x18\x04 \x01(\x05R\apostNum2\xbc\x01\n" +
+	"\x0eSettingService\x12T\n" +
+	"\x03Get\x12\x16.google.protobuf.Empty\x1a\x1b.fifsky.blog.api.v1.Setting\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/blog/setting\x12T\n" +
 	"\vGetChinaMap\x12\x16.google.protobuf.Empty\x1a\x14.google.api.HttpBody\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/blog/china_mapB\xad\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\fSettingProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
 
+var (
+	file_api_v1_setting_proto_rawDescOnce sync.Once
+	file_api_v1_setting_proto_rawDescData []byte
+)
+
+func file_api_v1_setting_proto_rawDescGZIP() []byte {
+	file_api_v1_setting_proto_rawDescOnce.Do(func() {
+		file_api_v1_setting_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_v1_setting_proto_rawDesc), len(file_api_v1_setting_proto_rawDesc)))
+	})
+	return file_api_v1_setting_proto_rawDescData
+}
+
+var file_api_v1_setting_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_api_v1_setting_proto_goTypes = []any{
-	(*emptypb.Empty)(nil),     // 0: google.protobuf.Empty
-	(*types.Options)(nil),     // 1: fifsky.blog.types.Options
+	(*Setting)(nil),           // 0: fifsky.blog.api.v1.Setting
+	(*emptypb.Empty)(nil),     // 1: google.protobuf.Empty
 	(*httpbody.HttpBody)(nil), // 2: google.api.HttpBody
 }
 var file_api_v1_setting_proto_depIdxs = []int32{
-	0, // 0: fifsky.blog.api.v1.SettingService.Get:input_type -> google.protobuf.Empty
-	0, // 1: fifsky.blog.api.v1.SettingService.GetChinaMap:input_type -> google.protobuf.Empty
-	1, // 2: fifsky.blog.api.v1.SettingService.Get:output_type -> fifsky.blog.types.Options
+	1, // 0: fifsky.blog.api.v1.SettingService.Get:input_type -> google.protobuf.Empty
+	1, // 1: fifsky.blog.api.v1.SettingService.GetChinaMap:input_type -> google.protobuf.Empty
+	0, // 2: fifsky.blog.api.v1.SettingService.Get:output_type -> fifsky.blog.api.v1.Setting
 	2, // 3: fifsky.blog.api.v1.SettingService.GetChinaMap:output_type -> google.api.HttpBody
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type
@@ -62,12 +149,13 @@ func file_api_v1_setting_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_v1_setting_proto_rawDesc), len(file_api_v1_setting_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   0,
+			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_api_v1_setting_proto_goTypes,
 		DependencyIndexes: file_api_v1_setting_proto_depIdxs,
+		MessageInfos:      file_api_v1_setting_proto_msgTypes,
 	}.Build()
 	File_api_v1_setting_proto = out.File
 	file_api_v1_setting_proto_goTypes = nil

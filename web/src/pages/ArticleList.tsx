@@ -8,13 +8,13 @@ import { PageTransition } from "@/components/PageTransition";
 import { SkeletonArticleList } from "@/components/Skeleton";
 import { articleListApi, settingApi } from "@/service";
 import { useStore } from "@/store/context";
-import { ArticleItem, ArticleListRequest, Options } from "@/types/openapi";
+import { ArticleItem, ArticleListRequest, Setting } from "@/types/openapi";
 
 export default function ArticleList() {
   const [list, setList] = useState<ArticleItem[]>();
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [settings, setSettings] = useState<Options>();
+  const [settings, setSettings] = useState<Setting>();
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ export default function ArticleList() {
     loadList();
   }, [location.pathname, location.search]);
 
-  const siteName = settings?.kv?.site_name || "無處告別";
+  const siteName = settings?.site_name || "無處告別";
 
   // Show skeleton during initial load
   if (!list) {
@@ -64,8 +64,8 @@ export default function ArticleList() {
   return (
     <div>
       <title>{siteName}</title>
-      <meta name="description" content={settings?.kv?.site_desc || ""} />
-      <meta name="keywords" content={settings?.kv?.site_keyword || ""} />
+      <meta name="description" content={settings?.site_desc || ""} />
+      <meta name="keywords" content={settings?.site_keyword || ""} />
       <PageTransition loading={loading}>
         {list.length === 0 ? (
           <Empty icon={<FileText />} title="暂无文章" content="当前没有可显示的文章内容" />
@@ -80,7 +80,7 @@ export default function ArticleList() {
             <Pagination
               page={page}
               total={total}
-              pageSize={parseInt(settings?.kv?.post_num || "10") || 10}
+              pageSize={settings?.post_num || 10}
               onChange={changePage}
             />
           </>

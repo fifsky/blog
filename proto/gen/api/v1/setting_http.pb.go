@@ -5,7 +5,6 @@
 package apiv1
 
 import (
-	types "app/proto/gen/types"
 	context "context"
 	httpbody "google.golang.org/genproto/googleapis/api/httpbody"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -19,7 +18,7 @@ import (
 // SettingService 提供设置相关的接口
 type SettingServiceHTTPServer interface {
 	// Get 获取设置
-	Get(context.Context, *emptypb.Empty) (*types.Options, error)
+	Get(context.Context, *emptypb.Empty) (*Setting, error)
 	// GetChinaMap 获取中国地图数据
 	GetChinaMap(context.Context, *emptypb.Empty) (*httpbody.HttpBody, error)
 }

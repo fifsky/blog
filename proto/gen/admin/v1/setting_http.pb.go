@@ -5,8 +5,8 @@
 package adminv1
 
 import (
-	types "app/proto/gen/types"
 	context "context"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	http "net/http"
 )
 
@@ -16,8 +16,10 @@ import (
 
 // SettingService 提供设置相关的接口
 type SettingServiceHTTPServer interface {
+	// Get 获取后台设置
+	Get(context.Context, *emptypb.Empty) (*AdminSetting, error)
 	// Update 更新设置
-	Update(context.Context, *types.Options) (*types.Options, error)
+	Update(context.Context, *AdminSetting) (*AdminSetting, error)
 }
 
 type SettingService struct {
@@ -27,6 +29,7 @@ type SettingService struct {
 }
 
 func (s *SettingService) RegisterService() {
+	s.mux.HandleFunc("POST /blog/admin/setting", s.Get)
 	s.mux.HandleFunc("POST /blog/admin/setting/update", s.Update)
 }
 
@@ -39,8 +42,20 @@ func RegisterSettingServiceHTTPServer(mux ServeMux, codec Codec, srv SettingServ
 	s.RegisterService()
 }
 
+func (s *SettingService) Get(w http.ResponseWriter, r *http.Request) {
+	var in emptypb.Empty
+
+	out, err := s.server.Get(r.Context(), &in)
+	if err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+	s.codec.Encode(w, r, out)
+	return
+}
+
 func (s *SettingService) Update(w http.ResponseWriter, r *http.Request) {
-	var in types.Options
+	var in AdminSetting
 	if err := s.codec.Decode(r, &in); err != nil {
 		s.codec.Encode(w, r, err)
 		return

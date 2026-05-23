@@ -5,7 +5,7 @@ import { Pagination } from "@/components/Pagination";
 import { Empty } from "@/components/Empty";
 import { PageTransition } from "@/components/PageTransition";
 import { articleListApi, settingApi } from "@/service";
-import { ArticleItem, Options } from "@/types/openapi";
+import { ArticleItem, Setting } from "@/types/openapi";
 import { SkeletonArchive } from "@/components/Skeleton";
 
 type GroupedArticles = {
@@ -17,7 +17,7 @@ export default function Archive() {
   const [list, setList] = useState<ArticleItem[]>();
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [settings, setSettings] = useState<Options>();
+  const [settings, setSettings] = useState<Setting>();
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
@@ -71,13 +71,13 @@ export default function Archive() {
   if (!list) {
     return <SkeletonArchive />;
   }
-  const siteName = settings?.kv?.site_name || "無處告別";
+  const siteName = settings?.site_name || "無處告別";
   const pageTitle = `文章归档 - ${siteName}`;
   return (
     <div>
       <title>{pageTitle}</title>
-      <meta name="description" content={settings?.kv?.site_desc || ""} />
-      <meta name="keywords" content={settings?.kv?.site_keyword || ""} />
+      <meta name="description" content={settings?.site_desc || ""} />
+      <meta name="keywords" content={settings?.site_keyword || ""} />
 
       <h2 className="text-xl font-bold mb-6">文章归档</h2>
 

@@ -2,7 +2,7 @@ import { CHeader } from "@/components/CHeader";
 import { CFooter } from "@/components/CFooter";
 import { useStore } from "@/store/context";
 import { useNavigate } from "react-router";
-import { LoginRequest, Options } from "@/types/openapi";
+import { LoginRequest, Setting } from "@/types/openapi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field";
@@ -30,7 +30,7 @@ export default function Login() {
     mode: "onChange",
   });
   const [loading, setLoading] = useState(false);
-  const [settings, setSettings] = useState<Options>();
+  const [settings, setSettings] = useState<Setting>();
   const loginAction = useStore((s) => s.loginAction);
   const navigate = useNavigate();
 
@@ -47,13 +47,13 @@ export default function Login() {
     navigate("/admin/index");
   };
 
-  const siteName = settings?.kv?.site_name || "無處告別";
+  const siteName = settings?.site_name || "無處告別";
   const pageTitle = `登录 - ${siteName}`;
   return (
     <div className="w-[1024px] mt-4 mx-auto min-h-[500px]">
       <title>{pageTitle}</title>
-      <meta name="description" content={settings?.kv?.site_desc || ""} />
-      <meta name="keywords" content={settings?.kv?.site_keyword || ""} />
+      <meta name="description" content={settings?.site_desc || ""} />
+      <meta name="keywords" content={settings?.site_keyword || ""} />
       <CHeader />
       <div className="p-5 border border-[#89d5ef] bg-white relative overflow-hidden">
         <div className="px-[30px] relative z-10">

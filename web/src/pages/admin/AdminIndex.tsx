@@ -1,5 +1,5 @@
 import React from "react";
-import { settingApi, settingUpdateApi } from "@/service";
+import { settingAdminApi, settingUpdateApi } from "@/service";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import type { AdminSetting } from "@/types/openapi";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
@@ -50,11 +51,11 @@ export default function AdminIndex() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
-      const kv = { ...values };
-      if (!kv.ai_token?.trim()) {
-        delete kv.ai_token;
+      const payload = { ...values, post_num: parseInt(values.post_num) || 10 };
+      if (!payload.ai_token?.trim()) {
+        delete payload.ai_token;
       }
-      await settingUpdateApi({ kv });
+      await settingUpdateApi(payload as AdminSetting);
       setShowMessage(true);
       setTimeout(() => setShowMessage(false), 3000);
     } finally {
@@ -62,15 +63,15 @@ export default function AdminIndex() {
     }
   };
   useAsyncEffect(async () => {
-    const data = await settingApi();
+    const data = await settingAdminApi();
     form.reset({
-      site_name: data.kv?.site_name || "",
-      site_desc: data.kv?.site_desc || "",
-      site_keyword: data.kv?.site_keyword || "",
-      post_num: data.kv?.post_num || "",
-      ai_token: data.kv?.ai_token || "",
-      ai_endpoint: data.kv?.ai_endpoint || "",
-      ai_model: data.kv?.ai_model || "",
+      site_name: data.site_name || "",
+      site_desc: data.site_desc || "",
+      site_keyword: data.site_keyword || "",
+      post_num: data.post_num?.toString() || "",
+      ai_token: data.ai_token || "",
+      ai_endpoint: data.ai_endpoint || "",
+      ai_model: data.ai_model || "",
     });
   }, [form]);
   return (

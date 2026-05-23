@@ -603,6 +603,23 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
+    /blog/admin/setting:
+        post:
+            tags:
+                - SettingService
+            description: Get 获取后台设置
+            operationId: SettingService_Get
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AdminSetting'
     /blog/admin/setting/update:
         post:
             tags:
@@ -613,7 +630,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/Options'
+                            $ref: '#/components/schemas/AdminSetting'
                 required: true
             responses:
                 "200":
@@ -621,7 +638,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Options'
+                                $ref: '#/components/schemas/AdminSetting'
     /blog/admin/user/create:
         post:
             tags:
@@ -1051,7 +1068,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Options'
+                                $ref: '#/components/schemas/Setting'
     /blog/travel/footprints:
         post:
             tags:
@@ -1092,6 +1109,24 @@ paths:
                                 $ref: '#/components/schemas/ListCityPhotosResponse'
 components:
     schemas:
+        AdminSetting:
+            type: object
+            properties:
+                site_name:
+                    type: string
+                site_desc:
+                    type: string
+                site_keyword:
+                    type: string
+                post_num:
+                    type: integer
+                    format: int32
+                ai_endpoint:
+                    type: string
+                ai_model:
+                    type: string
+                ai_token:
+                    type: string
         ArchiveResponse:
             type: object
             properties:
@@ -1694,13 +1729,6 @@ components:
                     format: int32
                 content:
                     type: string
-        Options:
-            type: object
-            properties:
-                kv:
-                    type: object
-                    additionalProperties:
-                        type: string
         PhotoCreateRequest:
             required:
                 - title
@@ -1976,6 +2004,18 @@ components:
                     type: integer
                     format: int32
                 minute:
+                    type: integer
+                    format: int32
+        Setting:
+            type: object
+            properties:
+                site_name:
+                    type: string
+                site_desc:
+                    type: string
+                site_keyword:
+                    type: string
+                post_num:
                     type: integer
                     format: int32
         TextResponse:

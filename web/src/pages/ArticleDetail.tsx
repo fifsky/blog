@@ -5,7 +5,7 @@ import { Comment } from "@/components/Comment";
 import { PageTransition } from "@/components/PageTransition";
 import { SkeletonArticle } from "@/components/Skeleton";
 import { articleDetailApi, prevnextArticleApi, settingApi } from "@/service";
-import { ArticleItem, PrevNextItem, Options } from "@/types/openapi";
+import { ArticleItem, PrevNextItem, Setting } from "@/types/openapi";
 import { useAsyncEffect } from "@/hooks";
 
 // 生成文章链接：有自定义路径则使用 /${url}，否则 /article/${id}
@@ -16,7 +16,7 @@ function articleLink(item: PrevNextItem): string {
 export default function ArticleDetail() {
   const [article, setArticle] = useState<ArticleItem>();
   const [data, setData] = useState<{ prev?: PrevNextItem; next?: PrevNextItem }>({});
-  const [settings, setSettings] = useState<Options>();
+  const [settings, setSettings] = useState<Setting>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
   const params = useParams();
@@ -44,7 +44,7 @@ export default function ArticleDetail() {
     throw error;
   }
 
-  const siteName = settings?.kv?.site_name || "無處告別";
+  const siteName = settings?.site_name || "無處告別";
   const pageTitle = `${article?.title ? article?.title + " - " : ""}${siteName}`;
   const isAboutPage = article?.url === "about";
 
@@ -56,8 +56,8 @@ export default function ArticleDetail() {
   return (
     <>
       <title>{pageTitle}</title>
-      <meta name="description" content={settings?.kv?.site_desc || ""} />
-      <meta name="keywords" content={settings?.kv?.site_keyword || ""} />
+      <meta name="description" content={settings?.site_desc || ""} />
+      <meta name="keywords" content={settings?.site_keyword || ""} />
       <PageTransition loading={loading}>
         <div className="mb-[10px]">
           <CArticle article={article} />
