@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	"app/config"
 	"app/pkg/bark"
@@ -111,25 +112,23 @@ func TestOpenAIProvider_GenerateWrapsAgentRun(t *testing.T) {
 }
 
 func TestOpenAIProvider_Generate(t *testing.T) {
-	t.Skip("skip test")
+	// t.Skip("skip test")
 	client := openai.NewClient(
 		option.WithAPIKey(os.Getenv("AI_TOKEN")),
 		option.WithBaseURL(os.Getenv("AI_ENDPOINT")),
 	)
-	prompt := "每天自动根据用户所在城市的天气（如：暴雨、雾霾、晚霞）生成一段符合意境的诗句或短评。示例： “今日上海大雨。AI 检测到 80% 的忧郁湿度，建议配一杯热可可和坂本龙一的钢琴曲。”"
-
 	req := openai.ChatCompletionNewParams{
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.SystemMessage(prompt),
-			openai.UserMessage("Test Content"),
+			openai.UserMessage(time.Now().Format(time.DateOnly)),
 		},
-		Model: openai.ChatModel(os.Getenv("AI_MODEL")),
-		Tools: []openai.ChatCompletionToolUnionParam{},
+		Model:           openai.ChatModel(os.Getenv("AI_MODEL")),
+		ReasoningEffort: "high",
 	}
 
 	req.SetExtraFields(map[string]any{
 		"thinking": map[string]any{
-			"type": "disabled",
+			"type": "enabled",
 		},
 	})
 
