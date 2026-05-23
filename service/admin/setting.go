@@ -59,7 +59,7 @@ func (s *Setting) Update(ctx context.Context, req *adminv1.AdminSetting) (*admin
 	if err != nil {
 		return nil, err
 	}
-	
+
 	postNum := 10
 	if val, ok := m["post_num"]; ok {
 		if n, err := strconv.Atoi(val); err == nil {
