@@ -10,7 +10,7 @@ import (
 )
 
 // This is a compile-time assertion to ensure that this generated file
-// is compatible with the kratos package it is being compiled against.
+// is compatible with the grpc-http package it is being compiled against.
 // context.http.
 
 // GeoService 提供地理位置相关的接口
