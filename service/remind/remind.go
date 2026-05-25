@@ -40,6 +40,10 @@ func (r *Remind) Start() {
 }
 
 func NextTimeFromRule(from time.Time, m *model.Remind) time.Time {
+	if m.Cron == "" {
+		return time.Time{}
+	}
+
 	location, _ := time.LoadLocation("Asia/Shanghai")
 	if location == nil {
 		location = time.Local
@@ -57,7 +61,7 @@ func NextTimeFromRule(from time.Time, m *model.Remind) time.Time {
 	parser := cron.NewParser(cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow)
 	schedule, err := parser.Parse(m.Cron)
 	if err != nil {
-		return base
+		return time.Time{}
 	}
 	return schedule.Next(base)
 }
@@ -89,13 +93,11 @@ func (r *Remind) message(title, content string, v *model.Remind) {
 	}
 }
 
-func (r *Remind) changeNextTime(id int) {
-	location, _ := time.LoadLocation("Asia/Shanghai")
-	now := time.Now().In(location)
-	nextTime := now.AddDate(0, 0, 1)
+func (r *Remind) changeNextTime(v *model.Remind) {
+	nextTime := NextTimeFromRule(time.Now(), v)
 
-	_ = r.store.UpdateRemindStatus(context.Background(), id, 2)
-	_ = r.store.UpdateRemindNextTime(context.Background(), id, nextTime)
+	_ = r.store.UpdateRemindStatus(context.Background(), v.Id, 2)
+	_ = r.store.UpdateRemindNextTime(context.Background(), v.Id, nextTime)
 }
 
 func (r *Remind) run(t time.Time) {
@@ -110,7 +112,7 @@ func (r *Remind) run(t time.Time) {
 			if t.Format("15:04") == v.NextTime.Format("15:04") {
 				v2 := v
 				r.message("🙋🏻‍再次提醒", content, &v2)
-				r.changeNextTime(v.Id)
+				r.changeNextTime(&v2)
 			}
 			continue
 		}
@@ -119,7 +121,7 @@ func (r *Remind) run(t time.Time) {
 			v2 := v
 			r.message("⏰重要提醒⏰", content, &v2)
 			// 如果发出提醒，在用户没有点击确认收到之前，会不断提醒，因此需要更新下一次提醒时间为次日相同时间点
-			r.changeNextTime(v.Id)
+			r.changeNextTime(&v2)
 		}
 	}
 }
