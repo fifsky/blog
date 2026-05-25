@@ -1,5 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
-import { moodDeleteApi, moodListApi, moodCreateApi, moodUpdateApi, aiGenerateMoodApi } from "@/service";
+import {
+  moodDeleteApi,
+  moodListApi,
+  moodCreateApi,
+  moodUpdateApi,
+  aiGenerateMoodApi,
+} from "@/service";
 import { BatchHandle } from "@/components/BatchHandle";
 import { Pagination } from "@/components/Pagination";
 import { useForm, Controller } from "react-hook-form";
@@ -239,10 +245,10 @@ export default function AdminMood() {
                 <Button type="submit" size="sm" loading={loading}>
                   {item?.id ? "修改" : "添加"}
                 </Button>
-                <Button 
-                  type="button" 
-                  size="sm" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
                   loading={aiLoading}
                   onClick={(e) => {
                     e.preventDefault();

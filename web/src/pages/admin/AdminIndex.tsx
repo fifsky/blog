@@ -180,9 +180,7 @@ export default function AdminIndex() {
                   <FieldLabel htmlFor={field.name}>AI Model</FieldLabel>
                   <FieldContent>
                     <Input {...field} id={field.name} />
-                    <FieldDescription>
-                      AI 服务的模型名称，如 deepseek-v4-flash。
-                    </FieldDescription>
+                    <FieldDescription>AI 服务的模型名称，如 deepseek-v4-flash。</FieldDescription>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </FieldContent>
                 </Field>

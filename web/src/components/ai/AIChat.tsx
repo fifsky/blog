@@ -31,7 +31,6 @@ import {
 import { ToolCallCard } from "./ToolCallCard";
 import type { ToolCall, DisplayMessage, StreamEvent } from "./types";
 
-
 // ByteMD plugins for rendering
 const plugins = [gfm(), breaks(), highlightPlugin()];
 
@@ -43,7 +42,15 @@ interface ButtonPosition {
   right: number;
 }
 
-function ReasoningBlock({ content, isFinished, isStreaming }: { content: string; isFinished: boolean; isStreaming?: boolean }) {
+function ReasoningBlock({
+  content,
+  isFinished,
+  isStreaming,
+}: {
+  content: string;
+  isFinished: boolean;
+  isStreaming?: boolean;
+}) {
   const [isOpen, setIsOpen] = useState(!isFinished);
   const [hasAutoClosed, setHasAutoClosed] = useState(false);
 
@@ -62,10 +69,10 @@ function ReasoningBlock({ content, isFinished, isStreaming }: { content: string;
       >
         <BrainCircuit className="w-4 h-4 text-purple-500" />
         深度思考
-        {!isFinished && isStreaming && (
-          <AgentChatIndicator size="sm" className="ml-1" />
-        )}
-        <ChevronRight className={`w-4 h-4 ml-auto text-gray-400 transition-transform ${isOpen ? "rotate-90" : ""}`} />
+        {!isFinished && isStreaming && <AgentChatIndicator size="sm" className="ml-1" />}
+        <ChevronRight
+          className={`w-4 h-4 ml-auto text-gray-400 transition-transform ${isOpen ? "rotate-90" : ""}`}
+        />
       </button>
       {isOpen && (
         <div className="px-3 py-2 border-t border-gray-200 bg-white text-xs text-gray-500 whitespace-pre-wrap font-mono leading-relaxed">
@@ -282,7 +289,9 @@ export function AIChat() {
         .filter((m) => m.content.trim() !== "")
         .map((m) => ({
           role: m.role,
-          content: m.content.replace(/<tool_call id="[^"]+"><\/tool_call>/g, "").replace(/<think>[\s\S]*?<\/think>/g, ""),
+          content: m.content
+            .replace(/<tool_call id="[^"]+"><\/tool_call>/g, "")
+            .replace(/<think>[\s\S]*?<\/think>/g, ""),
           contextMessages: m.contextMessages,
         }));
 
@@ -357,7 +366,9 @@ export function AIChat() {
                 accumulatedContent += `\n<tool_call id="${toolData.id}"></tool_call>\n`;
                 setMessages((prev) =>
                   prev.map((msg) =>
-                    msg.id === assistantMsg.id ? { ...msg, content: accumulatedContent, toolCalls: currentToolCalls } : msg,
+                    msg.id === assistantMsg.id
+                      ? { ...msg, content: accumulatedContent, toolCalls: currentToolCalls }
+                      : msg,
                   ),
                 );
                 continue;
@@ -416,7 +427,11 @@ export function AIChat() {
               }
             } catch (e) {
               // If it's a JSON parse error, ignore or log it, but if it's our thrown error, rethrow it
-              if (e instanceof Error && e.message !== "Unexpected end of JSON input" && !e.message.includes("JSON")) {
+              if (
+                e instanceof Error &&
+                e.message !== "Unexpected end of JSON input" &&
+                !e.message.includes("JSON")
+              ) {
                 throw e;
               }
               console.error("Failed to parse SSE event:", e);
@@ -477,7 +492,9 @@ export function AIChat() {
 
     const content = message.content || "";
     // Regex to split by <tool_call id="..."></tool_call> or <think>...</think>
-    const parts = content.split(/(<tool_call id="[^"]+"><\/tool_call>|<think>[\s\S]*?<\/think>|<think>[\s\S]*$)/);
+    const parts = content.split(
+      /(<tool_call id="[^"]+"><\/tool_call>|<think>[\s\S]*?<\/think>|<think>[\s\S]*$)/,
+    );
 
     // Keep track of which tool calls have been rendered inline
     const renderedToolCallIds = new Set<string>();
@@ -499,11 +516,11 @@ export function AIChat() {
         const thinkContent = matchThink[1];
         const isFinished = part.endsWith("</think>");
         return (
-          <ReasoningBlock 
-            key={`think-${index}`} 
-            content={thinkContent} 
-            isFinished={isFinished} 
-            isStreaming={message.isStreaming} 
+          <ReasoningBlock
+            key={`think-${index}`}
+            content={thinkContent}
+            isFinished={isFinished}
+            isStreaming={message.isStreaming}
           />
         );
       }
@@ -511,7 +528,10 @@ export function AIChat() {
       // Render text part with Viewer if it's not empty
       if (part.trim()) {
         return (
-          <div key={`text-${index}`} className="markdown-body text-sm prose prose-sm max-w-none [&_pre]:bg-gray-100 [&_pre]:p-2 [&_pre]:rounded mb-2 last:mb-0">
+          <div
+            key={`text-${index}`}
+            className="markdown-body text-sm prose prose-sm max-w-none [&_pre]:bg-gray-100 [&_pre]:p-2 [&_pre]:rounded mb-2 last:mb-0"
+          >
             <Viewer value={part} plugins={plugins} />
           </div>
         );
@@ -520,7 +540,8 @@ export function AIChat() {
     });
 
     // Render any remaining tool calls at the top (for backwards compatibility)
-    const unrenderedToolCalls = message.toolCalls?.filter((tc) => !renderedToolCallIds.has(tc.id)) || [];
+    const unrenderedToolCalls =
+      message.toolCalls?.filter((tc) => !renderedToolCallIds.has(tc.id)) || [];
 
     return (
       <>

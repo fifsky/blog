@@ -70,7 +70,12 @@ export async function addMessagePair(
 /**
  * Update assistant message content
  */
-export async function updateAssistantMessage(id: number, content: string, toolCalls?: any[], reasoningContent?: string): Promise<void> {
+export async function updateAssistantMessage(
+  id: number,
+  content: string,
+  toolCalls?: any[],
+  reasoningContent?: string,
+): Promise<void> {
   const updateData: any = { content };
   if (toolCalls !== undefined) {
     updateData.toolCalls = toolCalls;

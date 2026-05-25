@@ -242,6 +242,10 @@ export type RemindCreateRequest = {
   content: string;
 };
 
+export type RemindSmartCreateRequest = {
+  content: string;
+};
+
 export type RemindUpdateRequest = {
   id: number;
   cron?: string;

@@ -28,7 +28,9 @@ export default function ArticleDetail() {
     const url = params.path || undefined;
 
     // 传入 errorHandler 将异常保存到 state 以便在渲染阶段抛出
-    const errorHandler = (e: any) => { setError(e); };
+    const errorHandler = (e: any) => {
+      setError(e);
+    };
     const [a, s] = await Promise.all([articleDetailApi({ id, url }, errorHandler), settingApi()]);
     setArticle(a);
     setSettings(s);

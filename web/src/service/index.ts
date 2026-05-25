@@ -21,6 +21,7 @@ import type {
   MoodCreateRequest,
   MoodUpdateRequest,
   RemindCreateRequest,
+  RemindSmartCreateRequest,
   RemindUpdateRequest,
   CateCreateRequest,
   CateUpdateRequest,
@@ -110,6 +111,10 @@ export const aiGenerateTagsApi = (
 ) => createApi<GenerateTagsResponse>("/blog/admin/ai/tags", data, errorHandler);
 export const aiGenerateMoodApi = (errorHandler?: (e: AppError) => void) =>
   createApi<{ content: string }>("/blog/admin/ai/mood", undefined, errorHandler);
+export const remindSmartCreateApi = (
+  data: RemindSmartCreateRequest,
+  errorHandler?: (e: AppError) => void,
+) => createApi<IDResponse>("/blog/admin/ai/remind/create", data, errorHandler);
 export const settingAdminApi = (errorHandler?: (e: AppError) => void) =>
   createApi<AdminSetting>("/blog/admin/setting", undefined, errorHandler);
 export const settingUpdateApi = (data: AdminSetting, errorHandler?: (e: AppError) => void) =>

@@ -39,10 +39,10 @@ func (r *Remind) Change(ctx context.Context, req *apiv1.RemindActionRequest) (*a
 	}
 
 	nextTime := remindpkg.NextTimeFromRule(time.Now(), remind)
-	
+
 	// 判断是否是固定时间任务
 	isFixedDate := len(remind.Cron) >= 10 && remind.Cron[4] == '-'
-	
+
 	if isFixedDate {
 		// 固定时间任务确认收到后，置为状态 3 (已完成)
 		if err := r.store.UpdateRemindStatus(ctx, remind.Id, 3); err != nil {
@@ -57,7 +57,7 @@ func (r *Remind) Change(ctx context.Context, req *apiv1.RemindActionRequest) (*a
 			return nil, err
 		}
 	}
-	
+
 	return &apiv1.TextResponse{Text: "已确认收到提醒"}, nil
 }
 

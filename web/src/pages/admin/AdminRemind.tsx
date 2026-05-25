@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { remindDeleteApi, remindListApi, remindCreateApi, remindUpdateApi } from "@/service";
+import {
+  remindDeleteApi,
+  remindListApi,
+  remindCreateApi,
+  remindUpdateApi,
+  remindSmartCreateApi,
+} from "@/service";
 import { Pagination } from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
 import useDialog from "@/hooks/useDialog";
@@ -50,6 +56,12 @@ export default function AdminRemind() {
     loadList();
   };
 
+  const handleSmartSubmit = async (content: string) => {
+    await remindSmartCreateApi({ content });
+    setItem(undefined);
+    loadList();
+  };
+
   const handleOpenDialog = () => {
     setItem(undefined);
     openDialog();
@@ -69,9 +81,35 @@ export default function AdminRemind() {
       },
     },
     {
-      title: <div style={{ width: 180 }}>时间</div>,
+      title: <div style={{ width: 60 }}>状态</div>,
+      key: "status",
+      render: (_, record) => {
+        const statusMap: Record<number, string> = {
+          1: "正常",
+          2: "等待确认",
+          3: "已完成",
+        };
+        const colorMap: Record<number, string> = {
+          1: "text-green-600",
+          2: "text-orange-500",
+          3: "text-gray-400",
+        };
+        return (
+          <span className={colorMap[record.status] || "text-gray-600"}>
+            {statusMap[record.status] || "未知"}
+          </span>
+        );
+      },
+    },
+    {
+      title: <div style={{ width: 180 }}>执行规则</div>,
       key: "id",
       render: (_, record) => <>{remindTimeFormat(record)}</>,
+    },
+    {
+      title: <div style={{ width: 180 }}>下次执行时间</div>,
+      key: "next_time",
+      render: (_, record) => <>{record.next_time}</>,
     },
     {
       title: "内容",
@@ -136,6 +174,7 @@ export default function AdminRemind() {
         onClose={closeDialog}
         item={item}
         onSubmit={handleSubmit}
+        onSmartSubmit={handleSmartSubmit}
       />
     </div>
   );

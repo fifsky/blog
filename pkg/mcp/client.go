@@ -64,7 +64,7 @@ func (c *Client) Connect(ctx context.Context) error {
 
 	// Create HTTP client with auth header
 	httpClient := &http.Client{
-		Timeout: 30 * time.Second,
+		Timeout: 60 * time.Second,
 		Transport: &authTransport{
 			token: c.token,
 			rt:    http.DefaultTransport,

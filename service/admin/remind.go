@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	adminv1 "app/proto/gen/admin/v1"
@@ -59,6 +60,12 @@ func (r *Remind) Create(ctx context.Context, req *adminv1.RemindCreateRequest) (
 		CreatedAt: time.Now(),
 	}
 	c.NextTime = remind.NextTimeFromRule(c.CreatedAt, c)
+
+	// 如果由于解析失败等原因获取到了零值，返回错误，不存入数据库
+	if c.NextTime.IsZero() {
+		return nil, fmt.Errorf("无效的 Cron 表达式或时间格式: %s", req.Cron)
+	}
+
 	lastId, err := r.store.CreateRemind(ctx, c)
 	if err != nil {
 		return nil, err
@@ -82,6 +89,12 @@ func (r *Remind) Update(ctx context.Context, req *adminv1.RemindUpdateRequest) (
 		Cron:      req.Cron,
 		CreatedAt: time.Now(),
 	})
+
+	// 更新时如果包含了 Cron，则校验有效性
+	if req.Cron != "" && nextTime.IsZero() {
+		return nil, fmt.Errorf("无效的 Cron 表达式或时间格式: %s", req.Cron)
+	}
+
 	u.NextTime = &nextTime
 
 	if err := r.store.UpdateRemind(ctx, u); err != nil {

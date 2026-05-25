@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"app/cmd"
 	"app/config"
@@ -38,7 +39,10 @@ func main() {
 	}))
 
 	// httpClient
-	httpClient := httpx.NewClient(httpx.WithMiddleware(httpx.AccessLog(logger.Default())))
+	httpClient := httpx.NewClient(
+		httpx.WithTimeout(60*time.Second),
+		httpx.WithMiddleware(httpx.AccessLog(logger.Default())),
+	)
 	barkClient := bark.New(httpClient, conf.Common.NotifyUrl, conf.Common.NotifyToken)
 
 	// Create message senders for remind service

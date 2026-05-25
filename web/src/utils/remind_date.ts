@@ -93,13 +93,32 @@ export const cronToForm = (cron: string): any => {
     }
     if (day === "*" && month === "*" && week !== "*") {
       const formWeek = Number(week) === 0 ? 7 : Number(week);
-      return { ...defaultValues, type: 4, minute: Number(minute), hour: Number(hour), week: formWeek };
+      return {
+        ...defaultValues,
+        type: 4,
+        minute: Number(minute),
+        hour: Number(hour),
+        week: formWeek,
+      };
     }
     if (month === "*" && week === "*") {
-      return { ...defaultValues, type: 5, minute: Number(minute), hour: Number(hour), day: Number(day) };
+      return {
+        ...defaultValues,
+        type: 5,
+        minute: Number(minute),
+        hour: Number(hour),
+        day: Number(day),
+      };
     }
     if (week === "*") {
-      return { ...defaultValues, type: 6, minute: Number(minute), hour: Number(hour), day: Number(day), month: Number(month) };
+      return {
+        ...defaultValues,
+        type: 6,
+        minute: Number(minute),
+        hour: Number(hour),
+        day: Number(day),
+        month: Number(month),
+      };
     }
   }
 
