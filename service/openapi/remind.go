@@ -38,13 +38,26 @@ func (r *Remind) Change(ctx context.Context, req *apiv1.RemindActionRequest) (*a
 		return nil, fmt.Errorf("记录未找到:%w", err)
 	}
 
-	if err := r.store.UpdateRemindStatus(ctx, remind.Id, 1); err != nil {
-		return nil, err
+	nextTime := remindpkg.NextTimeFromRule(time.Now(), remind)
+	
+	// 判断是否是固定时间任务
+	isFixedDate := len(remind.Cron) >= 10 && remind.Cron[4] == '-'
+	
+	if isFixedDate {
+		// 固定时间任务确认收到后，置为状态 3 (已完成)
+		if err := r.store.UpdateRemindStatus(ctx, remind.Id, 3); err != nil {
+			return nil, err
+		}
+	} else {
+		// 周期性任务，恢复状态 1，并更新下一次时间
+		if err := r.store.UpdateRemindStatus(ctx, remind.Id, 1); err != nil {
+			return nil, err
+		}
+		if err := r.store.UpdateRemindNextTime(ctx, remind.Id, nextTime); err != nil {
+			return nil, err
+		}
 	}
-	nextTime := remindpkg.NextTimeFromRule(remind.NextTime, remind)
-	if err := r.store.UpdateRemindNextTime(ctx, remind.Id, nextTime); err != nil {
-		return nil, err
-	}
+	
 	return &apiv1.TextResponse{Text: "已确认收到提醒"}, nil
 }
 

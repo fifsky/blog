@@ -1914,26 +1914,10 @@ components:
                 - content
             type: object
             properties:
-                type:
-                    type: integer
-                    format: int32
+                cron:
+                    type: string
                 content:
                     type: string
-                month:
-                    type: integer
-                    format: int32
-                week:
-                    type: integer
-                    format: int32
-                day:
-                    type: integer
-                    format: int32
-                hour:
-                    type: integer
-                    format: int32
-                minute:
-                    type: integer
-                    format: int32
         RemindDeleteRequest:
             required:
                 - id
@@ -1949,26 +1933,10 @@ components:
                 id:
                     type: integer
                     format: int32
-                type:
-                    type: integer
-                    format: int32
+                cron:
+                    type: string
                 content:
                     type: string
-                month:
-                    type: integer
-                    format: int32
-                week:
-                    type: integer
-                    format: int32
-                day:
-                    type: integer
-                    format: int32
-                hour:
-                    type: integer
-                    format: int32
-                minute:
-                    type: integer
-                    format: int32
                 status:
                     type: integer
                     format: int32
@@ -2009,26 +1977,10 @@ components:
                 id:
                     type: integer
                     format: int32
-                type:
-                    type: integer
-                    format: int32
+                cron:
+                    type: string
                 content:
                     type: string
-                month:
-                    type: integer
-                    format: int32
-                week:
-                    type: integer
-                    format: int32
-                day:
-                    type: integer
-                    format: int32
-                hour:
-                    type: integer
-                    format: int32
-                minute:
-                    type: integer
-                    format: int32
         Setting:
             type: object
             properties:

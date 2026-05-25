@@ -14,6 +14,7 @@ import (
 	"app/store/model"
 
 	"github.com/goapt/logger"
+	"github.com/robfig/cron/v3"
 )
 
 type Remind struct {
@@ -38,13 +39,6 @@ func (r *Remind) Start() {
 	}
 }
 
-func numFormat(n int) string {
-	if n < 10 {
-		return "0" + strconv.Itoa(n)
-	}
-	return strconv.Itoa(n)
-}
-
 func NextTimeFromRule(from time.Time, m *model.Remind) time.Time {
 	location, _ := time.LoadLocation("Asia/Shanghai")
 	if location == nil {
@@ -52,72 +46,20 @@ func NextTimeFromRule(from time.Time, m *model.Remind) time.Time {
 	}
 	base := from.In(location)
 
-	switch m.Type {
-	case 0:
-		year := base.Year()
-		if !m.CreatedAt.IsZero() {
-			year = m.CreatedAt.In(location).Year()
+	// If Cron looks like a specific date "2006-01-02 15:04:00"
+	if len(m.Cron) >= 10 && m.Cron[4] == '-' {
+		t, err := time.ParseInLocation(time.DateTime, m.Cron, location)
+		if err == nil {
+			return t
 		}
-		month := time.Month(m.Month)
-		if month == 0 {
-			month = base.Month()
-		}
-		day := m.Day
-		if day == 0 {
-			day = base.Day()
-		}
-		return time.Date(year, month, day, m.Hour, m.Minute, 0, 0, location)
-	case 1:
-		return base.Add(time.Minute)
-	case 2:
-		return base.Add(time.Hour)
-	case 3:
-		week := m.Week
-		if week < 1 || week > 7 {
-			week = int(base.Weekday()) + 1
-		}
-		target := time.Weekday((week - 1 + 7) % 7)
-		candidate := time.Date(base.Year(), base.Month(), base.Day(), m.Hour, m.Minute, 0, 0, location)
-		for candidate.Weekday() != target {
-			candidate = candidate.AddDate(0, 0, 1)
-		}
-		if !candidate.After(base) {
-			candidate = candidate.AddDate(0, 0, 7)
-		}
-		return candidate
-	case 4:
-		candidate := time.Date(base.Year(), base.Month(), base.Day(), m.Hour, m.Minute, 0, 0, location)
-		if !candidate.After(base) {
-			candidate = candidate.AddDate(0, 0, 1)
-		}
-		return candidate
-	case 5:
-		day := m.Day
-		if day <= 0 {
-			day = base.Day()
-		}
-		candidate := time.Date(base.Year(), base.Month(), day, m.Hour, m.Minute, 0, 0, location)
-		if !candidate.After(base) {
-			candidate = candidate.AddDate(0, 1, 0)
-		}
-		return candidate
-	case 6:
-		month := time.Month(m.Month)
-		if month == 0 {
-			month = base.Month()
-		}
-		day := m.Day
-		if day == 0 {
-			day = base.Day()
-		}
-		candidate := time.Date(base.Year(), month, day, m.Hour, m.Minute, 0, 0, location)
-		if !candidate.After(base) {
-			candidate = candidate.AddDate(1, 0, 0)
-		}
-		return candidate
-	default:
+	}
+
+	parser := cron.NewParser(cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow)
+	schedule, err := parser.Parse(m.Cron)
+	if err != nil {
 		return base
 	}
+	return schedule.Next(base)
 }
 
 func (r *Remind) buildMessage(title, content string, v *model.Remind) messenger.Message {
@@ -170,41 +112,10 @@ func (r *Remind) run(t time.Time) {
 				r.message("🙋🏻‍再次提醒", content, &v2)
 				r.changeNextTime(v.Id)
 			}
-
 			continue
 		}
 
-		isRemind := false
-		switch v.Type {
-		case 0: // 固定时间
-			if t.Format("2006-01-02 15:04:00") == v.NextTime.Format("2006-01-02 15:04:00") {
-				isRemind = true
-			}
-		case 1: // 每分钟
-			isRemind = true
-		case 2: // 每小时
-			if t.Format("04:00") == numFormat(v.Hour)+":00" {
-				isRemind = true
-			}
-		case 3: // 每周
-			if t.Weekday().String() == time.Weekday(v.Week-1).String() && t.Format("15:04:00") == numFormat(v.Hour)+":"+numFormat(v.Minute)+":00" {
-				isRemind = true
-			}
-		case 4: // 每天
-			if t.Format("15:04:00") == numFormat(v.Hour)+":"+numFormat(v.Minute)+":00" {
-				isRemind = true
-			}
-		case 5: // 每月
-			if t.Format("02 15:04:00") == numFormat(v.Day)+" "+numFormat(v.Hour)+":"+numFormat(v.Minute)+":00" {
-				isRemind = true
-			}
-		case 6: // 每年
-			if t.Format("01-02 15:04:00") == numFormat(v.Month)+"-"+numFormat(v.Day)+" "+numFormat(v.Hour)+":"+numFormat(v.Minute)+":00" {
-				isRemind = true
-			}
-		}
-
-		if isRemind {
+		if !v.NextTime.IsZero() && !t.Before(v.NextTime) {
 			v2 := v
 			r.message("⏰重要提醒⏰", content, &v2)
 			// 如果发出提醒，在用户没有点击确认收到之前，会不断提醒，因此需要更新下一次提醒时间为次日相同时间点

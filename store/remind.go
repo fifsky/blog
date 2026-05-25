@@ -9,9 +9,9 @@ import (
 )
 
 func (s *Store) GetRemind(ctx context.Context, id int) (*model.Remind, error) {
-	query := "select id,`type`,content,month,week,`day`,`hour`,minute,status,next_time,created_at from reminds where id = ?"
+	query := "select id,cron,content,status,next_time,created_at from reminds where id = ?"
 	var m model.Remind
-	err := s.db.QueryRowContext(ctx, query, id).Scan(&m.Id, &m.Type, &m.Content, &m.Month, &m.Week, &m.Day, &m.Hour, &m.Minute, &m.Status, &m.NextTime, &m.CreatedAt)
+	err := s.db.QueryRowContext(ctx, query, id).Scan(&m.Id, &m.Cron, &m.Content, &m.Status, &m.NextTime, &m.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func (s *Store) GetRemind(ctx context.Context, id int) (*model.Remind, error) {
 
 func (s *Store) ListRemind(ctx context.Context, start int, num int) ([]*model.Remind, error) {
 	offset := (start - 1) * num
-	rows, err := s.db.QueryContext(ctx, "select id,`type`,content,month,week,`day`,`hour`,minute,status,next_time,created_at from reminds order by id desc limit ? offset ?", num, offset)
+	rows, err := s.db.QueryContext(ctx, "select id,cron,content,status,next_time,created_at from reminds order by id desc limit ? offset ?", num, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func (s *Store) ListRemind(ctx context.Context, start int, num int) ([]*model.Re
 	ret := make([]*model.Remind, 0)
 	for rows.Next() {
 		var item model.Remind
-		if err := rows.Scan(&item.Id, &item.Type, &item.Content, &item.Month, &item.Week, &item.Day, &item.Hour, &item.Minute, &item.Status, &item.NextTime, &item.CreatedAt); err != nil {
+		if err := rows.Scan(&item.Id, &item.Cron, &item.Content, &item.Status, &item.NextTime, &item.CreatedAt); err != nil {
 			return nil, err
 		}
 		tmp := item
@@ -38,7 +38,7 @@ func (s *Store) ListRemind(ctx context.Context, start int, num int) ([]*model.Re
 }
 
 func (s *Store) RemindAll(ctx context.Context) ([]model.Remind, error) {
-	rows, err := s.db.QueryContext(ctx, "select id,`type`,content,month,week,`day`,`hour`,minute,status,next_time,created_at from reminds order by id desc")
+	rows, err := s.db.QueryContext(ctx, "select id,cron,content,status,next_time,created_at from reminds where status in (1, 2) order by id desc")
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (s *Store) RemindAll(ctx context.Context) ([]model.Remind, error) {
 	ret := make([]model.Remind, 0)
 	for rows.Next() {
 		var item model.Remind
-		if err := rows.Scan(&item.Id, &item.Type, &item.Content, &item.Month, &item.Week, &item.Day, &item.Hour, &item.Minute, &item.Status, &item.NextTime, &item.CreatedAt); err != nil {
+		if err := rows.Scan(&item.Id, &item.Cron, &item.Content, &item.Status, &item.NextTime, &item.CreatedAt); err != nil {
 			return nil, err
 		}
 		ret = append(ret, item)
@@ -74,8 +74,8 @@ func (s *Store) UpdateRemindNextTime(ctx context.Context, id int, nextTime time.
 }
 
 func (s *Store) CreateRemind(ctx context.Context, md *model.Remind) (int64, error) {
-	res, err := s.db.ExecContext(ctx, "insert into reminds (type,content,month,week,day,hour,minute,status,next_time,created_at) values (?,?,?,?,?,?,?,?,?,?)",
-		md.Type, md.Content, md.Month, md.Week, md.Day, md.Hour, md.Minute, md.Status, md.NextTime, md.CreatedAt)
+	res, err := s.db.ExecContext(ctx, "insert into reminds (cron,content,status,next_time,created_at) values (?,?,?,?,?)",
+		md.Cron, md.Content, md.Status, md.NextTime, md.CreatedAt)
 	if err != nil {
 		return 0, err
 	}
@@ -85,26 +85,11 @@ func (s *Store) CreateRemind(ctx context.Context, md *model.Remind) (int64, erro
 func (s *Store) UpdateRemind(ctx context.Context, md *model.UpdateRemind) error {
 	set := make([]string, 0)
 	args := make([]any, 0)
-	if v := md.Type; v != nil {
-		set, args = append(set, "`type` = ?"), append(args, *v)
+	if v := md.Cron; v != nil {
+		set, args = append(set, "`cron` = ?"), append(args, *v)
 	}
 	if v := md.Content; v != nil {
 		set, args = append(set, "`content` = ?"), append(args, *v)
-	}
-	if v := md.Month; v != nil {
-		set, args = append(set, "`month` = ?"), append(args, *v)
-	}
-	if v := md.Week; v != nil {
-		set, args = append(set, "`week` = ?"), append(args, *v)
-	}
-	if v := md.Day; v != nil {
-		set, args = append(set, "`day` = ?"), append(args, *v)
-	}
-	if v := md.Hour; v != nil {
-		set, args = append(set, "`hour` = ?"), append(args, *v)
-	}
-	if v := md.Minute; v != nil {
-		set, args = append(set, "`minute` = ?"), append(args, *v)
 	}
 	if v := md.Status; v != nil {
 		set, args = append(set, "`status` = ?"), append(args, *v)

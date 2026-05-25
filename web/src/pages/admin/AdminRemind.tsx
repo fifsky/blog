@@ -4,7 +4,7 @@ import { Pagination } from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
 import useDialog from "@/hooks/useDialog";
 import { AdminRemindDialog } from "@/components/AdminRemindDialog";
-import { remindTimeFormat, remindType } from "@/utils/remind_date";
+import { remindTimeFormat, remindType, formToCron, cronToForm } from "@/utils/remind_date";
 import { RemindItem } from "@/types/openapi";
 import { CTable, Column } from "@/components/CTable";
 import { cn } from "@/lib/utils";
@@ -38,15 +38,11 @@ export default function AdminRemind() {
 
   const handleSubmit = async (values: any) => {
     const { id } = item || ({} as RemindItem);
+    const cron = formToCron(values);
     const data = {
       id,
-      type: Number(values.type),
+      cron,
       content: values.content,
-      month: values.month,
-      week: values.week,
-      day: values.day,
-      hour: values.hour,
-      minute: values.minute,
     };
     if (id) await remindUpdateApi(data);
     else await remindCreateApi(data);
@@ -67,7 +63,10 @@ export default function AdminRemind() {
     {
       title: <div style={{ width: 80 }}>提醒类别</div>,
       key: "type",
-      render: (value) => <>{remindType[value as keyof typeof remindType]}</>,
+      render: (_, record) => {
+        const v = cronToForm(record.cron);
+        return <>{remindType[v.type as keyof typeof remindType]}</>;
+      },
     },
     {
       title: <div style={{ width: 180 }}>时间</div>,

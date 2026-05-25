@@ -18,12 +18,7 @@ import (
 )
 
 type SmartRemindRule struct {
-	Type    int    `json:"type"`
-	Month   int    `json:"month"`
-	Week    int    `json:"week"`
-	Day     int    `json:"day"`
-	Hour    int    `json:"hour"`
-	Minute  int    `json:"minute"`
+	Cron    string `json:"cron"`
 	Content string `json:"content"`
 }
 
@@ -73,8 +68,8 @@ func SmartCreateRemind(ctx context.Context, aiClient openai.Client, aiModel stri
 		return 0, errors.InternalServer("AI_REMIND_PARSE_ERROR", "failed to parse ai response")
 	}
 
-	if rule.Hour < 0 || rule.Hour > 23 || rule.Minute < 0 || rule.Minute > 59 {
-		return 0, errors.BadRequest("INVALID_RULE", "invalid hour or minute")
+	if rule.Cron == "" {
+		return 0, errors.BadRequest("INVALID_RULE", "invalid cron")
 	}
 
 	finalContent := strings.TrimSpace(rule.Content)
@@ -83,13 +78,8 @@ func SmartCreateRemind(ctx context.Context, aiClient openai.Client, aiModel stri
 	}
 
 	insert := &model.Remind{
-		Type:      rule.Type,
+		Cron:      rule.Cron,
 		Content:   finalContent,
-		Month:     rule.Month,
-		Week:      rule.Week,
-		Day:       rule.Day,
-		Hour:      rule.Hour,
-		Minute:    rule.Minute,
 		Status:    1,
 		CreatedAt: time.Now(),
 	}

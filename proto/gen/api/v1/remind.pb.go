@@ -116,13 +116,8 @@ func (x *TextResponse) GetText() string {
 type RemindItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Type          int32                  `protobuf:"varint,2,opt,name=type,proto3" json:"type,omitempty"`
+	Cron          string                 `protobuf:"bytes,2,opt,name=cron,proto3" json:"cron,omitempty"`
 	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
-	Month         int32                  `protobuf:"varint,4,opt,name=month,proto3" json:"month,omitempty"`
-	Week          int32                  `protobuf:"varint,5,opt,name=week,proto3" json:"week,omitempty"`
-	Day           int32                  `protobuf:"varint,6,opt,name=day,proto3" json:"day,omitempty"`
-	Hour          int32                  `protobuf:"varint,7,opt,name=hour,proto3" json:"hour,omitempty"`
-	Minute        int32                  `protobuf:"varint,8,opt,name=minute,proto3" json:"minute,omitempty"`
 	Status        int32                  `protobuf:"varint,9,opt,name=status,proto3" json:"status,omitempty"`
 	NextTime      string                 `protobuf:"bytes,10,opt,name=next_time,json=nextTime,proto3" json:"next_time,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
@@ -167,11 +162,11 @@ func (x *RemindItem) GetId() int32 {
 	return 0
 }
 
-func (x *RemindItem) GetType() int32 {
+func (x *RemindItem) GetCron() string {
 	if x != nil {
-		return x.Type
+		return x.Cron
 	}
-	return 0
+	return ""
 }
 
 func (x *RemindItem) GetContent() string {
@@ -179,41 +174,6 @@ func (x *RemindItem) GetContent() string {
 		return x.Content
 	}
 	return ""
-}
-
-func (x *RemindItem) GetMonth() int32 {
-	if x != nil {
-		return x.Month
-	}
-	return 0
-}
-
-func (x *RemindItem) GetWeek() int32 {
-	if x != nil {
-		return x.Week
-	}
-	return 0
-}
-
-func (x *RemindItem) GetDay() int32 {
-	if x != nil {
-		return x.Day
-	}
-	return 0
-}
-
-func (x *RemindItem) GetHour() int32 {
-	if x != nil {
-		return x.Hour
-	}
-	return 0
-}
-
-func (x *RemindItem) GetMinute() int32 {
-	if x != nil {
-		return x.Minute
-	}
-	return 0
 }
 
 func (x *RemindItem) GetStatus() int32 {
@@ -297,17 +257,12 @@ const file_api_v1_remind_proto_rawDesc = "" +
 	"\x13RemindActionRequest\x12\x1f\n" +
 	"\x05token\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x05token\"\"\n" +
 	"\fTextResponse\x12\x12\n" +
-	"\x04text\x18\x01 \x01(\tR\x04text\"\x86\x02\n" +
+	"\x04text\x18\x01 \x01(\tR\x04text\"\x9e\x01\n" +
 	"\n" +
 	"RemindItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
-	"\x04type\x18\x02 \x01(\x05R\x04type\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\tR\acontent\x12\x14\n" +
-	"\x05month\x18\x04 \x01(\x05R\x05month\x12\x12\n" +
-	"\x04week\x18\x05 \x01(\x05R\x04week\x12\x10\n" +
-	"\x03day\x18\x06 \x01(\x05R\x03day\x12\x12\n" +
-	"\x04hour\x18\a \x01(\x05R\x04hour\x12\x16\n" +
-	"\x06minute\x18\b \x01(\x05R\x06minute\x12\x16\n" +
+	"\x04cron\x18\x02 \x01(\tR\x04cron\x12\x18\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\x12\x16\n" +
 	"\x06status\x18\t \x01(\x05R\x06status\x12\x1b\n" +
 	"\tnext_time\x18\n" +
 	" \x01(\tR\bnextTime\x12\x1d\n" +

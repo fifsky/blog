@@ -6,7 +6,7 @@ import { Field, FieldLabel, FieldError, FieldGroup, FieldContent } from "./ui/fi
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { remindType, monthFormat, weekFormat, numFormat } from "@/utils/remind_date";
+import { remindType, monthFormat, weekFormat, numFormat, cronToForm } from "@/utils/remind_date";
 import { RemindItem } from "@/types/openapi";
 import { useEffect, useState } from "react";
 
@@ -30,15 +30,17 @@ const formSchema = z.object({
 export function AdminRemindDialog({ isOpen, onClose, item, onSubmit }: AdminRemindDialogProps) {
   const [loading, setLoading] = useState(false);
 
+  const initialForm = item?.cron ? cronToForm(item.cron) : { type: 0, month: 1, week: 1, day: 1, hour: 0, minute: 0 };
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      type: item?.type ?? 0,
-      month: item?.month ?? 1,
-      week: item?.week ?? 1,
-      day: item?.day ?? 1,
-      hour: item?.hour ?? 0,
-      minute: item?.minute ?? 0,
+      type: initialForm.type,
+      month: initialForm.month,
+      week: initialForm.week,
+      day: initialForm.day,
+      hour: initialForm.hour,
+      minute: initialForm.minute,
       content: item?.content ?? "",
     },
     mode: "onChange",
@@ -46,15 +48,26 @@ export function AdminRemindDialog({ isOpen, onClose, item, onSubmit }: AdminRemi
 
   // 当 item 属性变化时，更新表单值
   useEffect(() => {
-    if (item) {
+    if (item?.cron) {
+      const v = cronToForm(item.cron);
       form.reset({
-        type: item?.type ?? 0,
-        month: item?.month ?? 1,
-        week: item?.week ?? 1,
-        day: item?.day ?? 1,
-        hour: item?.hour ?? 0,
-        minute: item?.minute ?? 0,
+        type: v.type,
+        month: v.month,
+        week: v.week,
+        day: v.day,
+        hour: v.hour,
+        minute: v.minute,
         content: item?.content ?? "",
+      });
+    } else {
+      form.reset({
+        type: 0,
+        month: 1,
+        week: 1,
+        day: 1,
+        hour: 0,
+        minute: 0,
+        content: "",
       });
     }
   }, [item, form]);

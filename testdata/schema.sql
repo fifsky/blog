@@ -122,13 +122,8 @@ DROP TABLE IF EXISTS `reminds`;
 
 CREATE TABLE `reminds` (
                            `id` int unsigned NOT NULL AUTO_INCREMENT,
-                           `type` int NOT NULL COMMENT '0固定，1每分钟，2每个小时，3每周，4，每天，5，每月，6，每年',
+                           `cron` varchar(255) NOT NULL DEFAULT '' COMMENT 'cron表达式或固定时间',
                            `content` varchar(255) NOT NULL DEFAULT '' COMMENT '内容',
-                           `month` int NOT NULL COMMENT '月',
-                           `week` int NOT NULL COMMENT '周',
-                           `day` int NOT NULL COMMENT '日',
-                           `hour` int NOT NULL COMMENT '时',
-                           `minute` int NOT NULL COMMENT '分',
                            `created_at` datetime NOT NULL COMMENT '创建时间',
                            `status` int NOT NULL DEFAULT '1',
                            `next_time` datetime NOT NULL COMMENT '下次提醒时间',

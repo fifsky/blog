@@ -28,13 +28,8 @@ const (
 type RemindItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Type          int32                  `protobuf:"varint,2,opt,name=type,proto3" json:"type,omitempty"`
+	Cron          string                 `protobuf:"bytes,2,opt,name=cron,proto3" json:"cron,omitempty"`
 	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
-	Month         int32                  `protobuf:"varint,4,opt,name=month,proto3" json:"month,omitempty"`
-	Week          int32                  `protobuf:"varint,5,opt,name=week,proto3" json:"week,omitempty"`
-	Day           int32                  `protobuf:"varint,6,opt,name=day,proto3" json:"day,omitempty"`
-	Hour          int32                  `protobuf:"varint,7,opt,name=hour,proto3" json:"hour,omitempty"`
-	Minute        int32                  `protobuf:"varint,8,opt,name=minute,proto3" json:"minute,omitempty"`
 	Status        int32                  `protobuf:"varint,9,opt,name=status,proto3" json:"status,omitempty"`
 	NextTime      string                 `protobuf:"bytes,10,opt,name=next_time,json=nextTime,proto3" json:"next_time,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
@@ -79,11 +74,11 @@ func (x *RemindItem) GetId() int32 {
 	return 0
 }
 
-func (x *RemindItem) GetType() int32 {
+func (x *RemindItem) GetCron() string {
 	if x != nil {
-		return x.Type
+		return x.Cron
 	}
-	return 0
+	return ""
 }
 
 func (x *RemindItem) GetContent() string {
@@ -91,41 +86,6 @@ func (x *RemindItem) GetContent() string {
 		return x.Content
 	}
 	return ""
-}
-
-func (x *RemindItem) GetMonth() int32 {
-	if x != nil {
-		return x.Month
-	}
-	return 0
-}
-
-func (x *RemindItem) GetWeek() int32 {
-	if x != nil {
-		return x.Week
-	}
-	return 0
-}
-
-func (x *RemindItem) GetDay() int32 {
-	if x != nil {
-		return x.Day
-	}
-	return 0
-}
-
-func (x *RemindItem) GetHour() int32 {
-	if x != nil {
-		return x.Hour
-	}
-	return 0
-}
-
-func (x *RemindItem) GetMinute() int32 {
-	if x != nil {
-		return x.Minute
-	}
-	return 0
 }
 
 func (x *RemindItem) GetStatus() int32 {
@@ -293,13 +253,8 @@ func (x *RemindListResponse) GetTotal() int32 {
 
 type RemindCreateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Type          int32                  `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty"`
+	Cron          string                 `protobuf:"bytes,1,opt,name=cron,proto3" json:"cron,omitempty"`
 	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	Month         int32                  `protobuf:"varint,3,opt,name=month,proto3" json:"month,omitempty"`
-	Week          int32                  `protobuf:"varint,4,opt,name=week,proto3" json:"week,omitempty"`
-	Day           int32                  `protobuf:"varint,5,opt,name=day,proto3" json:"day,omitempty"`
-	Hour          int32                  `protobuf:"varint,6,opt,name=hour,proto3" json:"hour,omitempty"`
-	Minute        int32                  `protobuf:"varint,7,opt,name=minute,proto3" json:"minute,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -334,11 +289,11 @@ func (*RemindCreateRequest) Descriptor() ([]byte, []int) {
 	return file_admin_v1_remind_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *RemindCreateRequest) GetType() int32 {
+func (x *RemindCreateRequest) GetCron() string {
 	if x != nil {
-		return x.Type
+		return x.Cron
 	}
-	return 0
+	return ""
 }
 
 func (x *RemindCreateRequest) GetContent() string {
@@ -348,51 +303,11 @@ func (x *RemindCreateRequest) GetContent() string {
 	return ""
 }
 
-func (x *RemindCreateRequest) GetMonth() int32 {
-	if x != nil {
-		return x.Month
-	}
-	return 0
-}
-
-func (x *RemindCreateRequest) GetWeek() int32 {
-	if x != nil {
-		return x.Week
-	}
-	return 0
-}
-
-func (x *RemindCreateRequest) GetDay() int32 {
-	if x != nil {
-		return x.Day
-	}
-	return 0
-}
-
-func (x *RemindCreateRequest) GetHour() int32 {
-	if x != nil {
-		return x.Hour
-	}
-	return 0
-}
-
-func (x *RemindCreateRequest) GetMinute() int32 {
-	if x != nil {
-		return x.Minute
-	}
-	return 0
-}
-
 type RemindUpdateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Type          int32                  `protobuf:"varint,2,opt,name=type,proto3" json:"type,omitempty"`
+	Cron          string                 `protobuf:"bytes,2,opt,name=cron,proto3" json:"cron,omitempty"`
 	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
-	Month         int32                  `protobuf:"varint,4,opt,name=month,proto3" json:"month,omitempty"`
-	Week          int32                  `protobuf:"varint,5,opt,name=week,proto3" json:"week,omitempty"`
-	Day           int32                  `protobuf:"varint,6,opt,name=day,proto3" json:"day,omitempty"`
-	Hour          int32                  `protobuf:"varint,7,opt,name=hour,proto3" json:"hour,omitempty"`
-	Minute        int32                  `protobuf:"varint,8,opt,name=minute,proto3" json:"minute,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -434,11 +349,11 @@ func (x *RemindUpdateRequest) GetId() int32 {
 	return 0
 }
 
-func (x *RemindUpdateRequest) GetType() int32 {
+func (x *RemindUpdateRequest) GetCron() string {
 	if x != nil {
-		return x.Type
+		return x.Cron
 	}
-	return 0
+	return ""
 }
 
 func (x *RemindUpdateRequest) GetContent() string {
@@ -448,56 +363,16 @@ func (x *RemindUpdateRequest) GetContent() string {
 	return ""
 }
 
-func (x *RemindUpdateRequest) GetMonth() int32 {
-	if x != nil {
-		return x.Month
-	}
-	return 0
-}
-
-func (x *RemindUpdateRequest) GetWeek() int32 {
-	if x != nil {
-		return x.Week
-	}
-	return 0
-}
-
-func (x *RemindUpdateRequest) GetDay() int32 {
-	if x != nil {
-		return x.Day
-	}
-	return 0
-}
-
-func (x *RemindUpdateRequest) GetHour() int32 {
-	if x != nil {
-		return x.Hour
-	}
-	return 0
-}
-
-func (x *RemindUpdateRequest) GetMinute() int32 {
-	if x != nil {
-		return x.Minute
-	}
-	return 0
-}
-
 var File_admin_v1_remind_proto protoreflect.FileDescriptor
 
 const file_admin_v1_remind_proto_rawDesc = "" +
 	"\n" +
-	"\x15admin/v1/remind.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"\x86\x02\n" +
+	"\x15admin/v1/remind.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"\x9e\x01\n" +
 	"\n" +
 	"RemindItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
-	"\x04type\x18\x02 \x01(\x05R\x04type\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\tR\acontent\x12\x14\n" +
-	"\x05month\x18\x04 \x01(\x05R\x05month\x12\x12\n" +
-	"\x04week\x18\x05 \x01(\x05R\x04week\x12\x10\n" +
-	"\x03day\x18\x06 \x01(\x05R\x03day\x12\x12\n" +
-	"\x04hour\x18\a \x01(\x05R\x04hour\x12\x16\n" +
-	"\x06minute\x18\b \x01(\x05R\x06minute\x12\x16\n" +
+	"\x04cron\x18\x02 \x01(\tR\x04cron\x12\x18\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\x12\x16\n" +
 	"\x06status\x18\t \x01(\x05R\x06status\x12\x1b\n" +
 	"\tnext_time\x18\n" +
 	" \x01(\tR\bnextTime\x12\x1d\n" +
@@ -510,25 +385,15 @@ const file_admin_v1_remind_proto_rawDesc = "" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"`\n" +
 	"\x12RemindListResponse\x124\n" +
 	"\x04list\x18\x01 \x03(\v2 .fifsky.blog.admin.v1.RemindItemR\x04list\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total\"\xb6\x01\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"N\n" +
 	"\x13RemindCreateRequest\x12\x12\n" +
-	"\x04type\x18\x01 \x01(\x05R\x04type\x12#\n" +
-	"\acontent\x18\x02 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\acontent\x12\x14\n" +
-	"\x05month\x18\x03 \x01(\x05R\x05month\x12\x12\n" +
-	"\x04week\x18\x04 \x01(\x05R\x04week\x12\x10\n" +
-	"\x03day\x18\x05 \x01(\x05R\x03day\x12\x12\n" +
-	"\x04hour\x18\x06 \x01(\x05R\x04hour\x12\x16\n" +
-	"\x06minute\x18\a \x01(\x05R\x06minute\"\xc7\x01\n" +
+	"\x04cron\x18\x01 \x01(\tR\x04cron\x12#\n" +
+	"\acontent\x18\x02 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\acontent\"_\n" +
 	"\x13RemindUpdateRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\x12\x12\n" +
-	"\x04type\x18\x02 \x01(\x05R\x04type\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\tR\acontent\x12\x14\n" +
-	"\x05month\x18\x04 \x01(\x05R\x05month\x12\x12\n" +
-	"\x04week\x18\x05 \x01(\x05R\x04week\x12\x10\n" +
-	"\x03day\x18\x06 \x01(\x05R\x03day\x12\x12\n" +
-	"\x04hour\x18\a \x01(\x05R\x04hour\x12\x16\n" +
-	"\x06minute\x18\b \x01(\x05R\x06minute2\xf5\x03\n" +
+	"\x04cron\x18\x02 \x01(\tR\x04cron\x12\x18\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent2\xf5\x03\n" +
 	"\rRemindService\x12}\n" +
 	"\x04List\x12'.fifsky.blog.admin.v1.RemindListRequest\x1a(.fifsky.blog.admin.v1.RemindListResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/remind/list\x12x\n" +
 	"\x06Create\x12).fifsky.blog.admin.v1.RemindCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/blog/admin/remind/create\x12x\n" +

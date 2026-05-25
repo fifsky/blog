@@ -19,7 +19,7 @@ func TestAdminRemind_ListCreateDelete(t *testing.T) {
 		if err != nil || len(resp.List) == 0 {
 			t.Fatalf("unexpected err=%v list=%v", err, resp.List)
 		}
-		_, err = svc.Create(context.Background(), &adminv1.RemindCreateRequest{Type: 1, Content: "demo", Month: 1, Week: 0, Day: 1, Hour: 1, Minute: 1})
+		_, err = svc.Create(context.Background(), &adminv1.RemindCreateRequest{Cron: "* * * * *", Content: "demo"})
 		if err != nil {
 			t.Fatalf("unexpected err=%v", err)
 		}

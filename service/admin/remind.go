@@ -34,13 +34,8 @@ func (r *Remind) List(ctx context.Context, req *adminv1.RemindListRequest) (*adm
 	for _, v := range reminds {
 		items = append(items, &adminv1.RemindItem{
 			Id:        int32(v.Id),
-			Type:      int32(v.Type),
+			Cron:      v.Cron,
 			Content:   v.Content,
-			Month:     int32(v.Month),
-			Week:      int32(v.Week),
-			Day:       int32(v.Day),
-			Hour:      int32(v.Hour),
-			Minute:    int32(v.Minute),
 			Status:    int32(v.Status),
 			NextTime:  v.NextTime.Format(time.DateTime),
 			CreatedAt: v.CreatedAt.Format(time.DateTime),
@@ -58,13 +53,8 @@ func (r *Remind) List(ctx context.Context, req *adminv1.RemindListRequest) (*adm
 
 func (r *Remind) Create(ctx context.Context, req *adminv1.RemindCreateRequest) (*types.IDResponse, error) {
 	c := &model.Remind{
-		Type:      int(req.Type),
+		Cron:      req.Cron,
 		Content:   req.Content,
-		Month:     int(req.Month),
-		Week:      int(req.Week),
-		Day:       int(req.Day),
-		Hour:      int(req.Hour),
-		Minute:    int(req.Minute),
 		Status:    1,
 		CreatedAt: time.Now(),
 	}
@@ -79,42 +69,17 @@ func (r *Remind) Create(ctx context.Context, req *adminv1.RemindCreateRequest) (
 func (r *Remind) Update(ctx context.Context, req *adminv1.RemindUpdateRequest) (*types.IDResponse, error) {
 	u := &model.UpdateRemind{Id: int(req.Id)}
 
-	if req.Type > 0 {
-		v := int(req.Type)
-		u.Type = &v
+	if req.Cron != "" {
+		v := req.Cron
+		u.Cron = &v
 	}
 	if req.Content != "" {
 		v := req.Content
 		u.Content = &v
 	}
-	if req.Month > 0 {
-		v := int(req.Month)
-		u.Month = &v
-	}
-	if req.Week > 0 {
-		v := int(req.Week)
-		u.Week = &v
-	}
-	if req.Day > 0 {
-		v := int(req.Day)
-		u.Day = &v
-	}
-	if req.Hour > 0 {
-		v := int(req.Hour)
-		u.Hour = &v
-	}
-	if req.Minute > 0 {
-		v := int(req.Minute)
-		u.Minute = &v
-	}
 
 	nextTime := remind.NextTimeFromRule(time.Now(), &model.Remind{
-		Type:      int(req.Type),
-		Month:     int(req.Month),
-		Week:      int(req.Week),
-		Day:       int(req.Day),
-		Hour:      int(req.Hour),
-		Minute:    int(req.Minute),
+		Cron:      req.Cron,
 		CreatedAt: time.Now(),
 	})
 	u.NextTime = &nextTime

@@ -34,13 +34,8 @@ message TextResponse {
 
 message RemindItem {
   int32 id = 1;
-  int32 type = 2;
+  string cron = 2;
   string content = 3;
-  int32 month = 4;
-  int32 week = 5;
-  int32 day = 6;
-  int32 hour = 7;
-  int32 minute = 8;
   int32 status = 9;
   string next_time = 10;
   string created_at = 11;

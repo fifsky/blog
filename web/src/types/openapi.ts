@@ -200,13 +200,8 @@ export type LinkListResponse = { list: LinkItem[]; total: number };
 export type PrevNextRequest = { id: number };
 export type RemindItem = {
   id: number;
-  type: number;
+  cron: string;
   content: string;
-  month?: number;
-  week?: number;
-  day?: number;
-  hour?: number;
-  minute?: number;
   status: number;
   next_time: string;
   created_at: string;
@@ -243,23 +238,13 @@ export type LinkUpdateRequest = {
 };
 
 export type RemindCreateRequest = {
-  type: number;
-  month?: number;
-  week?: number;
-  day?: number;
-  hour?: number;
-  minute?: number;
+  cron: string;
   content: string;
 };
 
 export type RemindUpdateRequest = {
   id: number;
-  type?: number;
-  month?: number;
-  week?: number;
-  day?: number;
-  hour?: number;
-  minute?: number;
+  cron?: string;
   content?: string;
 };
 

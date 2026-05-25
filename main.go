@@ -78,6 +78,7 @@ func main() {
 		Usage: "fifsky blog",
 		Commands: []*cli.Command{
 			cmd.NewHttp(db, conf, httpClient, agent),
+			cmd.NewTmp(db, conf),
 		},
 	}
 
