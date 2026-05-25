@@ -86,7 +86,7 @@ import (
 - Always `defer rows.Close()` after creating rows
 - Use context throughout: `ctx context.Context` as first param
 - Return errors directly, don't panic
-- **When you need to adjust or query the database**, you can use the `mysql` command by connecting with the database DSN found in `config.yml`.
+- **When you need to adjust or query the database**, you can use the `mysql` command by connecting with the database DSN found in `config.yml`. **However, any SQL execution MUST be approved by the user first.**
 
 **Protobuf:**
 
