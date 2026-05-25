@@ -40,7 +40,7 @@ func main() {
 
 	// httpClient
 	httpClient := httpx.NewClient(
-		httpx.WithTimeout(60*time.Second),
+		httpx.WithTimeout(10*time.Second),
 		httpx.WithMiddleware(httpx.AccessLog(logger.Default())),
 	)
 	barkClient := bark.New(httpClient, conf.Common.NotifyUrl, conf.Common.NotifyToken)
@@ -60,7 +60,6 @@ func main() {
 	client := openai.NewClient(
 		option.WithAPIKey(aiCfg.Token),
 		option.WithBaseURL(aiCfg.Endpoint),
-		option.WithHTTPClient(httpClient),
 	)
 	agent := aiagent.New(
 		aiagent.WithClient(client),

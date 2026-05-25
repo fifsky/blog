@@ -14,17 +14,12 @@ export async function request<T = any>(
   errorHandler?: (e: AppError) => void,
 ) {
   const { url, method = "GET", headers = {}, data } = option;
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s 超时
-
   const init: RequestInit = {
     method,
     headers: {
       Accept: "application/json",
       ...headers,
     },
-    signal: controller.signal,
   };
 
   if (data !== undefined && method.toUpperCase() !== "GET") {
@@ -38,8 +33,6 @@ export async function request<T = any>(
   }
   try {
     const resp = await fetch(url, init);
-    clearTimeout(timeoutId);
-
     const contentType = resp.headers.get("content-type") || "";
     const isJSON = contentType.includes("application/json");
     const payload = isJSON ? await resp.json() : await resp.text();
@@ -59,8 +52,6 @@ export async function request<T = any>(
     let err: AppError;
     if (e instanceof AppError) {
       err = e;
-    } else if (e instanceof Error && e.name === "AbortError") {
-      err = new AppError("REQUEST_TIMEOUT", "请求超时，请稍后重试");
     } else {
       err = new AppError(getErrorCode(e.code), getErrorMessage(e));
     }
