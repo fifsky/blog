@@ -114,6 +114,7 @@ export default function AdminRemind() {
     {
       title: "内容",
       key: "content",
+      render: (_, record) => <div className="break-all">{record.content}</div>,
     },
     {
       title: <div style={{ width: 90 }}>操作</div>,
