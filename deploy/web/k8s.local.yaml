@@ -45,9 +45,42 @@ metadata:
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.certresolver: fifsky
 spec:
+  ingressClassName: traefik
   tls:
     - hosts:
         - fifsky.com
+  rules:
+    - host: fifsky.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fifsky-blog-web
+                port:
+                  number: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: fifsky-blog-web-redirect-https
+  namespace: default
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fifsky-blog-web-http-redirect
+  namespace: default
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: default-fifsky-blog-web-redirect-https@kubernetescrd
+spec:
+  ingressClassName: traefik
   rules:
     - host: fifsky.com
       http:
