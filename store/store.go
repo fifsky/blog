@@ -1,9 +1,14 @@
 package store
 
-import "database/sql"
+import (
+	"database/sql"
+	"sync"
+)
 
 type Store struct {
-	db *sql.DB
+	db           *sql.DB
+	optionsCache map[string]string
+	optionsMu    sync.RWMutex
 }
 
 func New(db *sql.DB) *Store {

@@ -56,14 +56,15 @@ func main() {
 	r := remind.New(s, conf, multiSender)
 	go r.Start()
 
-	aiCfg := s.GetAIConfig(context.Background())
-	client := openai.NewClient(
-		option.WithAPIKey(aiCfg.Token),
-		option.WithBaseURL(aiCfg.Endpoint),
-	)
 	agent := aiagent.New(
-		aiagent.WithClient(client),
-		aiagent.WithModel(aiCfg.Model),
+		aiagent.WithConfigProvider(func(ctx context.Context) (openai.Client, string) {
+			aiCfg := s.GetAIConfig(ctx)
+			client := openai.NewClient(
+				option.WithAPIKey(aiCfg.Token),
+				option.WithBaseURL(aiCfg.Endpoint),
+			)
+			return client, aiCfg.Model
+		}),
 		aiagent.WithMCP(conf.MCP),
 	)
 

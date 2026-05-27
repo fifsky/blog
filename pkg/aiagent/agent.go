@@ -48,6 +48,7 @@ func (f openAIStreamFactory) NewStreaming(ctx context.Context, req openai.ChatCo
 type Agent struct {
 	client           openai.Client
 	model            string
+	configProvider   func(ctx context.Context) (openai.Client, string)
 	tools            toolProvider
 	streamFactory    chatStreamFactory
 	disableReasoning bool
@@ -118,6 +119,13 @@ func WithReasoningEffort(effort string) Option {
 	}
 }
 
+// WithConfigProvider 设置动态获取配置的函数
+func WithConfigProvider(provider func(ctx context.Context) (openai.Client, string)) Option {
+	return func(a *Agent) {
+		a.configProvider = provider
+	}
+}
+
 // WithMCP 设置 MCP 配置
 func WithMCP(mcp map[string]config.MCPConf) Option {
 	return func(a *Agent) {
@@ -150,12 +158,20 @@ func New(opts ...Option) *Agent {
 }
 
 // GetClient 返回当前使用的 OpenAI 客户端
-func (a *Agent) GetClient() openai.Client {
+func (a *Agent) GetClient(ctx context.Context) openai.Client {
+	if a.configProvider != nil {
+		client, _ := a.configProvider(ctx)
+		return client
+	}
 	return a.client
 }
 
 // GetModel 返回当前使用的模型名称
-func (a *Agent) GetModel() string {
+func (a *Agent) GetModel(ctx context.Context) string {
+	if a.configProvider != nil {
+		_, model := a.configProvider(ctx)
+		return model
+	}
 	return a.model
 }
 
@@ -168,6 +184,7 @@ func (a *Agent) Clone(opts ...Option) *Agent {
 	clone := &Agent{
 		client:           a.client,
 		model:            a.model,
+		configProvider:   a.configProvider,
 		tools:            a.tools,
 		streamFactory:    a.streamFactory,
 		disableReasoning: a.disableReasoning,
@@ -183,9 +200,12 @@ func (a *Agent) Clone(opts ...Option) *Agent {
 
 // Run 执行流式对话，并在模型请求工具时调用 MCP 后继续生成。
 func (a *Agent) Run(ctx context.Context, request Request, handler EventHandler) (Result, error) {
+	client := a.GetClient(ctx)
+	model := a.GetModel(ctx)
+
 	streamFactory := a.streamFactory
 	if streamFactory == nil {
-		streamFactory = openAIStreamFactory{client: a.client}
+		streamFactory = openAIStreamFactory{client: client}
 	}
 
 	messages := make([]openai.ChatCompletionMessageParamUnion, 0, len(request.Messages)+1)
@@ -195,7 +215,7 @@ func (a *Agent) Run(ctx context.Context, request Request, handler EventHandler) 
 	messages = append(messages, request.Messages...)
 
 	aiReq := openai.ChatCompletionNewParams{
-		Model:    openai.ChatModel(a.model),
+		Model:    openai.ChatModel(model),
 		Messages: messages,
 	}
 	if !a.disableReasoning {

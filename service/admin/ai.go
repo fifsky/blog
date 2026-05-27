@@ -221,8 +221,8 @@ func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest)
 		return nil, errors.BadRequest("EMPTY_CONTENT", "Content cannot be empty")
 	}
 
-	aiClient := a.agent.GetClient()
-	aiModel := a.agent.GetModel()
+	aiClient := a.agent.GetClient(ctx)
+	aiModel := a.agent.GetModel(ctx)
 
 	prompt := `你是一个博客写作助手。请根据用户提供的文章标题与正文，为文章生成 3-8 个中文标签。
 要求：
@@ -254,8 +254,8 @@ func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest)
 }
 
 func (a *AI) RemindSmartCreate(ctx context.Context, req *adminv1.RemindSmartCreateRequest) (*types.IDResponse, error) {
-	aiClient := a.agent.GetClient()
-	aiModel := a.agent.GetModel()
+	aiClient := a.agent.GetClient(ctx)
+	aiModel := a.agent.GetModel(ctx)
 
 	lastID, err := mcptool.SmartCreateRemind(ctx, aiClient, aiModel, a.store, req.Content)
 	if err != nil {

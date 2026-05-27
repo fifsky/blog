@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"maps"
 )
 
 // AIConfig AI 服务配置
@@ -26,6 +27,14 @@ func (s *Store) GetAIConfig(ctx context.Context) *AIConfig {
 }
 
 func (s *Store) GetOptions(ctx context.Context) (map[string]string, error) {
+	s.optionsMu.RLock()
+	if s.optionsCache != nil {
+		cacheCopy := maps.Clone(s.optionsCache)
+		s.optionsMu.RUnlock()
+		return cacheCopy, nil
+	}
+	s.optionsMu.RUnlock()
+
 	rows, err := s.db.QueryContext(ctx, "select id,option_key,option_value from options")
 	if err != nil {
 		return nil, err
@@ -40,7 +49,14 @@ func (s *Store) GetOptions(ctx context.Context) (map[string]string, error) {
 		}
 		options2[k] = v
 	}
-	return options2, nil
+
+	s.optionsMu.Lock()
+	s.optionsCache = options2
+	s.optionsMu.Unlock()
+
+	// 既然已经把 options2 交给了缓存，为了防止外部修改它，
+	// 返回给调用方时我们拷贝一份返回
+	return maps.Clone(options2), nil
 }
 
 func (s *Store) UpdateOptions(ctx context.Context, m map[string]string) (map[string]string, error) {
@@ -50,5 +66,10 @@ func (s *Store) UpdateOptions(ctx context.Context, m map[string]string) (map[str
 			return nil, err
 		}
 	}
+
+	s.optionsMu.Lock()
+	s.optionsCache = nil
+	s.optionsMu.Unlock()
+
 	return m, nil
 }
