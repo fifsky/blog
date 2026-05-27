@@ -280,7 +280,7 @@ func (a *Agent) Run(ctx context.Context, request Request, handler EventHandler) 
 func (a *Agent) runStream(ctx context.Context, streamFactory chatStreamFactory, aiReq openai.ChatCompletionNewParams, handler EventHandler, content *strings.Builder) (streamResult, error) {
 	stream, err := streamFactory.NewStreaming(ctx, aiReq)
 	if err != nil {
-		return streamResult{}, err
+		return streamResult{}, fmt.Errorf("NewStreaming err: %w", err)
 	}
 
 	acc := openai.ChatCompletionAccumulator{}
@@ -317,12 +317,20 @@ func (a *Agent) runStream(ctx context.Context, streamFactory chatStreamFactory, 
 		}
 	}
 	if err := stream.Err(); err != nil {
-		return streamResult{}, err
+		return streamResult{}, fmt.Errorf("stream.Err: %w", err)
 	}
 	return streamResult{acc: acc, reasoningContent: reasoningContent.String()}, nil
 }
 
 func assistantMessageWithReasoning(message openai.ChatCompletionMessage, reasoningContent string) openai.ChatCompletionMessageParamUnion {
+	// 修复部分大模型或代理（如 DeepSeek）在流式返回工具调用时丢失 type: "function" 字段的问题。
+	// 如果丢失 type，会导致后续 openai-go 将 ToolCall 序列化为空对象 {}，从而引发 unexpected end of JSON input 错误。
+	for i := range message.ToolCalls {
+		if message.ToolCalls[i].Type == "" {
+			message.ToolCalls[i].Type = "function"
+		}
+	}
+
 	assistantMessage := message.ToAssistantMessageParam()
 	if reasoningContent != "" {
 		// DeepSeek 工具调用后的后续请求必须完整回传 reasoning_content。

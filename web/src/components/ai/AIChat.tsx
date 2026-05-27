@@ -280,6 +280,9 @@ export function AIChat() {
     setInput("");
     setIsLoading(true);
 
+    let accumulatedContent = "";
+    let currentToolCalls: ToolCall[] = [];
+
     try {
       const controller = new AbortController();
       abortControllerRef.current = controller;
@@ -316,8 +319,6 @@ export function AIChat() {
       if (!reader) throw new Error("No reader available");
 
       const decoder = new TextDecoder();
-      let accumulatedContent = "";
-      let currentToolCalls: ToolCall[] = [];
       let responseContextMessages: Array<Record<string, unknown>> = [];
       let isThinking = false;
 
@@ -426,15 +427,12 @@ export function AIChat() {
                 continue;
               }
             } catch (e) {
-              // If it's a JSON parse error, ignore or log it, but if it's our thrown error, rethrow it
-              if (
-                e instanceof Error &&
-                e.message !== "Unexpected end of JSON input" &&
-                !e.message.includes("JSON")
-              ) {
-                throw e;
+              if (e instanceof SyntaxError) {
+                // Ignore JSON parse errors (e.g. from partial chunks)
+                console.error("Failed to parse SSE event:", e);
+                continue;
               }
-              console.error("Failed to parse SSE event:", e);
+              throw e;
             }
           }
         }
@@ -456,8 +454,12 @@ export function AIChat() {
       );
     } catch (err) {
       if ((err as Error).name !== "AbortError") {
-        const errorContent = "抱歉，请求失败，请稍后重试。";
-        await updateAssistantMessage(assistantMsg.id!, errorContent);
+        const errorMessage = err instanceof Error ? err.message : "请求失败，请稍后重试。";
+        const errorContent = accumulatedContent
+          ? accumulatedContent + `\n\n> **错误**: ${errorMessage}`
+          : `抱歉，${errorMessage}`;
+
+        await updateAssistantMessage(assistantMsg.id!, errorContent, currentToolCalls);
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === assistantMsg.id

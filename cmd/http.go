@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"database/sql"
 	"log"
 	"net/http"
 
@@ -17,7 +16,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func NewHttp(db *sql.DB, conf *config.Config, httpClient *http.Client, agent *aiagent.Agent) *cli.Command {
+func NewHttp(s *store.Store, conf *config.Config, httpClient *http.Client, agent *aiagent.Agent) *cli.Command {
 	return &cli.Command{
 		Name:  "http",
 		Usage: "http command eg: ./app http --addr=:8080",
@@ -32,7 +31,6 @@ func NewHttp(db *sql.DB, conf *config.Config, httpClient *http.Client, agent *ai
 				_ = cli.Set("addr", ":8080")
 			}
 			log.Println("[Env] Run profile:" + conf.Env)
-			s := store.New(db)
 
 			apiService := openapi.New(s, conf, httpClient)
 			adminService := admin.New(s, conf, agent)

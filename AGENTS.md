@@ -203,6 +203,8 @@ import { articleListApi } from "@/service";
 
 - Backend: Must `make test` runs all tests, Use -short to skip some tests
 - Single test: `go test -v -run TestName ./path/to/package`
+- **Environment Variables**: Environment variables required for unit tests are defined in `.envrc`. When running unit tests from the command line, you must load these variables first:
+  - `export $(cat .envrc | xargs) && go test ./...`
 - Use dbunit fixtures in `testdata/` directory
 - Linter configuration: `.golangci.yml`
 
