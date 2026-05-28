@@ -3,6 +3,7 @@ package router
 import (
 	"log/slog"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"app/config"
@@ -63,12 +64,17 @@ func (r *Router) Handler() http.Handler {
 		},
 	}
 
-	log := logger.New(&logger.Config{
-		Mode:     logger.ModeFile,
-		FileName: filepath.Join(r.conf.Common.StoragePath, "logs", "access.log"),
-		MaxFiles: 3,
-		Detail:   true,
-	})
+	log := logger.New(
+		logger.NewJSONHandler(os.Stdout, logger.WithLevel(slog.LevelDebug)),
+		logger.NewJSONHandler(
+			logger.NewFileWriter(
+				filepath.Join(r.conf.Common.StoragePath, "logs", "app.log"),
+				logger.WithMaxFiles(3),
+			),
+			logger.WithLevel(slog.LevelInfo),
+			logger.WithSource(),
+		), // info+ → file
+	)
 
 	mux := NewServeMux()
 	api := mux.Use(middleware.NewRecover, sloghttp.NewMiddleware(log, conf), middleware.NewHeader, middleware.NewCors)

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"time"
@@ -31,12 +32,17 @@ func main() {
 	defer clean()
 
 	// logger
-	logger.SetDefault(logger.New(&logger.Config{
-		Mode:     logger.ModeFile,
-		FileName: filepath.Join(conf.Common.StoragePath, "logs", "app.log"),
-		MaxFiles: 3,
-		Detail:   true,
-	}))
+	logger.SetDefault(logger.New(
+		logger.NewJSONHandler(os.Stdout, logger.WithLevel(slog.LevelDebug)),
+		logger.NewJSONHandler(
+			logger.NewFileWriter(
+				filepath.Join(conf.Common.StoragePath, "logs", "app.log"),
+				logger.WithMaxFiles(3),
+			),
+			logger.WithLevel(slog.LevelInfo),
+			logger.WithSource(),
+		), // info+ → file
+	))
 
 	// httpClient
 	httpClient := httpx.NewClient(
@@ -59,6 +65,7 @@ func main() {
 	agent := aiagent.New(
 		aiagent.WithConfigProvider(func(ctx context.Context) (openai.Client, string) {
 			aiCfg := s.GetAIConfig(ctx)
+			logger.Debug("ai config", aiCfg)
 			client := openai.NewClient(
 				option.WithAPIKey(aiCfg.Token),
 				option.WithBaseURL(aiCfg.Endpoint),
