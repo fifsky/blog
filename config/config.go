@@ -2,8 +2,10 @@ package config
 
 import (
 	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"go.yaml.in/yaml/v3"
 )
@@ -44,14 +46,28 @@ type FeishuConf struct {
 }
 
 type Config struct {
-	Env     string
-	AppName string             `yaml:"app_name"`
-	Common  common             `yaml:"common"`
-	DB      DBConf             `yaml:"database"`
-	OSS     ossConf            `yaml:"oss"`
-	MCP     map[string]MCPConf `yaml:"mcp"`
-	MiniAPP MiniAPPConf        `yaml:"miniapp"`
-	Feishu  FeishuConf         `yaml:"feishu"`
+	Env      string
+	LogLevel string             `yaml:"log_level"`
+	AppName  string             `yaml:"app_name"`
+	Common   common             `yaml:"common"`
+	DB       DBConf             `yaml:"database"`
+	OSS      ossConf            `yaml:"oss"`
+	MCP      map[string]MCPConf `yaml:"mcp"`
+	MiniAPP  MiniAPPConf        `yaml:"miniapp"`
+	Feishu   FeishuConf         `yaml:"feishu"`
+}
+
+func (c *Config) GetLogLevel() slog.Level {
+	switch strings.ToLower(c.LogLevel) {
+	case "debug":
+		return slog.LevelDebug
+	case "warn", "warning":
+		return slog.LevelWarn
+	case "error":
+		return slog.LevelError
+	default:
+		return slog.LevelInfo
+	}
 }
 
 func New() *Config {

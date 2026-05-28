@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"log/slog"
 	"os"
 	"path/filepath"
 	"time"
@@ -32,17 +31,24 @@ func main() {
 	defer clean()
 
 	// logger
-	logger.SetDefault(logger.New(
-		logger.NewJSONHandler(os.Stdout, logger.WithLevel(slog.LevelDebug)),
-		logger.NewJSONHandler(
-			logger.NewFileWriter(
-				filepath.Join(conf.Common.StoragePath, "logs", "app.log"),
-				logger.WithMaxFiles(3),
+	logLevel := conf.GetLogLevel()
+	if conf.Env == "dev" {
+		logger.SetDefault(logger.New(
+			logger.NewJSONHandler(os.Stdout, logger.WithLevel(logLevel)),
+		))
+	} else {
+		logger.SetDefault(logger.New(
+			logger.NewJSONHandler(os.Stdout, logger.WithLevel(logLevel)),
+			logger.NewJSONHandler(
+				logger.NewFileWriter(
+					filepath.Join(conf.Common.StoragePath, "logs", "app.log"),
+					logger.WithMaxFiles(3),
+				),
+				logger.WithLevel(logLevel),
+				logger.WithSource(),
 			),
-			logger.WithLevel(slog.LevelInfo),
-			logger.WithSource(),
-		), // info+ → file
-	))
+		))
+	}
 
 	// httpClient
 	httpClient := httpx.NewClient(
