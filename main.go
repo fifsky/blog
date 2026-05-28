@@ -5,7 +5,6 @@ import (
 	"log"
 	"log/slog"
 	"os"
-	"path/filepath"
 	"time"
 
 	"app/cmd"
@@ -32,24 +31,7 @@ func main() {
 	defer clean()
 
 	// logger
-	logLevel := conf.GetLogLevel()
-	if conf.Env == "dev" {
-		logger.SetDefault(logger.New(
-			logger.NewJSONHandler(os.Stdout, logger.WithLevel(logLevel)),
-		))
-	} else {
-		logger.SetDefault(logger.New(
-			logger.NewJSONHandler(os.Stdout, logger.WithLevel(logLevel)),
-			logger.NewJSONHandler(
-				logger.NewFileWriter(
-					filepath.Join(conf.Common.StoragePath, "logs", "app.log"),
-					logger.WithMaxFiles(3),
-				),
-				logger.WithLevel(logLevel),
-				logger.WithSource(),
-			),
-		))
-	}
+	logger.SetDefault(config.NewLogger(conf, "app.log"))
 
 	// httpClient
 	httpClient := httpx.NewClient(

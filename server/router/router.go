@@ -3,8 +3,6 @@ package router
 import (
 	"log/slog"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"app/config"
 	"app/contract"
@@ -18,7 +16,6 @@ import (
 	"app/service/openapi"
 	"app/store"
 
-	"github.com/goapt/logger"
 	"github.com/goapt/logger/sloghttp"
 )
 
@@ -64,17 +61,7 @@ func (r *Router) Handler() http.Handler {
 		},
 	}
 
-	log := logger.New(
-		logger.NewJSONHandler(os.Stdout, logger.WithLevel(slog.LevelDebug)),
-		logger.NewJSONHandler(
-			logger.NewFileWriter(
-				filepath.Join(r.conf.Common.StoragePath, "logs", "app.log"),
-				logger.WithMaxFiles(3),
-			),
-			logger.WithLevel(slog.LevelInfo),
-			logger.WithSource(),
-		), // info+ → file
-	)
+	log := config.NewLogger(r.conf, "access.log")
 
 	mux := NewServeMux()
 	api := mux.Use(middleware.NewRecover, sloghttp.NewMiddleware(log, conf), middleware.NewHeader, middleware.NewCors)
