@@ -9,7 +9,7 @@ import mediumZoom from "@bytemd/plugin-medium-zoom";
 import { Badge } from "@/components/ui/badge";
 
 // ByteMD 插件配置
-const plugins = [gfm(), breaks(), highlightPlugin(), mediumZoom()];
+const getPlugins = () => [gfm(), breaks(), highlightPlugin(), mediumZoom()];
 
 export function CArticle({ article }: { article: ArticleItem }) {
   const location = useLocation();
@@ -68,7 +68,7 @@ export function CArticle({ article }: { article: ArticleItem }) {
         </div>
       </div>
       <div className="mt-2">
-        <Viewer value={article.content} plugins={plugins} />
+        <Viewer value={article.content} plugins={getPlugins()} />
       </div>
       {tags.length > 0 ? (
         <div className="mt-4 flex w-full flex-wrap justify-end gap-2">

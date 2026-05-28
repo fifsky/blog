@@ -28,7 +28,31 @@ export default defineConfig(() => {
       rollupOptions: {
         output: {
           manualChunks: {
-            "utils-vendor": ["dayjs", "bytemd", "highlight.js"],
+            "vendor-react": ["react", "react-dom", "react-router"],
+            "vendor-ui": ["motion", "lucide-react"],
+            "vendor-radix": [
+              "@radix-ui/react-dialog",
+              "@radix-ui/react-select",
+              "@radix-ui/react-checkbox",
+              "@radix-ui/react-label",
+              "@radix-ui/react-radio-group",
+              "@radix-ui/react-separator",
+              "@radix-ui/react-slot",
+              "@radix-ui/react-switch",
+              "@radix-ui/react-tooltip",
+              "@radix-ui/react-alert-dialog"
+            ],
+            "vendor-editor": [
+              "bytemd",
+              "@bytemd/react",
+              "@bytemd/plugin-breaks",
+              "@bytemd/plugin-gfm",
+              "@bytemd/plugin-medium-zoom",
+              "highlight.js",
+              "rehype-highlight"
+            ],
+            "vendor-form": ["react-hook-form", "zod", "@hookform/resolvers"],
+            "vendor-utils": ["dayjs", "zustand", "sonner", "clsx", "tailwind-merge"],
           },
         },
       },

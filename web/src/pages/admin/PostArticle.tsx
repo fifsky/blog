@@ -59,7 +59,7 @@ const articleSchema = z.object({
 type ArticleFormValues = z.infer<typeof articleSchema>;
 
 // ByteMD 插件配置
-const plugins = [gfm(), breaks(), highlightPlugin(), mediumZoom()];
+const getPlugins = () => [gfm(), breaks(), highlightPlugin(), mediumZoom()];
 
 // 图片上传函数
 const uploadImages = async (
@@ -384,7 +384,7 @@ export default function PostArticle() {
                     <div className="bytemd-editor-wrapper">
                       <Editor
                         value={contentValue || ""}
-                        plugins={plugins}
+                        plugins={getPlugins()}
                         onChange={(v) => field.onChange(v)}
                         uploadImages={uploadImages}
                       />
