@@ -55,14 +55,19 @@ export async function request<T = any>(
     } else {
       err = new AppError(getErrorCode(e.code), getErrorMessage(e));
     }
+
+    if (err.code === "UNAUTHORIZED") {
+      localStorage.removeItem("access_token");
+      window.location.href = "/login";
+      return new Promise<any>(() => {});
+    }
+
     if (errorHandler) {
       errorHandler(err);
       // 返回一个 rejected promise 让调用方自行停止后续逻辑或继续链式处理
       throw err;
     } else {
-      if (err.code !== "UNAUTHORIZED") {
-        dialog.message(err.message);
-      }
+      dialog.message(err.message);
       throw err;
     }
   }

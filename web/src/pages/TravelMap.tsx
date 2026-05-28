@@ -46,17 +46,17 @@ export default function TravelMap() {
         const cities = footprintsResp.cities || [];
 
         // Map regions (provinces) for highlighting
-        const regionsList = (footprintsResp.provinces || []).map((p) => p.name);
+        const regionsList = (footprintsResp.provinces || []).map((p: any) => p.name);
 
         // Map footprints (cities) for scatter points
-        const data = cities.map((city) => ({
+        const data = cities.map((city: any) => ({
           name: city.name,
           value: [parseFloat(city.longitude), parseFloat(city.latitude)],
           regionId: city.region_id,
         }));
 
         const selectBg = "#fff";
-        const regions = regionsList.map((name) => ({
+        const regions = regionsList.map((name: any) => ({
           name,
           itemStyle: { areaColor: selectBg },
         }));
