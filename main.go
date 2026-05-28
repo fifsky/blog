@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"time"
@@ -71,7 +72,7 @@ func main() {
 	agent := aiagent.New(
 		aiagent.WithConfigProvider(func(ctx context.Context) (openai.Client, string) {
 			aiCfg := s.GetAIConfig(ctx)
-			logger.Debug("ai config", aiCfg)
+			logger.Debug("ai config", slog.Any("config", aiCfg))
 			client := openai.NewClient(
 				option.WithAPIKey(aiCfg.Token),
 				option.WithBaseURL(aiCfg.Endpoint),
