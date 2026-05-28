@@ -89,7 +89,7 @@ func (r *Remind) message(title, content string, v *model.Remind) {
 	msg := r.buildMessage(title, content, v)
 
 	if err := r.messenger.Send(context.Background(), msg); err != nil {
-		logger.Default().Error("remind send message error", slog.String("err", err.Error()))
+		logger.Error("remind send message error", slog.String("err", err.Error()))
 	}
 }
 

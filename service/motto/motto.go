@@ -96,20 +96,20 @@ func (m *Motto) Start(spec string) {
 	// 每天上午9点准时调用
 	_, err := c.AddFunc(spec, func() {
 		if err := m.GenerateDailyMotto(); err != nil {
-			logger.Default().Error("generate daily motto error", slog.String("err", err.Error()))
+			logger.Error("generate daily motto error", slog.String("err", err.Error()))
 		} else {
-			logger.Default().Info("generate daily motto success")
+			logger.Info("generate daily motto success")
 		}
 	})
 	if err != nil {
-		logger.Default().Error("motto cron add func error", slog.String("err", err.Error()))
+		logger.Error("motto cron add func error", slog.String("err", err.Error()))
 		return
 	}
 	c.Start()
 }
 
 func (m *Motto) GenerateDailyMotto() error {
-	logger.Default().Info("start generate daily motto")
+	logger.Info("start generate daily motto")
 	dateStr := time.Now().Format("2006-01-02")
 
 	content, err := m.ai.Generate(context.Background(), Prompt, dateStr)
@@ -134,7 +134,7 @@ func (m *Motto) GenerateDailyMotto() error {
 
 	// 发送提醒
 	if err := m.sendBark(content); err != nil {
-		logger.Default().Error("motto request bark error", slog.String("err", err.Error()))
+		logger.Error("motto request bark error", slog.String("err", err.Error()))
 	}
 
 	return nil

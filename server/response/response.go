@@ -46,7 +46,7 @@ func encode[T any](w http.ResponseWriter, status int, v T) error {
 func Success(w http.ResponseWriter, data any) {
 	err := encode(w, http.StatusOK, data)
 	if err != nil {
-		logger.Default().Error("response error", slog.String("err", err.Error()))
+		logger.Error("response error", slog.String("err", err.Error()))
 	}
 }
 
@@ -67,7 +67,7 @@ func Fail(w http.ResponseWriter, err *errors.Error) {
 	}
 
 	if e := encode(w, int(err.GetCode()), resp); e != nil {
-		logger.Default().Error("response error", slog.String("err", e.Error()))
+		logger.Error("response error", slog.String("err", e.Error()))
 	}
 }
 
@@ -78,6 +78,6 @@ func FailPlain(w http.ResponseWriter, code int, err error) {
 
 func Upload(w http.ResponseWriter, v any) {
 	if err := encode(w, http.StatusOK, v); err != nil {
-		logger.Default().Error("response error", slog.String("err", err.Error()))
+		logger.Error("response error", slog.String("err", err.Error()))
 	}
 }

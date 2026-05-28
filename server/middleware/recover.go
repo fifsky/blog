@@ -21,7 +21,7 @@ func NewRecover(next http.Handler) http.Handler {
 				stack := string(buf[:n])
 
 				// 记录错误日志
-				logger.Default().Error(fmt.Sprintf("%v", err), "stack", stack)
+				logger.Error(fmt.Sprintf("%v", err), "stack", stack)
 
 				// 返回系统错误响应
 				response.Fail(w, errors.ErrSystem.WithCause(fmt.Errorf("%v", err)))
