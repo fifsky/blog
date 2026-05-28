@@ -1,0 +1,25 @@
+# fifsky's blog
+
+> fifsky的个人博客，一个基于 Go 和 React 的全栈博客应用，分享技术文章、生活随笔和旅行足迹。
+
+欢迎访问我的个人博客！这个站点主要用于记录我的技术沉淀、生活感悟以及一些旅行的回忆。本文档旨在帮助大语言模型（LLMs）和智能体（AI Agents）快速理解本站的内容结构和页面导航。
+
+## 核心内容
+
+- [首页](https://fifsky.com/): 博客主页，展示最新的文章列表。
+- [关于我](https://fifsky.com/about): 博主的个人简介、联系方式和相关经历。
+- [文章归档](https://fifsky.com/archive): 按时间顺序排列的所有文章归档，方便快速查找历史文章。
+- [旅行足迹](https://fifsky.com/travel): 记录我旅行地点的足迹地图。
+
+## 分类与搜索
+
+- [文章搜索](https://fifsky.com/search): 在博客中搜索特定主题或关键词的文章。
+- [分类目录](https://fifsky.com/category/): 按不同技术方向或生活主题分类浏览文章。
+
+## 后台管理
+
+- [管理后台](https://fifsky.com/admin): 博客后台管理系统（需管理员权限），用于管理文章、动态、评论留言和照片等。
+
+## 可选资源
+
+- [Github 源码](https://github.com/fifsky/blog): 本博客系统的开源代码仓库，包含 Go 后端和 React 前端完整源码。
