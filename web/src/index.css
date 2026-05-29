@@ -23,20 +23,8 @@
   }
   body {
     @apply font-sans bg-background text-foreground text-[14px] leading-[150%];
-    background-color: #ffffff;
-    background-image:
-      linear-gradient(#97d2e8, transparent 350px),
-      radial-gradient(rgba(151, 210, 232, 0.5) 1.1px, transparent 1.1px),
-      radial-gradient(rgba(151, 210, 232, 0.5) 1.1px, #ffffff 1.1px);
-    background-size:
-      100% 100%,
-      44px 44px,
-      44px 44px;
-    background-position:
-      0 0,
-      0 0,
-      22px 22px;
-    background-attachment: fixed;
+    background-image: linear-gradient(#97d2e8, #fff 350px);
+    background-repeat: no-repeat;
   }
   html {
     @apply font-sans;
