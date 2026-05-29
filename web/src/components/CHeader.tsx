@@ -65,10 +65,11 @@ export function CHeader() {
           </li>
           <li className="bg-white">
             <a
-              href="https://caixudong.com"
+              href="https://www.travellings.cn/go"
               className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+              target="_blank"
             >
-              简历
+              开往
             </a>
           </li>
           {isLogin && (
