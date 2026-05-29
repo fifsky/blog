@@ -46,15 +46,26 @@ export function Sidebar() {
       <SidebarList title="文章分类" api="cateAllApi" />
       <SidebarList title="历史存档" api="archiveApi" />
       <SidebarList title="我关注的" api="linkAllApi" />
-      <div className="mt-5">
-        <i className="iconfont icon-rss" style={{ color: "orange" }}></i>
+      <div className="mt-5 flex items-center gap-4">
+        <div>
+          <i className="iconfont icon-rss" style={{ color: "orange" }}></i>
+          <a
+            className="pl-[5px]"
+            href="https://api.fifsky.com/blog/feed.xml"
+            target="_blank"
+            rel="noreferrer"
+          >
+            订阅我的消息
+          </a>
+        </div>
         <a
-          className="pl-[5px]"
-          href="https://api.fifsky.com/blog/feed.xml"
+          className="text-gray-500 hover:text-blue-500 hover:underline"
+          href="/llms.txt"
           target="_blank"
           rel="noreferrer"
+          title="For AI Agents"
         >
-          订阅我的消息
+          llms.txt
         </a>
       </div>
     </div>
