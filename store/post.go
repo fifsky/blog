@@ -56,7 +56,7 @@ func (s *Store) GetPostDaysInMonth(ctx context.Context, year, month int) ([]int3
 
 func (s *Store) PrevPost(ctx context.Context, id int) (*model.Post, error) {
 	var p model.Post
-	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where id < ? and status = 1 order by id desc limit 1", id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
+	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where (created_at > (select created_at from posts p2 where p2.id = ?) or (created_at = (select created_at from posts p3 where p3.id = ?) and id > ?)) and status = 1 order by created_at asc, id asc limit 1", id, id, id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (s *Store) PrevPost(ctx context.Context, id int) (*model.Post, error) {
 
 func (s *Store) NextPost(ctx context.Context, id int) (*model.Post, error) {
 	var p model.Post
-	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where id > ? and status = 1 order by id asc limit 1", id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
+	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where (created_at < (select created_at from posts p2 where p2.id = ?) or (created_at = (select created_at from posts p3 where p3.id = ?) and id < ?)) and status = 1 order by created_at desc, id desc limit 1", id, id, id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (s *Store) ListPost(ctx context.Context, p *model.Post, start int, num int,
 	}
 	args = append(args, num, offset)
 
-	query := "select id,cate_id,type,user_id,title,url,content,tags,status,created_at,updated_at from posts where " + where + " order by id desc limit ? offset ?"
+	query := "select id,cate_id,type,user_id,title,url,content,tags,status,created_at,updated_at from posts where " + where + " order by created_at desc, id desc limit ? offset ?"
 	rows, err := s.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
@@ -272,7 +272,7 @@ func (s *Store) ListPostForAdmin(ctx context.Context, p *model.Post, start int, 
 	}
 	args = append(args, num, offset)
 
-	query := "select id,cate_id,type,user_id,title,url,content,tags,status,view_num,created_at,updated_at from posts where " + where + " order by id desc limit ? offset ?"
+	query := "select id,cate_id,type,user_id,title,url,content,tags,status,view_num,created_at,updated_at from posts where " + where + " order by created_at desc, id desc limit ? offset ?"
 	rows, err := s.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err

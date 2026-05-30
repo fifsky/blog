@@ -18,7 +18,7 @@ func TestArticle_PostPrev(t *testing.T) {
 		ret, err := s.PrevPost(context.Background(), 7)
 		assert.NoError(t, err)
 		assert.NotNil(t, ret)
-		assert.Equal(t, ret.Id, 4)
+		assert.Equal(t, ret.Id, 8)
 	})
 }
 
@@ -26,11 +26,10 @@ func TestArticle_PostNext(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("posts")...)
 		s := New(db)
-		ret, err := s.NextPost(context.Background(), 4)
+		ret, err := s.NextPost(context.Background(), 7)
 		assert.NoError(t, err)
 		assert.NotNil(t, ret)
-		// 移除 type = 1 过滤后，NextPost(4) 返回 id=7（之前因 type=2 被跳过）
-		assert.Equal(t, ret.Id, 7)
+		assert.Equal(t, ret.Id, 4)
 	})
 }
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+export GOPROXY='https://goproxy.io,direct'
 
 deploy() {
   local list=$(util::get_depoly_list $1)

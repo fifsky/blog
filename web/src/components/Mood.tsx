@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { moodListApi, moodRandomApi } from "@/service";
 import dayjs from "dayjs";
 import { MoodItem } from "@/types/openapi";
 import { Typewriter } from "react-simple-typewriter";
-import { ListRestart } from "lucide-react";
+import { ListRestart, ChevronLeft, ChevronRight } from "lucide-react";
 
 function humanTime(v: string) {
   const currTime = dayjs().add(1, "second");
@@ -33,6 +33,8 @@ function humanTime(v: string) {
 export function Mood() {
   const [mood, setMood] = useState<MoodItem | null>(null);
   const [key, setKey] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const playerRef = useRef<any>(null);
 
   // 初始化时获取最新的一条心情
   useEffect(() => {
@@ -51,15 +53,47 @@ export function Mood() {
     setKey((k) => k + 1);
   };
 
+  const handlePrev = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (playerRef.current?.aplayer) {
+      playerRef.current.aplayer.skipBack();
+      playerRef.current.aplayer.play();
+    }
+  };
+
+  const handleNext = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (playerRef.current?.aplayer) {
+      playerRef.current.aplayer.skipForward();
+      playerRef.current.aplayer.play();
+    }
+  };
+
   return (
     <div className="relative mb-[10px] flex items-start group">
-      <div className="p-px border border-[#89d5ef] bg-white overflow-hidden">
-        <img
-          title="莫一哲"
-          alt="莫一哲"
-          src="/assets/images/faceicon.jpg"
-          className="block w-[96px] h-[96px]"
-        />
+      <div className="relative p-px border border-[#89d5ef] bg-white overflow-hidden w-[98px] h-[98px] group/player [&_meting-js]:block [&_meting-js]:w-full [&_meting-js]:h-full [&_.aplayer]:!w-full [&_.aplayer]:!h-full [&_.aplayer]:!m-0 [&_.aplayer]:!shadow-none [&_.aplayer]:!rounded-none [&_.aplayer-body]:!w-full [&_.aplayer-body]:!h-full [&_.aplayer-pic]:!w-full [&_.aplayer-pic]:!h-full [&_.aplayer-pic]:!rounded-none">
+        {/* @ts-expect-error Custom element meting-js */}
+        <meting-js ref={playerRef} server="netease" type="playlist" id="18003576240" mini="true" />
+
+        {/* 上一首按钮 */}
+        <div
+          onClick={handlePrev}
+          className="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center bg-black/30 opacity-0 group-hover/player:opacity-100 transition-opacity cursor-pointer z-10 text-white hover:bg-black/60"
+          title="上一首"
+        >
+          <ChevronLeft size={16} />
+        </div>
+
+        {/* 下一首按钮 */}
+        <div
+          onClick={handleNext}
+          className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center bg-black/30 opacity-0 group-hover/player:opacity-100 transition-opacity cursor-pointer z-10 text-white hover:bg-black/60"
+          title="下一首"
+        >
+          <ChevronRight size={16} />
+        </div>
       </div>
       <div className="flex-1 min-w-0 min-h-[98px] ml-[20px] border border-[#89d5ef] bg-gradient-to-b from-white to-[#eeffde]">
         {/* 左侧箭头 */}

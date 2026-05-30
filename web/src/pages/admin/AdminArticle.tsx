@@ -232,7 +232,7 @@ export default function AdminArticle() {
     },
     {
       title: <div style={{ width: 180 }}>日期</div>,
-      key: "updated_at",
+      key: "created_at",
     },
     {
       title: <div style={{ width: 130 }}>操作</div>,
