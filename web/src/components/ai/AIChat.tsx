@@ -34,6 +34,26 @@ import type { ToolCall, DisplayMessage, StreamEvent } from "./types";
 // ByteMD plugins for rendering
 const plugins = [gfm(), breaks(), highlightPlugin()];
 
+const sanitize = (schema: any) => {
+  const tags = schema.tagNames || [];
+  if (!tags.includes("iframe")) {
+    tags.push("iframe");
+  }
+  const attributes = schema.attributes || {};
+  attributes["iframe"] = [
+    "src",
+    "width",
+    "height",
+    "frameborder",
+    "allow",
+    "allowfullscreen",
+    "scrolling",
+    "style",
+    "className",
+  ];
+  return { ...schema, tagNames: tags, attributes };
+};
+
 const STORAGE_KEY = "ai-chat-button-position";
 const DEFAULT_POSITION = { bottom: 24, right: 80 };
 
@@ -534,7 +554,7 @@ export function AIChat() {
             key={`text-${index}`}
             className="markdown-body text-sm prose prose-sm max-w-none [&_pre]:bg-gray-100 [&_pre]:p-2 [&_pre]:rounded mb-2 last:mb-0"
           >
-            <Viewer value={part} plugins={plugins} />
+            <Viewer value={part} plugins={plugins} sanitize={sanitize} />
           </div>
         );
       }

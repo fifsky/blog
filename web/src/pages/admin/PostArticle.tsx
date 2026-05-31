@@ -61,6 +61,26 @@ type ArticleFormValues = z.infer<typeof articleSchema>;
 // ByteMD 插件配置
 const getPlugins = () => [gfm(), breaks(), highlightPlugin(), mediumZoom()];
 
+const sanitize = (schema: any) => {
+  const tags = schema.tagNames || [];
+  if (!tags.includes("iframe")) {
+    tags.push("iframe");
+  }
+  const attributes = schema.attributes || {};
+  attributes["iframe"] = [
+    "src",
+    "width",
+    "height",
+    "frameborder",
+    "allow",
+    "allowfullscreen",
+    "scrolling",
+    "style",
+    "className",
+  ];
+  return { ...schema, tagNames: tags, attributes };
+};
+
 // 图片上传函数
 const uploadImages = async (
   files: File[],
@@ -385,6 +405,7 @@ export default function PostArticle() {
                       <Editor
                         value={contentValue || ""}
                         plugins={getPlugins()}
+                        sanitize={sanitize}
                         onChange={(v) => field.onChange(v)}
                         uploadImages={uploadImages}
                       />

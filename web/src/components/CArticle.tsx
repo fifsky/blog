@@ -11,6 +11,26 @@ import { Badge } from "@/components/ui/badge";
 // ByteMD 插件配置
 const getPlugins = () => [gfm(), breaks(), highlightPlugin(), mediumZoom()];
 
+const sanitize = (schema: any) => {
+  const tags = schema.tagNames || [];
+  if (!tags.includes("iframe")) {
+    tags.push("iframe");
+  }
+  const attributes = schema.attributes || {};
+  attributes["iframe"] = [
+    "src",
+    "width",
+    "height",
+    "frameborder",
+    "allow",
+    "allowfullscreen",
+    "scrolling",
+    "style",
+    "className",
+  ];
+  return { ...schema, tagNames: tags, attributes };
+};
+
 export function CArticle({ article }: { article: ArticleItem }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -68,7 +88,7 @@ export function CArticle({ article }: { article: ArticleItem }) {
         </div>
       </div>
       <div className="mt-2">
-        <Viewer value={article.content} plugins={getPlugins()} />
+        <Viewer value={article.content} plugins={getPlugins()} sanitize={sanitize} />
       </div>
       {tags.length > 0 ? (
         <div className="mt-4 flex w-full flex-wrap justify-end gap-2">
