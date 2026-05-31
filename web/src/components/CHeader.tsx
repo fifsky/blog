@@ -14,9 +14,16 @@ export function CHeader() {
   return (
     <div className="flex items-center justify-between">
       <div className="group pt-1 pb-5 px-0">
-        <Link to="/" className="no-underline">
-          <img className="inline-block" alt="首页" src="/assets/images/logo.png" />
-          <span className="hidden ml-2 group-hover:inline group-hover:text-white">首页</span>
+        <Link to="/" className="no-underline flex items-baseline gap-1 drop-shadow-md">
+          <span className="text-white text-4xl font-black tracking-wider">
+            你好
+          </span>
+          <span className="text-white text-3xl font-bold">
+            。
+          </span>
+          <span className="text-white text-2xl font-normal italic tracking-widest">
+            旧时光
+          </span>
         </Link>
       </div>
       <div className="inline-flex items-center h-[35px] my-2 px-3 bg-white rounded-lg whitespace-nowrap">
