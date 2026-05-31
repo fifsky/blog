@@ -49,6 +49,11 @@ export function Pagination({
 
   const pages = getPageNumbers();
 
+  const handleChange = (p: number) => {
+    onChange(p);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <ul className="list-none py-[10px] text-center">
       <li className="mx-[0.2em] inline">
@@ -59,7 +64,7 @@ export function Pagination({
               ? "bg-[#f5f5f5] text-[#ccc] cursor-not-allowed"
               : "hover:border-[#06c] hover:bg-[#06c] hover:text-white cursor-pointer",
           )}
-          onClick={page === 1 ? undefined : () => onChange(page - 1)}
+          onClick={page === 1 ? undefined : () => handleChange(page - 1)}
         >
           上一页
         </a>
@@ -76,7 +81,7 @@ export function Pagination({
                   ? "bg-[#ddd] text-[#555] cursor-default"
                   : "hover:border-[#06c] hover:bg-[#06c] hover:text-white cursor-pointer",
               )}
-              onClick={p === page ? undefined : () => onChange(p as number)}
+              onClick={p === page ? undefined : () => handleChange(p as number)}
             >
               {p}
             </a>
@@ -91,7 +96,7 @@ export function Pagination({
               ? "bg-[#f5f5f5] text-[#ccc] cursor-not-allowed"
               : "hover:border-[#06c] hover:bg-[#06c] hover:text-white cursor-pointer",
           )}
-          onClick={page === pageTotal ? undefined : () => onChange(page + 1)}
+          onClick={page === pageTotal ? undefined : () => handleChange(page + 1)}
         >
           下一页
         </a>
