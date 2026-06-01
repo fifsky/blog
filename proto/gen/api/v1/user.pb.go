@@ -174,6 +174,7 @@ type LoginRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserName      string                 `protobuf:"bytes,1,opt,name=user_name,json=userName,proto3" json:"user_name,omitempty"`
 	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	TotpCode      string                 `protobuf:"bytes,3,opt,name=totp_code,json=totpCode,proto3" json:"totp_code,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -222,10 +223,18 @@ func (x *LoginRequest) GetPassword() string {
 	return ""
 }
 
+func (x *LoginRequest) GetTotpCode() string {
+	if x != nil {
+		return x.TotpCode
+	}
+	return ""
+}
+
 type LoginResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AccessToken   string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
 	User          *UserItem              `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	RequireTotp   bool                   `protobuf:"varint,3,opt,name=require_totp,json=requireTotp,proto3" json:"require_totp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -274,6 +283,13 @@ func (x *LoginResponse) GetUser() *UserItem {
 	return nil
 }
 
+func (x *LoginResponse) GetRequireTotp() bool {
+	if x != nil {
+		return x.RequireTotp
+	}
+	return false
+}
+
 var File_api_v1_user_proto protoreflect.FileDescriptor
 
 const file_api_v1_user_proto_rawDesc = "" +
@@ -292,13 +308,15 @@ const file_api_v1_user_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\a \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\b \x01(\tR\tupdatedAt\"]\n" +
+	"updated_at\x18\b \x01(\tR\tupdatedAt\"z\n" +
 	"\fLoginRequest\x12&\n" +
 	"\tuser_name\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\buserName\x12%\n" +
-	"\bpassword\x18\x02 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\bpassword\"d\n" +
+	"\bpassword\x18\x02 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\bpassword\x12\x1b\n" +
+	"\ttotp_code\x18\x03 \x01(\tR\btotpCode\"\x87\x01\n" +
 	"\rLoginResponse\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x120\n" +
-	"\x04user\x18\x02 \x01(\v2\x1c.fifsky.blog.api.v1.UserItemR\x04user2s\n" +
+	"\x04user\x18\x02 \x01(\v2\x1c.fifsky.blog.api.v1.UserItemR\x04user\x12!\n" +
+	"\frequire_totp\x18\x03 \x01(\bR\vrequireTotp2s\n" +
 	"\vUserService\x12d\n" +
 	"\x05Login\x12 .fifsky.blog.api.v1.LoginRequest\x1a!.fifsky.blog.api.v1.LoginResponse\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/blog/loginB\xaa\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\tUserProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"

@@ -53,6 +53,47 @@ service UserService {
       body: "*"
     };
   }
+  // Generate2FA 生成 2FA 密钥和二维码
+  rpc Generate2FA(Generate2FARequest) returns (Generate2FAResponse) {
+    option (google.api.http) = {
+      post: "/blog/admin/user/generate_2fa"
+      body: "*"
+    };
+  }
+  // Bind2FA 绑定 2FA
+  rpc Bind2FA(Bind2FARequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/blog/admin/user/bind_2fa"
+      body: "*"
+    };
+  }
+}
+
+message Generate2FARequest {
+  int32 id = 1 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+message Generate2FAResponse {
+  string secret = 1;
+  string qr_code_uri = 2;
+}
+
+message Bind2FARequest {
+  int32 id = 1 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string secret = 2 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string code = 3 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
 }
 
 message GetUserRequest {
@@ -84,6 +125,7 @@ message User {
   int32 type = 6;
   string created_at = 7;
   string updated_at = 8;
+  bool has_totp = 9;
 }
 
 message UserCreateRequest {
@@ -126,6 +168,7 @@ message UserItem {
   int32 type = 6;
   string created_at = 7;
   string updated_at = 8;
+  bool has_totp = 9;
 }
 message UserListResponse {
   repeated UserItem list = 1;

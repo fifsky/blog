@@ -8,20 +8,20 @@ import (
 )
 
 func (s *Store) GetUser(ctx context.Context, uid int) (*model.User, error) {
-	query := "select id,name,password,nick_name,email,status,`type`,created_at,updated_at from users where id = ?"
+	query := "select id,name,password,nick_name,email,status,`type`,totp_secret,created_at,updated_at from users where id = ?"
 	row := s.db.QueryRowContext(ctx, query, uid)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
 	var user model.User
-	if err := row.Scan(&user.Id, &user.Name, &user.Password, &user.NickName, &user.Email, &user.Status, &user.Type, &user.CreatedAt, &user.UpdatedAt); err != nil {
+	if err := row.Scan(&user.Id, &user.Name, &user.Password, &user.NickName, &user.Email, &user.Status, &user.Type, &user.TotpSecret, &user.CreatedAt, &user.UpdatedAt); err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
 
 func (s *Store) ListUser(ctx context.Context, start int, num int) ([]model.User, error) {
-	query := "select id,name,password,nick_name,email,status,`type`,created_at,updated_at from users order by id desc limit ?,?"
+	query := "select id,name,password,nick_name,email,status,`type`,totp_secret,created_at,updated_at from users order by id desc limit ?,?"
 	rows, err := s.db.QueryContext(ctx, query, max((start-1)*num, 0), num)
 	if err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func (s *Store) ListUser(ctx context.Context, start int, num int) ([]model.User,
 	users := make([]model.User, 0)
 	for rows.Next() {
 		var user model.User
-		if err := rows.Scan(&user.Id, &user.Name, &user.Password, &user.NickName, &user.Email, &user.Status, &user.Type, &user.CreatedAt, &user.UpdatedAt); err != nil {
+		if err := rows.Scan(&user.Id, &user.Name, &user.Password, &user.NickName, &user.Email, &user.Status, &user.Type, &user.TotpSecret, &user.CreatedAt, &user.UpdatedAt); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
@@ -49,7 +49,7 @@ func (s *Store) CountUserTotal(ctx context.Context) (int, error) {
 
 func (s *Store) GetUserByName(ctx context.Context, name string) (*model.User, error) {
 	var user model.User
-	err := s.db.QueryRowContext(ctx, "select id,name,password,nick_name,email,status,`type`,created_at,updated_at from users where name = ? limit 1", name).Scan(&user.Id, &user.Name, &user.Password, &user.NickName, &user.Email, &user.Status, &user.Type, &user.CreatedAt, &user.UpdatedAt)
+	err := s.db.QueryRowContext(ctx, "select id,name,password,nick_name,email,status,`type`,totp_secret,created_at,updated_at from users where name = ? limit 1", name).Scan(&user.Id, &user.Name, &user.Password, &user.NickName, &user.Email, &user.Status, &user.Type, &user.TotpSecret, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -57,8 +57,8 @@ func (s *Store) GetUserByName(ctx context.Context, name string) (*model.User, er
 }
 
 func (s *Store) CreateUser(ctx context.Context, users *model.User) (int64, error) {
-	res, err := s.db.ExecContext(ctx, "insert into users (name,password,nick_name,email,status,type,created_at,updated_at) values (?,?,?,?,?,?,?,?)",
-		users.Name, users.Password, users.NickName, users.Email, users.Status, users.Type, users.CreatedAt, users.UpdatedAt)
+	res, err := s.db.ExecContext(ctx, "insert into users (name,password,nick_name,email,status,type,totp_secret,created_at,updated_at) values (?,?,?,?,?,?,?,?,?)",
+		users.Name, users.Password, users.NickName, users.Email, users.Status, users.Type, users.TotpSecret, users.CreatedAt, users.UpdatedAt)
 	if err != nil {
 		return 0, err
 	}
@@ -86,6 +86,9 @@ func (s *Store) UpdateUser(ctx context.Context, users *model.UpdateUser) error {
 	if v := users.Type; v != nil {
 		set, args = append(set, "`type` = ?"), append(args, *v)
 	}
+	if v := users.TotpSecret; v != nil {
+		set, args = append(set, "`totp_secret` = ?"), append(args, *v)
+	}
 	if v := users.UpdatedAt; v != nil {
 		set, args = append(set, "`updated_at` = ?"), append(args, *v)
 	}
@@ -100,7 +103,7 @@ func (s *Store) GetUserByIds(ctx context.Context, ids []int) (map[int]model.User
 		return nil, nil
 	}
 	ph, args := In(ids)
-	query := "select id,name,password,nick_name,email,status,`type`,created_at,updated_at from users where id in(" + ph + ")"
+	query := "select id,name,password,nick_name,email,status,`type`,totp_secret,created_at,updated_at from users where id in(" + ph + ")"
 	rows, err := s.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
@@ -109,7 +112,7 @@ func (s *Store) GetUserByIds(ctx context.Context, ids []int) (map[int]model.User
 	um := make(map[int]model.User)
 	for rows.Next() {
 		var user model.User
-		if err := rows.Scan(&user.Id, &user.Name, &user.Password, &user.NickName, &user.Email, &user.Status, &user.Type, &user.CreatedAt, &user.UpdatedAt); err != nil {
+		if err := rows.Scan(&user.Id, &user.Name, &user.Password, &user.NickName, &user.Email, &user.Status, &user.Type, &user.TotpSecret, &user.CreatedAt, &user.UpdatedAt); err != nil {
 			return nil, err
 		}
 		um[user.Id] = user

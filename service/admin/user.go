@@ -12,6 +12,7 @@ import (
 	"app/store"
 	"app/store/model"
 
+	"github.com/goapt/gotp"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -43,6 +44,7 @@ func (u *User) Get(ctx context.Context, request *adminv1.GetUserRequest) (*admin
 		Email:     user.Email,
 		Status:    int32(user.Status),
 		Type:      int32(user.Type),
+		HasTotp:   user.TotpSecret != "",
 		CreatedAt: user.CreatedAt.Format(time.DateTime),
 		UpdatedAt: user.UpdatedAt.Format(time.DateTime),
 	}, nil
@@ -119,6 +121,7 @@ func (u *User) List(ctx context.Context, req *adminv1.UserListRequest) (*adminv1
 			Email:     user.Email,
 			Status:    int32(user.Status),
 			Type:      int32(user.Type),
+			HasTotp:   user.TotpSecret != "",
 			CreatedAt: user.CreatedAt.Format(time.DateTime),
 			UpdatedAt: user.UpdatedAt.Format(time.DateTime),
 		})
@@ -159,7 +162,51 @@ func (u *User) LoginUser(ctx context.Context, _ *emptypb.Empty) (*adminv1.User, 
 		Email:     user.Email,
 		Status:    int32(user.Status),
 		Type:      int32(user.Type),
+		HasTotp:   user.TotpSecret != "",
 		CreatedAt: user.CreatedAt.Format(time.DateTime),
 		UpdatedAt: user.UpdatedAt.Format(time.DateTime),
 	}, nil
+}
+
+func (u *User) Generate2FA(ctx context.Context, req *adminv1.Generate2FARequest) (*adminv1.Generate2FAResponse, error) {
+	user, err := u.store.GetUser(ctx, int(req.Id))
+	if err != nil {
+		return nil, err
+	}
+	secret, err := gotp.RandomSecret(16)
+	if err != nil {
+		return nil, err
+	}
+	totp := gotp.NewDefaultTOTP(secret)
+	issuer := "FIFSKY Blog"
+	if u.conf.Env == "dev" || u.conf.Env == "local" || u.conf.Env == "development" {
+		issuer = "FIFSKY Blog Dev"
+	}
+	uri, err := totp.ProvisioningUri(user.Name, issuer)
+	if err != nil {
+		return nil, err
+	}
+	return &adminv1.Generate2FAResponse{
+		Secret:    secret,
+		QrCodeUri: uri,
+	}, nil
+}
+
+func (u *User) Bind2FA(ctx context.Context, req *adminv1.Bind2FARequest) (*emptypb.Empty, error) {
+	if req.Secret == "" || req.Code == "" {
+		return nil, fmt.Errorf("无效的绑定请求")
+	}
+	totp := gotp.NewDefaultTOTP(req.Secret)
+	ok, err := totp.Verify(req.Code, int64(time.Now().Unix()))
+	if err != nil || !ok {
+		return nil, fmt.Errorf("2FA验证码错误")
+	}
+	err = u.store.UpdateUser(ctx, &model.UpdateUser{
+		Id:         int(req.Id),
+		TotpSecret: &req.Secret,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
 }

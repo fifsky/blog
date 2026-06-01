@@ -48,9 +48,11 @@ message LoginRequest {
     (buf.validate.field).required = true,
     (google.api.field_behavior) = REQUIRED
   ];
+  string totp_code = 3;
 }
 
 message LoginResponse {
   string access_token = 1;
   UserItem user = 2;
+  bool require_totp = 3;
 }

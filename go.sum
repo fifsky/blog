@@ -27,6 +27,8 @@ github.com/go-sql-driver/mysql v1.10.0 h1:Q+1LV8DkHJvSYAdR83XzuhDaTykuDx0l6fkXxo
 github.com/go-sql-driver/mysql v1.10.0/go.mod h1:M+cqaI7+xxXGG9swrdeUIoPG3Y3KCkF0pZej+SK+nWk=
 github.com/goapt/dbunit v0.0.5 h1:eFCxcBu6K+VDztxf2rM1wW3qqQS/iu5R1UQnu76abWY=
 github.com/goapt/dbunit v0.0.5/go.mod h1:vczbb9GXTMaEcTKbQkDu6t90T6kumU1ScrLwRfER6is=
+github.com/goapt/gotp v1.1.0 h1:2hWJqvj1XMW0owGgPVhuNZJyAdloxcJzuc2drkbyl/Q=
+github.com/goapt/gotp v1.1.0/go.mod h1:sWj0LnFBzX65zj8INTJfWhLiFgHO2xS1vhWUkBC8D4k=
 github.com/goapt/httpx v0.0.4 h1:L5QHvH/89AKaDf9v15+ugllKy58mt2W6gz9Lxb5wrtM=
 github.com/goapt/httpx v0.0.4/go.mod h1:Su5p4ptbtGlHXDXKWsurZeAYRP5UzVzsqb8VNbI0T3c=
 github.com/goapt/logger v1.8.0 h1:ms2RCz9RhR2sHr7ezVHEGS7fJoZsiNqbnwAUcDt6lto=

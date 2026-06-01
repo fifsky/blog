@@ -17,8 +17,12 @@ import (
 
 // UserService 提供用户相关的接口
 type UserServiceHTTPServer interface {
+	// Bind2FA 绑定 2FA
+	Bind2FA(context.Context, *Bind2FARequest) (*emptypb.Empty, error)
 	// Create 创建用户
 	Create(context.Context, *UserCreateRequest) (*types.IDResponse, error)
+	// Generate2FA 生成 2FA 密钥和二维码
+	Generate2FA(context.Context, *Generate2FARequest) (*Generate2FAResponse, error)
 	// Get 获取用户详情
 	Get(context.Context, *GetUserRequest) (*User, error)
 	// List 获取用户列表
@@ -44,6 +48,8 @@ func (s *UserService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/admin/user/list", s.List)
 	s.mux.HandleFunc("POST /blog/admin/user/status", s.Status)
 	s.mux.HandleFunc("POST /blog/admin/loginuser", s.LoginUser)
+	s.mux.HandleFunc("POST /blog/admin/user/generate_2fa", s.Generate2FA)
+	s.mux.HandleFunc("POST /blog/admin/user/bind_2fa", s.Bind2FA)
 }
 
 func RegisterUserServiceHTTPServer(mux ServeMux, codec Codec, srv UserServiceHTTPServer) {
@@ -168,5 +174,46 @@ func (s *UserService) LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.codec.Encode(w, r, out)
+	return
+}
+
+func (s *UserService) Generate2FA(w http.ResponseWriter, r *http.Request) {
+	var in Generate2FARequest
+	if err := s.codec.Decode(r, &in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	if err := s.codec.Validate(&in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	out, err := s.server.Generate2FA(r.Context(), &in)
+	if err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+	s.codec.Encode(w, r, out)
+	return
+}
+
+func (s *UserService) Bind2FA(w http.ResponseWriter, r *http.Request) {
+	var in Bind2FARequest
+	if err := s.codec.Decode(r, &in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	if err := s.codec.Validate(&in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	_, err := s.server.Bind2FA(r.Context(), &in)
+	if err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
 	return
 }

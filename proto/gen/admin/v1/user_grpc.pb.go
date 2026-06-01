@@ -21,12 +21,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_Get_FullMethodName       = "/fifsky.blog.admin.v1.UserService/Get"
-	UserService_Create_FullMethodName    = "/fifsky.blog.admin.v1.UserService/Create"
-	UserService_Update_FullMethodName    = "/fifsky.blog.admin.v1.UserService/Update"
-	UserService_List_FullMethodName      = "/fifsky.blog.admin.v1.UserService/List"
-	UserService_Status_FullMethodName    = "/fifsky.blog.admin.v1.UserService/Status"
-	UserService_LoginUser_FullMethodName = "/fifsky.blog.admin.v1.UserService/LoginUser"
+	UserService_Get_FullMethodName         = "/fifsky.blog.admin.v1.UserService/Get"
+	UserService_Create_FullMethodName      = "/fifsky.blog.admin.v1.UserService/Create"
+	UserService_Update_FullMethodName      = "/fifsky.blog.admin.v1.UserService/Update"
+	UserService_List_FullMethodName        = "/fifsky.blog.admin.v1.UserService/List"
+	UserService_Status_FullMethodName      = "/fifsky.blog.admin.v1.UserService/Status"
+	UserService_LoginUser_FullMethodName   = "/fifsky.blog.admin.v1.UserService/LoginUser"
+	UserService_Generate2FA_FullMethodName = "/fifsky.blog.admin.v1.UserService/Generate2FA"
+	UserService_Bind2FA_FullMethodName     = "/fifsky.blog.admin.v1.UserService/Bind2FA"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -47,6 +49,10 @@ type UserServiceClient interface {
 	Status(ctx context.Context, in *UserStatusRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// LoginUser 获取登录用户详情
 	LoginUser(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*User, error)
+	// Generate2FA 生成 2FA 密钥和二维码
+	Generate2FA(ctx context.Context, in *Generate2FARequest, opts ...grpc.CallOption) (*Generate2FAResponse, error)
+	// Bind2FA 绑定 2FA
+	Bind2FA(ctx context.Context, in *Bind2FARequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type userServiceClient struct {
@@ -117,6 +123,26 @@ func (c *userServiceClient) LoginUser(ctx context.Context, in *emptypb.Empty, op
 	return out, nil
 }
 
+func (c *userServiceClient) Generate2FA(ctx context.Context, in *Generate2FARequest, opts ...grpc.CallOption) (*Generate2FAResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Generate2FAResponse)
+	err := c.cc.Invoke(ctx, UserService_Generate2FA_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) Bind2FA(ctx context.Context, in *Bind2FARequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, UserService_Bind2FA_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -135,6 +161,10 @@ type UserServiceServer interface {
 	Status(context.Context, *UserStatusRequest) (*emptypb.Empty, error)
 	// LoginUser 获取登录用户详情
 	LoginUser(context.Context, *emptypb.Empty) (*User, error)
+	// Generate2FA 生成 2FA 密钥和二维码
+	Generate2FA(context.Context, *Generate2FARequest) (*Generate2FAResponse, error)
+	// Bind2FA 绑定 2FA
+	Bind2FA(context.Context, *Bind2FARequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -162,6 +192,12 @@ func (UnimplementedUserServiceServer) Status(context.Context, *UserStatusRequest
 }
 func (UnimplementedUserServiceServer) LoginUser(context.Context, *emptypb.Empty) (*User, error) {
 	return nil, status.Error(codes.Unimplemented, "method LoginUser not implemented")
+}
+func (UnimplementedUserServiceServer) Generate2FA(context.Context, *Generate2FARequest) (*Generate2FAResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Generate2FA not implemented")
+}
+func (UnimplementedUserServiceServer) Bind2FA(context.Context, *Bind2FARequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method Bind2FA not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -292,6 +328,42 @@ func _UserService_LoginUser_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_Generate2FA_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Generate2FARequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).Generate2FA(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_Generate2FA_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).Generate2FA(ctx, req.(*Generate2FARequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_Bind2FA_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Bind2FARequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).Bind2FA(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_Bind2FA_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).Bind2FA(ctx, req.(*Bind2FARequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -322,6 +394,14 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LoginUser",
 			Handler:    _UserService_LoginUser_Handler,
+		},
+		{
+			MethodName: "Generate2FA",
+			Handler:    _UserService_Generate2FA_Handler,
+		},
+		{
+			MethodName: "Bind2FA",
+			Handler:    _UserService_Bind2FA_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

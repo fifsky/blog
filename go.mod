@@ -8,6 +8,7 @@ require (
 	github.com/aliyun/alibabacloud-oss-go-sdk-v2 v1.5.1
 	github.com/go-sql-driver/mysql v1.10.0
 	github.com/goapt/dbunit v0.0.5
+	github.com/goapt/gotp v1.1.0
 	github.com/goapt/httpx v0.0.4
 	github.com/goapt/logger v1.8.0
 	github.com/golang-jwt/jwt/v5 v5.3.1

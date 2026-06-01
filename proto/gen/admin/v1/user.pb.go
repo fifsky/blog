@@ -25,6 +25,162 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Generate2FARequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Generate2FARequest) Reset() {
+	*x = Generate2FARequest{}
+	mi := &file_admin_v1_user_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Generate2FARequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Generate2FARequest) ProtoMessage() {}
+
+func (x *Generate2FARequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_user_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Generate2FARequest.ProtoReflect.Descriptor instead.
+func (*Generate2FARequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *Generate2FARequest) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type Generate2FAResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Secret        string                 `protobuf:"bytes,1,opt,name=secret,proto3" json:"secret,omitempty"`
+	QrCodeUri     string                 `protobuf:"bytes,2,opt,name=qr_code_uri,json=qrCodeUri,proto3" json:"qr_code_uri,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Generate2FAResponse) Reset() {
+	*x = Generate2FAResponse{}
+	mi := &file_admin_v1_user_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Generate2FAResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Generate2FAResponse) ProtoMessage() {}
+
+func (x *Generate2FAResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_user_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Generate2FAResponse.ProtoReflect.Descriptor instead.
+func (*Generate2FAResponse) Descriptor() ([]byte, []int) {
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Generate2FAResponse) GetSecret() string {
+	if x != nil {
+		return x.Secret
+	}
+	return ""
+}
+
+func (x *Generate2FAResponse) GetQrCodeUri() string {
+	if x != nil {
+		return x.QrCodeUri
+	}
+	return ""
+}
+
+type Bind2FARequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Secret        string                 `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
+	Code          string                 `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Bind2FARequest) Reset() {
+	*x = Bind2FARequest{}
+	mi := &file_admin_v1_user_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Bind2FARequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Bind2FARequest) ProtoMessage() {}
+
+func (x *Bind2FARequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_user_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Bind2FARequest.ProtoReflect.Descriptor instead.
+func (*Bind2FARequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *Bind2FARequest) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *Bind2FARequest) GetSecret() string {
+	if x != nil {
+		return x.Secret
+	}
+	return ""
+}
+
+func (x *Bind2FARequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
 type GetUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -34,7 +190,7 @@ type GetUserRequest struct {
 
 func (x *GetUserRequest) Reset() {
 	*x = GetUserRequest{}
-	mi := &file_admin_v1_user_proto_msgTypes[0]
+	mi := &file_admin_v1_user_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -46,7 +202,7 @@ func (x *GetUserRequest) String() string {
 func (*GetUserRequest) ProtoMessage() {}
 
 func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_user_proto_msgTypes[0]
+	mi := &file_admin_v1_user_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -59,7 +215,7 @@ func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserRequest.ProtoReflect.Descriptor instead.
 func (*GetUserRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{0}
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetUserRequest) GetId() int32 {
@@ -79,7 +235,7 @@ type UserListRequest struct {
 
 func (x *UserListRequest) Reset() {
 	*x = UserListRequest{}
-	mi := &file_admin_v1_user_proto_msgTypes[1]
+	mi := &file_admin_v1_user_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -91,7 +247,7 @@ func (x *UserListRequest) String() string {
 func (*UserListRequest) ProtoMessage() {}
 
 func (x *UserListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_user_proto_msgTypes[1]
+	mi := &file_admin_v1_user_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -104,7 +260,7 @@ func (x *UserListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserListRequest.ProtoReflect.Descriptor instead.
 func (*UserListRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{1}
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *UserListRequest) GetPage() int32 {
@@ -124,7 +280,7 @@ type UserStatusRequest struct {
 
 func (x *UserStatusRequest) Reset() {
 	*x = UserStatusRequest{}
-	mi := &file_admin_v1_user_proto_msgTypes[2]
+	mi := &file_admin_v1_user_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -136,7 +292,7 @@ func (x *UserStatusRequest) String() string {
 func (*UserStatusRequest) ProtoMessage() {}
 
 func (x *UserStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_user_proto_msgTypes[2]
+	mi := &file_admin_v1_user_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -149,7 +305,7 @@ func (x *UserStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserStatusRequest.ProtoReflect.Descriptor instead.
 func (*UserStatusRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{2}
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *UserStatusRequest) GetId() int32 {
@@ -169,13 +325,14 @@ type User struct {
 	Type          int32                  `protobuf:"varint,6,opt,name=type,proto3" json:"type,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     string                 `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	HasTotp       bool                   `protobuf:"varint,9,opt,name=has_totp,json=hasTotp,proto3" json:"has_totp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *User) Reset() {
 	*x = User{}
-	mi := &file_admin_v1_user_proto_msgTypes[3]
+	mi := &file_admin_v1_user_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -187,7 +344,7 @@ func (x *User) String() string {
 func (*User) ProtoMessage() {}
 
 func (x *User) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_user_proto_msgTypes[3]
+	mi := &file_admin_v1_user_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -200,7 +357,7 @@ func (x *User) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use User.ProtoReflect.Descriptor instead.
 func (*User) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{3}
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *User) GetId() int32 {
@@ -259,6 +416,13 @@ func (x *User) GetUpdatedAt() string {
 	return ""
 }
 
+func (x *User) GetHasTotp() bool {
+	if x != nil {
+		return x.HasTotp
+	}
+	return false
+}
+
 type UserCreateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -272,7 +436,7 @@ type UserCreateRequest struct {
 
 func (x *UserCreateRequest) Reset() {
 	*x = UserCreateRequest{}
-	mi := &file_admin_v1_user_proto_msgTypes[4]
+	mi := &file_admin_v1_user_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -284,7 +448,7 @@ func (x *UserCreateRequest) String() string {
 func (*UserCreateRequest) ProtoMessage() {}
 
 func (x *UserCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_user_proto_msgTypes[4]
+	mi := &file_admin_v1_user_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -297,7 +461,7 @@ func (x *UserCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserCreateRequest.ProtoReflect.Descriptor instead.
 func (*UserCreateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{4}
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UserCreateRequest) GetName() string {
@@ -349,7 +513,7 @@ type UserUpdateRequest struct {
 
 func (x *UserUpdateRequest) Reset() {
 	*x = UserUpdateRequest{}
-	mi := &file_admin_v1_user_proto_msgTypes[5]
+	mi := &file_admin_v1_user_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -361,7 +525,7 @@ func (x *UserUpdateRequest) String() string {
 func (*UserUpdateRequest) ProtoMessage() {}
 
 func (x *UserUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_user_proto_msgTypes[5]
+	mi := &file_admin_v1_user_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -374,7 +538,7 @@ func (x *UserUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserUpdateRequest.ProtoReflect.Descriptor instead.
 func (*UserUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{5}
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UserUpdateRequest) GetId() int32 {
@@ -429,13 +593,14 @@ type UserItem struct {
 	Type          int32                  `protobuf:"varint,6,opt,name=type,proto3" json:"type,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     string                 `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	HasTotp       bool                   `protobuf:"varint,9,opt,name=has_totp,json=hasTotp,proto3" json:"has_totp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *UserItem) Reset() {
 	*x = UserItem{}
-	mi := &file_admin_v1_user_proto_msgTypes[6]
+	mi := &file_admin_v1_user_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -447,7 +612,7 @@ func (x *UserItem) String() string {
 func (*UserItem) ProtoMessage() {}
 
 func (x *UserItem) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_user_proto_msgTypes[6]
+	mi := &file_admin_v1_user_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -460,7 +625,7 @@ func (x *UserItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserItem.ProtoReflect.Descriptor instead.
 func (*UserItem) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{6}
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *UserItem) GetId() int32 {
@@ -519,6 +684,13 @@ func (x *UserItem) GetUpdatedAt() string {
 	return ""
 }
 
+func (x *UserItem) GetHasTotp() bool {
+	if x != nil {
+		return x.HasTotp
+	}
+	return false
+}
+
 type UserListResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	List          []*UserItem            `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
@@ -529,7 +701,7 @@ type UserListResponse struct {
 
 func (x *UserListResponse) Reset() {
 	*x = UserListResponse{}
-	mi := &file_admin_v1_user_proto_msgTypes[7]
+	mi := &file_admin_v1_user_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -541,7 +713,7 @@ func (x *UserListResponse) String() string {
 func (*UserListResponse) ProtoMessage() {}
 
 func (x *UserListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_user_proto_msgTypes[7]
+	mi := &file_admin_v1_user_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -554,7 +726,7 @@ func (x *UserListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserListResponse.ProtoReflect.Descriptor instead.
 func (*UserListResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{7}
+	return file_admin_v1_user_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *UserListResponse) GetList() []*UserItem {
@@ -575,7 +747,18 @@ var File_admin_v1_user_proto protoreflect.FileDescriptor
 
 const file_admin_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x13admin/v1/user.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\",\n" +
+	"\x13admin/v1/user.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"0\n" +
+	"\x12Generate2FARequest\x12\x1a\n" +
+	"\x02id\x18\x01 \x01(\x05B\n" +
+	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"M\n" +
+	"\x13Generate2FAResponse\x12\x16\n" +
+	"\x06secret\x18\x01 \x01(\tR\x06secret\x12\x1e\n" +
+	"\vqr_code_uri\x18\x02 \x01(\tR\tqrCodeUri\"n\n" +
+	"\x0eBind2FARequest\x12\x1a\n" +
+	"\x02id\x18\x01 \x01(\x05B\n" +
+	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\x12!\n" +
+	"\x06secret\x18\x02 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x06secret\x12\x1d\n" +
+	"\x04code\x18\x03 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x04code\",\n" +
 	"\x0eGetUserRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\".\n" +
@@ -583,7 +766,7 @@ const file_admin_v1_user_proto_rawDesc = "" +
 	"\x04page\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02 \x00R\x04page\"/\n" +
 	"\x11UserStatusRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
-	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"\xc7\x01\n" +
+	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"\xe2\x01\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
@@ -594,7 +777,8 @@ const file_admin_v1_user_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\a \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\b \x01(\tR\tupdatedAt\"\xb7\x01\n" +
+	"updated_at\x18\b \x01(\tR\tupdatedAt\x12\x19\n" +
+	"\bhas_totp\x18\t \x01(\bR\ahasTotp\"\xb7\x01\n" +
 	"\x11UserCreateRequest\x12\x1d\n" +
 	"\x04name\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x04name\x12%\n" +
 	"\bpassword\x18\x02 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\bpassword\x12&\n" +
@@ -609,7 +793,7 @@ const file_admin_v1_user_proto_rawDesc = "" +
 	"\bpassword\x18\x03 \x01(\tR\bpassword\x12\x1b\n" +
 	"\tnick_name\x18\x04 \x01(\tR\bnickName\x12\x14\n" +
 	"\x05email\x18\x05 \x01(\tR\x05email\x12\x12\n" +
-	"\x04type\x18\x06 \x01(\x05R\x04type\"\xcb\x01\n" +
+	"\x04type\x18\x06 \x01(\x05R\x04type\"\xe6\x01\n" +
 	"\bUserItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
@@ -620,17 +804,20 @@ const file_admin_v1_user_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\a \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\b \x01(\tR\tupdatedAt\"\\\n" +
+	"updated_at\x18\b \x01(\tR\tupdatedAt\x12\x19\n" +
+	"\bhas_totp\x18\t \x01(\bR\ahasTotp\"\\\n" +
 	"\x10UserListResponse\x122\n" +
 	"\x04list\x18\x01 \x03(\v2\x1e.fifsky.blog.admin.v1.UserItemR\x04list\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total2\xae\x05\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total2\xac\a\n" +
 	"\vUserService\x12h\n" +
 	"\x03Get\x12$.fifsky.blog.admin.v1.GetUserRequest\x1a\x1a.fifsky.blog.admin.v1.User\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/blog/admin/user/get\x12t\n" +
 	"\x06Create\x12'.fifsky.blog.admin.v1.UserCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/user/create\x12t\n" +
 	"\x06Update\x12'.fifsky.blog.admin.v1.UserUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/user/update\x12w\n" +
 	"\x04List\x12%.fifsky.blog.admin.v1.UserListRequest\x1a&.fifsky.blog.admin.v1.UserListResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/blog/admin/user/list\x12m\n" +
 	"\x06Status\x12'.fifsky.blog.admin.v1.UserStatusRequest\x1a\x16.google.protobuf.Empty\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/user/status\x12a\n" +
-	"\tLoginUser\x12\x16.google.protobuf.Empty\x1a\x1a.fifsky.blog.admin.v1.User\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/blog/admin/loginuserB\xb8\x01\n" +
+	"\tLoginUser\x12\x16.google.protobuf.Empty\x1a\x1a.fifsky.blog.admin.v1.User\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/blog/admin/loginuser\x12\x8c\x01\n" +
+	"\vGenerate2FA\x12(.fifsky.blog.admin.v1.Generate2FARequest\x1a).fifsky.blog.admin.v1.Generate2FAResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/blog/admin/user/generate_2fa\x12m\n" +
+	"\aBind2FA\x12$.fifsky.blog.admin.v1.Bind2FARequest\x1a\x16.google.protobuf.Empty\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/blog/admin/user/bind_2faB\xb8\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\tUserProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
 var (
@@ -645,38 +832,45 @@ func file_admin_v1_user_proto_rawDescGZIP() []byte {
 	return file_admin_v1_user_proto_rawDescData
 }
 
-var file_admin_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_admin_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_admin_v1_user_proto_goTypes = []any{
-	(*GetUserRequest)(nil),    // 0: fifsky.blog.admin.v1.GetUserRequest
-	(*UserListRequest)(nil),   // 1: fifsky.blog.admin.v1.UserListRequest
-	(*UserStatusRequest)(nil), // 2: fifsky.blog.admin.v1.UserStatusRequest
-	(*User)(nil),              // 3: fifsky.blog.admin.v1.User
-	(*UserCreateRequest)(nil), // 4: fifsky.blog.admin.v1.UserCreateRequest
-	(*UserUpdateRequest)(nil), // 5: fifsky.blog.admin.v1.UserUpdateRequest
-	(*UserItem)(nil),          // 6: fifsky.blog.admin.v1.UserItem
-	(*UserListResponse)(nil),  // 7: fifsky.blog.admin.v1.UserListResponse
-	(*emptypb.Empty)(nil),     // 8: google.protobuf.Empty
-	(*types.IDResponse)(nil),  // 9: fifsky.blog.types.IDResponse
+	(*Generate2FARequest)(nil),  // 0: fifsky.blog.admin.v1.Generate2FARequest
+	(*Generate2FAResponse)(nil), // 1: fifsky.blog.admin.v1.Generate2FAResponse
+	(*Bind2FARequest)(nil),      // 2: fifsky.blog.admin.v1.Bind2FARequest
+	(*GetUserRequest)(nil),      // 3: fifsky.blog.admin.v1.GetUserRequest
+	(*UserListRequest)(nil),     // 4: fifsky.blog.admin.v1.UserListRequest
+	(*UserStatusRequest)(nil),   // 5: fifsky.blog.admin.v1.UserStatusRequest
+	(*User)(nil),                // 6: fifsky.blog.admin.v1.User
+	(*UserCreateRequest)(nil),   // 7: fifsky.blog.admin.v1.UserCreateRequest
+	(*UserUpdateRequest)(nil),   // 8: fifsky.blog.admin.v1.UserUpdateRequest
+	(*UserItem)(nil),            // 9: fifsky.blog.admin.v1.UserItem
+	(*UserListResponse)(nil),    // 10: fifsky.blog.admin.v1.UserListResponse
+	(*emptypb.Empty)(nil),       // 11: google.protobuf.Empty
+	(*types.IDResponse)(nil),    // 12: fifsky.blog.types.IDResponse
 }
 var file_admin_v1_user_proto_depIdxs = []int32{
-	6, // 0: fifsky.blog.admin.v1.UserListResponse.list:type_name -> fifsky.blog.admin.v1.UserItem
-	0, // 1: fifsky.blog.admin.v1.UserService.Get:input_type -> fifsky.blog.admin.v1.GetUserRequest
-	4, // 2: fifsky.blog.admin.v1.UserService.Create:input_type -> fifsky.blog.admin.v1.UserCreateRequest
-	5, // 3: fifsky.blog.admin.v1.UserService.Update:input_type -> fifsky.blog.admin.v1.UserUpdateRequest
-	1, // 4: fifsky.blog.admin.v1.UserService.List:input_type -> fifsky.blog.admin.v1.UserListRequest
-	2, // 5: fifsky.blog.admin.v1.UserService.Status:input_type -> fifsky.blog.admin.v1.UserStatusRequest
-	8, // 6: fifsky.blog.admin.v1.UserService.LoginUser:input_type -> google.protobuf.Empty
-	3, // 7: fifsky.blog.admin.v1.UserService.Get:output_type -> fifsky.blog.admin.v1.User
-	9, // 8: fifsky.blog.admin.v1.UserService.Create:output_type -> fifsky.blog.types.IDResponse
-	9, // 9: fifsky.blog.admin.v1.UserService.Update:output_type -> fifsky.blog.types.IDResponse
-	7, // 10: fifsky.blog.admin.v1.UserService.List:output_type -> fifsky.blog.admin.v1.UserListResponse
-	8, // 11: fifsky.blog.admin.v1.UserService.Status:output_type -> google.protobuf.Empty
-	3, // 12: fifsky.blog.admin.v1.UserService.LoginUser:output_type -> fifsky.blog.admin.v1.User
-	7, // [7:13] is the sub-list for method output_type
-	1, // [1:7] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	9,  // 0: fifsky.blog.admin.v1.UserListResponse.list:type_name -> fifsky.blog.admin.v1.UserItem
+	3,  // 1: fifsky.blog.admin.v1.UserService.Get:input_type -> fifsky.blog.admin.v1.GetUserRequest
+	7,  // 2: fifsky.blog.admin.v1.UserService.Create:input_type -> fifsky.blog.admin.v1.UserCreateRequest
+	8,  // 3: fifsky.blog.admin.v1.UserService.Update:input_type -> fifsky.blog.admin.v1.UserUpdateRequest
+	4,  // 4: fifsky.blog.admin.v1.UserService.List:input_type -> fifsky.blog.admin.v1.UserListRequest
+	5,  // 5: fifsky.blog.admin.v1.UserService.Status:input_type -> fifsky.blog.admin.v1.UserStatusRequest
+	11, // 6: fifsky.blog.admin.v1.UserService.LoginUser:input_type -> google.protobuf.Empty
+	0,  // 7: fifsky.blog.admin.v1.UserService.Generate2FA:input_type -> fifsky.blog.admin.v1.Generate2FARequest
+	2,  // 8: fifsky.blog.admin.v1.UserService.Bind2FA:input_type -> fifsky.blog.admin.v1.Bind2FARequest
+	6,  // 9: fifsky.blog.admin.v1.UserService.Get:output_type -> fifsky.blog.admin.v1.User
+	12, // 10: fifsky.blog.admin.v1.UserService.Create:output_type -> fifsky.blog.types.IDResponse
+	12, // 11: fifsky.blog.admin.v1.UserService.Update:output_type -> fifsky.blog.types.IDResponse
+	10, // 12: fifsky.blog.admin.v1.UserService.List:output_type -> fifsky.blog.admin.v1.UserListResponse
+	11, // 13: fifsky.blog.admin.v1.UserService.Status:output_type -> google.protobuf.Empty
+	6,  // 14: fifsky.blog.admin.v1.UserService.LoginUser:output_type -> fifsky.blog.admin.v1.User
+	1,  // 15: fifsky.blog.admin.v1.UserService.Generate2FA:output_type -> fifsky.blog.admin.v1.Generate2FAResponse
+	11, // 16: fifsky.blog.admin.v1.UserService.Bind2FA:output_type -> google.protobuf.Empty
+	9,  // [9:17] is the sub-list for method output_type
+	1,  // [1:9] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_admin_v1_user_proto_init() }
@@ -690,7 +884,7 @@ func file_admin_v1_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_user_proto_rawDesc), len(file_admin_v1_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

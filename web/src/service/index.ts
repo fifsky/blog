@@ -189,6 +189,12 @@ export const userUpdateApi = (data: UserUpdateRequest, errorHandler?: (e: AppErr
   createApi<IDResponse>("/blog/admin/user/update", data, errorHandler);
 export const userGetApi = (data: GetUserRequest, errorHandler?: (e: AppError) => void) =>
   createApi<User>("/blog/admin/user/get", data, errorHandler);
+export const userGenerate2FAApi = (
+  data: Generate2FARequest,
+  errorHandler?: (e: AppError) => void,
+) => createApi<Generate2FAResponse>("/blog/admin/user/generate_2fa", data, errorHandler);
+export const userBind2FAApi = (data: Bind2FARequest, errorHandler?: (e: AppError) => void) =>
+  createApi("/blog/admin/user/bind_2fa", data, errorHandler);
 export const userStatusApi = (data: UserStatusRequest, errorHandler?: (e: AppError) => void) =>
   createApi("/blog/admin/user/status", data, errorHandler);
 

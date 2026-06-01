@@ -15,8 +15,8 @@ export type ArticleDestroyRequest = { ids: number[] };
 // 通用响应
 export type IDResponse = { id: number };
 
-export type LoginRequest = { user_name: string; password: string };
-export type LoginResponse = { access_token: string; user: UserItem };
+export type LoginRequest = { user_name: string; password: string; totp_code?: string };
+export type LoginResponse = { access_token: string; user: UserItem; require_totp?: boolean };
 
 export type UserItem = {
   id: number;
@@ -25,6 +25,7 @@ export type UserItem = {
   email: string;
   status: number;
   type: number;
+  has_totp: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -43,6 +44,9 @@ export type User = {
 // 各模块独立的请求类型
 export type UserListRequest = { page?: number };
 export type UserStatusRequest = { id: number };
+export type Generate2FARequest = { id: number };
+export type Generate2FAResponse = { secret: string; qr_code_uri: string };
+export type Bind2FARequest = { id: number; secret: string; code: string };
 export type RemindListRequest = { page?: number };
 export type RemindDeleteRequest = { id: number };
 export type MoodListRequest = { page?: number };

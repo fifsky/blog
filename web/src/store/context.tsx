@@ -16,7 +16,7 @@ export type Store = {
   keyword: string;
   setUserInfo: (u: UserInfo) => void;
   setKeyword: (k: string) => void;
-  loginAction: (data: LoginRequest) => Promise<void>;
+  loginAction: (data: LoginRequest) => Promise<any>;
   currentUserAction: () => Promise<void>;
 };
 
@@ -27,9 +27,13 @@ export const useStore = create<Store>((set) => ({
   setKeyword: (k) => set({ keyword: k }),
   loginAction: async (data: LoginRequest) => {
     const ret = await loginApi(data);
+    if (ret.require_totp) {
+      return ret;
+    }
     if (!ret.access_token) throw "登录失败";
     localStorage.setItem("access_token", ret.access_token);
     set({ userInfo: ret.user });
+    return ret;
   },
   currentUserAction: async () => {
     try {
