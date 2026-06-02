@@ -106,7 +106,7 @@ export function CHeader() {
             </Link>
           </div>
           <div
-            className="inline-flex items-center h-[35px] my-2 px-3 bg-white rounded-lg whitespace-nowrap"
+            className="inline-flex items-center h-[35px] bg-white rounded-lg whitespace-nowrap"
             style={{
               transform: `translateX(${menuTranslateX}px)`,
               willChange: "transform",
