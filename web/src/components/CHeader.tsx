@@ -11,14 +11,8 @@ export function CHeader() {
   const navigate = useNavigate();
   const headerRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
-  const [headerHeight, setHeaderHeight] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(80);
   const rafRef = useRef(0);
-
-  useEffect(() => {
-    if (headerRef.current) {
-      setHeaderHeight(headerRef.current.offsetHeight);
-    }
-  }, []);
 
   const handleScroll = useCallback(() => {
     cancelAnimationFrame(rafRef.current);
