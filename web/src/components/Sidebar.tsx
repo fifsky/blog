@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { useStore } from "@/store/context";
 import { SidebarList } from "./SidebarList";
@@ -22,6 +22,13 @@ export function Sidebar() {
       });
     }
   };
+  const [weather, setWeather] = useState("");
+  useEffect(() => {
+    fetch("https://wttr.in/Shanghai?format=3&AT")
+      .then((r) => r.text())
+      .then((t) => setWeather(t.trim()))
+      .catch(() => {});
+  }, []);
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     setKeyword(params.get("keyword") || "");
@@ -42,6 +49,7 @@ export function Sidebar() {
           </InputGroupAddon>
         </InputGroup>
       </div>
+      {weather && <p className="mb-4 text-center text-xs text-[#8c8c8c]">{weather}</p>}
       <Calendar />
       <SidebarList title="文章分类" api="cateAllApi" />
       <SidebarList title="历史存档" api="archiveApi" />

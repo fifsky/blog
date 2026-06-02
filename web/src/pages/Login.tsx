@@ -11,6 +11,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { settingApi } from "@/service";
+import { dialog } from "@/utils/dialog";
 import { useAsyncEffect } from "@/hooks";
 
 export default function Login() {

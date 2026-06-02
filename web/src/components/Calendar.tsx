@@ -46,7 +46,7 @@ export function Calendar() {
 
   useEffect(builder, [currMonth]);
   return (
-    <div className="mb-6">
+    <div className="mb-5">
       <div id="blog-calendar">
         <table className="w-[200px] text-[13px]">
           <tbody>
