@@ -1,120 +1,213 @@
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useStore } from "@/store/context";
+
+const SCROLL_THRESHOLD = 150;
 
 export function CHeader() {
   const userInfo = useStore((s) => s.userInfo);
   const setUserInfo = useStore((s) => s.setUserInfo);
   const isLogin = !!userInfo.id;
   const navigate = useNavigate();
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    if (headerRef.current) {
+      setHeaderHeight(headerRef.current.offsetHeight);
+    }
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      const p = Math.min(window.scrollY / SCROLL_THRESHOLD, 1);
+      setProgress(p);
+    });
+  }, []);
+
+  useEffect(() => {
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, [handleScroll]);
+
   const logOut = () => {
     localStorage.removeItem("access_token");
     setUserInfo({});
     navigate("/");
   };
+
+  const logoScale = 1 - progress * 0.3;
+  const logoTranslateX = -progress * 24;
+  const menuTranslateX = progress * 24;
+  const logoR = Math.round(255 - progress * 221);
+  const logoG = Math.round(255 - progress * 221);
+  const logoB = Math.round(255 - progress * 221);
+  const logoColor = `rgb(${logoR},${logoG},${logoB})`;
+  const textShadow = progress > 0.5 ? `0 1px 2px rgba(0,0,0,${(progress - 0.5) * 0.15})` : undefined;
+  const bgOpacity = progress;
+  const shadowOpacity = Math.max(0, (progress - 0.5) * 2);
+  const headerPaddingY = 24 - progress * 20;
+
   return (
-    <div className="flex items-center justify-between">
-      <div className="group pt-1 pb-5 px-0">
-        <Link to="/" className="no-underline flex items-baseline gap-1 drop-shadow-md">
-          <span className="text-white text-4xl font-black tracking-wider">
-            你好
-          </span>
-          <span className="text-white text-3xl font-bold">
-            。
-          </span>
-          <span className="text-white text-2xl font-normal italic tracking-widest">
-            旧时光
-          </span>
-        </Link>
-      </div>
-      <div className="inline-flex items-center h-[35px] my-2 px-3 bg-white rounded-lg whitespace-nowrap">
-        <ul className="flex items-center list-none">
-          <li className="bg-white">
+    <>
+      {headerHeight > 0 && <div style={{ height: headerHeight }} />}
+      <div
+        ref={headerRef}
+        className="w-full"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          zIndex: 50,
+        }}
+      >
+        <div
+          className="absolute inset-0 bg-white pointer-events-none"
+          style={{
+            opacity: bgOpacity,
+            boxShadow:
+              shadowOpacity > 0
+                ? `0 1px 8px rgba(0,0,0,${shadowOpacity * 0.1})`
+                : "none",
+          }}
+        />
+        <div
+          className="flex items-center justify-between relative"
+          style={{
+            maxWidth: 1024,
+            margin: "0 auto",
+            paddingTop: headerPaddingY,
+            paddingBottom: headerPaddingY,
+          }}
+        >
+          <div
+            style={{
+              transform: `scale(${logoScale}) translateX(${logoTranslateX}px)`,
+              transformOrigin: "left center",
+              willChange: "transform",
+            }}
+          >
             <Link
               to="/"
-              className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+              className="no-underline flex items-baseline gap-1 drop-shadow-md"
+              style={{
+                color: logoColor,
+                textShadow: textShadow,
+              }}
             >
-              首页
+              <span className="text-4xl font-black tracking-wider">
+                你好
+              </span>
+              <span className="text-3xl font-bold">。</span>
+              <span className="text-2xl font-normal italic tracking-widest">
+                旧时光
+              </span>
             </Link>
-          </li>
-          <li className="bg-white">
-            <a
-              href="https://github.com/fifsky"
-              target="_blank"
-              rel="noreferrer"
-              className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
-            >
-              Github
-            </a>
-          </li>
-          <li className="bg-white">
-            <Link
-              to="/archive"
-              className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
-            >
-              归档
-            </Link>
-          </li>
-          <li className="bg-white">
-            <Link
-              to="/about"
-              className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
-            >
-              关于
-            </Link>
-          </li>
-          <li className="bg-white">
-            <a
-              href="https://windiness.fifsky.com"
-              className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
-            >
-              有风
-            </a>
-          </li>
-          <li className="bg-white">
-            <a
-              href="https://www.travellings.cn/go"
-              className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
-              target="_blank"
-            >
-              开往
-            </a>
-          </li>
-          {isLogin && (
-            <li className="bg-white">
-              <Link
-                to="/admin/index"
-                className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
-              >
-                管理中心
-              </Link>
-            </li>
-          )}
-          {isLogin && (
-            <li className="bg-white">
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  logOut();
-                }}
-                className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
-              >
-                退出
-              </a>
-            </li>
-          )}
-          {!isLogin && (
-            <li className="bg-white">
-              <Link
-                to="/login"
-                className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
-              >
-                登录
-              </Link>
-            </li>
-          )}
-        </ul>
+          </div>
+          <div
+            className="inline-flex items-center h-[35px] my-2 px-3 bg-white rounded-lg whitespace-nowrap"
+            style={{
+              transform: `translateX(${menuTranslateX}px)`,
+              willChange: "transform",
+            }}
+          >
+            <ul className="flex items-center list-none">
+              <li className="bg-white">
+                <Link
+                  to="/"
+                  className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+                >
+                  首页
+                </Link>
+              </li>
+              <li className="bg-white">
+                <a
+                  href="https://github.com/fifsky"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+                >
+                  Github
+                </a>
+              </li>
+              <li className="bg-white">
+                <Link
+                  to="/archive"
+                  className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+                >
+                  归档
+                </Link>
+              </li>
+              <li className="bg-white">
+                <Link
+                  to="/about"
+                  className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+                >
+                  关于
+                </Link>
+              </li>
+              <li className="bg-white">
+                <a
+                  href="https://windiness.fifsky.com"
+                  className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+                >
+                  有风
+                </a>
+              </li>
+              <li className="bg-white">
+                <a
+                  href="https://www.travellings.cn/go"
+                  className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+                  target="_blank"
+                >
+                  开往
+                </a>
+              </li>
+              {isLogin && (
+                <li className="bg-white">
+                  <Link
+                    to="/admin/index"
+                    className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+                  >
+                    管理中心
+                  </Link>
+                </li>
+              )}
+              {isLogin && (
+                <li className="bg-white">
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      logOut();
+                    }}
+                    className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+                  >
+                    退出
+                  </a>
+                </li>
+              )}
+              {!isLogin && (
+                <li className="bg-white">
+                  <Link
+                    to="/login"
+                    className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+                  >
+                    登录
+                  </Link>
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
