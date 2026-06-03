@@ -158,12 +158,14 @@ export function AdminFootprintDialog({ isOpen, onClose, item, onSubmit }: AdminF
       setCategories(item.categories || []);
       setExistingPhotos((item.photos || []).map((p) => p.src));
       setPendingFiles([]);
+      setMapSearchKeyword("");
     } else {
       form.reset({ name: "", longitude: "", latitude: "" });
       setSelectedColor("");
       setCategories([]);
       setExistingPhotos([]);
       setPendingFiles([]);
+      setMapSearchKeyword("");
     }
   }, [item, form]);
 
@@ -187,6 +189,7 @@ export function AdminFootprintDialog({ isOpen, onClose, item, onSubmit }: AdminF
         }
       }
       if (!form.getValues("name")) form.setValue("name", poi.name);
+      setMapSearchKeyword("");
     });
   }, [mapSearchKeyword, form]);
 
@@ -264,6 +267,7 @@ export function AdminFootprintDialog({ isOpen, onClose, item, onSubmit }: AdminF
           <DialogTitle>{isEdit ? "编辑足迹" : "新增足迹"}</DialogTitle>
         </DialogHeader>
         <form
+          key={item?.id ?? "new"}
           className="w-full px-1 overflow-y-auto"
           method="post"
           autoComplete="off"
