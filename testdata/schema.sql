@@ -132,19 +132,6 @@ CREATE TABLE `reminds` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
-CREATE TABLE `photos` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'PK',
-  `title` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '照片标题',
-  `description` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '照片描述',
-  `src` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '原图地址',
-  `thumbnail` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '缩略图地址',
-  `province` int NOT NULL COMMENT '省份区域ID',
-  `city` int NOT NULL COMMENT '城市区域ID',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='旅行照片';
-
 CREATE TABLE `regions` (
   `region_id` int unsigned NOT NULL AUTO_INCREMENT COMMENT '区域ID',
   `parent_id` int unsigned NOT NULL COMMENT '上级ID',
@@ -168,3 +155,20 @@ CREATE TABLE `guestbook` (
   `created_at` datetime NOT NULL COMMENT '留言时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `footprints` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'PK',
+  `name` varchar(256) NOT NULL COMMENT '地点名称',
+  `description` varchar(1024) NOT NULL DEFAULT '' COMMENT '描述',
+  `longitude` varchar(20) NOT NULL COMMENT '经度',
+  `latitude` varchar(20) NOT NULL COMMENT '纬度',
+  `date` varchar(128) NOT NULL DEFAULT '' COMMENT '到访日期',
+  `marker_color` varchar(32) NOT NULL DEFAULT '' COMMENT '标记颜色',
+  `categories` json DEFAULT NULL COMMENT '分类标签数组',
+  `url` varchar(1024) NOT NULL DEFAULT '' COMMENT '关联链接',
+  `url_label` varchar(128) NOT NULL DEFAULT '' COMMENT '链接按钮文案',
+  `photos` json DEFAULT NULL COMMENT '照片URL数组',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='旅行足迹';

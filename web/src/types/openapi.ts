@@ -256,51 +256,6 @@ export type RemindUpdateRequest = {
   content?: string;
 };
 
-// Photo types
-export type PhotoItem = {
-  id: number;
-  title: string;
-  description: string;
-  src: string;
-  thumbnail: string;
-  province: number;
-  province_name: string;
-  city: number;
-  city_name: string;
-  created_at: string;
-};
-export type PhotoListRequest = { page: number };
-export type PhotoListResponse = { list: PhotoItem[]; total: number };
-export type PhotoCreateRequest = {
-  title: string;
-  description?: string;
-  srcs: string[]; // 支持多个图片地址
-  province: number;
-  city: number;
-};
-export type PhotoUpdateRequest = {
-  id: number;
-  title?: string;
-  description?: string;
-  province?: number;
-  city?: number;
-};
-export type PhotoDeleteRequest = { id: number };
-
-// Region types
-export type RegionItem = {
-  region_id: number;
-  parent_id: number;
-  level: number;
-  region_name: string;
-  longitude: string;
-  latitude: string;
-  pinyin: string;
-  az_no: string;
-};
-export type RegionListRequest = { parent_id: number };
-export type RegionListResponse = { list: RegionItem[] };
-
 // OSS types
 export type OSSPresignRequest = { filename: string };
 export type OSSPresignResponse = {
@@ -309,24 +264,55 @@ export type OSSPresignResponse = {
 };
 
 // Travel types
-export type FootprintRegion = {
-  region_id: number;
-  name: string;
-  longitude: string;
-  latitude: string;
-};
-export type FootprintsResponse = {
-  provinces: FootprintRegion[];
-  cities: FootprintRegion[];
-};
-export type TravelPhoto = {
-  title: string;
-  description: string;
+export type FootprintPhotoItem = {
   src: string;
   thumbnail: string;
 };
-export type CityPhotosRequest = { region_id: number };
-export type CityPhotosResponse = { photos: TravelPhoto[] };
+export type FootprintItem = {
+  id: number;
+  name: string;
+  description: string;
+  longitude: string;
+  latitude: string;
+  date: string;
+  marker_color: string;
+  categories: string[];
+  url: string;
+  url_label: string;
+  photos: FootprintPhotoItem[];
+  created_at: string;
+};
+export type FootprintsResponse = {
+  footprints: FootprintItem[];
+};
+export type FootprintListRequest = { page: number };
+export type FootprintListResponse = { list: FootprintItem[]; total: number };
+export type FootprintCreateRequest = {
+  name: string;
+  description?: string;
+  longitude: string;
+  latitude: string;
+  date?: string;
+  marker_color?: string;
+  categories?: string[];
+  url?: string;
+  url_label?: string;
+  photo_urls?: string[];
+};
+export type FootprintUpdateRequest = {
+  id: number;
+  name?: string;
+  description?: string;
+  longitude?: string;
+  latitude?: string;
+  date?: string;
+  marker_color?: string;
+  categories?: string[];
+  url?: string;
+  url_label?: string;
+  photo_urls?: string[];
+};
+export type FootprintDeleteRequest = { id: number };
 
 // AI types
 export type GenerateTagsRequest = { title?: string; content: string };

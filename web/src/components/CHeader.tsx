@@ -11,7 +11,7 @@ export function CHeader() {
   const navigate = useNavigate();
   const headerRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
-  const [headerHeight, setHeaderHeight] = useState(80);
+  const [headerHeight] = useState(80);
   const rafRef = useRef(0);
 
   const handleScroll = useCallback(() => {

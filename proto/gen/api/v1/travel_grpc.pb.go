@@ -19,8 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TravelService_GetFootprints_FullMethodName  = "/fifsky.blog.api.v1.TravelService/GetFootprints"
-	TravelService_ListCityPhotos_FullMethodName = "/fifsky.blog.api.v1.TravelService/ListCityPhotos"
+	TravelService_GetFootprints_FullMethodName = "/fifsky.blog.api.v1.TravelService/GetFootprints"
 )
 
 // TravelServiceClient is the client API for TravelService service.
@@ -29,10 +28,8 @@ const (
 //
 // TravelService 提供旅行足迹相关的接口
 type TravelServiceClient interface {
-	// GetFootprints 获取足迹数据（省份和城市）
+	// GetFootprints 获取所有足迹数据
 	GetFootprints(ctx context.Context, in *GetFootprintsRequest, opts ...grpc.CallOption) (*GetFootprintsResponse, error)
-	// ListCityPhotos 根据城市获取照片列表
-	ListCityPhotos(ctx context.Context, in *ListCityPhotosRequest, opts ...grpc.CallOption) (*ListCityPhotosResponse, error)
 }
 
 type travelServiceClient struct {
@@ -53,26 +50,14 @@ func (c *travelServiceClient) GetFootprints(ctx context.Context, in *GetFootprin
 	return out, nil
 }
 
-func (c *travelServiceClient) ListCityPhotos(ctx context.Context, in *ListCityPhotosRequest, opts ...grpc.CallOption) (*ListCityPhotosResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListCityPhotosResponse)
-	err := c.cc.Invoke(ctx, TravelService_ListCityPhotos_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // TravelServiceServer is the server API for TravelService service.
 // All implementations must embed UnimplementedTravelServiceServer
 // for forward compatibility.
 //
 // TravelService 提供旅行足迹相关的接口
 type TravelServiceServer interface {
-	// GetFootprints 获取足迹数据（省份和城市）
+	// GetFootprints 获取所有足迹数据
 	GetFootprints(context.Context, *GetFootprintsRequest) (*GetFootprintsResponse, error)
-	// ListCityPhotos 根据城市获取照片列表
-	ListCityPhotos(context.Context, *ListCityPhotosRequest) (*ListCityPhotosResponse, error)
 	mustEmbedUnimplementedTravelServiceServer()
 }
 
@@ -85,9 +70,6 @@ type UnimplementedTravelServiceServer struct{}
 
 func (UnimplementedTravelServiceServer) GetFootprints(context.Context, *GetFootprintsRequest) (*GetFootprintsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetFootprints not implemented")
-}
-func (UnimplementedTravelServiceServer) ListCityPhotos(context.Context, *ListCityPhotosRequest) (*ListCityPhotosResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ListCityPhotos not implemented")
 }
 func (UnimplementedTravelServiceServer) mustEmbedUnimplementedTravelServiceServer() {}
 func (UnimplementedTravelServiceServer) testEmbeddedByValue()                       {}
@@ -128,24 +110,6 @@ func _TravelService_GetFootprints_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TravelService_ListCityPhotos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListCityPhotosRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TravelServiceServer).ListCityPhotos(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: TravelService_ListCityPhotos_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TravelServiceServer).ListCityPhotos(ctx, req.(*ListCityPhotosRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // TravelService_ServiceDesc is the grpc.ServiceDesc for TravelService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -156,10 +120,6 @@ var TravelService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFootprints",
 			Handler:    _TravelService_GetFootprints_Handler,
-		},
-		{
-			MethodName: "ListCityPhotos",
-			Handler:    _TravelService_ListCityPhotos_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

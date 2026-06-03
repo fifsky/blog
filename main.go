@@ -79,6 +79,7 @@ func main() {
 		Commands: []*cli.Command{
 			cmd.NewHttp(s, conf, httpClient, agent),
 			cmd.NewTmp(db, conf),
+			cmd.NewMigrate(db, conf),
 		},
 	}
 

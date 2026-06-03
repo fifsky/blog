@@ -23,30 +23,29 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type FootprintRegion struct {
+// FootprintPhoto 足迹照片
+type FootprintPhoto struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RegionId      int32                  `protobuf:"varint,1,opt,name=region_id,json=regionId,proto3" json:"region_id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Longitude     string                 `protobuf:"bytes,3,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	Latitude      string                 `protobuf:"bytes,4,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Src           string                 `protobuf:"bytes,1,opt,name=src,proto3" json:"src,omitempty"`
+	Thumbnail     string                 `protobuf:"bytes,2,opt,name=thumbnail,proto3" json:"thumbnail,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *FootprintRegion) Reset() {
-	*x = FootprintRegion{}
+func (x *FootprintPhoto) Reset() {
+	*x = FootprintPhoto{}
 	mi := &file_api_v1_travel_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *FootprintRegion) String() string {
+func (x *FootprintPhoto) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*FootprintRegion) ProtoMessage() {}
+func (*FootprintPhoto) ProtoMessage() {}
 
-func (x *FootprintRegion) ProtoReflect() protoreflect.Message {
+func (x *FootprintPhoto) ProtoReflect() protoreflect.Message {
 	mi := &file_api_v1_travel_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -58,37 +57,148 @@ func (x *FootprintRegion) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FootprintRegion.ProtoReflect.Descriptor instead.
-func (*FootprintRegion) Descriptor() ([]byte, []int) {
+// Deprecated: Use FootprintPhoto.ProtoReflect.Descriptor instead.
+func (*FootprintPhoto) Descriptor() ([]byte, []int) {
 	return file_api_v1_travel_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *FootprintRegion) GetRegionId() int32 {
+func (x *FootprintPhoto) GetSrc() string {
 	if x != nil {
-		return x.RegionId
+		return x.Src
+	}
+	return ""
+}
+
+func (x *FootprintPhoto) GetThumbnail() string {
+	if x != nil {
+		return x.Thumbnail
+	}
+	return ""
+}
+
+// Footprint 足迹点
+type Footprint struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Longitude     string                 `protobuf:"bytes,4,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	Latitude      string                 `protobuf:"bytes,5,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Date          string                 `protobuf:"bytes,6,opt,name=date,proto3" json:"date,omitempty"`
+	MarkerColor   string                 `protobuf:"bytes,7,opt,name=marker_color,json=markerColor,proto3" json:"marker_color,omitempty"`
+	Categories    []string               `protobuf:"bytes,8,rep,name=categories,proto3" json:"categories,omitempty"`
+	Url           string                 `protobuf:"bytes,9,opt,name=url,proto3" json:"url,omitempty"`
+	UrlLabel      string                 `protobuf:"bytes,10,opt,name=url_label,json=urlLabel,proto3" json:"url_label,omitempty"`
+	Photos        []*FootprintPhoto      `protobuf:"bytes,11,rep,name=photos,proto3" json:"photos,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Footprint) Reset() {
+	*x = Footprint{}
+	mi := &file_api_v1_travel_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Footprint) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Footprint) ProtoMessage() {}
+
+func (x *Footprint) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_travel_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Footprint.ProtoReflect.Descriptor instead.
+func (*Footprint) Descriptor() ([]byte, []int) {
+	return file_api_v1_travel_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Footprint) GetId() int32 {
+	if x != nil {
+		return x.Id
 	}
 	return 0
 }
 
-func (x *FootprintRegion) GetName() string {
+func (x *Footprint) GetName() string {
 	if x != nil {
 		return x.Name
 	}
 	return ""
 }
 
-func (x *FootprintRegion) GetLongitude() string {
+func (x *Footprint) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *Footprint) GetLongitude() string {
 	if x != nil {
 		return x.Longitude
 	}
 	return ""
 }
 
-func (x *FootprintRegion) GetLatitude() string {
+func (x *Footprint) GetLatitude() string {
 	if x != nil {
 		return x.Latitude
 	}
 	return ""
+}
+
+func (x *Footprint) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *Footprint) GetMarkerColor() string {
+	if x != nil {
+		return x.MarkerColor
+	}
+	return ""
+}
+
+func (x *Footprint) GetCategories() []string {
+	if x != nil {
+		return x.Categories
+	}
+	return nil
+}
+
+func (x *Footprint) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *Footprint) GetUrlLabel() string {
+	if x != nil {
+		return x.UrlLabel
+	}
+	return ""
+}
+
+func (x *Footprint) GetPhotos() []*FootprintPhoto {
+	if x != nil {
+		return x.Photos
+	}
+	return nil
 }
 
 // GetFootprintsRequest 获取足迹请求
@@ -100,7 +210,7 @@ type GetFootprintsRequest struct {
 
 func (x *GetFootprintsRequest) Reset() {
 	*x = GetFootprintsRequest{}
-	mi := &file_api_v1_travel_proto_msgTypes[1]
+	mi := &file_api_v1_travel_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -112,7 +222,7 @@ func (x *GetFootprintsRequest) String() string {
 func (*GetFootprintsRequest) ProtoMessage() {}
 
 func (x *GetFootprintsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_travel_proto_msgTypes[1]
+	mi := &file_api_v1_travel_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -125,21 +235,20 @@ func (x *GetFootprintsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFootprintsRequest.ProtoReflect.Descriptor instead.
 func (*GetFootprintsRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_travel_proto_rawDescGZIP(), []int{1}
+	return file_api_v1_travel_proto_rawDescGZIP(), []int{2}
 }
 
 // GetFootprintsResponse 足迹响应
 type GetFootprintsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Provinces     []*FootprintRegion     `protobuf:"bytes,1,rep,name=provinces,proto3" json:"provinces,omitempty"`
-	Cities        []*FootprintRegion     `protobuf:"bytes,2,rep,name=cities,proto3" json:"cities,omitempty"`
+	Footprints    []*Footprint           `protobuf:"bytes,1,rep,name=footprints,proto3" json:"footprints,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetFootprintsResponse) Reset() {
 	*x = GetFootprintsResponse{}
-	mi := &file_api_v1_travel_proto_msgTypes[2]
+	mi := &file_api_v1_travel_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -151,7 +260,7 @@ func (x *GetFootprintsResponse) String() string {
 func (*GetFootprintsResponse) ProtoMessage() {}
 
 func (x *GetFootprintsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_travel_proto_msgTypes[2]
+	mi := &file_api_v1_travel_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -164,177 +273,12 @@ func (x *GetFootprintsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFootprintsResponse.ProtoReflect.Descriptor instead.
 func (*GetFootprintsResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_travel_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *GetFootprintsResponse) GetProvinces() []*FootprintRegion {
-	if x != nil {
-		return x.Provinces
-	}
-	return nil
-}
-
-func (x *GetFootprintsResponse) GetCities() []*FootprintRegion {
-	if x != nil {
-		return x.Cities
-	}
-	return nil
-}
-
-type TravelPhoto struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
-	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Src           string                 `protobuf:"bytes,3,opt,name=src,proto3" json:"src,omitempty"`
-	Thumbnail     string                 `protobuf:"bytes,4,opt,name=thumbnail,proto3" json:"thumbnail,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TravelPhoto) Reset() {
-	*x = TravelPhoto{}
-	mi := &file_api_v1_travel_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TravelPhoto) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TravelPhoto) ProtoMessage() {}
-
-func (x *TravelPhoto) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_travel_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TravelPhoto.ProtoReflect.Descriptor instead.
-func (*TravelPhoto) Descriptor() ([]byte, []int) {
 	return file_api_v1_travel_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *TravelPhoto) GetTitle() string {
+func (x *GetFootprintsResponse) GetFootprints() []*Footprint {
 	if x != nil {
-		return x.Title
-	}
-	return ""
-}
-
-func (x *TravelPhoto) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-func (x *TravelPhoto) GetSrc() string {
-	if x != nil {
-		return x.Src
-	}
-	return ""
-}
-
-func (x *TravelPhoto) GetThumbnail() string {
-	if x != nil {
-		return x.Thumbnail
-	}
-	return ""
-}
-
-// ListCityPhotosRequest 城市照片列表请求
-type ListCityPhotosRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RegionId      int32                  `protobuf:"varint,1,opt,name=region_id,json=regionId,proto3" json:"region_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListCityPhotosRequest) Reset() {
-	*x = ListCityPhotosRequest{}
-	mi := &file_api_v1_travel_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListCityPhotosRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListCityPhotosRequest) ProtoMessage() {}
-
-func (x *ListCityPhotosRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_travel_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListCityPhotosRequest.ProtoReflect.Descriptor instead.
-func (*ListCityPhotosRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_travel_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *ListCityPhotosRequest) GetRegionId() int32 {
-	if x != nil {
-		return x.RegionId
-	}
-	return 0
-}
-
-// ListCityPhotosResponse 城市照片列表响应
-type ListCityPhotosResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Photos        []*TravelPhoto         `protobuf:"bytes,1,rep,name=photos,proto3" json:"photos,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListCityPhotosResponse) Reset() {
-	*x = ListCityPhotosResponse{}
-	mi := &file_api_v1_travel_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListCityPhotosResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListCityPhotosResponse) ProtoMessage() {}
-
-func (x *ListCityPhotosResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_travel_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListCityPhotosResponse.ProtoReflect.Descriptor instead.
-func (*ListCityPhotosResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_travel_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *ListCityPhotosResponse) GetPhotos() []*TravelPhoto {
-	if x != nil {
-		return x.Photos
+		return x.Footprints
 	}
 	return nil
 }
@@ -343,29 +287,32 @@ var File_api_v1_travel_proto protoreflect.FileDescriptor
 
 const file_api_v1_travel_proto_rawDesc = "" +
 	"\n" +
-	"\x13api/v1/travel.proto\x12\x12fifsky.blog.api.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\"|\n" +
-	"\x0fFootprintRegion\x12\x1b\n" +
-	"\tregion_id\x18\x01 \x01(\x05R\bregionId\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
-	"\tlongitude\x18\x03 \x01(\tR\tlongitude\x12\x1a\n" +
-	"\blatitude\x18\x04 \x01(\tR\blatitude\"\x16\n" +
-	"\x14GetFootprintsRequest\"\x97\x01\n" +
-	"\x15GetFootprintsResponse\x12A\n" +
-	"\tprovinces\x18\x01 \x03(\v2#.fifsky.blog.api.v1.FootprintRegionR\tprovinces\x12;\n" +
-	"\x06cities\x18\x02 \x03(\v2#.fifsky.blog.api.v1.FootprintRegionR\x06cities\"u\n" +
-	"\vTravelPhoto\x12\x14\n" +
-	"\x05title\x18\x01 \x01(\tR\x05title\x12 \n" +
-	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x10\n" +
-	"\x03src\x18\x03 \x01(\tR\x03src\x12\x1c\n" +
-	"\tthumbnail\x18\x04 \x01(\tR\tthumbnail\"@\n" +
-	"\x15ListCityPhotosRequest\x12'\n" +
-	"\tregion_id\x18\x01 \x01(\x05B\n" +
-	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\bregionId\"Q\n" +
-	"\x16ListCityPhotosResponse\x127\n" +
-	"\x06photos\x18\x01 \x03(\v2\x1f.fifsky.blog.api.v1.TravelPhotoR\x06photos2\xa4\x02\n" +
+	"\x13api/v1/travel.proto\x12\x12fifsky.blog.api.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\"@\n" +
+	"\x0eFootprintPhoto\x12\x10\n" +
+	"\x03src\x18\x01 \x01(\tR\x03src\x12\x1c\n" +
+	"\tthumbnail\x18\x02 \x01(\tR\tthumbnail\"\xcd\x02\n" +
+	"\tFootprint\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1c\n" +
+	"\tlongitude\x18\x04 \x01(\tR\tlongitude\x12\x1a\n" +
+	"\blatitude\x18\x05 \x01(\tR\blatitude\x12\x12\n" +
+	"\x04date\x18\x06 \x01(\tR\x04date\x12!\n" +
+	"\fmarker_color\x18\a \x01(\tR\vmarkerColor\x12\x1e\n" +
+	"\n" +
+	"categories\x18\b \x03(\tR\n" +
+	"categories\x12\x10\n" +
+	"\x03url\x18\t \x01(\tR\x03url\x12\x1b\n" +
+	"\turl_label\x18\n" +
+	" \x01(\tR\burlLabel\x12:\n" +
+	"\x06photos\x18\v \x03(\v2\".fifsky.blog.api.v1.FootprintPhotoR\x06photos\"\x16\n" +
+	"\x14GetFootprintsRequest\"V\n" +
+	"\x15GetFootprintsResponse\x12=\n" +
+	"\n" +
+	"footprints\x18\x01 \x03(\v2\x1d.fifsky.blog.api.v1.FootprintR\n" +
+	"footprints2\x9a\x01\n" +
 	"\rTravelService\x12\x88\x01\n" +
-	"\rGetFootprints\x12(.fifsky.blog.api.v1.GetFootprintsRequest\x1a).fifsky.blog.api.v1.GetFootprintsResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/travel/footprints\x12\x87\x01\n" +
-	"\x0eListCityPhotos\x12).fifsky.blog.api.v1.ListCityPhotosRequest\x1a*.fifsky.blog.api.v1.ListCityPhotosResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/blog/travel/photosB\xac\x01\n" +
+	"\rGetFootprints\x12(.fifsky.blog.api.v1.GetFootprintsRequest\x1a).fifsky.blog.api.v1.GetFootprintsResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/travel/footprintsB\xac\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\vTravelProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
 
 var (
@@ -380,28 +327,23 @@ func file_api_v1_travel_proto_rawDescGZIP() []byte {
 	return file_api_v1_travel_proto_rawDescData
 }
 
-var file_api_v1_travel_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_api_v1_travel_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_api_v1_travel_proto_goTypes = []any{
-	(*FootprintRegion)(nil),        // 0: fifsky.blog.api.v1.FootprintRegion
-	(*GetFootprintsRequest)(nil),   // 1: fifsky.blog.api.v1.GetFootprintsRequest
-	(*GetFootprintsResponse)(nil),  // 2: fifsky.blog.api.v1.GetFootprintsResponse
-	(*TravelPhoto)(nil),            // 3: fifsky.blog.api.v1.TravelPhoto
-	(*ListCityPhotosRequest)(nil),  // 4: fifsky.blog.api.v1.ListCityPhotosRequest
-	(*ListCityPhotosResponse)(nil), // 5: fifsky.blog.api.v1.ListCityPhotosResponse
+	(*FootprintPhoto)(nil),        // 0: fifsky.blog.api.v1.FootprintPhoto
+	(*Footprint)(nil),             // 1: fifsky.blog.api.v1.Footprint
+	(*GetFootprintsRequest)(nil),  // 2: fifsky.blog.api.v1.GetFootprintsRequest
+	(*GetFootprintsResponse)(nil), // 3: fifsky.blog.api.v1.GetFootprintsResponse
 }
 var file_api_v1_travel_proto_depIdxs = []int32{
-	0, // 0: fifsky.blog.api.v1.GetFootprintsResponse.provinces:type_name -> fifsky.blog.api.v1.FootprintRegion
-	0, // 1: fifsky.blog.api.v1.GetFootprintsResponse.cities:type_name -> fifsky.blog.api.v1.FootprintRegion
-	3, // 2: fifsky.blog.api.v1.ListCityPhotosResponse.photos:type_name -> fifsky.blog.api.v1.TravelPhoto
-	1, // 3: fifsky.blog.api.v1.TravelService.GetFootprints:input_type -> fifsky.blog.api.v1.GetFootprintsRequest
-	4, // 4: fifsky.blog.api.v1.TravelService.ListCityPhotos:input_type -> fifsky.blog.api.v1.ListCityPhotosRequest
-	2, // 5: fifsky.blog.api.v1.TravelService.GetFootprints:output_type -> fifsky.blog.api.v1.GetFootprintsResponse
-	5, // 6: fifsky.blog.api.v1.TravelService.ListCityPhotos:output_type -> fifsky.blog.api.v1.ListCityPhotosResponse
-	5, // [5:7] is the sub-list for method output_type
-	3, // [3:5] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	0, // 0: fifsky.blog.api.v1.Footprint.photos:type_name -> fifsky.blog.api.v1.FootprintPhoto
+	1, // 1: fifsky.blog.api.v1.GetFootprintsResponse.footprints:type_name -> fifsky.blog.api.v1.Footprint
+	2, // 2: fifsky.blog.api.v1.TravelService.GetFootprints:input_type -> fifsky.blog.api.v1.GetFootprintsRequest
+	3, // 3: fifsky.blog.api.v1.TravelService.GetFootprints:output_type -> fifsky.blog.api.v1.GetFootprintsResponse
+	3, // [3:4] is the sub-list for method output_type
+	2, // [2:3] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_api_v1_travel_proto_init() }
@@ -415,7 +357,7 @@ func file_api_v1_travel_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_v1_travel_proto_rawDesc), len(file_api_v1_travel_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

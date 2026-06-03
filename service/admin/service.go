@@ -16,10 +16,9 @@ type Service struct {
 	Remind    *Remind
 	Setting   *Setting
 	AI        *AI
-	Photo     *Photo
 	OSS       *OSS
-	Region    *Region
 	Guestbook *Guestbook
+	Footprint *Footprint
 }
 
 func New(s *store.Store, conf *config.Config, agent *aiagent.Agent) *Service {
@@ -32,9 +31,8 @@ func New(s *store.Store, conf *config.Config, agent *aiagent.Agent) *Service {
 		Remind:    NewRemind(s),
 		Setting:   NewSetting(s),
 		AI:        NewAI(agent, s),
-		Photo:     NewPhoto(s),
 		OSS:       NewOSS(conf),
-		Region:    NewRegion(s),
 		Guestbook: NewGuestbook(s),
+		Footprint: NewFootprint(s),
 	}
 }

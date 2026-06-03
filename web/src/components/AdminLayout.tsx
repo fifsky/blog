@@ -75,7 +75,7 @@ export function AdminLayout() {
                 文章
               </AdminNavItem>
               <AdminNavItem to="/admin/photos" isActive={isPage("/admin/photos")}>
-                相册
+                足迹
               </AdminNavItem>
               <li className="ml-1.5">
                 <a

@@ -18,7 +18,7 @@ const AdminCate = lazy(() => import("@/pages/admin/AdminCate"));
 const AdminLink = lazy(() => import("@/pages/admin/AdminLink"));
 const AdminRemind = lazy(() => import("@/pages/admin/AdminRemind"));
 const AdminUser = lazy(() => import("@/pages/admin/AdminUser"));
-const AdminPhoto = lazy(() => import("@/pages/admin/AdminPhoto"));
+const AdminFootprint = lazy(() => import("@/pages/admin/AdminFootprint"));
 const AdminGuestbook = lazy(() => import("@/pages/admin/AdminGuestbook"));
 const PostArticle = lazy(() => import("@/pages/admin/PostArticle"));
 const PostUser = lazy(() => import("@/pages/admin/PostUser"));
@@ -119,7 +119,7 @@ const routesConfig: RouteObject[] = [
           { path: "links", element: <AdminLink /> },
           { path: "remind", element: <AdminRemind /> },
           { path: "users", element: <AdminUser /> },
-          { path: "photos", element: <AdminPhoto /> },
+          { path: "photos", element: <AdminFootprint /> },
           { path: "guestbooks", element: <AdminGuestbook /> },
           { path: "post/user", element: <PostUser /> },
         ],

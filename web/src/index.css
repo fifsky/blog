@@ -107,3 +107,8 @@
 .bytemd-editor-wrapper .bytemd {
   height: 500px;
 }
+
+.amap-logo,
+.amap-copyright {
+  display: none !important;
+}

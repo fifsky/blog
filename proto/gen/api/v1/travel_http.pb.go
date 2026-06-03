@@ -15,10 +15,8 @@ import (
 
 // TravelService 提供旅行足迹相关的接口
 type TravelServiceHTTPServer interface {
-	// GetFootprints 获取足迹数据（省份和城市）
+	// GetFootprints 获取所有足迹数据
 	GetFootprints(context.Context, *GetFootprintsRequest) (*GetFootprintsResponse, error)
-	// ListCityPhotos 根据城市获取照片列表
-	ListCityPhotos(context.Context, *ListCityPhotosRequest) (*ListCityPhotosResponse, error)
 }
 
 type TravelService struct {
@@ -29,7 +27,6 @@ type TravelService struct {
 
 func (s *TravelService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/travel/footprints", s.GetFootprints)
-	s.mux.HandleFunc("POST /blog/travel/photos", s.ListCityPhotos)
 }
 
 func RegisterTravelServiceHTTPServer(mux ServeMux, codec Codec, srv TravelServiceHTTPServer) {
@@ -54,27 +51,6 @@ func (s *TravelService) GetFootprints(w http.ResponseWriter, r *http.Request) {
 	}
 
 	out, err := s.server.GetFootprints(r.Context(), &in)
-	if err != nil {
-		s.codec.Encode(w, r, err)
-		return
-	}
-	s.codec.Encode(w, r, out)
-	return
-}
-
-func (s *TravelService) ListCityPhotos(w http.ResponseWriter, r *http.Request) {
-	var in ListCityPhotosRequest
-	if err := s.codec.Decode(r, &in); err != nil {
-		s.codec.Encode(w, r, err)
-		return
-	}
-
-	if err := s.codec.Validate(&in); err != nil {
-		s.codec.Encode(w, r, err)
-		return
-	}
-
-	out, err := s.server.ListCityPhotos(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
 		return

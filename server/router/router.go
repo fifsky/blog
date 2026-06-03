@@ -102,11 +102,10 @@ func (r *Router) Handler() http.Handler {
 	adminv1.RegisterRemindServiceHTTPServer(adminAuth, codec, r.admin.Remind)
 	adminv1.RegisterUserServiceHTTPServer(adminAuth, codec, r.admin.User)
 	adminv1.RegisterSettingServiceHTTPServer(adminAuth, codec, r.admin.Setting)
-	adminv1.RegisterPhotoServiceHTTPServer(adminAuth, codec, r.admin.Photo)
 	adminv1.RegisterOSSServiceHTTPServer(adminAuth, codec, r.admin.OSS)
-	adminv1.RegisterRegionServiceHTTPServer(adminAuth, codec, r.admin.Region)
 	adminv1.RegisterAIServiceHTTPServer(adminAuth, codec, r.admin.AI)
 	adminv1.RegisterGuestbookServiceHTTPServer(adminAuth, codec, r.admin.Guestbook)
+	adminv1.RegisterFootprintServiceHTTPServer(adminAuth, codec, r.admin.Footprint)
 
 	// AI chat endpoint (SSE streaming)
 	adminAuth.HandleFunc("POST /blog/admin/ai/chat", r.admin.AI.Chat)

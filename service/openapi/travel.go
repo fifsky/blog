@@ -19,59 +19,40 @@ func NewTravel(s *store.Store) *Travel {
 }
 
 func (t *Travel) GetFootprints(ctx context.Context, req *apiv1.GetFootprintsRequest) (*apiv1.GetFootprintsResponse, error) {
-	provinces, err := t.store.ListProvincesWithPhotos(ctx)
+	footprints, err := t.store.ListAllFootprints(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	cities, err := t.store.ListCitiesWithPhotos(ctx)
-	if err != nil {
-		return nil, err
-	}
+	items := make([]*apiv1.Footprint, 0, len(footprints))
+	for _, v := range footprints {
+		item := &apiv1.Footprint{
+			Id:          int32(v.Id),
+			Name:        v.Name,
+			Description: v.Description,
+			Longitude:   v.Longitude,
+			Latitude:    v.Latitude,
+			Date:        v.Date,
+			MarkerColor: v.MarkerColor,
+			Url:         v.Url,
+			UrlLabel:    v.UrlLabel,
+		}
 
-	provinceItems := make([]*apiv1.FootprintRegion, 0, len(provinces))
-	for _, v := range provinces {
-		provinceItems = append(provinceItems, &apiv1.FootprintRegion{
-			RegionId:  int32(v.RegionId),
-			Name:      v.RegionName,
-			Longitude: v.Longitude,
-			Latitude:  v.Latitude,
-		})
-	}
+		for _, c := range v.Categories {
+			item.Categories = append(item.Categories, c)
+		}
 
-	cityItems := make([]*apiv1.FootprintRegion, 0, len(cities))
-	for _, v := range cities {
-		cityItems = append(cityItems, &apiv1.FootprintRegion{
-			RegionId:  int32(v.RegionId),
-			Name:      v.RegionName,
-			Longitude: v.Longitude,
-			Latitude:  v.Latitude,
-		})
+		for _, p := range v.Photos {
+			item.Photos = append(item.Photos, &apiv1.FootprintPhoto{
+				Src:       p.Src,
+				Thumbnail: p.Thumbnail,
+			})
+		}
+
+		items = append(items, item)
 	}
 
 	return &apiv1.GetFootprintsResponse{
-		Provinces: provinceItems,
-		Cities:    cityItems,
-	}, nil
-}
-
-func (t *Travel) ListCityPhotos(ctx context.Context, req *apiv1.ListCityPhotosRequest) (*apiv1.ListCityPhotosResponse, error) {
-	photos, err := t.store.ListPhotoByCity(ctx, int(req.RegionId))
-	if err != nil {
-		return nil, err
-	}
-
-	items := make([]*apiv1.TravelPhoto, 0, len(photos))
-	for _, v := range photos {
-		items = append(items, &apiv1.TravelPhoto{
-			Title:       v.Title,
-			Description: v.Description,
-			Src:         v.Src,
-			Thumbnail:   v.Thumbnail,
-		})
-	}
-
-	return &apiv1.ListCityPhotosResponse{
-		Photos: items,
+		Footprints: items,
 	}, nil
 }
