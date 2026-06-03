@@ -38,9 +38,7 @@ func (t *Travel) GetFootprints(ctx context.Context, req *apiv1.GetFootprintsRequ
 			UrlLabel:    v.UrlLabel,
 		}
 
-		for _, c := range v.Categories {
-			item.Categories = append(item.Categories, c)
-		}
+		item.Categories = append(item.Categories, v.Categories...)
 
 		for _, p := range v.Photos {
 			item.Photos = append(item.Photos, &apiv1.FootprintPhoto{

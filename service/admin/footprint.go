@@ -45,9 +45,7 @@ func (f *Footprint) List(ctx context.Context, req *adminv1.FootprintListRequest)
 			CreatedAt:   v.CreatedAt.Format(time.DateTime),
 		}
 
-		for _, c := range v.Categories {
-			item.Categories = append(item.Categories, c)
-		}
+		item.Categories = append(item.Categories, v.Categories...)
 
 		for _, p := range v.Photos {
 			item.Photos = append(item.Photos, &adminv1.FootprintPhotoItem{

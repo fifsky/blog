@@ -58,6 +58,7 @@ export default function TravelMap() {
   return (
     <>
       <title>山海漫记</title>
+      <h1 className="text-center text-lg font-medium py-4">山海漫记，皆是旅途</h1>
       <div
         ref={containerRef}
         className="footprint-map footprint-map--loading"

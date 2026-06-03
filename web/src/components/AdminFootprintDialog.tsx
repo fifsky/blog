@@ -168,43 +168,26 @@ export function AdminFootprintDialog({ isOpen, onClose, item, onSubmit }: AdminF
   }, [item, form]);
 
   const handleSearch = useCallback(() => {
+    if (!placeSearchRef.current || !mapSearchKeyword.trim()) return;
     const AMap = (window as any).AMap;
-    const keyword = mapSearchKeyword.trim();
-    if (!keyword) return;
-
-    const doSearch = (ps: any) => {
-      ps.search(keyword, (status: string, result: any) => {
-        if (status === "complete" && result.poiList?.pois?.length > 0) {
-          const poi = result.poiList.pois[0];
-          const { lng, lat } = poi.location;
-          form.setValue("longitude", lng.toFixed(6), { shouldValidate: true });
-          form.setValue("latitude", lat.toFixed(6), { shouldValidate: true });
-
-          if (mapInstanceRef.current) {
-            mapInstanceRef.current.setZoomAndCenter(14, [lng, lat]);
-            if (markerRef.current) {
-              markerRef.current.setPosition([lng, lat]);
-            } else {
-              const marker = new AMap.Marker({ position: [lng, lat], draggable: true });
-              mapInstanceRef.current.add(marker);
-              markerRef.current = marker;
-            }
-          }
-          if (!form.getValues("name")) {
-            form.setValue("name", poi.name);
-          }
+    placeSearchRef.current.search(mapSearchKeyword.trim(), (status: string, result: any) => {
+      if (status !== "complete" || !result.poiList?.pois?.length) return;
+      const poi = result.poiList.pois[0];
+      const { lng, lat } = poi.location;
+      form.setValue("longitude", lng.toFixed(6), { shouldValidate: true });
+      form.setValue("latitude", lat.toFixed(6), { shouldValidate: true });
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.setZoomAndCenter(14, [lng, lat]);
+        if (markerRef.current) {
+          markerRef.current.setPosition([lng, lat]);
+        } else {
+          const marker = new AMap.Marker({ position: [lng, lat], draggable: true });
+          mapInstanceRef.current.add(marker);
+          markerRef.current = marker;
         }
-      });
-    };
-
-    if (placeSearchRef.current) {
-      doSearch(placeSearchRef.current);
-    } else if (AMap) {
-      AMap.plugin(["AMap.PlaceSearch"], () => {
-        placeSearchRef.current = new AMap.PlaceSearch({ pageSize: 5, pageIndex: 1, city: "全国" });
-        doSearch(placeSearchRef.current);
-      });
-    }
+      }
+      if (!form.getValues("name")) form.setValue("name", poi.name);
+    });
   }, [mapSearchKeyword, form]);
 
   const handleFilesChange = useCallback((files: FileWithPreview[]) => {
@@ -275,13 +258,13 @@ export function AdminFootprintDialog({ isOpen, onClose, item, onSubmit }: AdminF
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent className="sm:max-w-[650px] max-h-[90vh] flex flex-col overflow-hidden" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>{isEdit ? "编辑足迹" : "新增足迹"}</DialogTitle>
         </DialogHeader>
         <form
-          className="w-full px-1"
+          className="w-full px-1 overflow-y-auto"
           method="post"
           autoComplete="off"
           onSubmit={form.handleSubmit(handleSubmit)}

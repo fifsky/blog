@@ -38,38 +38,32 @@ export default function AdminFootprint() {
   };
 
   const handleSubmit = async (values: FormValues) => {
-    const desc = (document.getElementById("description") as HTMLTextAreaElement)?.value || "";
-    const date = (document.getElementById("date") as HTMLInputElement)?.value || "";
-    const markerColor = (document.querySelector('input[name="marker_color"]') as HTMLInputElement)?.value || "";
-    const url = (document.getElementById("url") as HTMLInputElement)?.value || "";
-    const urlLabel = (document.getElementById("url_label") as HTMLInputElement)?.value || "";
-
     const { id } = item || ({} as FootprintItem);
     if (id) {
       await footprintUpdateApi({
         id,
         name: values.name,
-        description: desc,
+        description: values.description,
         longitude: values.longitude,
         latitude: values.latitude,
-        date,
-        marker_color: markerColor,
+        date: values.date,
+        marker_color: values.marker_color,
         categories: values.categories,
-        url,
-        url_label: urlLabel,
+        url: values.url,
+        url_label: values.url_label,
         photo_urls: values.photo_urls,
       });
     } else {
       await footprintCreateApi({
         name: values.name,
-        description: desc,
+        description: values.description,
         longitude: values.longitude,
         latitude: values.latitude,
-        date,
-        marker_color: markerColor,
+        date: values.date,
+        marker_color: values.marker_color,
         categories: values.categories,
-        url,
-        url_label: urlLabel,
+        url: values.url,
+        url_label: values.url_label,
         photo_urls: values.photo_urls,
       });
     }
