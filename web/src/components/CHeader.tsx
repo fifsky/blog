@@ -44,7 +44,8 @@ export function CHeader() {
   const logoG = Math.round(255 - progress * 221);
   const logoB = Math.round(255 - progress * 221);
   const logoColor = `rgb(${logoR},${logoG},${logoB})`;
-  const textShadow = progress > 0.5 ? `0 1px 2px rgba(0,0,0,${(progress - 0.5) * 0.15})` : undefined;
+  const textShadow =
+    progress > 0.5 ? `0 1px 2px rgba(0,0,0,${(progress - 0.5) * 0.15})` : undefined;
   const bgOpacity = progress;
   const shadowOpacity = Math.max(0, (progress - 0.5) * 2);
   const headerPaddingY = 24 - progress * 20;
@@ -66,10 +67,7 @@ export function CHeader() {
           className="absolute inset-0 bg-white pointer-events-none"
           style={{
             opacity: bgOpacity,
-            boxShadow:
-              shadowOpacity > 0
-                ? `0 1px 8px rgba(0,0,0,${shadowOpacity * 0.1})`
-                : "none",
+            boxShadow: shadowOpacity > 0 ? `0 1px 8px rgba(0,0,0,${shadowOpacity * 0.1})` : "none",
           }}
         />
         <div
@@ -96,13 +94,9 @@ export function CHeader() {
                 textShadow: textShadow,
               }}
             >
-              <span className="text-4xl font-black tracking-wider">
-                你好
-              </span>
+              <span className="text-4xl font-black tracking-wider">你好</span>
               <span className="text-3xl font-bold">。</span>
-              <span className="text-2xl font-normal italic tracking-widest">
-                旧时光
-              </span>
+              <span className="text-2xl font-normal italic tracking-widest">旧时光</span>
             </Link>
           </div>
           <div
@@ -112,7 +106,7 @@ export function CHeader() {
               willChange: "transform",
             }}
           >
-            <ul className="flex items-center list-none">
+            <ul className="flex items-center list-none px-4">
               <li className="bg-white">
                 <Link
                   to="/"
