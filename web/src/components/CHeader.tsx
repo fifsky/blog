@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { useStore } from "@/store/context";
 
 const SCROLL_THRESHOLD = 150;
+const HEADER_HEIGHT = 80;
 
 export function CHeader() {
   const userInfo = useStore((s) => s.userInfo);
@@ -11,11 +12,10 @@ export function CHeader() {
   const navigate = useNavigate();
   const headerRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
-  const [headerHeight] = useState(80);
-  const rafRef = useRef(0);
+  const rafRef = useRef<number | null>(null);
 
   const handleScroll = useCallback(() => {
-    cancelAnimationFrame(rafRef.current);
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
       const p = Math.min(window.scrollY / SCROLL_THRESHOLD, 1);
       setProgress(p);
@@ -27,7 +27,7 @@ export function CHeader() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      cancelAnimationFrame(rafRef.current);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
   }, [handleScroll]);
 
@@ -52,7 +52,7 @@ export function CHeader() {
 
   return (
     <>
-      {headerHeight > 0 && <div style={{ height: headerHeight }} />}
+      {HEADER_HEIGHT > 0 && <div style={{ height: HEADER_HEIGHT }} />}
       <div
         ref={headerRef}
         className="w-full"
