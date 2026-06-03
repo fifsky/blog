@@ -35,7 +35,7 @@
             mode: 'visited', 
             
             geojsonUrls: [
-                '/data/provinces.geojson'
+                '/assets/data/provinces.geojson'
             ],
             // 排除高亮的标签（包含以下纯标签的足迹点不会点亮所在区域）
             excludeTags: ['计划'], 
@@ -225,7 +225,7 @@
             this.container.appendChild(div);
 
             this.map = new AMap.Map(div, {
-                zoom: 4, center: [locations[0].lng, locations[0].lat],
+                zoom: 4, center: [104.195, 35.861],
                 mapStyle: Utils.isDarkMode() ? CONFIG.MAP_STYLES.amap.dark : CONFIG.MAP_STYLES.amap.light,
                 viewMode: '3D', pitch: 0, rotateEnable: false, pitchEnable: false
             });
@@ -254,7 +254,6 @@
                 if (this.highlightPlugin && this.highlightPlugin.onMapClick) this.highlightPlugin.onMapClick();
             });
 
-            this.fitView();
             new MutationObserver(() => { this.map.setMapStyle(Utils.isDarkMode() ? CONFIG.MAP_STYLES.amap.dark : CONFIG.MAP_STYLES.amap.light); })
                 .observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
