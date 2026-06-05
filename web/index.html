@@ -4,30 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="/assets/images/favicon.ico" />
+    <!-- AMap 安全配置必须在地图脚本之前执行（内联脚本立即执行） -->
     <script>
       window._AMapSecurityConfig = {
         securityJsCode: "c932865d83b23362ce9efdbbb6ec2a85",
       };
     </script>
-    <script src="https://webapi.amap.com/maps?v=2.0&key=6630f0c80296ada00162cd351cb53a58&plugin=AMap.Scale,AMap.MoveAnimation,AMap.PlaceSearch"></script>
+    <!-- defer 脚本按文档顺序执行，不阻塞 HTML 解析 -->
+    <script defer src="https://webapi.amap.com/maps?v=2.0&key=6630f0c80296ada00162cd351cb53a58&plugin=AMap.Scale,AMap.MoveAnimation,AMap.PlaceSearch"></script>
     <link rel="stylesheet" href="/assets/js/footprintmap.css" />
-    <script src="/assets/js/utils.js"></script>
-    <script src="/assets/js/footprintmap.js"></script>
-    <script src="/assets/js/plugin-visited.js"></script>
+    <script defer src="/assets/js/utils.js"></script>
+    <script defer src="/assets/js/footprintmap.js"></script>
+    <script defer src="/assets/js/plugin-visited.js"></script>
     <script
       defer
       src="https://cloud.umami.is/script.js"
       data-website-id="4ff9315c-e44f-41c0-a338-17f7e248f905"
     ></script>
-    <!-- require APlayer -->
+    <!-- APlayer & MetingJS 非关键功能，defer 加载 -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdmirror.com/npm/aplayer/dist/APlayer.min.css"
     />
-    <script src="https://cdn.jsdmirror.com/npm/aplayer/dist/APlayer.min.js"></script>
-    <!-- require MetingJS -->
-    <script src="https://cdn.jsdmirror.com/npm/meting@2/dist/Meting.min.js"></script>
-    <!-- require LXGW WenKai Lite -->
+    <script defer src="https://cdn.jsdmirror.com/npm/aplayer/dist/APlayer.min.js"></script>
+    <script defer src="https://cdn.jsdmirror.com/npm/meting@2/dist/Meting.min.js"></script>
+    <!-- LXGW WenKai Lite 字体非阻塞加载：先以 print 媒体加载，完成后切换为 all -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdmirror.com/npm/lxgw-wenkai-lite-webfont@1.7.0/style.min.css"
