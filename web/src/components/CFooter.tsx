@@ -11,7 +11,7 @@ export function CFooter() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const start = dayjs("2007-01-06T22:43:39+08:00");
+      const start = dayjs("2006-09-09T22:43:39+08:00");
       const now = dayjs();
       const diff = dayjs.duration(now.diff(start));
       const days = Math.floor(diff.asDays());
