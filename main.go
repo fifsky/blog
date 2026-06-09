@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"log/slog"
+	"net/http"
 	"os"
 	"time"
 
@@ -19,6 +20,7 @@ import (
 
 	"github.com/goapt/httpx"
 	"github.com/goapt/logger"
+	"github.com/goapt/logger/sloghttp"
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/option"
 
@@ -36,8 +38,18 @@ func main() {
 	// httpClient
 	httpClient := httpx.NewClient(
 		httpx.WithTimeout(10*time.Second),
-		httpx.WithMiddleware(httpx.AccessLog(logger.Default())),
+		httpx.WithMiddleware(func(rt http.RoundTripper) http.RoundTripper {
+			return sloghttp.NewRoundTripper(logger.Default(), rt, sloghttp.Config{
+				Level:              slog.LevelInfo,
+				WithUserAgent:      true,
+				WithRequestBody:    true,
+				WithRequestHeader:  true,
+				WithResponseBody:   true,
+				WithResponseHeader: true,
+			})
+		}),
 	)
+
 	barkClient := bark.New(httpClient, conf.Common.NotifyUrl, conf.Common.NotifyToken)
 
 	// Create message senders for remind service
@@ -79,7 +91,6 @@ func main() {
 		Commands: []*cli.Command{
 			cmd.NewHttp(s, conf, httpClient, agent),
 			cmd.NewTmp(db, conf),
-			cmd.NewMigrate(db, conf),
 		},
 	}
 
