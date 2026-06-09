@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	"app/config"
-	"app/contract"
 	"app/pkg/errors"
 	adminv1 "app/proto/gen/admin/v1"
 	apiv1 "app/proto/gen/api/v1"
+	"app/server/codec"
 	"app/server/middleware"
 	"app/server/response"
 	adminsvc "app/service/admin"
@@ -71,7 +71,7 @@ func (r *Router) Handler() http.Handler {
 		w.WriteHeader(http.StatusOK)
 	})
 
-	codec := contract.NewCodec()
+	codec := codec.NewCodec()
 	apiv1.RegisterArticleServiceHTTPServer(api, codec, r.service.Article)
 	apiv1.RegisterMoodServiceHTTPServer(api, codec, r.service.Mood)
 	apiv1.RegisterCateServiceHTTPServer(api, codec, r.service.Cate)
