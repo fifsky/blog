@@ -57,6 +57,7 @@
   letter-spacing: 0.5px;
   text-align: justify;
   line-height: 1.6;
+  color: var(--foreground);
 }
 
 .markdown-body ol,

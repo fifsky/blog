@@ -78,7 +78,7 @@ export function Pagination({
               className={cn(
                 "px-2 py-[2px] border border-[#ddd] no-underline select-none outline-none",
                 p === page
-                  ? "bg-[#ddd] text-[#555] cursor-default"
+                  ? "bg-[#ddd] cursor-default"
                   : "hover:border-[#06c] hover:bg-[#06c] hover:text-white cursor-pointer",
               )}
               onClick={p === page ? undefined : () => handleChange(p as number)}

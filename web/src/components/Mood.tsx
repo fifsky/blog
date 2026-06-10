@@ -99,7 +99,7 @@ export function Mood() {
         {/* 左侧箭头 */}
         <div className="absolute top-[0.9rem] left-[110px] w-0 h-0 border-t-[0.6rem] border-t-transparent border-b-[0.6rem] border-b-transparent border-r-[0.7rem] border-r-white"></div>
         {mood && (
-          <p className="p-[10px] line-[120%] break-all overflow-hidden text-ellipsis text-[#555] text-justify">
+          <p className="p-[10px] line-[120%] break-all overflow-hidden text-ellipsis text-justify">
             <Typewriter key={key} words={[mood.content]} typeSpeed={50} />
             <span className="absolute right-[10px] bottom-[5px] line-[120%] text-[#8c8c8c] text-xs">
               {humanTime(mood.created_at)} by {mood.user.nick_name}
