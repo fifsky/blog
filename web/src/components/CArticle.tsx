@@ -63,7 +63,7 @@ export function CArticle({ article }: { article: ArticleItem }) {
       <div className="flex justify-between items-center h-[54px] overflow-hidden">
         <img className="p-[2px] w-[40px] h-[40px]" src="/assets/images/avatar.jpg" alt="" />
         <div className="flex-1 ml-4">
-          <h2 className="text-[16px] font-medium">
+          <h2 className="text-[16px] font-semibold">
             <Link
               to={`/article/${article.id}`}
               onClick={() => window.scrollTo({ top: 0 })}

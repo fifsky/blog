@@ -52,7 +52,7 @@
 
 /* Overrides for github-markdown-css */
 .markdown-body {
-  font-size: 14px;
+  font-size: 16px;
   @apply font-sans;
 }
 
