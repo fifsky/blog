@@ -20,10 +20,10 @@ import (
 )
 
 type Router struct {
-	service     *openapi.Service
-	admin       *adminsvc.Service
-	conf        *config.Config
-	store       *store.Store
+	service      *openapi.Service
+	admin        *adminsvc.Service
+	conf         *config.Config
+	store        *store.Store
 	accessLogger *slog.Logger
 }
 
