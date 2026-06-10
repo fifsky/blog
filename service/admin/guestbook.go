@@ -22,37 +22,35 @@ func NewGuestbook(s *store.Store) *Guestbook {
 
 func (g *Guestbook) List(ctx context.Context, req *adminv1.GuestbookListRequest) (*adminv1.GuestbookListResponse, error) {
 	num := 10
-	guestbooks, err := g.store.ListGuestbook(ctx, req.Keyword, int(req.Page), num)
+	guestbooks, err := g.store.ListGuestbook(ctx, req.GetKeyword(), int(req.GetPage()), num)
 	if err != nil {
 		return nil, err
 	}
 
 	items := make([]*adminv1.GuestbookItem, 0, len(guestbooks))
 	for _, gb := range guestbooks {
-		items = append(items, &adminv1.GuestbookItem{
-			Id:        int32(gb.Id),
+		items = append(items, adminv1.GuestbookItem_builder{Id: int32(gb.Id),
 			Name:      gb.Name,
 			Content:   gb.Content,
 			Ip:        gb.Ip,
 			Top:       int32(gb.Top),
-			CreatedAt: gb.CreatedAt.Format("2006-01-02 15:04:05"),
-		})
+			CreatedAt: gb.CreatedAt.Format("2006-01-02 15:04:05")}.Build(),
+		)
 	}
 
-	total, err := g.store.CountGuestbookTotal(ctx, req.Keyword)
+	total, err := g.store.CountGuestbookTotal(ctx, req.GetKeyword())
 	if err != nil {
 		return nil, err
 	}
 
-	return &adminv1.GuestbookListResponse{
-		List:  items,
-		Total: int32(total),
-	}, nil
+	return adminv1.GuestbookListResponse_builder{List: items,
+			Total: int32(total)}.Build(),
+		nil
 }
 
 func (g *Guestbook) Delete(ctx context.Context, req *adminv1.GuestbookDeleteRequest) (*emptypb.Empty, error) {
-	ids := make([]int, len(req.Ids))
-	for i, id := range req.Ids {
+	ids := make([]int, len(req.GetIds()))
+	for i, id := range req.GetIds() {
 		ids[i] = int(id)
 	}
 	if err := g.store.DeleteGuestbook(ctx, ids); err != nil {

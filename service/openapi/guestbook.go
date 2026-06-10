@@ -61,39 +61,37 @@ func NewGuestbook(s *store.Store, opts ...GuestbookOption) *Guestbook {
 
 func (g *Guestbook) List(ctx context.Context, req *apiv1.GuestbookListRequest) (*apiv1.GuestbookListResponse, error) {
 	num := 10
-	guestbooks, err := g.store.ListGuestbook(ctx, req.Keyword, int(req.Page), num)
+	guestbooks, err := g.store.ListGuestbook(ctx, req.GetKeyword(), int(req.GetPage()), num)
 	if err != nil {
 		return nil, err
 	}
 
 	items := make([]*apiv1.GuestbookItem, 0, len(guestbooks))
 	for _, gb := range guestbooks {
-		item := &apiv1.GuestbookItem{
-			Id:        int32(gb.Id),
+		item := apiv1.GuestbookItem_builder{Id: int32(gb.Id),
 			Name:      gb.Name,
 			Content:   gb.Content,
 			Ip:        gb.Ip,
 			CreatedAt: gb.CreatedAt.Format(time.DateTime),
-			Top:       int32(gb.Top),
-		}
+			Top:       int32(gb.Top)}.Build()
+
 		items = append(items, item)
 	}
 
-	total, err := g.store.CountGuestbookTotal(ctx, req.Keyword)
+	total, err := g.store.CountGuestbookTotal(ctx, req.GetKeyword())
 	if err != nil {
 		return nil, err
 	}
 
-	return &apiv1.GuestbookListResponse{
-		List:  items,
-		Total: int32(total),
-	}, nil
+	return apiv1.GuestbookListResponse_builder{List: items,
+			Total: int32(total)}.Build(),
+		nil
 }
 
 func (g *Guestbook) Create(ctx context.Context, req *apiv1.GuestbookCreateRequest) (*apiv1.GuestbookCreateResponse, error) {
 	// 内容审核
 	if g.moderator != nil {
-		if err := g.moderator.Moderate(ctx, fmt.Sprintf("%s %s", req.Name, req.Content)); err != nil {
+		if err := g.moderator.Moderate(ctx, fmt.Sprintf("%s %s", req.GetName(), req.GetContent())); err != nil {
 			return nil, err
 		}
 	}
@@ -102,8 +100,8 @@ func (g *Guestbook) Create(ctx context.Context, req *apiv1.GuestbookCreateReques
 	ip := middleware.ClientIPFromContext(ctx)
 
 	gb := &model.Guestbook{
-		Name:      html.EscapeString(req.Name),
-		Content:   html.EscapeString(req.Content),
+		Name:      html.EscapeString(req.GetName()),
+		Content:   html.EscapeString(req.GetContent()),
 		Ip:        ip,
 		CreatedAt: time.Now(),
 	}
@@ -113,9 +111,8 @@ func (g *Guestbook) Create(ctx context.Context, req *apiv1.GuestbookCreateReques
 		return nil, err
 	}
 
-	return &apiv1.GuestbookCreateResponse{
-		Id: int32(id),
-	}, nil
+	return apiv1.GuestbookCreateResponse_builder{Id: int32(id)}.Build(),
+		nil
 }
 
 // AIModerator 基于 AI 的内容审核器

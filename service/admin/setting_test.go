@@ -17,12 +17,11 @@ func TestAdminSetting_Update(t *testing.T) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options")...)
 		svc := NewSetting(store.New(db))
 
-		resp, err := svc.Update(context.Background(), &adminv1.AdminSetting{
-			SiteName: "abc",
-			SiteDesc: "def",
-		})
+		resp, err := svc.Update(context.Background(), adminv1.AdminSetting_builder{SiteName: "abc",
+			SiteDesc: "def"}.Build(),
+		)
 		require.NoError(t, err)
-		require.Equal(t, "abc", resp.SiteName)
-		require.Equal(t, "def", resp.SiteDesc)
+		require.Equal(t, "abc", resp.GetSiteName())
+		require.Equal(t, "def", resp.GetSiteDesc())
 	})
 }

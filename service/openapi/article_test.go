@@ -17,8 +17,8 @@ func TestArticle_Archive(t *testing.T) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
 		svc := NewArticle(store.New(db), nil)
 		resp, err := svc.Archive(context.Background(), &emptypb.Empty{})
-		if err != nil || len(resp.List) == 0 {
-			t.Fatalf("unexpected err=%v list=%v", err, resp.List)
+		if err != nil || len(resp.GetList()) == 0 {
+			t.Fatalf("unexpected err=%v list=%v", err, resp.GetList())
 		}
 	})
 }
@@ -27,13 +27,13 @@ func TestArticle_Calendar(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
 		svc := NewArticle(store.New(db), nil)
-		resp, err := svc.Calendar(context.Background(), &apiv1.ArticleCalendarRequest{Year: 2012, Month: 9})
+		resp, err := svc.Calendar(context.Background(), apiv1.ArticleCalendarRequest_builder{Year: 2012, Month: 9}.Build())
 		if err != nil {
 			t.Fatalf("unexpected err=%v", err)
 		}
 		// 移除 type = 1 过滤后，返回所有已发布文章的日期
-		if len(resp.Days) != 2 {
-			t.Fatalf("unexpected days=%v", resp.Days)
+		if len(resp.GetDays()) != 2 {
+			t.Fatalf("unexpected days=%v", resp.GetDays())
 		}
 	})
 }
@@ -42,9 +42,9 @@ func TestArticle_List(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates")...)
 		svc := NewArticle(store.New(db), nil)
-		resp, err := svc.List(context.Background(), &apiv1.ArticleListRequest{Page: 1})
-		if err != nil || len(resp.List) == 0 {
-			t.Fatalf("unexpected err=%v list=%v", err, resp.List)
+		resp, err := svc.List(context.Background(), apiv1.ArticleListRequest_builder{Page: 1}.Build())
+		if err != nil || len(resp.GetList()) == 0 {
+			t.Fatalf("unexpected err=%v list=%v", err, resp.GetList())
 		}
 	})
 }
@@ -53,9 +53,9 @@ func TestArticle_List_Day(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates")...)
 		svc := NewArticle(store.New(db), nil)
-		resp, err := svc.List(context.Background(), &apiv1.ArticleListRequest{Year: "2012", Month: "09", Day: "10", Page: 1})
-		if err != nil || len(resp.List) != 1 {
-			t.Fatalf("unexpected err=%v list_len=%d", err, len(resp.List))
+		resp, err := svc.List(context.Background(), apiv1.ArticleListRequest_builder{Year: "2012", Month: "09", Day: "10", Page: 1}.Build())
+		if err != nil || len(resp.GetList()) != 1 {
+			t.Fatalf("unexpected err=%v list_len=%d", err, len(resp.GetList()))
 		}
 	})
 }
@@ -64,9 +64,9 @@ func TestArticle_PrevNext(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
 		svc := NewArticle(store.New(db), nil)
-		resp, err := svc.PrevNext(context.Background(), &apiv1.PrevNextRequest{Id: 7})
-		if err != nil || resp.Prev == nil || resp.Next == nil {
-			t.Fatalf("unexpected err=%v prev=%v,next=%v", err, resp.Prev, resp.Next)
+		resp, err := svc.PrevNext(context.Background(), apiv1.PrevNextRequest_builder{Id: 7}.Build())
+		if err != nil || resp.GetPrev() == nil || resp.GetNext() == nil {
+			t.Fatalf("unexpected err=%v prev=%v,next=%v", err, resp.GetPrev(), resp.GetNext())
 		}
 	})
 }
@@ -75,8 +75,8 @@ func TestArticle_Detail(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates")...)
 		svc := NewArticle(store.New(db), nil)
-		item, err := svc.Detail(context.Background(), &apiv1.ArticleDetailRequest{Id: 7})
-		if err != nil || item == nil || item.Id == 0 {
+		item, err := svc.Detail(context.Background(), apiv1.ArticleDetailRequest_builder{Id: 7}.Build())
+		if err != nil || item == nil || item.GetId() == 0 {
 			t.Fatalf("unexpected err=%v item=%v", err, item)
 		}
 	})

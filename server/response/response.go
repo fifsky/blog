@@ -19,15 +19,21 @@ var protoencoder = protojson.MarshalOptions{
 	EmitUnpopulated: true,
 }
 
+var errorEncoder = protojson.MarshalOptions{
+	UseProtoNames: true,
+}
+
 func encode[T any](w http.ResponseWriter, status int, v T) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	switch vv := any(v).(type) {
 	case *types.ErrorResponse:
-		if err := json.NewEncoder(w).Encode(v); err != nil {
-			return fmt.Errorf("encode json: %w", err)
+		buf, err := errorEncoder.Marshal(vv)
+		if err != nil {
+			return fmt.Errorf("encode error protojson: %w", err)
 		}
-		return nil
+		_, err = w.Write(buf)
+		return err
 	case proto.Message:
 		buf, err := protoencoder.Marshal(vv)
 		if err != nil {
@@ -51,19 +57,22 @@ func Success(w http.ResponseWriter, data any) {
 }
 
 func Fail(w http.ResponseWriter, err *errors.Error) {
-	resp := &types.ErrorResponse{
-		Code:    err.GetReason(),
-		Message: err.GetMessage(),
-	}
+	resp := types.ErrorResponse_builder{}.Build()
+	resp.SetCode(err.GetReason())
+	resp.SetMessage(err.GetMessage())
+	details := err.GetMetadata()
 	if len(err.GetMetadata()) > 0 {
-		resp.Details = err.GetMetadata()
+		details = err.GetMetadata()
 	}
 
 	if unErr := errors.Unwrap(err); unErr != nil {
-		if resp.Details == nil {
-			resp.Details = make(map[string]string)
+		if details == nil {
+			details = make(map[string]string)
 		}
-		resp.Details["cause"] = unErr.Error()
+		details["cause"] = unErr.Error()
+	}
+	if len(details) > 0 {
+		resp.SetDetails(details)
 	}
 
 	if e := encode(w, int(err.GetCode()), resp); e != nil {

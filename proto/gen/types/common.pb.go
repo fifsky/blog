@@ -10,7 +10,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -22,8 +21,8 @@ const (
 )
 
 type IDResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id int32                  `protobuf:"varint,1,opt,name=id,proto3"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -53,25 +52,38 @@ func (x *IDResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use IDResponse.ProtoReflect.Descriptor instead.
-func (*IDResponse) Descriptor() ([]byte, []int) {
-	return file_types_common_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *IDResponse) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
+func (x *IDResponse) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+type IDResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id int32
+}
+
+func (b0 IDResponse_builder) Build() *IDResponse {
+	m0 := &IDResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	return m0
+}
+
 type UserSummary struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	NickName      string                 `protobuf:"bytes,3,opt,name=nick_name,json=nickName,proto3" json:"nick_name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id       int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Name     string                 `protobuf:"bytes,2,opt,name=name,proto3"`
+	xxx_hidden_NickName string                 `protobuf:"bytes,3,opt,name=nick_name,json=nickName,proto3"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *UserSummary) Reset() {
@@ -99,39 +111,64 @@ func (x *UserSummary) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserSummary.ProtoReflect.Descriptor instead.
-func (*UserSummary) Descriptor() ([]byte, []int) {
-	return file_types_common_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *UserSummary) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *UserSummary) GetName() string {
 	if x != nil {
-		return x.Name
+		return x.xxx_hidden_Name
 	}
 	return ""
 }
 
 func (x *UserSummary) GetNickName() string {
 	if x != nil {
-		return x.NickName
+		return x.xxx_hidden_NickName
 	}
 	return ""
 }
 
+func (x *UserSummary) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *UserSummary) SetName(v string) {
+	x.xxx_hidden_Name = v
+}
+
+func (x *UserSummary) SetNickName(v string) {
+	x.xxx_hidden_NickName = v
+}
+
+type UserSummary_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id       int32
+	Name     string
+	NickName string
+}
+
+func (b0 UserSummary_builder) Build() *UserSummary {
+	m0 := &UserSummary{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Name = b.Name
+	x.xxx_hidden_NickName = b.NickName
+	return m0
+}
+
 type CateSummary struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Domain        string                 `protobuf:"bytes,3,opt,name=domain,proto3" json:"domain,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id     int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Name   string                 `protobuf:"bytes,2,opt,name=name,proto3"`
+	xxx_hidden_Domain string                 `protobuf:"bytes,3,opt,name=domain,proto3"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *CateSummary) Reset() {
@@ -159,39 +196,64 @@ func (x *CateSummary) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CateSummary.ProtoReflect.Descriptor instead.
-func (*CateSummary) Descriptor() ([]byte, []int) {
-	return file_types_common_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *CateSummary) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *CateSummary) GetName() string {
 	if x != nil {
-		return x.Name
+		return x.xxx_hidden_Name
 	}
 	return ""
 }
 
 func (x *CateSummary) GetDomain() string {
 	if x != nil {
-		return x.Domain
+		return x.xxx_hidden_Domain
 	}
 	return ""
 }
 
+func (x *CateSummary) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *CateSummary) SetName(v string) {
+	x.xxx_hidden_Name = v
+}
+
+func (x *CateSummary) SetDomain(v string) {
+	x.xxx_hidden_Domain = v
+}
+
+type CateSummary_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id     int32
+	Name   string
+	Domain string
+}
+
+func (b0 CateSummary_builder) Build() *CateSummary {
+	m0 := &CateSummary{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Name = b.Name
+	x.xxx_hidden_Domain = b.Domain
+	return m0
+}
+
 type ErrorResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	Details       map[string]string      `protobuf:"bytes,3,rep,name=details,proto3" json:"details,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Code    string                 `protobuf:"bytes,1,opt,name=code,proto3"`
+	xxx_hidden_Message string                 `protobuf:"bytes,2,opt,name=message,proto3"`
+	xxx_hidden_Details map[string]string      `protobuf:"bytes,3,rep,name=details,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *ErrorResponse) Reset() {
@@ -219,30 +281,55 @@ func (x *ErrorResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ErrorResponse.ProtoReflect.Descriptor instead.
-func (*ErrorResponse) Descriptor() ([]byte, []int) {
-	return file_types_common_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *ErrorResponse) GetCode() string {
 	if x != nil {
-		return x.Code
+		return x.xxx_hidden_Code
 	}
 	return ""
 }
 
 func (x *ErrorResponse) GetMessage() string {
 	if x != nil {
-		return x.Message
+		return x.xxx_hidden_Message
 	}
 	return ""
 }
 
 func (x *ErrorResponse) GetDetails() map[string]string {
 	if x != nil {
-		return x.Details
+		return x.xxx_hidden_Details
 	}
 	return nil
+}
+
+func (x *ErrorResponse) SetCode(v string) {
+	x.xxx_hidden_Code = v
+}
+
+func (x *ErrorResponse) SetMessage(v string) {
+	x.xxx_hidden_Message = v
+}
+
+func (x *ErrorResponse) SetDetails(v map[string]string) {
+	x.xxx_hidden_Details = v
+}
+
+type ErrorResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Code    string
+	Message string
+	Details map[string]string
+}
+
+func (b0 ErrorResponse_builder) Build() *ErrorResponse {
+	m0 := &ErrorResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Code = b.Code
+	x.xxx_hidden_Message = b.Message
+	x.xxx_hidden_Details = b.Details
+	return m0
 }
 
 var File_types_common_proto protoreflect.FileDescriptor
@@ -269,18 +356,6 @@ const file_types_common_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x9f\x01\n" +
 	"\x15com.fifsky.blog.typesB\vCommonProtoP\x01Z\x13app/proto/gen/types\xa2\x02\x03FBT\xaa\x02\x11Fifsky.Blog.Types\xca\x02\x11Fifsky\\Blog\\Types\xe2\x02\x1dFifsky\\Blog\\Types\\GPBMetadata\xea\x02\x13Fifsky::Blog::Typesb\x06proto3"
-
-var (
-	file_types_common_proto_rawDescOnce sync.Once
-	file_types_common_proto_rawDescData []byte
-)
-
-func file_types_common_proto_rawDescGZIP() []byte {
-	file_types_common_proto_rawDescOnce.Do(func() {
-		file_types_common_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_types_common_proto_rawDesc), len(file_types_common_proto_rawDesc)))
-	})
-	return file_types_common_proto_rawDescData
-}
 
 var file_types_common_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_types_common_proto_goTypes = []any{

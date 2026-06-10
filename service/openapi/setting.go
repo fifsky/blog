@@ -37,12 +37,11 @@ func (s *Setting) Get(ctx context.Context, _ *emptypb.Empty) (*apiv1.Setting, er
 		}
 	}
 
-	return &apiv1.Setting{
-		SiteName:    m["site_name"],
-		SiteDesc:    m["site_desc"],
-		SiteKeyword: m["site_keyword"],
-		PostNum:     int32(postNum),
-	}, nil
+	return apiv1.Setting_builder{SiteName: m["site_name"],
+			SiteDesc:    m["site_desc"],
+			SiteKeyword: m["site_keyword"],
+			PostNum:     int32(postNum)}.Build(),
+		nil
 }
 
 func (s *Setting) GetChinaMap(ctx context.Context, _ *emptypb.Empty) (*httpbody.HttpBody, error) {

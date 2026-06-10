@@ -16,20 +16,20 @@ func TestTravel_GetFootprints(t *testing.T) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("footprints")...)
 		svc := NewTravel(store.New(db))
 
-		resp, err := svc.GetFootprints(context.Background(), &apiv1.GetFootprintsRequest{})
+		resp, err := svc.GetFootprints(context.Background(), apiv1.GetFootprintsRequest_builder{}.Build())
 		if err != nil {
 			t.Fatalf("GetFootprints failed: %v", err)
 		}
 
-		if len(resp.Footprints) == 0 {
+		if len(resp.GetFootprints()) == 0 {
 			t.Fatal("Expected non-empty footprints list")
 		}
 
-		fp := resp.Footprints[0]
-		if fp.Name == "" {
+		fp := resp.GetFootprints()[0]
+		if fp.GetName() == "" {
 			t.Fatal("Expected footprint name")
 		}
-		if fp.Longitude == "" || fp.Latitude == "" {
+		if fp.GetLongitude() == "" || fp.GetLatitude() == "" {
 			t.Fatal("Expected footprint coordinates")
 		}
 	})

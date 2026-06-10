@@ -25,15 +25,14 @@ func NewFootprint(s *store.Store) *Footprint {
 
 func (f *Footprint) List(ctx context.Context, req *adminv1.FootprintListRequest) (*adminv1.FootprintListResponse, error) {
 	num := 10
-	footprints, err := f.store.ListFootprint(ctx, int(req.Page), num)
+	footprints, err := f.store.ListFootprint(ctx, int(req.GetPage()), num)
 	if err != nil {
 		return nil, err
 	}
 
 	items := make([]*adminv1.FootprintItem, 0, len(footprints))
 	for _, v := range footprints {
-		item := &adminv1.FootprintItem{
-			Id:          int32(v.Id),
+		item := adminv1.FootprintItem_builder{Id: int32(v.Id),
 			Name:        v.Name,
 			Description: v.Description,
 			Longitude:   v.Longitude,
@@ -42,16 +41,14 @@ func (f *Footprint) List(ctx context.Context, req *adminv1.FootprintListRequest)
 			MarkerColor: v.MarkerColor,
 			Url:         v.Url,
 			UrlLabel:    v.UrlLabel,
-			CreatedAt:   v.CreatedAt.Format(time.DateTime),
-		}
+			CreatedAt:   v.CreatedAt.Format(time.DateTime)}.Build()
 
-		item.Categories = append(item.Categories, v.Categories...)
+		item.SetCategories(append(item.GetCategories(), v.Categories...))
 
 		for _, p := range v.Photos {
-			item.Photos = append(item.Photos, &adminv1.FootprintPhotoItem{
-				Src:       p.Src,
-				Thumbnail: p.Thumbnail,
-			})
+			item.SetPhotos(append(item.GetPhotos(), adminv1.FootprintPhotoItem_builder{Src: p.Src,
+				Thumbnail: p.Thumbnail}.Build(),
+			))
 		}
 
 		items = append(items, item)
@@ -62,28 +59,27 @@ func (f *Footprint) List(ctx context.Context, req *adminv1.FootprintListRequest)
 		return nil, err
 	}
 
-	return &adminv1.FootprintListResponse{
-		List:  items,
-		Total: int32(total),
-	}, nil
+	return adminv1.FootprintListResponse_builder{List: items,
+			Total: int32(total)}.Build(),
+		nil
 }
 
 func (f *Footprint) Create(ctx context.Context, req *adminv1.FootprintCreateRequest) (*types.IDResponse, error) {
-	photos := model.PhotosFromURLs(req.PhotoUrls)
+	photos := model.PhotosFromURLs(req.GetPhotoUrls())
 
-	categories := make([]string, 0, len(req.Categories))
-	categories = append(categories, req.Categories...)
+	categories := make([]string, 0, len(req.GetCategories()))
+	categories = append(categories, req.GetCategories()...)
 
 	fp := &model.Footprint{
-		Name:        req.Name,
-		Description: req.Description,
-		Longitude:   req.Longitude,
-		Latitude:    req.Latitude,
-		Date:        req.Date,
-		MarkerColor: req.MarkerColor,
+		Name:        req.GetName(),
+		Description: req.GetDescription(),
+		Longitude:   req.GetLongitude(),
+		Latitude:    req.GetLatitude(),
+		Date:        req.GetDate(),
+		MarkerColor: req.GetMarkerColor(),
 		Categories:  categories,
-		Url:         req.Url,
-		UrlLabel:    req.UrlLabel,
+		Url:         req.GetUrl(),
+		UrlLabel:    req.GetUrlLabel(),
 		Photos:      photos,
 	}
 
@@ -92,52 +88,60 @@ func (f *Footprint) Create(ctx context.Context, req *adminv1.FootprintCreateRequ
 		return nil, err
 	}
 
-	return &types.IDResponse{Id: int32(id)}, nil
+	return types.IDResponse_builder{Id: int32(id)}.Build(), nil
 }
 
 func (f *Footprint) Update(ctx context.Context, req *adminv1.FootprintUpdateRequest) (*types.IDResponse, error) {
-	u := &model.UpdateFootprint{Id: int(req.Id)}
+	u := &model.UpdateFootprint{Id: int(req.GetId())}
 
-	if req.Name != "" {
-		u.Name = &req.Name
+	if req.GetName() != "" {
+		v := req.GetName()
+		u.Name = &v
 	}
-	if req.Description != "" {
-		u.Description = &req.Description
+	if req.GetDescription() != "" {
+		v := req.GetDescription()
+		u.Description = &v
 	}
-	if req.Longitude != "" {
-		u.Longitude = &req.Longitude
+	if req.GetLongitude() != "" {
+		v := req.GetLongitude()
+		u.Longitude = &v
 	}
-	if req.Latitude != "" {
-		u.Latitude = &req.Latitude
+	if req.GetLatitude() != "" {
+		v := req.GetLatitude()
+		u.Latitude = &v
 	}
-	if req.Date != "" {
-		u.Date = &req.Date
+	if req.GetDate() != "" {
+		v := req.GetDate()
+		u.Date = &v
 	}
-	if req.MarkerColor != "" {
-		u.MarkerColor = &req.MarkerColor
+	if req.GetMarkerColor() != "" {
+		v := req.GetMarkerColor()
+		u.MarkerColor = &v
 	}
-	if req.Categories != nil {
-		u.Categories = req.Categories
+	if req.GetCategories() != nil {
+		u.Categories = req.GetCategories()
 	}
-	if req.Url != "" {
-		u.Url = &req.Url
+	if req.GetUrl() != "" {
+		v := req.GetUrl()
+		u.Url = &v
 	}
-	if req.UrlLabel != "" {
-		u.UrlLabel = &req.UrlLabel
+	if req.GetUrlLabel() != "" {
+		v := req.GetUrlLabel()
+		u.UrlLabel = &v
 	}
-	if req.PhotoUrls != nil {
-		u.PhotoUrls = req.PhotoUrls
+	if req.GetPhotoUrls() != nil {
+		u.PhotoUrls = req.GetPhotoUrls()
 	}
 
 	if err := f.store.UpdateFootprint(ctx, u); err != nil {
 		return nil, err
 	}
 
-	return &types.IDResponse{Id: req.Id}, nil
+	return types.IDResponse_builder{Id: req.GetId()}.Build(), nil
 }
 
 func (f *Footprint) Delete(ctx context.Context, req *adminv1.FootprintDeleteRequest) (*emptypb.Empty, error) {
-	if err := f.store.DeleteFootprint(ctx, int(req.Id)); err != nil {
+	if err := f.store.DeleteFootprint(ctx, int(req.GetId())); err != nil {
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil

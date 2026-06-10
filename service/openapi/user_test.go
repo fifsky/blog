@@ -18,19 +18,19 @@ func TestUser_Login(t *testing.T) {
 		conf := &config.Config{}
 		conf.Common.TokenSecret = "abcdabcdabcdabcd"
 		svc := NewUser(store.New(db), conf)
-		resp, err := svc.Login(context.Background(), &apiv1.LoginRequest{UserName: "test", Password: "test"})
-		if err != nil || len(resp.AccessToken) == 0 {
-			t.Fatalf("unexpected err=%v token=%s", err, resp.AccessToken)
+		resp, err := svc.Login(context.Background(), apiv1.LoginRequest_builder{UserName: "test", Password: "test"}.Build())
+		if err != nil || len(resp.GetAccessToken()) == 0 {
+			t.Fatalf("unexpected err=%v token=%s", err, resp.GetAccessToken())
 		}
-		_, err2 := svc.Login(context.Background(), &apiv1.LoginRequest{})
+		_, err2 := svc.Login(context.Background(), apiv1.LoginRequest_builder{}.Build())
 		if err2 == nil {
 			t.Fatalf("expected validation error")
 		}
-		_, err3 := svc.Login(context.Background(), &apiv1.LoginRequest{UserName: "test", Password: "test234"})
+		_, err3 := svc.Login(context.Background(), apiv1.LoginRequest_builder{UserName: "test", Password: "test234"}.Build())
 		if err3 == nil {
 			t.Fatalf("expected error for wrong password")
 		}
-		_, err4 := svc.Login(context.Background(), &apiv1.LoginRequest{UserName: "stop", Password: "test"})
+		_, err4 := svc.Login(context.Background(), apiv1.LoginRequest_builder{UserName: "stop", Password: "test"}.Build())
 		if err4 == nil {
 			t.Fatalf("expected error for stopped user")
 		}

@@ -26,12 +26,11 @@ func (c *Cate) All(ctx context.Context, _ *emptypb.Empty) (*apiv1.CateMenuRespon
 	if err != nil {
 		return nil, err
 	}
-	resp := &apiv1.CateMenuResponse{}
+	resp := apiv1.CateMenuResponse_builder{}.Build()
 	for _, v := range cates {
-		resp.List = append(resp.List, &apiv1.CateMenuItem{
-			Url:     "/category/" + v.Domain,
-			Content: v.Name + "(" + strconv.Itoa(v.Num) + ")",
-		})
+		resp.SetList(append(resp.GetList(), apiv1.CateMenuItem_builder{Url: "/category/" + v.Domain,
+			Content: v.Name + "(" + strconv.Itoa(v.Num) + ")"}.Build(),
+		))
 	}
 	return resp, nil
 }

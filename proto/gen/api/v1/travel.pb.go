@@ -12,7 +12,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -25,11 +24,11 @@ const (
 
 // FootprintPhoto 足迹照片
 type FootprintPhoto struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Src           string                 `protobuf:"bytes,1,opt,name=src,proto3" json:"src,omitempty"`
-	Thumbnail     string                 `protobuf:"bytes,2,opt,name=thumbnail,proto3" json:"thumbnail,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Src       string                 `protobuf:"bytes,1,opt,name=src,proto3"`
+	xxx_hidden_Thumbnail string                 `protobuf:"bytes,2,opt,name=thumbnail,proto3"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *FootprintPhoto) Reset() {
@@ -57,41 +56,60 @@ func (x *FootprintPhoto) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FootprintPhoto.ProtoReflect.Descriptor instead.
-func (*FootprintPhoto) Descriptor() ([]byte, []int) {
-	return file_api_v1_travel_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *FootprintPhoto) GetSrc() string {
 	if x != nil {
-		return x.Src
+		return x.xxx_hidden_Src
 	}
 	return ""
 }
 
 func (x *FootprintPhoto) GetThumbnail() string {
 	if x != nil {
-		return x.Thumbnail
+		return x.xxx_hidden_Thumbnail
 	}
 	return ""
 }
 
+func (x *FootprintPhoto) SetSrc(v string) {
+	x.xxx_hidden_Src = v
+}
+
+func (x *FootprintPhoto) SetThumbnail(v string) {
+	x.xxx_hidden_Thumbnail = v
+}
+
+type FootprintPhoto_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Src       string
+	Thumbnail string
+}
+
+func (b0 FootprintPhoto_builder) Build() *FootprintPhoto {
+	m0 := &FootprintPhoto{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Src = b.Src
+	x.xxx_hidden_Thumbnail = b.Thumbnail
+	return m0
+}
+
 // Footprint 足迹点
 type Footprint struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Longitude     string                 `protobuf:"bytes,4,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	Latitude      string                 `protobuf:"bytes,5,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	Date          string                 `protobuf:"bytes,6,opt,name=date,proto3" json:"date,omitempty"`
-	MarkerColor   string                 `protobuf:"bytes,7,opt,name=marker_color,json=markerColor,proto3" json:"marker_color,omitempty"`
-	Categories    []string               `protobuf:"bytes,8,rep,name=categories,proto3" json:"categories,omitempty"`
-	Url           string                 `protobuf:"bytes,9,opt,name=url,proto3" json:"url,omitempty"`
-	UrlLabel      string                 `protobuf:"bytes,10,opt,name=url_label,json=urlLabel,proto3" json:"url_label,omitempty"`
-	Photos        []*FootprintPhoto      `protobuf:"bytes,11,rep,name=photos,proto3" json:"photos,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id          int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Name        string                 `protobuf:"bytes,2,opt,name=name,proto3"`
+	xxx_hidden_Description string                 `protobuf:"bytes,3,opt,name=description,proto3"`
+	xxx_hidden_Longitude   string                 `protobuf:"bytes,4,opt,name=longitude,proto3"`
+	xxx_hidden_Latitude    string                 `protobuf:"bytes,5,opt,name=latitude,proto3"`
+	xxx_hidden_Date        string                 `protobuf:"bytes,6,opt,name=date,proto3"`
+	xxx_hidden_MarkerColor string                 `protobuf:"bytes,7,opt,name=marker_color,json=markerColor,proto3"`
+	xxx_hidden_Categories  []string               `protobuf:"bytes,8,rep,name=categories,proto3"`
+	xxx_hidden_Url         string                 `protobuf:"bytes,9,opt,name=url,proto3"`
+	xxx_hidden_UrlLabel    string                 `protobuf:"bytes,10,opt,name=url_label,json=urlLabel,proto3"`
+	xxx_hidden_Photos      *[]*FootprintPhoto     `protobuf:"bytes,11,rep,name=photos,proto3"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Footprint) Reset() {
@@ -119,91 +137,166 @@ func (x *Footprint) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Footprint.ProtoReflect.Descriptor instead.
-func (*Footprint) Descriptor() ([]byte, []int) {
-	return file_api_v1_travel_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *Footprint) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *Footprint) GetName() string {
 	if x != nil {
-		return x.Name
+		return x.xxx_hidden_Name
 	}
 	return ""
 }
 
 func (x *Footprint) GetDescription() string {
 	if x != nil {
-		return x.Description
+		return x.xxx_hidden_Description
 	}
 	return ""
 }
 
 func (x *Footprint) GetLongitude() string {
 	if x != nil {
-		return x.Longitude
+		return x.xxx_hidden_Longitude
 	}
 	return ""
 }
 
 func (x *Footprint) GetLatitude() string {
 	if x != nil {
-		return x.Latitude
+		return x.xxx_hidden_Latitude
 	}
 	return ""
 }
 
 func (x *Footprint) GetDate() string {
 	if x != nil {
-		return x.Date
+		return x.xxx_hidden_Date
 	}
 	return ""
 }
 
 func (x *Footprint) GetMarkerColor() string {
 	if x != nil {
-		return x.MarkerColor
+		return x.xxx_hidden_MarkerColor
 	}
 	return ""
 }
 
 func (x *Footprint) GetCategories() []string {
 	if x != nil {
-		return x.Categories
+		return x.xxx_hidden_Categories
 	}
 	return nil
 }
 
 func (x *Footprint) GetUrl() string {
 	if x != nil {
-		return x.Url
+		return x.xxx_hidden_Url
 	}
 	return ""
 }
 
 func (x *Footprint) GetUrlLabel() string {
 	if x != nil {
-		return x.UrlLabel
+		return x.xxx_hidden_UrlLabel
 	}
 	return ""
 }
 
 func (x *Footprint) GetPhotos() []*FootprintPhoto {
 	if x != nil {
-		return x.Photos
+		if x.xxx_hidden_Photos != nil {
+			return *x.xxx_hidden_Photos
+		}
 	}
 	return nil
 }
 
+func (x *Footprint) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *Footprint) SetName(v string) {
+	x.xxx_hidden_Name = v
+}
+
+func (x *Footprint) SetDescription(v string) {
+	x.xxx_hidden_Description = v
+}
+
+func (x *Footprint) SetLongitude(v string) {
+	x.xxx_hidden_Longitude = v
+}
+
+func (x *Footprint) SetLatitude(v string) {
+	x.xxx_hidden_Latitude = v
+}
+
+func (x *Footprint) SetDate(v string) {
+	x.xxx_hidden_Date = v
+}
+
+func (x *Footprint) SetMarkerColor(v string) {
+	x.xxx_hidden_MarkerColor = v
+}
+
+func (x *Footprint) SetCategories(v []string) {
+	x.xxx_hidden_Categories = v
+}
+
+func (x *Footprint) SetUrl(v string) {
+	x.xxx_hidden_Url = v
+}
+
+func (x *Footprint) SetUrlLabel(v string) {
+	x.xxx_hidden_UrlLabel = v
+}
+
+func (x *Footprint) SetPhotos(v []*FootprintPhoto) {
+	x.xxx_hidden_Photos = &v
+}
+
+type Footprint_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id          int32
+	Name        string
+	Description string
+	Longitude   string
+	Latitude    string
+	Date        string
+	MarkerColor string
+	Categories  []string
+	Url         string
+	UrlLabel    string
+	Photos      []*FootprintPhoto
+}
+
+func (b0 Footprint_builder) Build() *Footprint {
+	m0 := &Footprint{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Name = b.Name
+	x.xxx_hidden_Description = b.Description
+	x.xxx_hidden_Longitude = b.Longitude
+	x.xxx_hidden_Latitude = b.Latitude
+	x.xxx_hidden_Date = b.Date
+	x.xxx_hidden_MarkerColor = b.MarkerColor
+	x.xxx_hidden_Categories = b.Categories
+	x.xxx_hidden_Url = b.Url
+	x.xxx_hidden_UrlLabel = b.UrlLabel
+	x.xxx_hidden_Photos = &b.Photos
+	return m0
+}
+
 // GetFootprintsRequest 获取足迹请求
 type GetFootprintsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -233,17 +326,24 @@ func (x *GetFootprintsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetFootprintsRequest.ProtoReflect.Descriptor instead.
-func (*GetFootprintsRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_travel_proto_rawDescGZIP(), []int{2}
+type GetFootprintsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 GetFootprintsRequest_builder) Build() *GetFootprintsRequest {
+	m0 := &GetFootprintsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
 }
 
 // GetFootprintsResponse 足迹响应
 type GetFootprintsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Footprints    []*Footprint           `protobuf:"bytes,1,rep,name=footprints,proto3" json:"footprints,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                 protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Footprints *[]*Footprint          `protobuf:"bytes,1,rep,name=footprints,proto3"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *GetFootprintsResponse) Reset() {
@@ -271,16 +371,31 @@ func (x *GetFootprintsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetFootprintsResponse.ProtoReflect.Descriptor instead.
-func (*GetFootprintsResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_travel_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *GetFootprintsResponse) GetFootprints() []*Footprint {
 	if x != nil {
-		return x.Footprints
+		if x.xxx_hidden_Footprints != nil {
+			return *x.xxx_hidden_Footprints
+		}
 	}
 	return nil
+}
+
+func (x *GetFootprintsResponse) SetFootprints(v []*Footprint) {
+	x.xxx_hidden_Footprints = &v
+}
+
+type GetFootprintsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Footprints []*Footprint
+}
+
+func (b0 GetFootprintsResponse_builder) Build() *GetFootprintsResponse {
+	m0 := &GetFootprintsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Footprints = &b.Footprints
+	return m0
 }
 
 var File_api_v1_travel_proto protoreflect.FileDescriptor
@@ -314,18 +429,6 @@ const file_api_v1_travel_proto_rawDesc = "" +
 	"\rTravelService\x12\x88\x01\n" +
 	"\rGetFootprints\x12(.fifsky.blog.api.v1.GetFootprintsRequest\x1a).fifsky.blog.api.v1.GetFootprintsResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/travel/footprintsB\xac\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\vTravelProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
-
-var (
-	file_api_v1_travel_proto_rawDescOnce sync.Once
-	file_api_v1_travel_proto_rawDescData []byte
-)
-
-func file_api_v1_travel_proto_rawDescGZIP() []byte {
-	file_api_v1_travel_proto_rawDescOnce.Do(func() {
-		file_api_v1_travel_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_v1_travel_proto_rawDesc), len(file_api_v1_travel_proto_rawDesc)))
-	})
-	return file_api_v1_travel_proto_rawDescData
-}
 
 var file_api_v1_travel_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_api_v1_travel_proto_goTypes = []any{

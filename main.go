@@ -35,11 +35,14 @@ func main() {
 	// logger
 	logger.SetDefault(config.NewLogger(conf, "app.log"))
 
+	// accessLogger 用于HTTP请求日志和路由访问日志
+	accessLogger := config.NewLogger(conf, "access.log")
+
 	// httpClient
 	httpClient := httpx.NewClient(
 		httpx.WithTimeout(10*time.Second),
 		httpx.WithMiddleware(func(rt http.RoundTripper) http.RoundTripper {
-			return sloghttp.NewRoundTripper(logger.Default(), rt, sloghttp.Config{
+			return sloghttp.NewRoundTripper(accessLogger, rt, sloghttp.Config{
 				Level:              slog.LevelInfo,
 				WithUserAgent:      true,
 				WithRequestBody:    true,
@@ -89,7 +92,7 @@ func main() {
 		Name:  "blog",
 		Usage: "fifsky blog",
 		Commands: []*cli.Command{
-			cmd.NewHttp(s, conf, httpClient, agent),
+			cmd.NewHttp(s, conf, httpClient, agent, accessLogger),
 			cmd.NewTmp(db, conf),
 		},
 	}

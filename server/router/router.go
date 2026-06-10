@@ -20,18 +20,20 @@ import (
 )
 
 type Router struct {
-	service *openapi.Service
-	admin   *adminsvc.Service
-	conf    *config.Config
-	store   *store.Store
+	service     *openapi.Service
+	admin       *adminsvc.Service
+	conf        *config.Config
+	store       *store.Store
+	accessLogger *slog.Logger
 }
 
-func New(apiService *openapi.Service, adminService *adminsvc.Service, conf *config.Config, s *store.Store) Router {
+func New(apiService *openapi.Service, adminService *adminsvc.Service, conf *config.Config, s *store.Store, accessLogger *slog.Logger) Router {
 	return Router{
-		service: apiService,
-		admin:   adminService,
-		conf:    conf,
-		store:   s,
+		service:      apiService,
+		admin:        adminService,
+		conf:         conf,
+		store:        s,
+		accessLogger: accessLogger,
 	}
 }
 
@@ -61,10 +63,8 @@ func (r *Router) Handler() http.Handler {
 		},
 	}
 
-	log := config.NewLogger(r.conf, "access.log")
-
 	mux := NewServeMux()
-	api := mux.Use(middleware.NewRecover, sloghttp.NewMiddleware(log, conf), middleware.NewHeader, middleware.NewCors)
+	api := mux.Use(middleware.NewRecover, sloghttp.NewMiddleware(r.accessLogger, conf), middleware.NewHeader, middleware.NewCors)
 
 	// 统一处理所有 /blog/ 路径的预检请求，确保中间件设置CORS响应头
 	api.HandleFunc("OPTIONS /blog/", func(w http.ResponseWriter, r *http.Request) {

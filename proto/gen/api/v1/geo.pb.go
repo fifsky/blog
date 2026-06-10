@@ -12,7 +12,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -25,11 +24,11 @@ const (
 
 // GetNearestRegionRequest 最近城市请求
 type GetNearestRegionRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Latitude      float64                `protobuf:"fixed64,1,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	Longitude     float64                `protobuf:"fixed64,2,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Latitude  float64                `protobuf:"fixed64,1,opt,name=latitude,proto3"`
+	xxx_hidden_Longitude float64                `protobuf:"fixed64,2,opt,name=longitude,proto3"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *GetNearestRegionRequest) Reset() {
@@ -57,34 +56,53 @@ func (x *GetNearestRegionRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetNearestRegionRequest.ProtoReflect.Descriptor instead.
-func (*GetNearestRegionRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_geo_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *GetNearestRegionRequest) GetLatitude() float64 {
 	if x != nil {
-		return x.Latitude
+		return x.xxx_hidden_Latitude
 	}
 	return 0
 }
 
 func (x *GetNearestRegionRequest) GetLongitude() float64 {
 	if x != nil {
-		return x.Longitude
+		return x.xxx_hidden_Longitude
 	}
 	return 0
 }
 
+func (x *GetNearestRegionRequest) SetLatitude(v float64) {
+	x.xxx_hidden_Latitude = v
+}
+
+func (x *GetNearestRegionRequest) SetLongitude(v float64) {
+	x.xxx_hidden_Longitude = v
+}
+
+type GetNearestRegionRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Latitude  float64
+	Longitude float64
+}
+
+func (b0 GetNearestRegionRequest_builder) Build() *GetNearestRegionRequest {
+	m0 := &GetNearestRegionRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Latitude = b.Latitude
+	x.xxx_hidden_Longitude = b.Longitude
+	return m0
+}
+
 // GetNearestRegionResponse 最近城市响应
 type GetNearestRegionResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ProvinceId    int32                  `protobuf:"varint,1,opt,name=province_id,json=provinceId,proto3" json:"province_id,omitempty"`
-	ProvinceName  string                 `protobuf:"bytes,2,opt,name=province_name,json=provinceName,proto3" json:"province_name,omitempty"`
-	CityId        int32                  `protobuf:"varint,3,opt,name=city_id,json=cityId,proto3" json:"city_id,omitempty"`
-	CityName      string                 `protobuf:"bytes,4,opt,name=city_name,json=cityName,proto3" json:"city_name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                   protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_ProvinceId   int32                  `protobuf:"varint,1,opt,name=province_id,json=provinceId,proto3"`
+	xxx_hidden_ProvinceName string                 `protobuf:"bytes,2,opt,name=province_name,json=provinceName,proto3"`
+	xxx_hidden_CityId       int32                  `protobuf:"varint,3,opt,name=city_id,json=cityId,proto3"`
+	xxx_hidden_CityName     string                 `protobuf:"bytes,4,opt,name=city_name,json=cityName,proto3"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *GetNearestRegionResponse) Reset() {
@@ -112,37 +130,68 @@ func (x *GetNearestRegionResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetNearestRegionResponse.ProtoReflect.Descriptor instead.
-func (*GetNearestRegionResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_geo_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *GetNearestRegionResponse) GetProvinceId() int32 {
 	if x != nil {
-		return x.ProvinceId
+		return x.xxx_hidden_ProvinceId
 	}
 	return 0
 }
 
 func (x *GetNearestRegionResponse) GetProvinceName() string {
 	if x != nil {
-		return x.ProvinceName
+		return x.xxx_hidden_ProvinceName
 	}
 	return ""
 }
 
 func (x *GetNearestRegionResponse) GetCityId() int32 {
 	if x != nil {
-		return x.CityId
+		return x.xxx_hidden_CityId
 	}
 	return 0
 }
 
 func (x *GetNearestRegionResponse) GetCityName() string {
 	if x != nil {
-		return x.CityName
+		return x.xxx_hidden_CityName
 	}
 	return ""
+}
+
+func (x *GetNearestRegionResponse) SetProvinceId(v int32) {
+	x.xxx_hidden_ProvinceId = v
+}
+
+func (x *GetNearestRegionResponse) SetProvinceName(v string) {
+	x.xxx_hidden_ProvinceName = v
+}
+
+func (x *GetNearestRegionResponse) SetCityId(v int32) {
+	x.xxx_hidden_CityId = v
+}
+
+func (x *GetNearestRegionResponse) SetCityName(v string) {
+	x.xxx_hidden_CityName = v
+}
+
+type GetNearestRegionResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	ProvinceId   int32
+	ProvinceName string
+	CityId       int32
+	CityName     string
+}
+
+func (b0 GetNearestRegionResponse_builder) Build() *GetNearestRegionResponse {
+	m0 := &GetNearestRegionResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_ProvinceId = b.ProvinceId
+	x.xxx_hidden_ProvinceName = b.ProvinceName
+	x.xxx_hidden_CityId = b.CityId
+	x.xxx_hidden_CityName = b.CityName
+	return m0
 }
 
 var File_api_v1_geo_proto protoreflect.FileDescriptor
@@ -163,18 +212,6 @@ const file_api_v1_geo_proto_rawDesc = "" +
 	"GeoService\x12\x8b\x01\n" +
 	"\x10GetNearestRegion\x12+.fifsky.blog.api.v1.GetNearestRegionRequest\x1a,.fifsky.blog.api.v1.GetNearestRegionResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/blog/region/nearestB\xa9\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\bGeoProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
-
-var (
-	file_api_v1_geo_proto_rawDescOnce sync.Once
-	file_api_v1_geo_proto_rawDescData []byte
-)
-
-func file_api_v1_geo_proto_rawDescGZIP() []byte {
-	file_api_v1_geo_proto_rawDescOnce.Do(func() {
-		file_api_v1_geo_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_v1_geo_proto_rawDesc), len(file_api_v1_geo_proto_rawDesc)))
-	})
-	return file_api_v1_geo_proto_rawDescData
-}
 
 var file_api_v1_geo_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_api_v1_geo_proto_goTypes = []any{

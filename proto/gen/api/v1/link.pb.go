@@ -14,7 +14,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -26,11 +25,11 @@ const (
 )
 
 type LinkMenuItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
-	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Url     string                 `protobuf:"bytes,1,opt,name=url,proto3"`
+	xxx_hidden_Content string                 `protobuf:"bytes,2,opt,name=content,proto3"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *LinkMenuItem) Reset() {
@@ -58,30 +57,49 @@ func (x *LinkMenuItem) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use LinkMenuItem.ProtoReflect.Descriptor instead.
-func (*LinkMenuItem) Descriptor() ([]byte, []int) {
-	return file_api_v1_link_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *LinkMenuItem) GetUrl() string {
 	if x != nil {
-		return x.Url
+		return x.xxx_hidden_Url
 	}
 	return ""
 }
 
 func (x *LinkMenuItem) GetContent() string {
 	if x != nil {
-		return x.Content
+		return x.xxx_hidden_Content
 	}
 	return ""
 }
 
+func (x *LinkMenuItem) SetUrl(v string) {
+	x.xxx_hidden_Url = v
+}
+
+func (x *LinkMenuItem) SetContent(v string) {
+	x.xxx_hidden_Content = v
+}
+
+type LinkMenuItem_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Url     string
+	Content string
+}
+
+func (b0 LinkMenuItem_builder) Build() *LinkMenuItem {
+	m0 := &LinkMenuItem{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Url = b.Url
+	x.xxx_hidden_Content = b.Content
+	return m0
+}
+
 type LinkMenuResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*LinkMenuItem        `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_List *[]*LinkMenuItem       `protobuf:"bytes,1,rep,name=list,proto3"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *LinkMenuResponse) Reset() {
@@ -109,27 +127,42 @@ func (x *LinkMenuResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use LinkMenuResponse.ProtoReflect.Descriptor instead.
-func (*LinkMenuResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_link_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *LinkMenuResponse) GetList() []*LinkMenuItem {
 	if x != nil {
-		return x.List
+		if x.xxx_hidden_List != nil {
+			return *x.xxx_hidden_List
+		}
 	}
 	return nil
 }
 
+func (x *LinkMenuResponse) SetList(v []*LinkMenuItem) {
+	x.xxx_hidden_List = &v
+}
+
+type LinkMenuResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	List []*LinkMenuItem
+}
+
+func (b0 LinkMenuResponse_builder) Build() *LinkMenuResponse {
+	m0 := &LinkMenuResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_List = &b.List
+	return m0
+}
+
 type LinkItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Url           string                 `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
-	Desc          string                 `protobuf:"bytes,4,opt,name=desc,proto3" json:"desc,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id        int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Name      string                 `protobuf:"bytes,2,opt,name=name,proto3"`
+	xxx_hidden_Url       string                 `protobuf:"bytes,3,opt,name=url,proto3"`
+	xxx_hidden_Desc      string                 `protobuf:"bytes,4,opt,name=desc,proto3"`
+	xxx_hidden_CreatedAt string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *LinkItem) Reset() {
@@ -157,52 +190,89 @@ func (x *LinkItem) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use LinkItem.ProtoReflect.Descriptor instead.
-func (*LinkItem) Descriptor() ([]byte, []int) {
-	return file_api_v1_link_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *LinkItem) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *LinkItem) GetName() string {
 	if x != nil {
-		return x.Name
+		return x.xxx_hidden_Name
 	}
 	return ""
 }
 
 func (x *LinkItem) GetUrl() string {
 	if x != nil {
-		return x.Url
+		return x.xxx_hidden_Url
 	}
 	return ""
 }
 
 func (x *LinkItem) GetDesc() string {
 	if x != nil {
-		return x.Desc
+		return x.xxx_hidden_Desc
 	}
 	return ""
 }
 
 func (x *LinkItem) GetCreatedAt() string {
 	if x != nil {
-		return x.CreatedAt
+		return x.xxx_hidden_CreatedAt
 	}
 	return ""
 }
 
+func (x *LinkItem) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *LinkItem) SetName(v string) {
+	x.xxx_hidden_Name = v
+}
+
+func (x *LinkItem) SetUrl(v string) {
+	x.xxx_hidden_Url = v
+}
+
+func (x *LinkItem) SetDesc(v string) {
+	x.xxx_hidden_Desc = v
+}
+
+func (x *LinkItem) SetCreatedAt(v string) {
+	x.xxx_hidden_CreatedAt = v
+}
+
+type LinkItem_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id        int32
+	Name      string
+	Url       string
+	Desc      string
+	CreatedAt string
+}
+
+func (b0 LinkItem_builder) Build() *LinkItem {
+	m0 := &LinkItem{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Name = b.Name
+	x.xxx_hidden_Url = b.Url
+	x.xxx_hidden_Desc = b.Desc
+	x.xxx_hidden_CreatedAt = b.CreatedAt
+	return m0
+}
+
 type LinkListResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*LinkItem            `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_List  *[]*LinkItem           `protobuf:"bytes,1,rep,name=list,proto3"`
+	xxx_hidden_Total int32                  `protobuf:"varint,2,opt,name=total,proto3"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *LinkListResponse) Reset() {
@@ -230,23 +300,44 @@ func (x *LinkListResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use LinkListResponse.ProtoReflect.Descriptor instead.
-func (*LinkListResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_link_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *LinkListResponse) GetList() []*LinkItem {
 	if x != nil {
-		return x.List
+		if x.xxx_hidden_List != nil {
+			return *x.xxx_hidden_List
+		}
 	}
 	return nil
 }
 
 func (x *LinkListResponse) GetTotal() int32 {
 	if x != nil {
-		return x.Total
+		return x.xxx_hidden_Total
 	}
 	return 0
+}
+
+func (x *LinkListResponse) SetList(v []*LinkItem) {
+	x.xxx_hidden_List = &v
+}
+
+func (x *LinkListResponse) SetTotal(v int32) {
+	x.xxx_hidden_Total = v
+}
+
+type LinkListResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	List  []*LinkItem
+	Total int32
+}
+
+func (b0 LinkListResponse_builder) Build() *LinkListResponse {
+	m0 := &LinkListResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_List = &b.List
+	x.xxx_hidden_Total = b.Total
+	return m0
 }
 
 var File_api_v1_link_proto protoreflect.FileDescriptor
@@ -272,18 +363,6 @@ const file_api_v1_link_proto_rawDesc = "" +
 	"\vLinkService\x12^\n" +
 	"\x03All\x12\x16.google.protobuf.Empty\x1a$.fifsky.blog.api.v1.LinkMenuResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/blog/link/allB\xaa\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\tLinkProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
-
-var (
-	file_api_v1_link_proto_rawDescOnce sync.Once
-	file_api_v1_link_proto_rawDescData []byte
-)
-
-func file_api_v1_link_proto_rawDescGZIP() []byte {
-	file_api_v1_link_proto_rawDescOnce.Do(func() {
-		file_api_v1_link_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_v1_link_proto_rawDesc), len(file_api_v1_link_proto_rawDesc)))
-	})
-	return file_api_v1_link_proto_rawDescData
-}
 
 var file_api_v1_link_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_api_v1_link_proto_goTypes = []any{

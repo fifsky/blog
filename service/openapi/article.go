@@ -39,24 +39,22 @@ func (a *Article) Archive(ctx context.Context, _ *emptypb.Empty) (*apiv1.Archive
 	if err != nil {
 		return nil, err
 	}
-	resp := &apiv1.ArchiveResponse{}
+	resp := apiv1.ArchiveResponse_builder{}.Build()
 	for _, v := range archives {
-		resp.List = append(resp.List, &apiv1.DateArchiveItem{
-			Url:     "/date/" + v.Ym,
-			Content: fmt.Sprintf("%s(%s)", v.Ym, v.Total),
-		})
+		resp.SetList(append(resp.GetList(), apiv1.DateArchiveItem_builder{Url: "/date/" + v.Ym,
+			Content: fmt.Sprintf("%s(%s)", v.Ym, v.Total)}.Build(),
+		))
 	}
 	return resp, nil
 }
 
 func (a *Article) Calendar(ctx context.Context, req *apiv1.ArticleCalendarRequest) (*apiv1.ArticleCalendarResponse, error) {
-	days, err := a.store.GetPostDaysInMonth(ctx, int(req.Year), int(req.Month))
+	days, err := a.store.GetPostDaysInMonth(ctx, int(req.GetYear()), int(req.GetMonth()))
 	if err != nil {
 		return nil, err
 	}
-	return &apiv1.ArticleCalendarResponse{
-		Days: days,
-	}, nil
+	return apiv1.ArticleCalendarResponse_builder{Days: days}.Build(),
+		nil
 }
 
 func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*apiv1.ArticleListResponse, error) {
@@ -65,8 +63,8 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 		return nil, err
 	}
 	var num int
-	if req.PageSize > 0 {
-		num = int(req.PageSize)
+	if req.GetPageSize() > 0 {
+		num = int(req.GetPageSize())
 	} else {
 		n, err := strconv.ParseInt(options["post_num"], 10, 0)
 		if err != nil {
@@ -76,25 +74,25 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 	}
 
 	cateId := 0
-	if req.Domain != "" {
-		cate, err := a.store.GetCateByDomain(ctx, req.Domain)
+	if req.GetDomain() != "" {
+		cate, err := a.store.GetCateByDomain(ctx, req.GetDomain())
 		if err != nil {
 			return nil, err
 		}
 		cateId = cate.Id
 	}
 	artdate := ""
-	if req.Year != "" && req.Month != "" {
-		artdate = req.Year + "-" + req.Month
-		if req.Day != "" {
-			artdate += "-" + req.Day
+	if req.GetYear() != "" && req.GetMonth() != "" {
+		artdate = req.GetYear() + "-" + req.GetMonth()
+		if req.GetDay() != "" {
+			artdate += "-" + req.GetDay()
 		}
 	}
-	page := max(int(req.Page), 1)
+	page := max(int(req.GetPage()), 1)
 	posts, err := a.store.ListPost(ctx, &model.Post{
 		CateId: cateId,
-		Type:   int(req.Type),
-	}, page, num, artdate, req.Keyword, req.Tag)
+		Type:   int(req.GetType()),
+	}, page, num, artdate, req.GetKeyword(), req.GetTag())
 	if err != nil {
 		return nil, err
 	}
@@ -114,8 +112,7 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 		return nil, err
 	}
 	for _, p := range posts {
-		item := &apiv1.ArticleItem{
-			Id:        int32(p.Id),
+		item := apiv1.ArticleItem_builder{Id: int32(p.Id),
 			CateId:    int32(p.CateId),
 			Type:      int32(p.Type),
 			UserId:    int32(p.UserId),
@@ -125,39 +122,38 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 			Tags:      []string(p.Tags),
 			Status:    int32(p.Status),
 			CreatedAt: p.CreatedAt.Format(time.DateTime),
-			UpdatedAt: p.UpdatedAt.Format(time.DateTime),
-		}
+			UpdatedAt: p.UpdatedAt.Format(time.DateTime)}.Build()
+
 		if u, ok := um[p.UserId]; ok {
-			item.User = &types.UserSummary{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}
+			item.SetUser(types.UserSummary_builder{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}.Build())
 		}
 		if c, ok := cm[p.CateId]; ok {
-			item.Cate = &types.CateSummary{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}
+			item.SetCate(types.CateSummary_builder{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}.Build())
 		}
 		items = append(items, item)
 	}
-	total, err := a.store.CountPosts(ctx, &model.Post{CateId: cateId, Type: int(req.Type)}, artdate, req.Keyword, req.Tag)
+	total, err := a.store.CountPosts(ctx, &model.Post{CateId: cateId, Type: int(req.GetType())}, artdate, req.GetKeyword(), req.GetTag())
 	if err != nil {
 		return nil, err
 	}
-	return &apiv1.ArticleListResponse{
-		List:  items,
-		Total: int32(total),
-	}, nil
+	return apiv1.ArticleListResponse_builder{List: items,
+			Total: int32(total)}.Build(),
+		nil
 }
 
 func (a *Article) PrevNext(ctx context.Context, req *apiv1.PrevNextRequest) (*apiv1.PrevNextResponse, error) {
-	resp := &apiv1.PrevNextResponse{}
-	if prev, err := a.store.PrevPost(ctx, int(req.Id)); err == nil {
-		resp.Prev = &apiv1.PrevNextItem{Id: int32(prev.Id), Title: prev.Title, Url: prev.Url}
+	resp := apiv1.PrevNextResponse_builder{}.Build()
+	if prev, err := a.store.PrevPost(ctx, int(req.GetId())); err == nil {
+		resp.SetPrev(apiv1.PrevNextItem_builder{Id: int32(prev.Id), Title: prev.Title, Url: prev.Url}.Build())
 	}
-	if next, err := a.store.NextPost(ctx, int(req.Id)); err == nil {
-		resp.Next = &apiv1.PrevNextItem{Id: int32(next.Id), Title: next.Title, Url: next.Url}
+	if next, err := a.store.NextPost(ctx, int(req.GetId())); err == nil {
+		resp.SetNext(apiv1.PrevNextItem_builder{Id: int32(next.Id), Title: next.Title, Url: next.Url}.Build())
 	}
 	return resp, nil
 }
 
 func (a *Article) Detail(ctx context.Context, req *apiv1.ArticleDetailRequest) (*apiv1.ArticleItem, error) {
-	post, err := a.store.GetPost(ctx, int(req.Id), req.Url)
+	post, err := a.store.GetPost(ctx, int(req.GetId()), req.GetUrl())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, errors.ErrArticleNotFound
@@ -172,8 +168,7 @@ func (a *Article) Detail(ctx context.Context, req *apiv1.ArticleDetailRequest) (
 	// Increment view count
 	_ = a.store.IncrementPostViewNum(ctx, post.Id)
 
-	item := &apiv1.ArticleItem{
-		Id:        int32(post.Id),
+	item := apiv1.ArticleItem_builder{Id: int32(post.Id),
 		CateId:    int32(post.CateId),
 		Type:      int32(post.Type),
 		UserId:    int32(post.UserId),
@@ -184,15 +179,15 @@ func (a *Article) Detail(ctx context.Context, req *apiv1.ArticleDetailRequest) (
 		Status:    int32(post.Status),
 		ViewNum:   int32(post.ViewNum + 1), // Return incremented value
 		CreatedAt: post.CreatedAt.Format(time.DateTime),
-		UpdatedAt: post.UpdatedAt.Format(time.DateTime),
-	}
+		UpdatedAt: post.UpdatedAt.Format(time.DateTime)}.Build()
+
 	u, err := a.store.GetUser(ctx, post.UserId)
 	if err == nil {
-		item.User = &types.UserSummary{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}
+		item.SetUser(types.UserSummary_builder{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}.Build())
 	}
 	c, err := a.store.GetCate(ctx, post.CateId)
 	if err == nil {
-		item.Cate = &types.CateSummary{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}
+		item.SetCate(types.CateSummary_builder{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}.Build())
 	}
 	return item, nil
 }

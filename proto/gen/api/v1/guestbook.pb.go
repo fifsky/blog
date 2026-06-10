@@ -12,7 +12,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -25,11 +24,11 @@ const (
 
 // GuestbookListRequest 留言列表分页请求
 type GuestbookListRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
-	Keyword       string                 `protobuf:"bytes,2,opt,name=keyword,proto3" json:"keyword,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Page    int32                  `protobuf:"varint,1,opt,name=page,proto3"`
+	xxx_hidden_Keyword string                 `protobuf:"bytes,2,opt,name=keyword,proto3"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *GuestbookListRequest) Reset() {
@@ -57,36 +56,55 @@ func (x *GuestbookListRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GuestbookListRequest.ProtoReflect.Descriptor instead.
-func (*GuestbookListRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_guestbook_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *GuestbookListRequest) GetPage() int32 {
 	if x != nil {
-		return x.Page
+		return x.xxx_hidden_Page
 	}
 	return 0
 }
 
 func (x *GuestbookListRequest) GetKeyword() string {
 	if x != nil {
-		return x.Keyword
+		return x.xxx_hidden_Keyword
 	}
 	return ""
 }
 
+func (x *GuestbookListRequest) SetPage(v int32) {
+	x.xxx_hidden_Page = v
+}
+
+func (x *GuestbookListRequest) SetKeyword(v string) {
+	x.xxx_hidden_Keyword = v
+}
+
+type GuestbookListRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Page    int32
+	Keyword string
+}
+
+func (b0 GuestbookListRequest_builder) Build() *GuestbookListRequest {
+	m0 := &GuestbookListRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Page = b.Page
+	x.xxx_hidden_Keyword = b.Keyword
+	return m0
+}
+
 // GuestbookItem 留言项
 type GuestbookItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
-	Ip            string                 `protobuf:"bytes,4,opt,name=ip,proto3" json:"ip,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	Top           int32                  `protobuf:"varint,6,opt,name=top,proto3" json:"top,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id        int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Name      string                 `protobuf:"bytes,2,opt,name=name,proto3"`
+	xxx_hidden_Content   string                 `protobuf:"bytes,3,opt,name=content,proto3"`
+	xxx_hidden_Ip        string                 `protobuf:"bytes,4,opt,name=ip,proto3"`
+	xxx_hidden_CreatedAt string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3"`
+	xxx_hidden_Top       int32                  `protobuf:"varint,6,opt,name=top,proto3"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *GuestbookItem) Reset() {
@@ -114,60 +132,103 @@ func (x *GuestbookItem) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GuestbookItem.ProtoReflect.Descriptor instead.
-func (*GuestbookItem) Descriptor() ([]byte, []int) {
-	return file_api_v1_guestbook_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *GuestbookItem) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *GuestbookItem) GetName() string {
 	if x != nil {
-		return x.Name
+		return x.xxx_hidden_Name
 	}
 	return ""
 }
 
 func (x *GuestbookItem) GetContent() string {
 	if x != nil {
-		return x.Content
+		return x.xxx_hidden_Content
 	}
 	return ""
 }
 
 func (x *GuestbookItem) GetIp() string {
 	if x != nil {
-		return x.Ip
+		return x.xxx_hidden_Ip
 	}
 	return ""
 }
 
 func (x *GuestbookItem) GetCreatedAt() string {
 	if x != nil {
-		return x.CreatedAt
+		return x.xxx_hidden_CreatedAt
 	}
 	return ""
 }
 
 func (x *GuestbookItem) GetTop() int32 {
 	if x != nil {
-		return x.Top
+		return x.xxx_hidden_Top
 	}
 	return 0
 }
 
+func (x *GuestbookItem) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *GuestbookItem) SetName(v string) {
+	x.xxx_hidden_Name = v
+}
+
+func (x *GuestbookItem) SetContent(v string) {
+	x.xxx_hidden_Content = v
+}
+
+func (x *GuestbookItem) SetIp(v string) {
+	x.xxx_hidden_Ip = v
+}
+
+func (x *GuestbookItem) SetCreatedAt(v string) {
+	x.xxx_hidden_CreatedAt = v
+}
+
+func (x *GuestbookItem) SetTop(v int32) {
+	x.xxx_hidden_Top = v
+}
+
+type GuestbookItem_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id        int32
+	Name      string
+	Content   string
+	Ip        string
+	CreatedAt string
+	Top       int32
+}
+
+func (b0 GuestbookItem_builder) Build() *GuestbookItem {
+	m0 := &GuestbookItem{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Name = b.Name
+	x.xxx_hidden_Content = b.Content
+	x.xxx_hidden_Ip = b.Ip
+	x.xxx_hidden_CreatedAt = b.CreatedAt
+	x.xxx_hidden_Top = b.Top
+	return m0
+}
+
 // GuestbookListResponse 留言列表响应
 type GuestbookListResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*GuestbookItem       `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_List  *[]*GuestbookItem      `protobuf:"bytes,1,rep,name=list,proto3"`
+	xxx_hidden_Total int32                  `protobuf:"varint,2,opt,name=total,proto3"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *GuestbookListResponse) Reset() {
@@ -195,32 +256,53 @@ func (x *GuestbookListResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GuestbookListResponse.ProtoReflect.Descriptor instead.
-func (*GuestbookListResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_guestbook_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *GuestbookListResponse) GetList() []*GuestbookItem {
 	if x != nil {
-		return x.List
+		if x.xxx_hidden_List != nil {
+			return *x.xxx_hidden_List
+		}
 	}
 	return nil
 }
 
 func (x *GuestbookListResponse) GetTotal() int32 {
 	if x != nil {
-		return x.Total
+		return x.xxx_hidden_Total
 	}
 	return 0
 }
 
+func (x *GuestbookListResponse) SetList(v []*GuestbookItem) {
+	x.xxx_hidden_List = &v
+}
+
+func (x *GuestbookListResponse) SetTotal(v int32) {
+	x.xxx_hidden_Total = v
+}
+
+type GuestbookListResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	List  []*GuestbookItem
+	Total int32
+}
+
+func (b0 GuestbookListResponse_builder) Build() *GuestbookListResponse {
+	m0 := &GuestbookListResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_List = &b.List
+	x.xxx_hidden_Total = b.Total
+	return m0
+}
+
 // GuestbookCreateRequest 创建留言请求
 type GuestbookCreateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Name    string                 `protobuf:"bytes,1,opt,name=name,proto3"`
+	xxx_hidden_Content string                 `protobuf:"bytes,2,opt,name=content,proto3"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *GuestbookCreateRequest) Reset() {
@@ -248,29 +330,48 @@ func (x *GuestbookCreateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GuestbookCreateRequest.ProtoReflect.Descriptor instead.
-func (*GuestbookCreateRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_guestbook_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *GuestbookCreateRequest) GetName() string {
 	if x != nil {
-		return x.Name
+		return x.xxx_hidden_Name
 	}
 	return ""
 }
 
 func (x *GuestbookCreateRequest) GetContent() string {
 	if x != nil {
-		return x.Content
+		return x.xxx_hidden_Content
 	}
 	return ""
 }
 
+func (x *GuestbookCreateRequest) SetName(v string) {
+	x.xxx_hidden_Name = v
+}
+
+func (x *GuestbookCreateRequest) SetContent(v string) {
+	x.xxx_hidden_Content = v
+}
+
+type GuestbookCreateRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name    string
+	Content string
+}
+
+func (b0 GuestbookCreateRequest_builder) Build() *GuestbookCreateRequest {
+	m0 := &GuestbookCreateRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Name = b.Name
+	x.xxx_hidden_Content = b.Content
+	return m0
+}
+
 // GuestbookCreateResponse 创建留言响应
 type GuestbookCreateResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id int32                  `protobuf:"varint,1,opt,name=id,proto3"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -300,16 +401,29 @@ func (x *GuestbookCreateResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GuestbookCreateResponse.ProtoReflect.Descriptor instead.
-func (*GuestbookCreateResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_guestbook_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *GuestbookCreateResponse) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
+}
+
+func (x *GuestbookCreateResponse) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+type GuestbookCreateResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id int32
+}
+
+func (b0 GuestbookCreateResponse_builder) Build() *GuestbookCreateResponse {
+	m0 := &GuestbookCreateResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	return m0
 }
 
 var File_api_v1_guestbook_proto protoreflect.FileDescriptor
@@ -341,18 +455,6 @@ const file_api_v1_guestbook_proto_rawDesc = "" +
 	"\x04List\x12(.fifsky.blog.api.v1.GuestbookListRequest\x1a).fifsky.blog.api.v1.GuestbookListResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/blog/guestbook/list\x12\x84\x01\n" +
 	"\x06Create\x12*.fifsky.blog.api.v1.GuestbookCreateRequest\x1a+.fifsky.blog.api.v1.GuestbookCreateResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/blog/guestbook/createB\xaf\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\x0eGuestbookProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
-
-var (
-	file_api_v1_guestbook_proto_rawDescOnce sync.Once
-	file_api_v1_guestbook_proto_rawDescData []byte
-)
-
-func file_api_v1_guestbook_proto_rawDescGZIP() []byte {
-	file_api_v1_guestbook_proto_rawDescOnce.Do(func() {
-		file_api_v1_guestbook_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_v1_guestbook_proto_rawDesc), len(file_api_v1_guestbook_proto_rawDesc)))
-	})
-	return file_api_v1_guestbook_proto_rawDescData
-}
 
 var file_api_v1_guestbook_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_api_v1_guestbook_proto_goTypes = []any{

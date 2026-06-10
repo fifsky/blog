@@ -12,7 +12,7 @@ managed:
 plugins:
   - remote: buf.build/protocolbuffers/go
     out: gen
-    opt: paths=source_relative
+    opt: paths=source_relative,default_api_level=API_OPAQUE
   - remote: buf.build/grpc/go
     out: gen
     opt: paths=source_relative

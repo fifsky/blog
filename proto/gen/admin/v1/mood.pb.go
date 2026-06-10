@@ -14,7 +14,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -27,10 +26,10 @@ const (
 
 // MoodDeleteRequest 删除心情请求
 type MoodDeleteRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ids           []int32                `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Ids []int32                `protobuf:"varint,1,rep,packed,name=ids,proto3"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *MoodDeleteRequest) Reset() {
@@ -58,23 +57,36 @@ func (x *MoodDeleteRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MoodDeleteRequest.ProtoReflect.Descriptor instead.
-func (*MoodDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_mood_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *MoodDeleteRequest) GetIds() []int32 {
 	if x != nil {
-		return x.Ids
+		return x.xxx_hidden_Ids
 	}
 	return nil
 }
 
+func (x *MoodDeleteRequest) SetIds(v []int32) {
+	x.xxx_hidden_Ids = v
+}
+
+type MoodDeleteRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Ids []int32
+}
+
+func (b0 MoodDeleteRequest_builder) Build() *MoodDeleteRequest {
+	m0 := &MoodDeleteRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Ids = b.Ids
+	return m0
+}
+
 type MoodCreateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Content       string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Content string                 `protobuf:"bytes,1,opt,name=content,proto3"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *MoodCreateRequest) Reset() {
@@ -102,24 +114,37 @@ func (x *MoodCreateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MoodCreateRequest.ProtoReflect.Descriptor instead.
-func (*MoodCreateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_mood_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *MoodCreateRequest) GetContent() string {
 	if x != nil {
-		return x.Content
+		return x.xxx_hidden_Content
 	}
 	return ""
 }
 
+func (x *MoodCreateRequest) SetContent(v string) {
+	x.xxx_hidden_Content = v
+}
+
+type MoodCreateRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Content string
+}
+
+func (b0 MoodCreateRequest_builder) Build() *MoodCreateRequest {
+	m0 := &MoodCreateRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Content = b.Content
+	return m0
+}
+
 type MoodUpdateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id      int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Content string                 `protobuf:"bytes,2,opt,name=content,proto3"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *MoodUpdateRequest) Reset() {
@@ -147,23 +172,42 @@ func (x *MoodUpdateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MoodUpdateRequest.ProtoReflect.Descriptor instead.
-func (*MoodUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_mood_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *MoodUpdateRequest) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *MoodUpdateRequest) GetContent() string {
 	if x != nil {
-		return x.Content
+		return x.xxx_hidden_Content
 	}
 	return ""
+}
+
+func (x *MoodUpdateRequest) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *MoodUpdateRequest) SetContent(v string) {
+	x.xxx_hidden_Content = v
+}
+
+type MoodUpdateRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id      int32
+	Content string
+}
+
+func (b0 MoodUpdateRequest_builder) Build() *MoodUpdateRequest {
+	m0 := &MoodUpdateRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Content = b.Content
+	return m0
 }
 
 var File_admin_v1_mood_proto protoreflect.FileDescriptor
@@ -184,18 +228,6 @@ const file_admin_v1_mood_proto_rawDesc = "" +
 	"\x06Update\x12'.fifsky.blog.admin.v1.MoodUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/mood/update\x12m\n" +
 	"\x06Delete\x12'.fifsky.blog.admin.v1.MoodDeleteRequest\x1a\x16.google.protobuf.Empty\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/mood/deleteB\xb8\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\tMoodProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
-
-var (
-	file_admin_v1_mood_proto_rawDescOnce sync.Once
-	file_admin_v1_mood_proto_rawDescData []byte
-)
-
-func file_admin_v1_mood_proto_rawDescGZIP() []byte {
-	file_admin_v1_mood_proto_rawDescOnce.Do(func() {
-		file_admin_v1_mood_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_admin_v1_mood_proto_rawDesc), len(file_admin_v1_mood_proto_rawDesc)))
-	})
-	return file_admin_v1_mood_proto_rawDescData
-}
 
 var file_admin_v1_mood_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_admin_v1_mood_proto_goTypes = []any{

@@ -26,8 +26,7 @@ func (t *Travel) GetFootprints(ctx context.Context, req *apiv1.GetFootprintsRequ
 
 	items := make([]*apiv1.Footprint, 0, len(footprints))
 	for _, v := range footprints {
-		item := &apiv1.Footprint{
-			Id:          int32(v.Id),
+		item := apiv1.Footprint_builder{Id: int32(v.Id),
 			Name:        v.Name,
 			Description: v.Description,
 			Longitude:   v.Longitude,
@@ -35,22 +34,19 @@ func (t *Travel) GetFootprints(ctx context.Context, req *apiv1.GetFootprintsRequ
 			Date:        v.Date,
 			MarkerColor: v.MarkerColor,
 			Url:         v.Url,
-			UrlLabel:    v.UrlLabel,
-		}
+			UrlLabel:    v.UrlLabel}.Build()
 
-		item.Categories = append(item.Categories, v.Categories...)
+		item.SetCategories(append(item.GetCategories(), v.Categories...))
 
 		for _, p := range v.Photos {
-			item.Photos = append(item.Photos, &apiv1.FootprintPhoto{
-				Src:       p.Src,
-				Thumbnail: p.Thumbnail,
-			})
+			item.SetPhotos(append(item.GetPhotos(), apiv1.FootprintPhoto_builder{Src: p.Src,
+				Thumbnail: p.Thumbnail}.Build(),
+			))
 		}
 
 		items = append(items, item)
 	}
 
-	return &apiv1.GetFootprintsResponse{
-		Footprints: items,
-	}, nil
+	return apiv1.GetFootprintsResponse_builder{Footprints: items}.Build(),
+		nil
 }

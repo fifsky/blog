@@ -12,7 +12,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -24,16 +23,16 @@ const (
 )
 
 type AdminSetting struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SiteName      string                 `protobuf:"bytes,1,opt,name=site_name,json=siteName,proto3" json:"site_name,omitempty"`
-	SiteDesc      string                 `protobuf:"bytes,2,opt,name=site_desc,json=siteDesc,proto3" json:"site_desc,omitempty"`
-	SiteKeyword   string                 `protobuf:"bytes,3,opt,name=site_keyword,json=siteKeyword,proto3" json:"site_keyword,omitempty"`
-	PostNum       int32                  `protobuf:"varint,4,opt,name=post_num,json=postNum,proto3" json:"post_num,omitempty"`
-	AiEndpoint    string                 `protobuf:"bytes,5,opt,name=ai_endpoint,json=aiEndpoint,proto3" json:"ai_endpoint,omitempty"`
-	AiModel       string                 `protobuf:"bytes,6,opt,name=ai_model,json=aiModel,proto3" json:"ai_model,omitempty"`
-	AiToken       string                 `protobuf:"bytes,7,opt,name=ai_token,json=aiToken,proto3" json:"ai_token,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_SiteName    string                 `protobuf:"bytes,1,opt,name=site_name,json=siteName,proto3"`
+	xxx_hidden_SiteDesc    string                 `protobuf:"bytes,2,opt,name=site_desc,json=siteDesc,proto3"`
+	xxx_hidden_SiteKeyword string                 `protobuf:"bytes,3,opt,name=site_keyword,json=siteKeyword,proto3"`
+	xxx_hidden_PostNum     int32                  `protobuf:"varint,4,opt,name=post_num,json=postNum,proto3"`
+	xxx_hidden_AiEndpoint  string                 `protobuf:"bytes,5,opt,name=ai_endpoint,json=aiEndpoint,proto3"`
+	xxx_hidden_AiModel     string                 `protobuf:"bytes,6,opt,name=ai_model,json=aiModel,proto3"`
+	xxx_hidden_AiToken     string                 `protobuf:"bytes,7,opt,name=ai_token,json=aiToken,proto3"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *AdminSetting) Reset() {
@@ -61,58 +60,107 @@ func (x *AdminSetting) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AdminSetting.ProtoReflect.Descriptor instead.
-func (*AdminSetting) Descriptor() ([]byte, []int) {
-	return file_admin_v1_setting_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *AdminSetting) GetSiteName() string {
 	if x != nil {
-		return x.SiteName
+		return x.xxx_hidden_SiteName
 	}
 	return ""
 }
 
 func (x *AdminSetting) GetSiteDesc() string {
 	if x != nil {
-		return x.SiteDesc
+		return x.xxx_hidden_SiteDesc
 	}
 	return ""
 }
 
 func (x *AdminSetting) GetSiteKeyword() string {
 	if x != nil {
-		return x.SiteKeyword
+		return x.xxx_hidden_SiteKeyword
 	}
 	return ""
 }
 
 func (x *AdminSetting) GetPostNum() int32 {
 	if x != nil {
-		return x.PostNum
+		return x.xxx_hidden_PostNum
 	}
 	return 0
 }
 
 func (x *AdminSetting) GetAiEndpoint() string {
 	if x != nil {
-		return x.AiEndpoint
+		return x.xxx_hidden_AiEndpoint
 	}
 	return ""
 }
 
 func (x *AdminSetting) GetAiModel() string {
 	if x != nil {
-		return x.AiModel
+		return x.xxx_hidden_AiModel
 	}
 	return ""
 }
 
 func (x *AdminSetting) GetAiToken() string {
 	if x != nil {
-		return x.AiToken
+		return x.xxx_hidden_AiToken
 	}
 	return ""
+}
+
+func (x *AdminSetting) SetSiteName(v string) {
+	x.xxx_hidden_SiteName = v
+}
+
+func (x *AdminSetting) SetSiteDesc(v string) {
+	x.xxx_hidden_SiteDesc = v
+}
+
+func (x *AdminSetting) SetSiteKeyword(v string) {
+	x.xxx_hidden_SiteKeyword = v
+}
+
+func (x *AdminSetting) SetPostNum(v int32) {
+	x.xxx_hidden_PostNum = v
+}
+
+func (x *AdminSetting) SetAiEndpoint(v string) {
+	x.xxx_hidden_AiEndpoint = v
+}
+
+func (x *AdminSetting) SetAiModel(v string) {
+	x.xxx_hidden_AiModel = v
+}
+
+func (x *AdminSetting) SetAiToken(v string) {
+	x.xxx_hidden_AiToken = v
+}
+
+type AdminSetting_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	SiteName    string
+	SiteDesc    string
+	SiteKeyword string
+	PostNum     int32
+	AiEndpoint  string
+	AiModel     string
+	AiToken     string
+}
+
+func (b0 AdminSetting_builder) Build() *AdminSetting {
+	m0 := &AdminSetting{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_SiteName = b.SiteName
+	x.xxx_hidden_SiteDesc = b.SiteDesc
+	x.xxx_hidden_SiteKeyword = b.SiteKeyword
+	x.xxx_hidden_PostNum = b.PostNum
+	x.xxx_hidden_AiEndpoint = b.AiEndpoint
+	x.xxx_hidden_AiModel = b.AiModel
+	x.xxx_hidden_AiToken = b.AiToken
+	return m0
 }
 
 var File_admin_v1_setting_proto protoreflect.FileDescriptor
@@ -133,18 +181,6 @@ const file_admin_v1_setting_proto_rawDesc = "" +
 	"\x03Get\x12\x16.google.protobuf.Empty\x1a\".fifsky.blog.admin.v1.AdminSetting\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/blog/admin/setting\x12w\n" +
 	"\x06Update\x12\".fifsky.blog.admin.v1.AdminSetting\x1a\".fifsky.blog.admin.v1.AdminSetting\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/blog/admin/setting/updateB\xbb\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\fSettingProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
-
-var (
-	file_admin_v1_setting_proto_rawDescOnce sync.Once
-	file_admin_v1_setting_proto_rawDescData []byte
-)
-
-func file_admin_v1_setting_proto_rawDescGZIP() []byte {
-	file_admin_v1_setting_proto_rawDescOnce.Do(func() {
-		file_admin_v1_setting_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_admin_v1_setting_proto_rawDesc), len(file_admin_v1_setting_proto_rawDesc)))
-	})
-	return file_admin_v1_setting_proto_rawDescData
-}
 
 var file_admin_v1_setting_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_admin_v1_setting_proto_goTypes = []any{

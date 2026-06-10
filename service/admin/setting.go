@@ -33,26 +33,25 @@ func (s *Setting) Get(ctx context.Context, _ *emptypb.Empty) (*adminv1.AdminSett
 		}
 	}
 
-	return &adminv1.AdminSetting{
-		SiteName:    m["site_name"],
-		SiteDesc:    m["site_desc"],
-		SiteKeyword: m["site_keyword"],
-		PostNum:     int32(postNum),
-		AiEndpoint:  m["ai_endpoint"],
-		AiModel:     m["ai_model"],
-		AiToken:     m["ai_token"],
-	}, nil
+	return adminv1.AdminSetting_builder{SiteName: m["site_name"],
+			SiteDesc:    m["site_desc"],
+			SiteKeyword: m["site_keyword"],
+			PostNum:     int32(postNum),
+			AiEndpoint:  m["ai_endpoint"],
+			AiModel:     m["ai_model"],
+			AiToken:     m["ai_token"]}.Build(),
+		nil
 }
 
 func (s *Setting) Update(ctx context.Context, req *adminv1.AdminSetting) (*adminv1.AdminSetting, error) {
 	kv := map[string]string{
-		"site_name":    req.SiteName,
-		"site_desc":    req.SiteDesc,
-		"site_keyword": req.SiteKeyword,
-		"post_num":     strconv.Itoa(int(req.PostNum)),
-		"ai_endpoint":  req.AiEndpoint,
-		"ai_model":     req.AiModel,
-		"ai_token":     req.AiToken,
+		"site_name":    req.GetSiteName(),
+		"site_desc":    req.GetSiteDesc(),
+		"site_keyword": req.GetSiteKeyword(),
+		"post_num":     strconv.Itoa(int(req.GetPostNum())),
+		"ai_endpoint":  req.GetAiEndpoint(),
+		"ai_model":     req.GetAiModel(),
+		"ai_token":     req.GetAiToken(),
 	}
 
 	m, err := s.store.UpdateOptions(ctx, kv)
@@ -67,13 +66,12 @@ func (s *Setting) Update(ctx context.Context, req *adminv1.AdminSetting) (*admin
 		}
 	}
 
-	return &adminv1.AdminSetting{
-		SiteName:    m["site_name"],
-		SiteDesc:    m["site_desc"],
-		SiteKeyword: m["site_keyword"],
-		PostNum:     int32(postNum),
-		AiEndpoint:  m["ai_endpoint"],
-		AiModel:     m["ai_model"],
-		AiToken:     m["ai_token"],
-	}, nil
+	return adminv1.AdminSetting_builder{SiteName: m["site_name"],
+			SiteDesc:    m["site_desc"],
+			SiteKeyword: m["site_keyword"],
+			PostNum:     int32(postNum),
+			AiEndpoint:  m["ai_endpoint"],
+			AiModel:     m["ai_model"],
+			AiToken:     m["ai_token"]}.Build(),
+		nil
 }

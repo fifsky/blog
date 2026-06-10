@@ -49,7 +49,7 @@ func (o *OSS) GetPresignURL(ctx context.Context, req *adminv1.GetPresignURLReque
 
 	// Generate upload path: blog/photos/${YYYY}/${MM}/${DD}/${filename}
 	now := time.Now()
-	ext := filepath.Ext(req.Filename)
+	ext := filepath.Ext(req.GetFilename())
 	filename := fmt.Sprintf("%d%s", now.UnixNano(), ext)
 	objectKey := fmt.Sprintf("blog/photos/%d/%02d/%02d/%s", now.Year(), now.Month(), now.Day(), filename)
 
@@ -67,8 +67,7 @@ func (o *OSS) GetPresignURL(ctx context.Context, req *adminv1.GetPresignURLReque
 	// CDN URL prefix
 	cdnURL := fmt.Sprintf("https://static.fifsky.com/%s", objectKey)
 
-	return &adminv1.GetPresignURLResponse{
-		Url:    result.URL,
-		CdnUrl: cdnURL,
-	}, nil
+	return adminv1.GetPresignURLResponse_builder{Url: result.URL,
+			CdnUrl: cdnURL}.Build(),
+		nil
 }

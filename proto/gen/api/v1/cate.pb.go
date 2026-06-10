@@ -14,7 +14,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -26,11 +25,11 @@ const (
 )
 
 type CateMenuItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
-	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Url     string                 `protobuf:"bytes,1,opt,name=url,proto3"`
+	xxx_hidden_Content string                 `protobuf:"bytes,2,opt,name=content,proto3"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *CateMenuItem) Reset() {
@@ -58,30 +57,49 @@ func (x *CateMenuItem) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CateMenuItem.ProtoReflect.Descriptor instead.
-func (*CateMenuItem) Descriptor() ([]byte, []int) {
-	return file_api_v1_cate_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *CateMenuItem) GetUrl() string {
 	if x != nil {
-		return x.Url
+		return x.xxx_hidden_Url
 	}
 	return ""
 }
 
 func (x *CateMenuItem) GetContent() string {
 	if x != nil {
-		return x.Content
+		return x.xxx_hidden_Content
 	}
 	return ""
 }
 
+func (x *CateMenuItem) SetUrl(v string) {
+	x.xxx_hidden_Url = v
+}
+
+func (x *CateMenuItem) SetContent(v string) {
+	x.xxx_hidden_Content = v
+}
+
+type CateMenuItem_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Url     string
+	Content string
+}
+
+func (b0 CateMenuItem_builder) Build() *CateMenuItem {
+	m0 := &CateMenuItem{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Url = b.Url
+	x.xxx_hidden_Content = b.Content
+	return m0
+}
+
 type CateMenuResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*CateMenuItem        `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_List *[]*CateMenuItem       `protobuf:"bytes,1,rep,name=list,proto3"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *CateMenuResponse) Reset() {
@@ -109,29 +127,44 @@ func (x *CateMenuResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CateMenuResponse.ProtoReflect.Descriptor instead.
-func (*CateMenuResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_cate_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *CateMenuResponse) GetList() []*CateMenuItem {
 	if x != nil {
-		return x.List
+		if x.xxx_hidden_List != nil {
+			return *x.xxx_hidden_List
+		}
 	}
 	return nil
 }
 
+func (x *CateMenuResponse) SetList(v []*CateMenuItem) {
+	x.xxx_hidden_List = &v
+}
+
+type CateMenuResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	List []*CateMenuItem
+}
+
+func (b0 CateMenuResponse_builder) Build() *CateMenuResponse {
+	m0 := &CateMenuResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_List = &b.List
+	return m0
+}
+
 type CateListItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Desc          string                 `protobuf:"bytes,3,opt,name=desc,proto3" json:"desc,omitempty"`
-	Domain        string                 `protobuf:"bytes,4,opt,name=domain,proto3" json:"domain,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	Num           int32                  `protobuf:"varint,7,opt,name=num,proto3" json:"num,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id        int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Name      string                 `protobuf:"bytes,2,opt,name=name,proto3"`
+	xxx_hidden_Desc      string                 `protobuf:"bytes,3,opt,name=desc,proto3"`
+	xxx_hidden_Domain    string                 `protobuf:"bytes,4,opt,name=domain,proto3"`
+	xxx_hidden_CreatedAt string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3"`
+	xxx_hidden_UpdatedAt string                 `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3"`
+	xxx_hidden_Num       int32                  `protobuf:"varint,7,opt,name=num,proto3"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *CateListItem) Reset() {
@@ -159,58 +192,107 @@ func (x *CateListItem) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CateListItem.ProtoReflect.Descriptor instead.
-func (*CateListItem) Descriptor() ([]byte, []int) {
-	return file_api_v1_cate_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *CateListItem) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *CateListItem) GetName() string {
 	if x != nil {
-		return x.Name
+		return x.xxx_hidden_Name
 	}
 	return ""
 }
 
 func (x *CateListItem) GetDesc() string {
 	if x != nil {
-		return x.Desc
+		return x.xxx_hidden_Desc
 	}
 	return ""
 }
 
 func (x *CateListItem) GetDomain() string {
 	if x != nil {
-		return x.Domain
+		return x.xxx_hidden_Domain
 	}
 	return ""
 }
 
 func (x *CateListItem) GetCreatedAt() string {
 	if x != nil {
-		return x.CreatedAt
+		return x.xxx_hidden_CreatedAt
 	}
 	return ""
 }
 
 func (x *CateListItem) GetUpdatedAt() string {
 	if x != nil {
-		return x.UpdatedAt
+		return x.xxx_hidden_UpdatedAt
 	}
 	return ""
 }
 
 func (x *CateListItem) GetNum() int32 {
 	if x != nil {
-		return x.Num
+		return x.xxx_hidden_Num
 	}
 	return 0
+}
+
+func (x *CateListItem) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *CateListItem) SetName(v string) {
+	x.xxx_hidden_Name = v
+}
+
+func (x *CateListItem) SetDesc(v string) {
+	x.xxx_hidden_Desc = v
+}
+
+func (x *CateListItem) SetDomain(v string) {
+	x.xxx_hidden_Domain = v
+}
+
+func (x *CateListItem) SetCreatedAt(v string) {
+	x.xxx_hidden_CreatedAt = v
+}
+
+func (x *CateListItem) SetUpdatedAt(v string) {
+	x.xxx_hidden_UpdatedAt = v
+}
+
+func (x *CateListItem) SetNum(v int32) {
+	x.xxx_hidden_Num = v
+}
+
+type CateListItem_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id        int32
+	Name      string
+	Desc      string
+	Domain    string
+	CreatedAt string
+	UpdatedAt string
+	Num       int32
+}
+
+func (b0 CateListItem_builder) Build() *CateListItem {
+	m0 := &CateListItem{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Name = b.Name
+	x.xxx_hidden_Desc = b.Desc
+	x.xxx_hidden_Domain = b.Domain
+	x.xxx_hidden_CreatedAt = b.CreatedAt
+	x.xxx_hidden_UpdatedAt = b.UpdatedAt
+	x.xxx_hidden_Num = b.Num
+	return m0
 }
 
 var File_api_v1_cate_proto protoreflect.FileDescriptor
@@ -236,18 +318,6 @@ const file_api_v1_cate_proto_rawDesc = "" +
 	"\vCateService\x12^\n" +
 	"\x03All\x12\x16.google.protobuf.Empty\x1a$.fifsky.blog.api.v1.CateMenuResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/blog/cate/allB\xaa\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\tCateProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
-
-var (
-	file_api_v1_cate_proto_rawDescOnce sync.Once
-	file_api_v1_cate_proto_rawDescData []byte
-)
-
-func file_api_v1_cate_proto_rawDescGZIP() []byte {
-	file_api_v1_cate_proto_rawDescOnce.Do(func() {
-		file_api_v1_cate_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_v1_cate_proto_rawDesc), len(file_api_v1_cate_proto_rawDesc)))
-	})
-	return file_api_v1_cate_proto_rawDescData
-}
 
 var file_api_v1_cate_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_api_v1_cate_proto_goTypes = []any{

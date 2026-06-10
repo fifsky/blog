@@ -14,7 +14,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	_ "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -26,10 +25,10 @@ const (
 )
 
 type RemindActionRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Token string                 `protobuf:"bytes,1,opt,name=token,proto3"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *RemindActionRequest) Reset() {
@@ -57,23 +56,36 @@ func (x *RemindActionRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RemindActionRequest.ProtoReflect.Descriptor instead.
-func (*RemindActionRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_remind_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *RemindActionRequest) GetToken() string {
 	if x != nil {
-		return x.Token
+		return x.xxx_hidden_Token
 	}
 	return ""
 }
 
+func (x *RemindActionRequest) SetToken(v string) {
+	x.xxx_hidden_Token = v
+}
+
+type RemindActionRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Token string
+}
+
+func (b0 RemindActionRequest_builder) Build() *RemindActionRequest {
+	m0 := &RemindActionRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Token = b.Token
+	return m0
+}
+
 type TextResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Text          string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Text string                 `protobuf:"bytes,1,opt,name=text,proto3"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *TextResponse) Reset() {
@@ -101,28 +113,41 @@ func (x *TextResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TextResponse.ProtoReflect.Descriptor instead.
-func (*TextResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_remind_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *TextResponse) GetText() string {
 	if x != nil {
-		return x.Text
+		return x.xxx_hidden_Text
 	}
 	return ""
 }
 
+func (x *TextResponse) SetText(v string) {
+	x.xxx_hidden_Text = v
+}
+
+type TextResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Text string
+}
+
+func (b0 TextResponse_builder) Build() *TextResponse {
+	m0 := &TextResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Text = b.Text
+	return m0
+}
+
 type RemindItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Cron          string                 `protobuf:"bytes,2,opt,name=cron,proto3" json:"cron,omitempty"`
-	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
-	Status        int32                  `protobuf:"varint,9,opt,name=status,proto3" json:"status,omitempty"`
-	NextTime      string                 `protobuf:"bytes,10,opt,name=next_time,json=nextTime,proto3" json:"next_time,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id        int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Cron      string                 `protobuf:"bytes,2,opt,name=cron,proto3"`
+	xxx_hidden_Content   string                 `protobuf:"bytes,3,opt,name=content,proto3"`
+	xxx_hidden_Status    int32                  `protobuf:"varint,9,opt,name=status,proto3"`
+	xxx_hidden_NextTime  string                 `protobuf:"bytes,10,opt,name=next_time,json=nextTime,proto3"`
+	xxx_hidden_CreatedAt string                 `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *RemindItem) Reset() {
@@ -150,59 +175,102 @@ func (x *RemindItem) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RemindItem.ProtoReflect.Descriptor instead.
-func (*RemindItem) Descriptor() ([]byte, []int) {
-	return file_api_v1_remind_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *RemindItem) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *RemindItem) GetCron() string {
 	if x != nil {
-		return x.Cron
+		return x.xxx_hidden_Cron
 	}
 	return ""
 }
 
 func (x *RemindItem) GetContent() string {
 	if x != nil {
-		return x.Content
+		return x.xxx_hidden_Content
 	}
 	return ""
 }
 
 func (x *RemindItem) GetStatus() int32 {
 	if x != nil {
-		return x.Status
+		return x.xxx_hidden_Status
 	}
 	return 0
 }
 
 func (x *RemindItem) GetNextTime() string {
 	if x != nil {
-		return x.NextTime
+		return x.xxx_hidden_NextTime
 	}
 	return ""
 }
 
 func (x *RemindItem) GetCreatedAt() string {
 	if x != nil {
-		return x.CreatedAt
+		return x.xxx_hidden_CreatedAt
 	}
 	return ""
 }
 
+func (x *RemindItem) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *RemindItem) SetCron(v string) {
+	x.xxx_hidden_Cron = v
+}
+
+func (x *RemindItem) SetContent(v string) {
+	x.xxx_hidden_Content = v
+}
+
+func (x *RemindItem) SetStatus(v int32) {
+	x.xxx_hidden_Status = v
+}
+
+func (x *RemindItem) SetNextTime(v string) {
+	x.xxx_hidden_NextTime = v
+}
+
+func (x *RemindItem) SetCreatedAt(v string) {
+	x.xxx_hidden_CreatedAt = v
+}
+
+type RemindItem_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id        int32
+	Cron      string
+	Content   string
+	Status    int32
+	NextTime  string
+	CreatedAt string
+}
+
+func (b0 RemindItem_builder) Build() *RemindItem {
+	m0 := &RemindItem{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Cron = b.Cron
+	x.xxx_hidden_Content = b.Content
+	x.xxx_hidden_Status = b.Status
+	x.xxx_hidden_NextTime = b.NextTime
+	x.xxx_hidden_CreatedAt = b.CreatedAt
+	return m0
+}
+
 type RemindListResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*RemindItem          `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_List  *[]*RemindItem         `protobuf:"bytes,1,rep,name=list,proto3"`
+	xxx_hidden_Total int32                  `protobuf:"varint,2,opt,name=total,proto3"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *RemindListResponse) Reset() {
@@ -230,23 +298,44 @@ func (x *RemindListResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RemindListResponse.ProtoReflect.Descriptor instead.
-func (*RemindListResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_remind_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *RemindListResponse) GetList() []*RemindItem {
 	if x != nil {
-		return x.List
+		if x.xxx_hidden_List != nil {
+			return *x.xxx_hidden_List
+		}
 	}
 	return nil
 }
 
 func (x *RemindListResponse) GetTotal() int32 {
 	if x != nil {
-		return x.Total
+		return x.xxx_hidden_Total
 	}
 	return 0
+}
+
+func (x *RemindListResponse) SetList(v []*RemindItem) {
+	x.xxx_hidden_List = &v
+}
+
+func (x *RemindListResponse) SetTotal(v int32) {
+	x.xxx_hidden_Total = v
+}
+
+type RemindListResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	List  []*RemindItem
+	Total int32
+}
+
+func (b0 RemindListResponse_builder) Build() *RemindListResponse {
+	m0 := &RemindListResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_List = &b.List
+	x.xxx_hidden_Total = b.Total
+	return m0
 }
 
 var File_api_v1_remind_proto protoreflect.FileDescriptor
@@ -275,18 +364,6 @@ const file_api_v1_remind_proto_rawDesc = "" +
 	"\x06Change\x12'.fifsky.blog.api.v1.RemindActionRequest\x1a .fifsky.blog.api.v1.TextResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/blog/remind/change\x12n\n" +
 	"\x05Delay\x12'.fifsky.blog.api.v1.RemindActionRequest\x1a .fifsky.blog.api.v1.TextResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/blog/remind/delayB\xac\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\vRemindProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
-
-var (
-	file_api_v1_remind_proto_rawDescOnce sync.Once
-	file_api_v1_remind_proto_rawDescData []byte
-)
-
-func file_api_v1_remind_proto_rawDescGZIP() []byte {
-	file_api_v1_remind_proto_rawDescOnce.Do(func() {
-		file_api_v1_remind_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_v1_remind_proto_rawDesc), len(file_api_v1_remind_proto_rawDesc)))
-	})
-	return file_api_v1_remind_proto_rawDescData
-}
 
 var file_api_v1_remind_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_api_v1_remind_proto_goTypes = []any{

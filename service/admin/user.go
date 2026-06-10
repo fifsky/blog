@@ -32,90 +32,12 @@ func NewUser(s *store.Store, conf *config.Config) *User {
 }
 
 func (u *User) Get(ctx context.Context, request *adminv1.GetUserRequest) (*adminv1.User, error) {
-	user, err := u.store.GetUser(ctx, int(request.Id))
+	user, err := u.store.GetUser(ctx, int(request.GetId()))
 	if err != nil {
 		return nil, err
 	}
 
-	return &adminv1.User{
-		Id:        int32(user.Id),
-		Name:      user.Name,
-		NickName:  user.NickName,
-		Email:     user.Email,
-		Status:    int32(user.Status),
-		Type:      int32(user.Type),
-		HasTotp:   user.TotpSecret != "",
-		CreatedAt: user.CreatedAt.Format(time.DateTime),
-		UpdatedAt: user.UpdatedAt.Format(time.DateTime),
-	}, nil
-}
-
-func (u *User) Create(ctx context.Context, in *adminv1.UserCreateRequest) (*types.IDResponse, error) {
-	if in.Password == "" {
-		return nil, fmt.Errorf("密码不能为空")
-	}
-	hashed := fmt.Sprintf("%x", md5.Sum([]byte(in.Password)))
-	now := time.Now()
-	cReq := &model.User{
-		Name:      in.Name,
-		Password:  hashed,
-		NickName:  in.NickName,
-		Email:     in.Email,
-		Status:    1,
-		Type:      int(in.Type),
-		CreatedAt: now,
-		UpdatedAt: now,
-	}
-	lastId, err := u.store.CreateUser(ctx, cReq)
-	if err != nil {
-		return nil, err
-	}
-	return &types.IDResponse{Id: int32(lastId)}, nil
-}
-
-func (u *User) Update(ctx context.Context, in *adminv1.UserUpdateRequest) (*types.IDResponse, error) {
-	hashed := fmt.Sprintf("%x", md5.Sum([]byte(in.Password)))
-	now := time.Now()
-	uReq := &model.UpdateUser{
-		Id:        int(in.Id),
-		UpdatedAt: &now,
-	}
-	if in.Name != "" {
-		v := in.Name
-		uReq.Name = &v
-	}
-	if in.Password != "" {
-		v := hashed
-		uReq.Password = &v
-	}
-	if in.NickName != "" {
-		v := in.NickName
-		uReq.NickName = &v
-	}
-	if in.Email != "" {
-		v := in.Email
-		uReq.Email = &v
-	}
-	if in.Type > 0 {
-		v := int(in.Type)
-		uReq.Type = &v
-	}
-	if err := u.store.UpdateUser(ctx, uReq); err != nil {
-		return nil, err
-	}
-	return &types.IDResponse{Id: int32(in.Id)}, nil
-}
-
-func (u *User) List(ctx context.Context, req *adminv1.UserListRequest) (*adminv1.UserListResponse, error) {
-	num := 10
-	users, err := u.store.ListUser(ctx, int(req.Page), num)
-	if err != nil {
-		return nil, err
-	}
-	items := make([]*adminv1.UserItem, 0, len(users))
-	for _, user := range users {
-		items = append(items, &adminv1.UserItem{
-			Id:        int32(user.Id),
+	return adminv1.User_builder{Id: int32(user.Id),
 			Name:      user.Name,
 			NickName:  user.NickName,
 			Email:     user.Email,
@@ -123,21 +45,96 @@ func (u *User) List(ctx context.Context, req *adminv1.UserListRequest) (*adminv1
 			Type:      int32(user.Type),
 			HasTotp:   user.TotpSecret != "",
 			CreatedAt: user.CreatedAt.Format(time.DateTime),
-			UpdatedAt: user.UpdatedAt.Format(time.DateTime),
-		})
+			UpdatedAt: user.UpdatedAt.Format(time.DateTime)}.Build(),
+		nil
+}
+
+func (u *User) Create(ctx context.Context, in *adminv1.UserCreateRequest) (*types.IDResponse, error) {
+	if in.GetPassword() == "" {
+		return nil, fmt.Errorf("密码不能为空")
+	}
+	hashed := fmt.Sprintf("%x", md5.Sum([]byte(in.GetPassword())))
+	now := time.Now()
+	cReq := &model.User{
+		Name:      in.GetName(),
+		Password:  hashed,
+		NickName:  in.GetNickName(),
+		Email:     in.GetEmail(),
+		Status:    1,
+		Type:      int(in.GetType()),
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+	lastId, err := u.store.CreateUser(ctx, cReq)
+	if err != nil {
+		return nil, err
+	}
+	return types.IDResponse_builder{Id: int32(lastId)}.Build(), nil
+}
+
+func (u *User) Update(ctx context.Context, in *adminv1.UserUpdateRequest) (*types.IDResponse, error) {
+	hashed := fmt.Sprintf("%x", md5.Sum([]byte(in.GetPassword())))
+	now := time.Now()
+	uReq := &model.UpdateUser{
+		Id:        int(in.GetId()),
+		UpdatedAt: &now,
+	}
+	if in.GetName() != "" {
+		v := in.GetName()
+		uReq.Name = &v
+	}
+	if in.GetPassword() != "" {
+		v := hashed
+		uReq.Password = &v
+	}
+	if in.GetNickName() != "" {
+		v := in.GetNickName()
+		uReq.NickName = &v
+	}
+	if in.GetEmail() != "" {
+		v := in.GetEmail()
+		uReq.Email = &v
+	}
+	if in.GetType() > 0 {
+		v := int(in.GetType())
+		uReq.Type = &v
+	}
+	if err := u.store.UpdateUser(ctx, uReq); err != nil {
+		return nil, err
+	}
+	return types.IDResponse_builder{Id: int32(in.GetId())}.Build(), nil
+}
+
+func (u *User) List(ctx context.Context, req *adminv1.UserListRequest) (*adminv1.UserListResponse, error) {
+	num := 10
+	users, err := u.store.ListUser(ctx, int(req.GetPage()), num)
+	if err != nil {
+		return nil, err
+	}
+	items := make([]*adminv1.UserItem, 0, len(users))
+	for _, user := range users {
+		items = append(items, adminv1.UserItem_builder{Id: int32(user.Id),
+			Name:      user.Name,
+			NickName:  user.NickName,
+			Email:     user.Email,
+			Status:    int32(user.Status),
+			Type:      int32(user.Type),
+			HasTotp:   user.TotpSecret != "",
+			CreatedAt: user.CreatedAt.Format(time.DateTime),
+			UpdatedAt: user.UpdatedAt.Format(time.DateTime)}.Build(),
+		)
 	}
 	total, err := u.store.CountUserTotal(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &adminv1.UserListResponse{
-		List:  items,
-		Total: int32(total),
-	}, nil
+	return adminv1.UserListResponse_builder{List: items,
+			Total: int32(total)}.Build(),
+		nil
 }
 
 func (u *User) Status(ctx context.Context, req *adminv1.UserStatusRequest) (*emptypb.Empty, error) {
-	user, err := u.store.GetUser(ctx, int(req.Id))
+	user, err := u.store.GetUser(ctx, int(req.GetId()))
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +144,7 @@ func (u *User) Status(ctx context.Context, req *adminv1.UserStatusRequest) (*emp
 	} else {
 		status = 1
 	}
-	if err := u.store.UpdateUser(ctx, &model.UpdateUser{Id: int(req.Id), Status: &status}); err != nil {
+	if err := u.store.UpdateUser(ctx, &model.UpdateUser{Id: int(req.GetId()), Status: &status}); err != nil {
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil
@@ -155,21 +152,20 @@ func (u *User) Status(ctx context.Context, req *adminv1.UserStatusRequest) (*emp
 
 func (u *User) LoginUser(ctx context.Context, _ *emptypb.Empty) (*adminv1.User, error) {
 	user := GetLoginUser(ctx)
-	return &adminv1.User{
-		Id:        int32(user.Id),
-		Name:      user.Name,
-		NickName:  user.NickName,
-		Email:     user.Email,
-		Status:    int32(user.Status),
-		Type:      int32(user.Type),
-		HasTotp:   user.TotpSecret != "",
-		CreatedAt: user.CreatedAt.Format(time.DateTime),
-		UpdatedAt: user.UpdatedAt.Format(time.DateTime),
-	}, nil
+	return adminv1.User_builder{Id: int32(user.Id),
+			Name:      user.Name,
+			NickName:  user.NickName,
+			Email:     user.Email,
+			Status:    int32(user.Status),
+			Type:      int32(user.Type),
+			HasTotp:   user.TotpSecret != "",
+			CreatedAt: user.CreatedAt.Format(time.DateTime),
+			UpdatedAt: user.UpdatedAt.Format(time.DateTime)}.Build(),
+		nil
 }
 
 func (u *User) Generate2FA(ctx context.Context, req *adminv1.Generate2FARequest) (*adminv1.Generate2FAResponse, error) {
-	user, err := u.store.GetUser(ctx, int(req.Id))
+	user, err := u.store.GetUser(ctx, int(req.GetId()))
 	if err != nil {
 		return nil, err
 	}
@@ -186,24 +182,24 @@ func (u *User) Generate2FA(ctx context.Context, req *adminv1.Generate2FARequest)
 	if err != nil {
 		return nil, err
 	}
-	return &adminv1.Generate2FAResponse{
-		Secret:    secret,
-		QrCodeUri: uri,
-	}, nil
+	return adminv1.Generate2FAResponse_builder{Secret: secret,
+			QrCodeUri: uri}.Build(),
+		nil
 }
 
 func (u *User) Bind2FA(ctx context.Context, req *adminv1.Bind2FARequest) (*emptypb.Empty, error) {
-	if req.Secret == "" || req.Code == "" {
+	if req.GetSecret() == "" || req.GetCode() == "" {
 		return nil, fmt.Errorf("无效的绑定请求")
 	}
-	totp := gotp.NewDefaultTOTP(req.Secret)
-	ok, err := totp.Verify(req.Code, int64(time.Now().Unix()))
+	totp := gotp.NewDefaultTOTP(req.GetSecret())
+	ok, err := totp.Verify(req.GetCode(), int64(time.Now().Unix()))
 	if err != nil || !ok {
 		return nil, fmt.Errorf("2FA验证码错误")
 	}
+	secret := req.GetSecret()
 	err = u.store.UpdateUser(ctx, &model.UpdateUser{
-		Id:         int(req.Id),
-		TotpSecret: &req.Secret,
+		Id:         int(req.GetId()),
+		TotpSecret: &secret,
 	})
 	if err != nil {
 		return nil, err

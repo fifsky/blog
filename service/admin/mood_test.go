@@ -17,11 +17,11 @@ func TestAdminMood_CreateDelete(t *testing.T) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixture("moods"))
 		svc := NewMood(store.New(db))
 		ctx := SetLoginUser(context.Background(), &model.User{Id: 1})
-		_, err := svc.Create(ctx, &adminv1.MoodCreateRequest{Content: "demo"})
+		_, err := svc.Create(ctx, adminv1.MoodCreateRequest_builder{Content: "demo"}.Build())
 		if err != nil {
 			t.Fatalf("unexpected err=%v", err)
 		}
-		_, err2 := svc.Delete(context.Background(), &adminv1.MoodDeleteRequest{Ids: []int32{1}})
+		_, err2 := svc.Delete(context.Background(), adminv1.MoodDeleteRequest_builder{Ids: []int32{1}}.Build())
 		if err2 != nil {
 			t.Fatalf("unexpected err=%v", err2)
 		}

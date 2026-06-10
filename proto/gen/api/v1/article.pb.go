@@ -15,7 +15,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -27,10 +26,10 @@ const (
 )
 
 type ArchiveResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*DateArchiveItem     `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_List *[]*DateArchiveItem    `protobuf:"bytes,1,rep,name=list,proto3"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *ArchiveResponse) Reset() {
@@ -58,24 +57,39 @@ func (x *ArchiveResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArchiveResponse.ProtoReflect.Descriptor instead.
-func (*ArchiveResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_article_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *ArchiveResponse) GetList() []*DateArchiveItem {
 	if x != nil {
-		return x.List
+		if x.xxx_hidden_List != nil {
+			return *x.xxx_hidden_List
+		}
 	}
 	return nil
 }
 
+func (x *ArchiveResponse) SetList(v []*DateArchiveItem) {
+	x.xxx_hidden_List = &v
+}
+
+type ArchiveResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	List []*DateArchiveItem
+}
+
+func (b0 ArchiveResponse_builder) Build() *ArchiveResponse {
+	m0 := &ArchiveResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_List = &b.List
+	return m0
+}
+
 type DateArchiveItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
-	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Url     string                 `protobuf:"bytes,1,opt,name=url,proto3"`
+	xxx_hidden_Content string                 `protobuf:"bytes,2,opt,name=content,proto3"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *DateArchiveItem) Reset() {
@@ -103,31 +117,50 @@ func (x *DateArchiveItem) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DateArchiveItem.ProtoReflect.Descriptor instead.
-func (*DateArchiveItem) Descriptor() ([]byte, []int) {
-	return file_api_v1_article_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *DateArchiveItem) GetUrl() string {
 	if x != nil {
-		return x.Url
+		return x.xxx_hidden_Url
 	}
 	return ""
 }
 
 func (x *DateArchiveItem) GetContent() string {
 	if x != nil {
-		return x.Content
+		return x.xxx_hidden_Content
 	}
 	return ""
 }
 
+func (x *DateArchiveItem) SetUrl(v string) {
+	x.xxx_hidden_Url = v
+}
+
+func (x *DateArchiveItem) SetContent(v string) {
+	x.xxx_hidden_Content = v
+}
+
+type DateArchiveItem_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Url     string
+	Content string
+}
+
+func (b0 DateArchiveItem_builder) Build() *DateArchiveItem {
+	m0 := &DateArchiveItem{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Url = b.Url
+	x.xxx_hidden_Content = b.Content
+	return m0
+}
+
 type ArticleCalendarRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Year          int32                  `protobuf:"varint,1,opt,name=year,proto3" json:"year,omitempty"`
-	Month         int32                  `protobuf:"varint,2,opt,name=month,proto3" json:"month,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Year  int32                  `protobuf:"varint,1,opt,name=year,proto3"`
+	xxx_hidden_Month int32                  `protobuf:"varint,2,opt,name=month,proto3"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *ArticleCalendarRequest) Reset() {
@@ -155,30 +188,49 @@ func (x *ArticleCalendarRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArticleCalendarRequest.ProtoReflect.Descriptor instead.
-func (*ArticleCalendarRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_article_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *ArticleCalendarRequest) GetYear() int32 {
 	if x != nil {
-		return x.Year
+		return x.xxx_hidden_Year
 	}
 	return 0
 }
 
 func (x *ArticleCalendarRequest) GetMonth() int32 {
 	if x != nil {
-		return x.Month
+		return x.xxx_hidden_Month
 	}
 	return 0
 }
 
+func (x *ArticleCalendarRequest) SetYear(v int32) {
+	x.xxx_hidden_Year = v
+}
+
+func (x *ArticleCalendarRequest) SetMonth(v int32) {
+	x.xxx_hidden_Month = v
+}
+
+type ArticleCalendarRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Year  int32
+	Month int32
+}
+
+func (b0 ArticleCalendarRequest_builder) Build() *ArticleCalendarRequest {
+	m0 := &ArticleCalendarRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Year = b.Year
+	x.xxx_hidden_Month = b.Month
+	return m0
+}
+
 type ArticleCalendarResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Days          []int32                `protobuf:"varint,1,rep,packed,name=days,proto3" json:"days,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Days []int32                `protobuf:"varint,1,rep,packed,name=days,proto3"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *ArticleCalendarResponse) Reset() {
@@ -206,31 +258,44 @@ func (x *ArticleCalendarResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArticleCalendarResponse.ProtoReflect.Descriptor instead.
-func (*ArticleCalendarResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_article_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *ArticleCalendarResponse) GetDays() []int32 {
 	if x != nil {
-		return x.Days
+		return x.xxx_hidden_Days
 	}
 	return nil
 }
 
+func (x *ArticleCalendarResponse) SetDays(v []int32) {
+	x.xxx_hidden_Days = v
+}
+
+type ArticleCalendarResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Days []int32
+}
+
+func (b0 ArticleCalendarResponse_builder) Build() *ArticleCalendarResponse {
+	m0 := &ArticleCalendarResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Days = b.Days
+	return m0
+}
+
 type ArticleListRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Year          string                 `protobuf:"bytes,1,opt,name=year,proto3" json:"year,omitempty"`
-	Month         string                 `protobuf:"bytes,2,opt,name=month,proto3" json:"month,omitempty"`
-	Domain        string                 `protobuf:"bytes,3,opt,name=domain,proto3" json:"domain,omitempty"`
-	Keyword       string                 `protobuf:"bytes,4,opt,name=keyword,proto3" json:"keyword,omitempty"`
-	Page          int32                  `protobuf:"varint,5,opt,name=page,proto3" json:"page,omitempty"`
-	Type          int32                  `protobuf:"varint,6,opt,name=type,proto3" json:"type,omitempty"`
-	Day           string                 `protobuf:"bytes,7,opt,name=day,proto3" json:"day,omitempty"`
-	PageSize      int32                  `protobuf:"varint,8,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	Tag           string                 `protobuf:"bytes,9,opt,name=tag,proto3" json:"tag,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Year     string                 `protobuf:"bytes,1,opt,name=year,proto3"`
+	xxx_hidden_Month    string                 `protobuf:"bytes,2,opt,name=month,proto3"`
+	xxx_hidden_Domain   string                 `protobuf:"bytes,3,opt,name=domain,proto3"`
+	xxx_hidden_Keyword  string                 `protobuf:"bytes,4,opt,name=keyword,proto3"`
+	xxx_hidden_Page     int32                  `protobuf:"varint,5,opt,name=page,proto3"`
+	xxx_hidden_Type     int32                  `protobuf:"varint,6,opt,name=type,proto3"`
+	xxx_hidden_Day      string                 `protobuf:"bytes,7,opt,name=day,proto3"`
+	xxx_hidden_PageSize int32                  `protobuf:"varint,8,opt,name=page_size,json=pageSize,proto3"`
+	xxx_hidden_Tag      string                 `protobuf:"bytes,9,opt,name=tag,proto3"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *ArticleListRequest) Reset() {
@@ -258,92 +323,153 @@ func (x *ArticleListRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArticleListRequest.ProtoReflect.Descriptor instead.
-func (*ArticleListRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_article_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *ArticleListRequest) GetYear() string {
 	if x != nil {
-		return x.Year
+		return x.xxx_hidden_Year
 	}
 	return ""
 }
 
 func (x *ArticleListRequest) GetMonth() string {
 	if x != nil {
-		return x.Month
+		return x.xxx_hidden_Month
 	}
 	return ""
 }
 
 func (x *ArticleListRequest) GetDomain() string {
 	if x != nil {
-		return x.Domain
+		return x.xxx_hidden_Domain
 	}
 	return ""
 }
 
 func (x *ArticleListRequest) GetKeyword() string {
 	if x != nil {
-		return x.Keyword
+		return x.xxx_hidden_Keyword
 	}
 	return ""
 }
 
 func (x *ArticleListRequest) GetPage() int32 {
 	if x != nil {
-		return x.Page
+		return x.xxx_hidden_Page
 	}
 	return 0
 }
 
 func (x *ArticleListRequest) GetType() int32 {
 	if x != nil {
-		return x.Type
+		return x.xxx_hidden_Type
 	}
 	return 0
 }
 
 func (x *ArticleListRequest) GetDay() string {
 	if x != nil {
-		return x.Day
+		return x.xxx_hidden_Day
 	}
 	return ""
 }
 
 func (x *ArticleListRequest) GetPageSize() int32 {
 	if x != nil {
-		return x.PageSize
+		return x.xxx_hidden_PageSize
 	}
 	return 0
 }
 
 func (x *ArticleListRequest) GetTag() string {
 	if x != nil {
-		return x.Tag
+		return x.xxx_hidden_Tag
 	}
 	return ""
 }
 
+func (x *ArticleListRequest) SetYear(v string) {
+	x.xxx_hidden_Year = v
+}
+
+func (x *ArticleListRequest) SetMonth(v string) {
+	x.xxx_hidden_Month = v
+}
+
+func (x *ArticleListRequest) SetDomain(v string) {
+	x.xxx_hidden_Domain = v
+}
+
+func (x *ArticleListRequest) SetKeyword(v string) {
+	x.xxx_hidden_Keyword = v
+}
+
+func (x *ArticleListRequest) SetPage(v int32) {
+	x.xxx_hidden_Page = v
+}
+
+func (x *ArticleListRequest) SetType(v int32) {
+	x.xxx_hidden_Type = v
+}
+
+func (x *ArticleListRequest) SetDay(v string) {
+	x.xxx_hidden_Day = v
+}
+
+func (x *ArticleListRequest) SetPageSize(v int32) {
+	x.xxx_hidden_PageSize = v
+}
+
+func (x *ArticleListRequest) SetTag(v string) {
+	x.xxx_hidden_Tag = v
+}
+
+type ArticleListRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Year     string
+	Month    string
+	Domain   string
+	Keyword  string
+	Page     int32
+	Type     int32
+	Day      string
+	PageSize int32
+	Tag      string
+}
+
+func (b0 ArticleListRequest_builder) Build() *ArticleListRequest {
+	m0 := &ArticleListRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Year = b.Year
+	x.xxx_hidden_Month = b.Month
+	x.xxx_hidden_Domain = b.Domain
+	x.xxx_hidden_Keyword = b.Keyword
+	x.xxx_hidden_Page = b.Page
+	x.xxx_hidden_Type = b.Type
+	x.xxx_hidden_Day = b.Day
+	x.xxx_hidden_PageSize = b.PageSize
+	x.xxx_hidden_Tag = b.Tag
+	return m0
+}
+
 type ArticleItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	CateId        int32                  `protobuf:"varint,2,opt,name=cate_id,json=cateId,proto3" json:"cate_id,omitempty"`
-	Type          int32                  `protobuf:"varint,3,opt,name=type,proto3" json:"type,omitempty"`
-	UserId        int32                  `protobuf:"varint,4,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Title         string                 `protobuf:"bytes,5,opt,name=title,proto3" json:"title,omitempty"`
-	Url           string                 `protobuf:"bytes,6,opt,name=url,proto3" json:"url,omitempty"`
-	Content       string                 `protobuf:"bytes,7,opt,name=content,proto3" json:"content,omitempty"`
-	Status        int32                  `protobuf:"varint,8,opt,name=status,proto3" json:"status,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	User          *types.UserSummary     `protobuf:"bytes,11,opt,name=user,proto3" json:"user,omitempty"`
-	Cate          *types.CateSummary     `protobuf:"bytes,12,opt,name=cate,proto3" json:"cate,omitempty"`
-	ViewNum       int32                  `protobuf:"varint,13,opt,name=view_num,json=viewNum,proto3" json:"view_num,omitempty"`
-	Tags          []string               `protobuf:"bytes,14,rep,name=tags,proto3" json:"tags,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id        int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_CateId    int32                  `protobuf:"varint,2,opt,name=cate_id,json=cateId,proto3"`
+	xxx_hidden_Type      int32                  `protobuf:"varint,3,opt,name=type,proto3"`
+	xxx_hidden_UserId    int32                  `protobuf:"varint,4,opt,name=user_id,json=userId,proto3"`
+	xxx_hidden_Title     string                 `protobuf:"bytes,5,opt,name=title,proto3"`
+	xxx_hidden_Url       string                 `protobuf:"bytes,6,opt,name=url,proto3"`
+	xxx_hidden_Content   string                 `protobuf:"bytes,7,opt,name=content,proto3"`
+	xxx_hidden_Status    int32                  `protobuf:"varint,8,opt,name=status,proto3"`
+	xxx_hidden_CreatedAt string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3"`
+	xxx_hidden_UpdatedAt string                 `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3"`
+	xxx_hidden_User      *types.UserSummary     `protobuf:"bytes,11,opt,name=user,proto3"`
+	xxx_hidden_Cate      *types.CateSummary     `protobuf:"bytes,12,opt,name=cate,proto3"`
+	xxx_hidden_ViewNum   int32                  `protobuf:"varint,13,opt,name=view_num,json=viewNum,proto3"`
+	xxx_hidden_Tags      []string               `protobuf:"bytes,14,rep,name=tags,proto3"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *ArticleItem) Reset() {
@@ -371,115 +497,228 @@ func (x *ArticleItem) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArticleItem.ProtoReflect.Descriptor instead.
-func (*ArticleItem) Descriptor() ([]byte, []int) {
-	return file_api_v1_article_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *ArticleItem) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *ArticleItem) GetCateId() int32 {
 	if x != nil {
-		return x.CateId
+		return x.xxx_hidden_CateId
 	}
 	return 0
 }
 
 func (x *ArticleItem) GetType() int32 {
 	if x != nil {
-		return x.Type
+		return x.xxx_hidden_Type
 	}
 	return 0
 }
 
 func (x *ArticleItem) GetUserId() int32 {
 	if x != nil {
-		return x.UserId
+		return x.xxx_hidden_UserId
 	}
 	return 0
 }
 
 func (x *ArticleItem) GetTitle() string {
 	if x != nil {
-		return x.Title
+		return x.xxx_hidden_Title
 	}
 	return ""
 }
 
 func (x *ArticleItem) GetUrl() string {
 	if x != nil {
-		return x.Url
+		return x.xxx_hidden_Url
 	}
 	return ""
 }
 
 func (x *ArticleItem) GetContent() string {
 	if x != nil {
-		return x.Content
+		return x.xxx_hidden_Content
 	}
 	return ""
 }
 
 func (x *ArticleItem) GetStatus() int32 {
 	if x != nil {
-		return x.Status
+		return x.xxx_hidden_Status
 	}
 	return 0
 }
 
 func (x *ArticleItem) GetCreatedAt() string {
 	if x != nil {
-		return x.CreatedAt
+		return x.xxx_hidden_CreatedAt
 	}
 	return ""
 }
 
 func (x *ArticleItem) GetUpdatedAt() string {
 	if x != nil {
-		return x.UpdatedAt
+		return x.xxx_hidden_UpdatedAt
 	}
 	return ""
 }
 
 func (x *ArticleItem) GetUser() *types.UserSummary {
 	if x != nil {
-		return x.User
+		return x.xxx_hidden_User
 	}
 	return nil
 }
 
 func (x *ArticleItem) GetCate() *types.CateSummary {
 	if x != nil {
-		return x.Cate
+		return x.xxx_hidden_Cate
 	}
 	return nil
 }
 
 func (x *ArticleItem) GetViewNum() int32 {
 	if x != nil {
-		return x.ViewNum
+		return x.xxx_hidden_ViewNum
 	}
 	return 0
 }
 
 func (x *ArticleItem) GetTags() []string {
 	if x != nil {
-		return x.Tags
+		return x.xxx_hidden_Tags
 	}
 	return nil
 }
 
+func (x *ArticleItem) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *ArticleItem) SetCateId(v int32) {
+	x.xxx_hidden_CateId = v
+}
+
+func (x *ArticleItem) SetType(v int32) {
+	x.xxx_hidden_Type = v
+}
+
+func (x *ArticleItem) SetUserId(v int32) {
+	x.xxx_hidden_UserId = v
+}
+
+func (x *ArticleItem) SetTitle(v string) {
+	x.xxx_hidden_Title = v
+}
+
+func (x *ArticleItem) SetUrl(v string) {
+	x.xxx_hidden_Url = v
+}
+
+func (x *ArticleItem) SetContent(v string) {
+	x.xxx_hidden_Content = v
+}
+
+func (x *ArticleItem) SetStatus(v int32) {
+	x.xxx_hidden_Status = v
+}
+
+func (x *ArticleItem) SetCreatedAt(v string) {
+	x.xxx_hidden_CreatedAt = v
+}
+
+func (x *ArticleItem) SetUpdatedAt(v string) {
+	x.xxx_hidden_UpdatedAt = v
+}
+
+func (x *ArticleItem) SetUser(v *types.UserSummary) {
+	x.xxx_hidden_User = v
+}
+
+func (x *ArticleItem) SetCate(v *types.CateSummary) {
+	x.xxx_hidden_Cate = v
+}
+
+func (x *ArticleItem) SetViewNum(v int32) {
+	x.xxx_hidden_ViewNum = v
+}
+
+func (x *ArticleItem) SetTags(v []string) {
+	x.xxx_hidden_Tags = v
+}
+
+func (x *ArticleItem) HasUser() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_User != nil
+}
+
+func (x *ArticleItem) HasCate() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Cate != nil
+}
+
+func (x *ArticleItem) ClearUser() {
+	x.xxx_hidden_User = nil
+}
+
+func (x *ArticleItem) ClearCate() {
+	x.xxx_hidden_Cate = nil
+}
+
+type ArticleItem_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id        int32
+	CateId    int32
+	Type      int32
+	UserId    int32
+	Title     string
+	Url       string
+	Content   string
+	Status    int32
+	CreatedAt string
+	UpdatedAt string
+	User      *types.UserSummary
+	Cate      *types.CateSummary
+	ViewNum   int32
+	Tags      []string
+}
+
+func (b0 ArticleItem_builder) Build() *ArticleItem {
+	m0 := &ArticleItem{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_CateId = b.CateId
+	x.xxx_hidden_Type = b.Type
+	x.xxx_hidden_UserId = b.UserId
+	x.xxx_hidden_Title = b.Title
+	x.xxx_hidden_Url = b.Url
+	x.xxx_hidden_Content = b.Content
+	x.xxx_hidden_Status = b.Status
+	x.xxx_hidden_CreatedAt = b.CreatedAt
+	x.xxx_hidden_UpdatedAt = b.UpdatedAt
+	x.xxx_hidden_User = b.User
+	x.xxx_hidden_Cate = b.Cate
+	x.xxx_hidden_ViewNum = b.ViewNum
+	x.xxx_hidden_Tags = b.Tags
+	return m0
+}
+
 type ArticleListResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*ArticleItem         `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_List  *[]*ArticleItem        `protobuf:"bytes,1,rep,name=list,proto3"`
+	xxx_hidden_Total int32                  `protobuf:"varint,2,opt,name=total,proto3"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *ArticleListResponse) Reset() {
@@ -507,28 +746,49 @@ func (x *ArticleListResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArticleListResponse.ProtoReflect.Descriptor instead.
-func (*ArticleListResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_article_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *ArticleListResponse) GetList() []*ArticleItem {
 	if x != nil {
-		return x.List
+		if x.xxx_hidden_List != nil {
+			return *x.xxx_hidden_List
+		}
 	}
 	return nil
 }
 
 func (x *ArticleListResponse) GetTotal() int32 {
 	if x != nil {
-		return x.Total
+		return x.xxx_hidden_Total
 	}
 	return 0
 }
 
+func (x *ArticleListResponse) SetList(v []*ArticleItem) {
+	x.xxx_hidden_List = &v
+}
+
+func (x *ArticleListResponse) SetTotal(v int32) {
+	x.xxx_hidden_Total = v
+}
+
+type ArticleListResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	List  []*ArticleItem
+	Total int32
+}
+
+func (b0 ArticleListResponse_builder) Build() *ArticleListResponse {
+	m0 := &ArticleListResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_List = &b.List
+	x.xxx_hidden_Total = b.Total
+	return m0
+}
+
 type PrevNextRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id int32                  `protobuf:"varint,1,opt,name=id,proto3"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -558,25 +818,38 @@ func (x *PrevNextRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PrevNextRequest.ProtoReflect.Descriptor instead.
-func (*PrevNextRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_article_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *PrevNextRequest) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
+func (x *PrevNextRequest) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+type PrevNextRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id int32
+}
+
+func (b0 PrevNextRequest_builder) Build() *PrevNextRequest {
+	m0 := &PrevNextRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	return m0
+}
+
 type PrevNextItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Url           string                 `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id    int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Title string                 `protobuf:"bytes,2,opt,name=title,proto3"`
+	xxx_hidden_Url   string                 `protobuf:"bytes,3,opt,name=url,proto3"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *PrevNextItem) Reset() {
@@ -604,38 +877,63 @@ func (x *PrevNextItem) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PrevNextItem.ProtoReflect.Descriptor instead.
-func (*PrevNextItem) Descriptor() ([]byte, []int) {
-	return file_api_v1_article_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *PrevNextItem) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *PrevNextItem) GetTitle() string {
 	if x != nil {
-		return x.Title
+		return x.xxx_hidden_Title
 	}
 	return ""
 }
 
 func (x *PrevNextItem) GetUrl() string {
 	if x != nil {
-		return x.Url
+		return x.xxx_hidden_Url
 	}
 	return ""
 }
 
+func (x *PrevNextItem) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *PrevNextItem) SetTitle(v string) {
+	x.xxx_hidden_Title = v
+}
+
+func (x *PrevNextItem) SetUrl(v string) {
+	x.xxx_hidden_Url = v
+}
+
+type PrevNextItem_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id    int32
+	Title string
+	Url   string
+}
+
+func (b0 PrevNextItem_builder) Build() *PrevNextItem {
+	m0 := &PrevNextItem{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Title = b.Title
+	x.xxx_hidden_Url = b.Url
+	return m0
+}
+
 type PrevNextResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Prev          *PrevNextItem          `protobuf:"bytes,1,opt,name=prev,proto3" json:"prev,omitempty"`
-	Next          *PrevNextItem          `protobuf:"bytes,2,opt,name=next,proto3" json:"next,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Prev *PrevNextItem          `protobuf:"bytes,1,opt,name=prev,proto3"`
+	xxx_hidden_Next *PrevNextItem          `protobuf:"bytes,2,opt,name=next,proto3"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *PrevNextResponse) Reset() {
@@ -663,31 +961,72 @@ func (x *PrevNextResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PrevNextResponse.ProtoReflect.Descriptor instead.
-func (*PrevNextResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_article_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *PrevNextResponse) GetPrev() *PrevNextItem {
 	if x != nil {
-		return x.Prev
+		return x.xxx_hidden_Prev
 	}
 	return nil
 }
 
 func (x *PrevNextResponse) GetNext() *PrevNextItem {
 	if x != nil {
-		return x.Next
+		return x.xxx_hidden_Next
 	}
 	return nil
 }
 
+func (x *PrevNextResponse) SetPrev(v *PrevNextItem) {
+	x.xxx_hidden_Prev = v
+}
+
+func (x *PrevNextResponse) SetNext(v *PrevNextItem) {
+	x.xxx_hidden_Next = v
+}
+
+func (x *PrevNextResponse) HasPrev() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Prev != nil
+}
+
+func (x *PrevNextResponse) HasNext() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Next != nil
+}
+
+func (x *PrevNextResponse) ClearPrev() {
+	x.xxx_hidden_Prev = nil
+}
+
+func (x *PrevNextResponse) ClearNext() {
+	x.xxx_hidden_Next = nil
+}
+
+type PrevNextResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Prev *PrevNextItem
+	Next *PrevNextItem
+}
+
+func (b0 PrevNextResponse_builder) Build() *PrevNextResponse {
+	m0 := &PrevNextResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Prev = b.Prev
+	x.xxx_hidden_Next = b.Next
+	return m0
+}
+
 type ArticleDetailRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Url           string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id  int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Url string                 `protobuf:"bytes,2,opt,name=url,proto3"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ArticleDetailRequest) Reset() {
@@ -715,23 +1054,42 @@ func (x *ArticleDetailRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArticleDetailRequest.ProtoReflect.Descriptor instead.
-func (*ArticleDetailRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_article_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *ArticleDetailRequest) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *ArticleDetailRequest) GetUrl() string {
 	if x != nil {
-		return x.Url
+		return x.xxx_hidden_Url
 	}
 	return ""
+}
+
+func (x *ArticleDetailRequest) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *ArticleDetailRequest) SetUrl(v string) {
+	x.xxx_hidden_Url = v
+}
+
+type ArticleDetailRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id  int32
+	Url string
+}
+
+func (b0 ArticleDetailRequest_builder) Build() *ArticleDetailRequest {
+	m0 := &ArticleDetailRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Url = b.Url
+	return m0
 }
 
 var File_api_v1_article_proto protoreflect.FileDescriptor
@@ -803,18 +1161,6 @@ const file_api_v1_article_proto_rawDesc = "" +
 	"\x04Feed\x12\x16.google.protobuf.Empty\x1a\x14.google.api.HttpBody\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/blog/feed.xml\x12\x86\x01\n" +
 	"\bCalendar\x12*.fifsky.blog.api.v1.ArticleCalendarRequest\x1a+.fifsky.blog.api.v1.ArticleCalendarResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/blog/article/calendarB\xad\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\fArticleProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
-
-var (
-	file_api_v1_article_proto_rawDescOnce sync.Once
-	file_api_v1_article_proto_rawDescData []byte
-)
-
-func file_api_v1_article_proto_rawDescGZIP() []byte {
-	file_api_v1_article_proto_rawDescOnce.Do(func() {
-		file_api_v1_article_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_v1_article_proto_rawDesc), len(file_api_v1_article_proto_rawDesc)))
-	})
-	return file_api_v1_article_proto_rawDescData
-}
 
 var file_api_v1_article_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_api_v1_article_proto_goTypes = []any{

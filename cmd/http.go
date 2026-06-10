@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"log"
+	"log/slog"
 	"net/http"
 
 	"app/config"
@@ -16,7 +17,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func NewHttp(s *store.Store, conf *config.Config, httpClient *http.Client, agent *aiagent.Agent) *cli.Command {
+func NewHttp(s *store.Store, conf *config.Config, httpClient *http.Client, agent *aiagent.Agent, accessLogger *slog.Logger) *cli.Command {
 	return &cli.Command{
 		Name:  "http",
 		Usage: "http command eg: ./app http --addr=:8080",
@@ -34,7 +35,7 @@ func NewHttp(s *store.Store, conf *config.Config, httpClient *http.Client, agent
 
 			apiService := openapi.New(s, conf, httpClient)
 			adminService := admin.New(s, conf, agent)
-			route := router.New(apiService, adminService, conf, s)
+			route := router.New(apiService, adminService, conf, s, accessLogger)
 			return server.New(
 				server.Handler(route.Handler()),
 				server.Address(cli.String("addr")),

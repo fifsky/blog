@@ -28,7 +28,7 @@ func NewRemind(s *store.Store, conf *config.Config) *Remind {
 }
 
 func (r *Remind) Change(ctx context.Context, req *apiv1.RemindActionRequest) (*apiv1.TextResponse, error) {
-	id, err := aesutil.AesDecode(r.conf.Common.TokenSecret, req.Token)
+	id, err := aesutil.AesDecode(r.conf.Common.TokenSecret, req.GetToken())
 	if err != nil {
 		return nil, fmt.Errorf("token错误:%w", err)
 	}
@@ -58,11 +58,11 @@ func (r *Remind) Change(ctx context.Context, req *apiv1.RemindActionRequest) (*a
 		}
 	}
 
-	return &apiv1.TextResponse{Text: "已确认收到提醒"}, nil
+	return apiv1.TextResponse_builder{Text: "已确认收到提醒"}.Build(), nil
 }
 
 func (r *Remind) Delay(ctx context.Context, req *apiv1.RemindActionRequest) (*apiv1.TextResponse, error) {
-	id, err := aesutil.AesDecode(r.conf.Common.TokenSecret, req.Token)
+	id, err := aesutil.AesDecode(r.conf.Common.TokenSecret, req.GetToken())
 	if err != nil {
 		return nil, fmt.Errorf("token错误:%w", err)
 	}
@@ -76,5 +76,5 @@ func (r *Remind) Delay(ctx context.Context, req *apiv1.RemindActionRequest) (*ap
 	if err := r.store.UpdateRemindNextTime(ctx, remind.Id, nextTime); err != nil {
 		return nil, err
 	}
-	return &apiv1.TextResponse{Text: "将在10分钟后再次提醒"}, nil
+	return apiv1.TextResponse_builder{Text: "将在10分钟后再次提醒"}.Build(), nil
 }

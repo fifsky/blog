@@ -42,17 +42,17 @@ func (a *Article) Create(ctx context.Context, req *adminv1.ArticleCreateRequest)
 	loginUser := GetLoginUser(ctx)
 	now := time.Now()
 	status := int32(1)
-	if req.Status > 0 {
-		status = req.Status
+	if req.GetStatus() > 0 {
+		status = req.GetStatus()
 	}
 	c := &model.Post{
-		CateId:    int(req.CateId),
-		Type:      int(req.Type),
+		CateId:    int(req.GetCateId()),
+		Type:      int(req.GetType()),
 		UserId:    loginUser.Id,
-		Title:     req.Title,
-		Url:       req.Url,
-		Content:   req.Content,
-		Tags:      model.Tags(req.Tags),
+		Title:     req.GetTitle(),
+		Url:       req.GetUrl(),
+		Content:   req.GetContent(),
+		Tags:      model.Tags(req.GetTags()),
 		Status:    int(status),
 		CreatedAt: now,
 		UpdatedAt: now,
@@ -61,49 +61,49 @@ func (a *Article) Create(ctx context.Context, req *adminv1.ArticleCreateRequest)
 	if err != nil {
 		return nil, err
 	}
-	return &types.IDResponse{Id: int32(lastId)}, nil
+	return types.IDResponse_builder{Id: int32(lastId)}.Build(), nil
 }
 
 func (a *Article) Update(ctx context.Context, req *adminv1.ArticleUpdateRequest) (*types.IDResponse, error) {
 	now := time.Now()
-	u := &model.UpdatePost{Id: int(req.Id)}
-	if req.CateId > 0 {
-		v := int(req.CateId)
+	u := &model.UpdatePost{Id: int(req.GetId())}
+	if req.GetCateId() > 0 {
+		v := int(req.GetCateId())
 		u.CateId = &v
 	}
-	if req.Type > 0 {
-		v := int(req.Type)
+	if req.GetType() > 0 {
+		v := int(req.GetType())
 		u.Type = &v
 	}
-	if req.Status > 0 {
-		v := int(req.Status)
+	if req.GetStatus() > 0 {
+		v := int(req.GetStatus())
 		u.Status = &v
 	}
-	if req.Title != "" {
-		v := req.Title
+	if req.GetTitle() != "" {
+		v := req.GetTitle()
 		u.Title = &v
 	}
 	// 始终更新 url 字段，允许清空自定义路径
-	urlVal := req.Url
+	urlVal := req.GetUrl()
 	u.Url = &urlVal
-	if req.Content != "" {
-		v := req.Content
+	if req.GetContent() != "" {
+		v := req.GetContent()
 		u.Content = &v
 	}
-	if req.Tags != nil {
-		v := model.Tags(req.Tags)
+	if req.GetTags() != nil {
+		v := model.Tags(req.GetTags())
 		u.Tags = &v
 	}
 	u.UpdatedAt = &now
 	if err := a.store.UpdatePost(ctx, u); err != nil {
 		return nil, err
 	}
-	return &types.IDResponse{Id: req.Id}, nil
+	return types.IDResponse_builder{Id: req.GetId()}.Build(), nil
 }
 
 func (a *Article) Delete(ctx context.Context, req *adminv1.ArticleDeleteRequest) (*emptypb.Empty, error) {
-	ids := make([]int, 0, len(req.Ids))
-	for _, id := range req.Ids {
+	ids := make([]int, 0, len(req.GetIds()))
+	for _, id := range req.GetIds() {
 		if id > 0 {
 			ids = append(ids, int(id))
 		}
@@ -118,27 +118,28 @@ func (a *Article) Delete(ctx context.Context, req *adminv1.ArticleDeleteRequest)
 }
 
 func (a *Article) Restore(ctx context.Context, req *adminv1.ArticleRestoreRequest) (*types.IDResponse, error) {
-	ids := make([]int, 0, len(req.Ids))
-	for _, id := range req.Ids {
+	ids := make([]int, 0, len(req.GetIds()))
+	for _, id := range req.GetIds() {
 		if id > 0 {
 			ids = append(ids, int(id))
 		}
 	}
 	if len(ids) == 0 {
-		return &types.IDResponse{}, nil
+		return types.IDResponse_builder{}.Build(), nil
 	}
+
 	// 批量恢复，逐个执行
 	for _, id := range ids {
 		if err := a.store.RestorePost(ctx, id); err != nil {
 			return nil, err
 		}
 	}
-	return &types.IDResponse{Id: int32(ids[0])}, nil
+	return types.IDResponse_builder{Id: int32(ids[0])}.Build(), nil
 }
 
 func (a *Article) Destroy(ctx context.Context, req *adminv1.ArticleDestroyRequest) (*emptypb.Empty, error) {
-	ids := make([]int, 0, len(req.Ids))
-	for _, id := range req.Ids {
+	ids := make([]int, 0, len(req.GetIds()))
+	for _, id := range req.GetIds() {
 		if id > 0 {
 			ids = append(ids, int(id))
 		}
@@ -153,13 +154,12 @@ func (a *Article) Destroy(ctx context.Context, req *adminv1.ArticleDestroyReques
 }
 
 func (a *Article) Detail(ctx context.Context, req *adminv1.ArticleDetailRequest) (*adminv1.ArticleItem, error) {
-	post, err := a.store.GetPost(ctx, int(req.Id), "")
+	post, err := a.store.GetPost(ctx, int(req.GetId()), "")
 	if err != nil {
 		return nil, err
 	}
 
-	item := &adminv1.ArticleItem{
-		Id:        int32(post.Id),
+	item := adminv1.ArticleItem_builder{Id: int32(post.Id),
 		CateId:    int32(post.CateId),
 		Type:      int32(post.Type),
 		UserId:    int32(post.UserId),
@@ -170,29 +170,29 @@ func (a *Article) Detail(ctx context.Context, req *adminv1.ArticleDetailRequest)
 		Status:    int32(post.Status),
 		ViewNum:   int32(post.ViewNum),
 		CreatedAt: post.CreatedAt.Format(time.DateTime),
-		UpdatedAt: post.UpdatedAt.Format(time.DateTime),
-	}
+		UpdatedAt: post.UpdatedAt.Format(time.DateTime)}.Build()
+
 	u, err := a.store.GetUser(ctx, post.UserId)
 	if err == nil {
-		item.User = &types.UserSummary{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}
+		item.SetUser(types.UserSummary_builder{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}.Build())
 	}
 	c, err := a.store.GetCate(ctx, post.CateId)
 	if err == nil {
-		item.Cate = &types.CateSummary{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}
+		item.SetCate(types.CateSummary_builder{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}.Build())
 	}
 	return item, nil
 }
 
 func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*adminv1.ArticleListResponse, error) {
 	page := 1
-	if req.Page > 0 {
-		page = int(req.Page)
+	if req.GetPage() > 0 {
+		page = int(req.GetPage())
 	}
 	num := 20
 	posts, err := a.store.ListPostForAdmin(ctx, &model.Post{
-		Type:   int(req.Type),
-		Status: int(req.Status),
-	}, page, num, req.Keyword)
+		Type:   int(req.GetType()),
+		Status: int(req.GetStatus()),
+	}, page, num, req.GetKeyword())
 	if err != nil {
 		return nil, err
 	}
@@ -212,8 +212,7 @@ func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*a
 		return nil, err
 	}
 	for _, p := range posts {
-		item := &adminv1.ArticleItem{
-			Id:        int32(p.Id),
+		item := adminv1.ArticleItem_builder{Id: int32(p.Id),
 			CateId:    int32(p.CateId),
 			Type:      int32(p.Type),
 			UserId:    int32(p.UserId),
@@ -224,27 +223,26 @@ func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*a
 			Status:    int32(p.Status),
 			ViewNum:   int32(p.ViewNum),
 			CreatedAt: p.CreatedAt.Format(time.DateTime),
-			UpdatedAt: p.UpdatedAt.Format(time.DateTime),
-		}
+			UpdatedAt: p.UpdatedAt.Format(time.DateTime)}.Build()
+
 		if u, ok := um[p.UserId]; ok {
-			item.User = &types.UserSummary{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}
+			item.SetUser(types.UserSummary_builder{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}.Build())
 		}
 		if c, ok := cm[p.CateId]; ok {
-			item.Cate = &types.CateSummary{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}
+			item.SetCate(types.CateSummary_builder{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}.Build())
 		}
 		items = append(items, item)
 	}
 	total, err := a.store.CountPostsForAdmin(ctx, &model.Post{
-		Type:   int(req.Type),
-		Status: int(req.Status),
-	}, req.Keyword)
+		Type:   int(req.GetType()),
+		Status: int(req.GetStatus()),
+	}, req.GetKeyword())
 	if err != nil {
 		return nil, err
 	}
-	return &adminv1.ArticleListResponse{
-		List:  items,
-		Total: int32(total),
-	}, nil
+	return adminv1.ArticleListResponse_builder{List: items,
+			Total: int32(total)}.Build(),
+		nil
 }
 
 // Upload 上传接口（仅管理员）

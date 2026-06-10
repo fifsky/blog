@@ -24,12 +24,11 @@ func (l *Link) All(ctx context.Context, _ *emptypb.Empty) (*apiv1.LinkMenuRespon
 	if err != nil {
 		return nil, err
 	}
-	resp := &apiv1.LinkMenuResponse{}
+	resp := apiv1.LinkMenuResponse_builder{}.Build()
 	for _, v := range links {
-		resp.List = append(resp.List, &apiv1.LinkMenuItem{
-			Url:     v.Url,
-			Content: v.Name,
-		})
+		resp.SetList(append(resp.GetList(), apiv1.LinkMenuItem_builder{Url: v.Url,
+			Content: v.Name}.Build(),
+		))
 	}
 	return resp, nil
 }

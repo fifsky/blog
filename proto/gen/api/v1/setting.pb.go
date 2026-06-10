@@ -13,7 +13,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -25,13 +24,13 @@ const (
 )
 
 type Setting struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SiteName      string                 `protobuf:"bytes,1,opt,name=site_name,json=siteName,proto3" json:"site_name,omitempty"`
-	SiteDesc      string                 `protobuf:"bytes,2,opt,name=site_desc,json=siteDesc,proto3" json:"site_desc,omitempty"`
-	SiteKeyword   string                 `protobuf:"bytes,3,opt,name=site_keyword,json=siteKeyword,proto3" json:"site_keyword,omitempty"`
-	PostNum       int32                  `protobuf:"varint,4,opt,name=post_num,json=postNum,proto3" json:"post_num,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_SiteName    string                 `protobuf:"bytes,1,opt,name=site_name,json=siteName,proto3"`
+	xxx_hidden_SiteDesc    string                 `protobuf:"bytes,2,opt,name=site_desc,json=siteDesc,proto3"`
+	xxx_hidden_SiteKeyword string                 `protobuf:"bytes,3,opt,name=site_keyword,json=siteKeyword,proto3"`
+	xxx_hidden_PostNum     int32                  `protobuf:"varint,4,opt,name=post_num,json=postNum,proto3"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Setting) Reset() {
@@ -59,37 +58,68 @@ func (x *Setting) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Setting.ProtoReflect.Descriptor instead.
-func (*Setting) Descriptor() ([]byte, []int) {
-	return file_api_v1_setting_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Setting) GetSiteName() string {
 	if x != nil {
-		return x.SiteName
+		return x.xxx_hidden_SiteName
 	}
 	return ""
 }
 
 func (x *Setting) GetSiteDesc() string {
 	if x != nil {
-		return x.SiteDesc
+		return x.xxx_hidden_SiteDesc
 	}
 	return ""
 }
 
 func (x *Setting) GetSiteKeyword() string {
 	if x != nil {
-		return x.SiteKeyword
+		return x.xxx_hidden_SiteKeyword
 	}
 	return ""
 }
 
 func (x *Setting) GetPostNum() int32 {
 	if x != nil {
-		return x.PostNum
+		return x.xxx_hidden_PostNum
 	}
 	return 0
+}
+
+func (x *Setting) SetSiteName(v string) {
+	x.xxx_hidden_SiteName = v
+}
+
+func (x *Setting) SetSiteDesc(v string) {
+	x.xxx_hidden_SiteDesc = v
+}
+
+func (x *Setting) SetSiteKeyword(v string) {
+	x.xxx_hidden_SiteKeyword = v
+}
+
+func (x *Setting) SetPostNum(v int32) {
+	x.xxx_hidden_PostNum = v
+}
+
+type Setting_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	SiteName    string
+	SiteDesc    string
+	SiteKeyword string
+	PostNum     int32
+}
+
+func (b0 Setting_builder) Build() *Setting {
+	m0 := &Setting{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_SiteName = b.SiteName
+	x.xxx_hidden_SiteDesc = b.SiteDesc
+	x.xxx_hidden_SiteKeyword = b.SiteKeyword
+	x.xxx_hidden_PostNum = b.PostNum
+	return m0
 }
 
 var File_api_v1_setting_proto protoreflect.FileDescriptor
@@ -106,18 +136,6 @@ const file_api_v1_setting_proto_rawDesc = "" +
 	"\x03Get\x12\x16.google.protobuf.Empty\x1a\x1b.fifsky.blog.api.v1.Setting\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/blog/setting\x12T\n" +
 	"\vGetChinaMap\x12\x16.google.protobuf.Empty\x1a\x14.google.api.HttpBody\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/blog/china_mapB\xad\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\fSettingProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
-
-var (
-	file_api_v1_setting_proto_rawDescOnce sync.Once
-	file_api_v1_setting_proto_rawDescData []byte
-)
-
-func file_api_v1_setting_proto_rawDescGZIP() []byte {
-	file_api_v1_setting_proto_rawDescOnce.Do(func() {
-		file_api_v1_setting_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_v1_setting_proto_rawDesc), len(file_api_v1_setting_proto_rawDesc)))
-	})
-	return file_api_v1_setting_proto_rawDescData
-}
 
 var file_api_v1_setting_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_api_v1_setting_proto_goTypes = []any{

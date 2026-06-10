@@ -26,7 +26,7 @@ func NewMood(s *store.Store) *Mood {
 func (m *Mood) Create(ctx context.Context, req *adminv1.MoodCreateRequest) (*types.IDResponse, error) {
 	loginUser := GetLoginUser(ctx)
 	c := &model.Mood{
-		Content:   req.Content,
+		Content:   req.GetContent(),
 		UserId:    loginUser.Id,
 		CreatedAt: time.Now(),
 	}
@@ -34,24 +34,24 @@ func (m *Mood) Create(ctx context.Context, req *adminv1.MoodCreateRequest) (*typ
 	if err != nil {
 		return nil, err
 	}
-	return &types.IDResponse{Id: int32(lastId)}, nil
+	return types.IDResponse_builder{Id: int32(lastId)}.Build(), nil
 }
 
 func (m *Mood) Update(ctx context.Context, req *adminv1.MoodUpdateRequest) (*types.IDResponse, error) {
-	u := &model.UpdateMood{Id: int(req.Id)}
-	if req.Content != "" {
-		v := req.Content
+	u := &model.UpdateMood{Id: int(req.GetId())}
+	if req.GetContent() != "" {
+		v := req.GetContent()
 		u.Content = &v
 	}
 	if err := m.store.UpdateMood(ctx, u); err != nil {
 		return nil, err
 	}
-	return &types.IDResponse{Id: int32(req.Id)}, nil
+	return types.IDResponse_builder{Id: int32(req.GetId())}.Build(), nil
 }
 
 func (m *Mood) Delete(ctx context.Context, req *adminv1.MoodDeleteRequest) (*emptypb.Empty, error) {
-	ids := make([]int, len(req.Ids))
-	for i, id := range req.Ids {
+	ids := make([]int, len(req.GetIds()))
+	for i, id := range req.GetIds() {
 		ids[i] = int(id)
 	}
 	if err := m.store.DeleteMood(ctx, ids); err != nil {

@@ -14,7 +14,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -27,8 +26,8 @@ const (
 
 // ArticleDetailRequest 获取文章详情请求
 type ArticleDetailRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id int32                  `protobuf:"varint,1,opt,name=id,proto3"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -58,24 +57,37 @@ func (x *ArticleDetailRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArticleDetailRequest.ProtoReflect.Descriptor instead.
-func (*ArticleDetailRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *ArticleDetailRequest) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
+func (x *ArticleDetailRequest) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+type ArticleDetailRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id int32
+}
+
+func (b0 ArticleDetailRequest_builder) Build() *ArticleDetailRequest {
+	m0 := &ArticleDetailRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	return m0
+}
+
 // ArticleDeleteRequest 删除文章请求（支持批量）
 type ArticleDeleteRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ids           []int32                `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Ids []int32                `protobuf:"varint,1,rep,packed,name=ids,proto3"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ArticleDeleteRequest) Reset() {
@@ -103,24 +115,37 @@ func (x *ArticleDeleteRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArticleDeleteRequest.ProtoReflect.Descriptor instead.
-func (*ArticleDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *ArticleDeleteRequest) GetIds() []int32 {
 	if x != nil {
-		return x.Ids
+		return x.xxx_hidden_Ids
 	}
 	return nil
 }
 
+func (x *ArticleDeleteRequest) SetIds(v []int32) {
+	x.xxx_hidden_Ids = v
+}
+
+type ArticleDeleteRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Ids []int32
+}
+
+func (b0 ArticleDeleteRequest_builder) Build() *ArticleDeleteRequest {
+	m0 := &ArticleDeleteRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Ids = b.Ids
+	return m0
+}
+
 // ArticleRestoreRequest 恢复文章请求（支持批量）
 type ArticleRestoreRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ids           []int32                `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Ids []int32                `protobuf:"varint,1,rep,packed,name=ids,proto3"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ArticleRestoreRequest) Reset() {
@@ -148,24 +173,37 @@ func (x *ArticleRestoreRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArticleRestoreRequest.ProtoReflect.Descriptor instead.
-func (*ArticleRestoreRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *ArticleRestoreRequest) GetIds() []int32 {
 	if x != nil {
-		return x.Ids
+		return x.xxx_hidden_Ids
 	}
 	return nil
 }
 
+func (x *ArticleRestoreRequest) SetIds(v []int32) {
+	x.xxx_hidden_Ids = v
+}
+
+type ArticleRestoreRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Ids []int32
+}
+
+func (b0 ArticleRestoreRequest_builder) Build() *ArticleRestoreRequest {
+	m0 := &ArticleRestoreRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Ids = b.Ids
+	return m0
+}
+
 // ArticleDestroyRequest 物理删除文章请求（支持批量）
 type ArticleDestroyRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ids           []int32                `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Ids []int32                `protobuf:"varint,1,rep,packed,name=ids,proto3"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ArticleDestroyRequest) Reset() {
@@ -193,29 +231,42 @@ func (x *ArticleDestroyRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArticleDestroyRequest.ProtoReflect.Descriptor instead.
-func (*ArticleDestroyRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *ArticleDestroyRequest) GetIds() []int32 {
 	if x != nil {
-		return x.Ids
+		return x.xxx_hidden_Ids
 	}
 	return nil
 }
 
+func (x *ArticleDestroyRequest) SetIds(v []int32) {
+	x.xxx_hidden_Ids = v
+}
+
+type ArticleDestroyRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Ids []int32
+}
+
+func (b0 ArticleDestroyRequest_builder) Build() *ArticleDestroyRequest {
+	m0 := &ArticleDestroyRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Ids = b.Ids
+	return m0
+}
+
 type ArticleCreateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	CateId        int32                  `protobuf:"varint,1,opt,name=cate_id,json=cateId,proto3" json:"cate_id,omitempty"`
-	Type          int32                  `protobuf:"varint,2,opt,name=type,proto3" json:"type,omitempty"`
-	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
-	Url           string                 `protobuf:"bytes,4,opt,name=url,proto3" json:"url,omitempty"`
-	Content       string                 `protobuf:"bytes,5,opt,name=content,proto3" json:"content,omitempty"`
-	Status        int32                  `protobuf:"varint,6,opt,name=status,proto3" json:"status,omitempty"`
-	Tags          []string               `protobuf:"bytes,7,rep,name=tags,proto3" json:"tags,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_CateId  int32                  `protobuf:"varint,1,opt,name=cate_id,json=cateId,proto3"`
+	xxx_hidden_Type    int32                  `protobuf:"varint,2,opt,name=type,proto3"`
+	xxx_hidden_Title   string                 `protobuf:"bytes,3,opt,name=title,proto3"`
+	xxx_hidden_Url     string                 `protobuf:"bytes,4,opt,name=url,proto3"`
+	xxx_hidden_Content string                 `protobuf:"bytes,5,opt,name=content,proto3"`
+	xxx_hidden_Status  int32                  `protobuf:"varint,6,opt,name=status,proto3"`
+	xxx_hidden_Tags    []string               `protobuf:"bytes,7,rep,name=tags,proto3"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *ArticleCreateRequest) Reset() {
@@ -243,72 +294,121 @@ func (x *ArticleCreateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArticleCreateRequest.ProtoReflect.Descriptor instead.
-func (*ArticleCreateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *ArticleCreateRequest) GetCateId() int32 {
 	if x != nil {
-		return x.CateId
+		return x.xxx_hidden_CateId
 	}
 	return 0
 }
 
 func (x *ArticleCreateRequest) GetType() int32 {
 	if x != nil {
-		return x.Type
+		return x.xxx_hidden_Type
 	}
 	return 0
 }
 
 func (x *ArticleCreateRequest) GetTitle() string {
 	if x != nil {
-		return x.Title
+		return x.xxx_hidden_Title
 	}
 	return ""
 }
 
 func (x *ArticleCreateRequest) GetUrl() string {
 	if x != nil {
-		return x.Url
+		return x.xxx_hidden_Url
 	}
 	return ""
 }
 
 func (x *ArticleCreateRequest) GetContent() string {
 	if x != nil {
-		return x.Content
+		return x.xxx_hidden_Content
 	}
 	return ""
 }
 
 func (x *ArticleCreateRequest) GetStatus() int32 {
 	if x != nil {
-		return x.Status
+		return x.xxx_hidden_Status
 	}
 	return 0
 }
 
 func (x *ArticleCreateRequest) GetTags() []string {
 	if x != nil {
-		return x.Tags
+		return x.xxx_hidden_Tags
 	}
 	return nil
 }
 
+func (x *ArticleCreateRequest) SetCateId(v int32) {
+	x.xxx_hidden_CateId = v
+}
+
+func (x *ArticleCreateRequest) SetType(v int32) {
+	x.xxx_hidden_Type = v
+}
+
+func (x *ArticleCreateRequest) SetTitle(v string) {
+	x.xxx_hidden_Title = v
+}
+
+func (x *ArticleCreateRequest) SetUrl(v string) {
+	x.xxx_hidden_Url = v
+}
+
+func (x *ArticleCreateRequest) SetContent(v string) {
+	x.xxx_hidden_Content = v
+}
+
+func (x *ArticleCreateRequest) SetStatus(v int32) {
+	x.xxx_hidden_Status = v
+}
+
+func (x *ArticleCreateRequest) SetTags(v []string) {
+	x.xxx_hidden_Tags = v
+}
+
+type ArticleCreateRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	CateId  int32
+	Type    int32
+	Title   string
+	Url     string
+	Content string
+	Status  int32
+	Tags    []string
+}
+
+func (b0 ArticleCreateRequest_builder) Build() *ArticleCreateRequest {
+	m0 := &ArticleCreateRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_CateId = b.CateId
+	x.xxx_hidden_Type = b.Type
+	x.xxx_hidden_Title = b.Title
+	x.xxx_hidden_Url = b.Url
+	x.xxx_hidden_Content = b.Content
+	x.xxx_hidden_Status = b.Status
+	x.xxx_hidden_Tags = b.Tags
+	return m0
+}
+
 type ArticleUpdateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	CateId        int32                  `protobuf:"varint,2,opt,name=cate_id,json=cateId,proto3" json:"cate_id,omitempty"`
-	Type          int32                  `protobuf:"varint,3,opt,name=type,proto3" json:"type,omitempty"`
-	Title         string                 `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
-	Url           string                 `protobuf:"bytes,5,opt,name=url,proto3" json:"url,omitempty"`
-	Content       string                 `protobuf:"bytes,6,opt,name=content,proto3" json:"content,omitempty"`
-	Status        int32                  `protobuf:"varint,7,opt,name=status,proto3" json:"status,omitempty"`
-	Tags          []string               `protobuf:"bytes,8,rep,name=tags,proto3" json:"tags,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id      int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_CateId  int32                  `protobuf:"varint,2,opt,name=cate_id,json=cateId,proto3"`
+	xxx_hidden_Type    int32                  `protobuf:"varint,3,opt,name=type,proto3"`
+	xxx_hidden_Title   string                 `protobuf:"bytes,4,opt,name=title,proto3"`
+	xxx_hidden_Url     string                 `protobuf:"bytes,5,opt,name=url,proto3"`
+	xxx_hidden_Content string                 `protobuf:"bytes,6,opt,name=content,proto3"`
+	xxx_hidden_Status  int32                  `protobuf:"varint,7,opt,name=status,proto3"`
+	xxx_hidden_Tags    []string               `protobuf:"bytes,8,rep,name=tags,proto3"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *ArticleUpdateRequest) Reset() {
@@ -336,75 +436,130 @@ func (x *ArticleUpdateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArticleUpdateRequest.ProtoReflect.Descriptor instead.
-func (*ArticleUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *ArticleUpdateRequest) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *ArticleUpdateRequest) GetCateId() int32 {
 	if x != nil {
-		return x.CateId
+		return x.xxx_hidden_CateId
 	}
 	return 0
 }
 
 func (x *ArticleUpdateRequest) GetType() int32 {
 	if x != nil {
-		return x.Type
+		return x.xxx_hidden_Type
 	}
 	return 0
 }
 
 func (x *ArticleUpdateRequest) GetTitle() string {
 	if x != nil {
-		return x.Title
+		return x.xxx_hidden_Title
 	}
 	return ""
 }
 
 func (x *ArticleUpdateRequest) GetUrl() string {
 	if x != nil {
-		return x.Url
+		return x.xxx_hidden_Url
 	}
 	return ""
 }
 
 func (x *ArticleUpdateRequest) GetContent() string {
 	if x != nil {
-		return x.Content
+		return x.xxx_hidden_Content
 	}
 	return ""
 }
 
 func (x *ArticleUpdateRequest) GetStatus() int32 {
 	if x != nil {
-		return x.Status
+		return x.xxx_hidden_Status
 	}
 	return 0
 }
 
 func (x *ArticleUpdateRequest) GetTags() []string {
 	if x != nil {
-		return x.Tags
+		return x.xxx_hidden_Tags
 	}
 	return nil
 }
 
+func (x *ArticleUpdateRequest) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *ArticleUpdateRequest) SetCateId(v int32) {
+	x.xxx_hidden_CateId = v
+}
+
+func (x *ArticleUpdateRequest) SetType(v int32) {
+	x.xxx_hidden_Type = v
+}
+
+func (x *ArticleUpdateRequest) SetTitle(v string) {
+	x.xxx_hidden_Title = v
+}
+
+func (x *ArticleUpdateRequest) SetUrl(v string) {
+	x.xxx_hidden_Url = v
+}
+
+func (x *ArticleUpdateRequest) SetContent(v string) {
+	x.xxx_hidden_Content = v
+}
+
+func (x *ArticleUpdateRequest) SetStatus(v int32) {
+	x.xxx_hidden_Status = v
+}
+
+func (x *ArticleUpdateRequest) SetTags(v []string) {
+	x.xxx_hidden_Tags = v
+}
+
+type ArticleUpdateRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id      int32
+	CateId  int32
+	Type    int32
+	Title   string
+	Url     string
+	Content string
+	Status  int32
+	Tags    []string
+}
+
+func (b0 ArticleUpdateRequest_builder) Build() *ArticleUpdateRequest {
+	m0 := &ArticleUpdateRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_CateId = b.CateId
+	x.xxx_hidden_Type = b.Type
+	x.xxx_hidden_Title = b.Title
+	x.xxx_hidden_Url = b.Url
+	x.xxx_hidden_Content = b.Content
+	x.xxx_hidden_Status = b.Status
+	x.xxx_hidden_Tags = b.Tags
+	return m0
+}
+
 type ArticleListRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
-	Type          int32                  `protobuf:"varint,2,opt,name=type,proto3" json:"type,omitempty"`
-	Status        int32                  `protobuf:"varint,3,opt,name=status,proto3" json:"status,omitempty"`
-	Keyword       string                 `protobuf:"bytes,4,opt,name=keyword,proto3" json:"keyword,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Page    int32                  `protobuf:"varint,1,opt,name=page,proto3"`
+	xxx_hidden_Type    int32                  `protobuf:"varint,2,opt,name=type,proto3"`
+	xxx_hidden_Status  int32                  `protobuf:"varint,3,opt,name=status,proto3"`
+	xxx_hidden_Keyword string                 `protobuf:"bytes,4,opt,name=keyword,proto3"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *ArticleListRequest) Reset() {
@@ -432,45 +587,76 @@ func (x *ArticleListRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArticleListRequest.ProtoReflect.Descriptor instead.
-func (*ArticleListRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *ArticleListRequest) GetPage() int32 {
 	if x != nil {
-		return x.Page
+		return x.xxx_hidden_Page
 	}
 	return 0
 }
 
 func (x *ArticleListRequest) GetType() int32 {
 	if x != nil {
-		return x.Type
+		return x.xxx_hidden_Type
 	}
 	return 0
 }
 
 func (x *ArticleListRequest) GetStatus() int32 {
 	if x != nil {
-		return x.Status
+		return x.xxx_hidden_Status
 	}
 	return 0
 }
 
 func (x *ArticleListRequest) GetKeyword() string {
 	if x != nil {
-		return x.Keyword
+		return x.xxx_hidden_Keyword
 	}
 	return ""
 }
 
+func (x *ArticleListRequest) SetPage(v int32) {
+	x.xxx_hidden_Page = v
+}
+
+func (x *ArticleListRequest) SetType(v int32) {
+	x.xxx_hidden_Type = v
+}
+
+func (x *ArticleListRequest) SetStatus(v int32) {
+	x.xxx_hidden_Status = v
+}
+
+func (x *ArticleListRequest) SetKeyword(v string) {
+	x.xxx_hidden_Keyword = v
+}
+
+type ArticleListRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Page    int32
+	Type    int32
+	Status  int32
+	Keyword string
+}
+
+func (b0 ArticleListRequest_builder) Build() *ArticleListRequest {
+	m0 := &ArticleListRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Page = b.Page
+	x.xxx_hidden_Type = b.Type
+	x.xxx_hidden_Status = b.Status
+	x.xxx_hidden_Keyword = b.Keyword
+	return m0
+}
+
 type ArticleListResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*ArticleItem         `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_List  *[]*ArticleItem        `protobuf:"bytes,1,rep,name=list,proto3"`
+	xxx_hidden_Total int32                  `protobuf:"varint,2,opt,name=total,proto3"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *ArticleListResponse) Reset() {
@@ -498,43 +684,64 @@ func (x *ArticleListResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArticleListResponse.ProtoReflect.Descriptor instead.
-func (*ArticleListResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *ArticleListResponse) GetList() []*ArticleItem {
 	if x != nil {
-		return x.List
+		if x.xxx_hidden_List != nil {
+			return *x.xxx_hidden_List
+		}
 	}
 	return nil
 }
 
 func (x *ArticleListResponse) GetTotal() int32 {
 	if x != nil {
-		return x.Total
+		return x.xxx_hidden_Total
 	}
 	return 0
 }
 
+func (x *ArticleListResponse) SetList(v []*ArticleItem) {
+	x.xxx_hidden_List = &v
+}
+
+func (x *ArticleListResponse) SetTotal(v int32) {
+	x.xxx_hidden_Total = v
+}
+
+type ArticleListResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	List  []*ArticleItem
+	Total int32
+}
+
+func (b0 ArticleListResponse_builder) Build() *ArticleListResponse {
+	m0 := &ArticleListResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_List = &b.List
+	x.xxx_hidden_Total = b.Total
+	return m0
+}
+
 type ArticleItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	CateId        int32                  `protobuf:"varint,2,opt,name=cate_id,json=cateId,proto3" json:"cate_id,omitempty"`
-	Type          int32                  `protobuf:"varint,3,opt,name=type,proto3" json:"type,omitempty"`
-	UserId        int32                  `protobuf:"varint,4,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Title         string                 `protobuf:"bytes,5,opt,name=title,proto3" json:"title,omitempty"`
-	Url           string                 `protobuf:"bytes,6,opt,name=url,proto3" json:"url,omitempty"`
-	Content       string                 `protobuf:"bytes,7,opt,name=content,proto3" json:"content,omitempty"`
-	Status        int32                  `protobuf:"varint,8,opt,name=status,proto3" json:"status,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	User          *types.UserSummary     `protobuf:"bytes,11,opt,name=user,proto3" json:"user,omitempty"`
-	Cate          *types.CateSummary     `protobuf:"bytes,12,opt,name=cate,proto3" json:"cate,omitempty"`
-	ViewNum       int32                  `protobuf:"varint,13,opt,name=view_num,json=viewNum,proto3" json:"view_num,omitempty"`
-	Tags          []string               `protobuf:"bytes,14,rep,name=tags,proto3" json:"tags,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id        int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_CateId    int32                  `protobuf:"varint,2,opt,name=cate_id,json=cateId,proto3"`
+	xxx_hidden_Type      int32                  `protobuf:"varint,3,opt,name=type,proto3"`
+	xxx_hidden_UserId    int32                  `protobuf:"varint,4,opt,name=user_id,json=userId,proto3"`
+	xxx_hidden_Title     string                 `protobuf:"bytes,5,opt,name=title,proto3"`
+	xxx_hidden_Url       string                 `protobuf:"bytes,6,opt,name=url,proto3"`
+	xxx_hidden_Content   string                 `protobuf:"bytes,7,opt,name=content,proto3"`
+	xxx_hidden_Status    int32                  `protobuf:"varint,8,opt,name=status,proto3"`
+	xxx_hidden_CreatedAt string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3"`
+	xxx_hidden_UpdatedAt string                 `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3"`
+	xxx_hidden_User      *types.UserSummary     `protobuf:"bytes,11,opt,name=user,proto3"`
+	xxx_hidden_Cate      *types.CateSummary     `protobuf:"bytes,12,opt,name=cate,proto3"`
+	xxx_hidden_ViewNum   int32                  `protobuf:"varint,13,opt,name=view_num,json=viewNum,proto3"`
+	xxx_hidden_Tags      []string               `protobuf:"bytes,14,rep,name=tags,proto3"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *ArticleItem) Reset() {
@@ -562,107 +769,220 @@ func (x *ArticleItem) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ArticleItem.ProtoReflect.Descriptor instead.
-func (*ArticleItem) Descriptor() ([]byte, []int) {
-	return file_admin_v1_article_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *ArticleItem) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *ArticleItem) GetCateId() int32 {
 	if x != nil {
-		return x.CateId
+		return x.xxx_hidden_CateId
 	}
 	return 0
 }
 
 func (x *ArticleItem) GetType() int32 {
 	if x != nil {
-		return x.Type
+		return x.xxx_hidden_Type
 	}
 	return 0
 }
 
 func (x *ArticleItem) GetUserId() int32 {
 	if x != nil {
-		return x.UserId
+		return x.xxx_hidden_UserId
 	}
 	return 0
 }
 
 func (x *ArticleItem) GetTitle() string {
 	if x != nil {
-		return x.Title
+		return x.xxx_hidden_Title
 	}
 	return ""
 }
 
 func (x *ArticleItem) GetUrl() string {
 	if x != nil {
-		return x.Url
+		return x.xxx_hidden_Url
 	}
 	return ""
 }
 
 func (x *ArticleItem) GetContent() string {
 	if x != nil {
-		return x.Content
+		return x.xxx_hidden_Content
 	}
 	return ""
 }
 
 func (x *ArticleItem) GetStatus() int32 {
 	if x != nil {
-		return x.Status
+		return x.xxx_hidden_Status
 	}
 	return 0
 }
 
 func (x *ArticleItem) GetCreatedAt() string {
 	if x != nil {
-		return x.CreatedAt
+		return x.xxx_hidden_CreatedAt
 	}
 	return ""
 }
 
 func (x *ArticleItem) GetUpdatedAt() string {
 	if x != nil {
-		return x.UpdatedAt
+		return x.xxx_hidden_UpdatedAt
 	}
 	return ""
 }
 
 func (x *ArticleItem) GetUser() *types.UserSummary {
 	if x != nil {
-		return x.User
+		return x.xxx_hidden_User
 	}
 	return nil
 }
 
 func (x *ArticleItem) GetCate() *types.CateSummary {
 	if x != nil {
-		return x.Cate
+		return x.xxx_hidden_Cate
 	}
 	return nil
 }
 
 func (x *ArticleItem) GetViewNum() int32 {
 	if x != nil {
-		return x.ViewNum
+		return x.xxx_hidden_ViewNum
 	}
 	return 0
 }
 
 func (x *ArticleItem) GetTags() []string {
 	if x != nil {
-		return x.Tags
+		return x.xxx_hidden_Tags
 	}
 	return nil
+}
+
+func (x *ArticleItem) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *ArticleItem) SetCateId(v int32) {
+	x.xxx_hidden_CateId = v
+}
+
+func (x *ArticleItem) SetType(v int32) {
+	x.xxx_hidden_Type = v
+}
+
+func (x *ArticleItem) SetUserId(v int32) {
+	x.xxx_hidden_UserId = v
+}
+
+func (x *ArticleItem) SetTitle(v string) {
+	x.xxx_hidden_Title = v
+}
+
+func (x *ArticleItem) SetUrl(v string) {
+	x.xxx_hidden_Url = v
+}
+
+func (x *ArticleItem) SetContent(v string) {
+	x.xxx_hidden_Content = v
+}
+
+func (x *ArticleItem) SetStatus(v int32) {
+	x.xxx_hidden_Status = v
+}
+
+func (x *ArticleItem) SetCreatedAt(v string) {
+	x.xxx_hidden_CreatedAt = v
+}
+
+func (x *ArticleItem) SetUpdatedAt(v string) {
+	x.xxx_hidden_UpdatedAt = v
+}
+
+func (x *ArticleItem) SetUser(v *types.UserSummary) {
+	x.xxx_hidden_User = v
+}
+
+func (x *ArticleItem) SetCate(v *types.CateSummary) {
+	x.xxx_hidden_Cate = v
+}
+
+func (x *ArticleItem) SetViewNum(v int32) {
+	x.xxx_hidden_ViewNum = v
+}
+
+func (x *ArticleItem) SetTags(v []string) {
+	x.xxx_hidden_Tags = v
+}
+
+func (x *ArticleItem) HasUser() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_User != nil
+}
+
+func (x *ArticleItem) HasCate() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Cate != nil
+}
+
+func (x *ArticleItem) ClearUser() {
+	x.xxx_hidden_User = nil
+}
+
+func (x *ArticleItem) ClearCate() {
+	x.xxx_hidden_Cate = nil
+}
+
+type ArticleItem_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id        int32
+	CateId    int32
+	Type      int32
+	UserId    int32
+	Title     string
+	Url       string
+	Content   string
+	Status    int32
+	CreatedAt string
+	UpdatedAt string
+	User      *types.UserSummary
+	Cate      *types.CateSummary
+	ViewNum   int32
+	Tags      []string
+}
+
+func (b0 ArticleItem_builder) Build() *ArticleItem {
+	m0 := &ArticleItem{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_CateId = b.CateId
+	x.xxx_hidden_Type = b.Type
+	x.xxx_hidden_UserId = b.UserId
+	x.xxx_hidden_Title = b.Title
+	x.xxx_hidden_Url = b.Url
+	x.xxx_hidden_Content = b.Content
+	x.xxx_hidden_Status = b.Status
+	x.xxx_hidden_CreatedAt = b.CreatedAt
+	x.xxx_hidden_UpdatedAt = b.UpdatedAt
+	x.xxx_hidden_User = b.User
+	x.xxx_hidden_Cate = b.Cate
+	x.xxx_hidden_ViewNum = b.ViewNum
+	x.xxx_hidden_Tags = b.Tags
+	return m0
 }
 
 var File_admin_v1_article_proto protoreflect.FileDescriptor
@@ -734,18 +1054,6 @@ const file_admin_v1_article_proto_rawDesc = "" +
 	"\aDestroy\x12+.fifsky.blog.admin.v1.ArticleDestroyRequest\x1a\x16.google.protobuf.Empty\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/blog/admin/article/destroy\x12~\n" +
 	"\x06Detail\x12*.fifsky.blog.admin.v1.ArticleDetailRequest\x1a!.fifsky.blog.admin.v1.ArticleItem\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/blog/admin/article/detailB\xbb\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\fArticleProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
-
-var (
-	file_admin_v1_article_proto_rawDescOnce sync.Once
-	file_admin_v1_article_proto_rawDescData []byte
-)
-
-func file_admin_v1_article_proto_rawDescGZIP() []byte {
-	file_admin_v1_article_proto_rawDescOnce.Do(func() {
-		file_admin_v1_article_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_admin_v1_article_proto_rawDesc), len(file_admin_v1_article_proto_rawDesc)))
-	})
-	return file_admin_v1_article_proto_rawDescData
-}
 
 var file_admin_v1_article_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_admin_v1_article_proto_goTypes = []any{

@@ -65,21 +65,21 @@ func TestGuestbook_List(t *testing.T) {
 				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook")...)
 				svc := NewGuestbook(store.New(db), WithModerator(&MockModerator{ShouldPass: true}))
 
-				resp, err := svc.List(context.Background(), &apiv1.GuestbookListRequest{Page: tt.page})
+				resp, err := svc.List(context.Background(), apiv1.GuestbookListRequest_builder{Page: tt.page}.Build())
 				if tt.wantErr {
 					require.Error(t, err)
 					return
 				}
 				require.NoError(t, err)
-				assert.Len(t, resp.List, tt.wantCount)
-				assert.Equal(t, tt.wantTotal, resp.Total)
+				assert.Len(t, resp.GetList(), tt.wantCount)
+				assert.Equal(t, tt.wantTotal, resp.GetTotal())
 
 				// 验证数据字段
-				if len(resp.List) > 0 {
-					item := resp.List[0]
-					assert.NotEmpty(t, item.Name)
-					assert.NotEmpty(t, item.Content)
-					assert.NotEmpty(t, item.CreatedAt)
+				if len(resp.GetList()) > 0 {
+					item := resp.GetList()[0]
+					assert.NotEmpty(t, item.GetName())
+					assert.NotEmpty(t, item.GetContent())
+					assert.NotEmpty(t, item.GetCreatedAt())
 				}
 			})
 		})
@@ -96,38 +96,34 @@ func TestGuestbook_Create(t *testing.T) {
 	}{
 		{
 			name: "创建成功",
-			req: &apiv1.GuestbookCreateRequest{
-				Name:    "张三",
-				Content: "这是测试留言",
-			},
+			req: apiv1.GuestbookCreateRequest_builder{Name: "张三",
+				Content: "这是测试留言"}.Build(),
+
 			moderator: &MockModerator{ShouldPass: true},
 			wantErr:   false,
 		},
 		{
 			name: "XSS防护",
-			req: &apiv1.GuestbookCreateRequest{
-				Name:    "<script>alert('xss')</script>",
-				Content: "<img src=x onerror=alert('xss')>",
-			},
+			req: apiv1.GuestbookCreateRequest_builder{Name: "<script>alert('xss')</script>",
+				Content: "<img src=x onerror=alert('xss')>"}.Build(),
+
 			moderator: &MockModerator{ShouldPass: true},
 			wantErr:   false,
 		},
 		{
 			name: "内容审核失败",
-			req: &apiv1.GuestbookCreateRequest{
-				Name:    "测试",
-				Content: "违规内容",
-			},
+			req: apiv1.GuestbookCreateRequest_builder{Name: "测试",
+				Content: "违规内容"}.Build(),
+
 			moderator: &MockModerator{ShouldPass: false, Reason: "检测到违规内容"},
 			wantErr:   true,
 			errCode:   "CONTENT_MODERATION_FAILED",
 		},
 		{
 			name: "内容审核服务异常",
-			req: &apiv1.GuestbookCreateRequest{
-				Name:    "测试",
-				Content: "正常内容",
-			},
+			req: apiv1.GuestbookCreateRequest_builder{Name: "测试",
+				Content: "正常内容"}.Build(),
+
 			moderator: &MockModerator{Err: errors.InternalServer("CONTENT_MODERATION_ERROR", "服务异常")},
 			wantErr:   true,
 			errCode:   "CONTENT_MODERATION_ERROR",
@@ -144,9 +140,9 @@ func TestGuestbook_Create(t *testing.T) {
 				svc := NewGuestbook(store.New(db), WithModerator(tt.moderator))
 
 				// 获取创建前的总数
-				beforeResp, err := svc.List(ctx, &apiv1.GuestbookListRequest{Page: 1})
+				beforeResp, err := svc.List(ctx, apiv1.GuestbookListRequest_builder{Page: 1}.Build())
 				require.NoError(t, err)
-				beforeCount := beforeResp.Total
+				beforeCount := beforeResp.GetTotal()
 
 				resp, err := svc.Create(ctx, tt.req)
 				if tt.wantErr {
@@ -154,29 +150,29 @@ func TestGuestbook_Create(t *testing.T) {
 					if tt.errCode != "" {
 						appErr, ok := err.(*errors.Error)
 						require.True(t, ok, "expected *errors.Error type")
-						assert.Equal(t, tt.errCode, appErr.Reason)
+						assert.Equal(t, tt.errCode, appErr.GetReason())
 					}
 					return
 				}
 				require.NoError(t, err)
-				assert.Greater(t, resp.Id, int32(0))
+				assert.Greater(t, resp.GetId(), int32(0))
 
 				// 验证总数增加
-				afterResp, err := svc.List(ctx, &apiv1.GuestbookListRequest{Page: 1})
+				afterResp, err := svc.List(ctx, apiv1.GuestbookListRequest_builder{Page: 1}.Build())
 				require.NoError(t, err)
-				assert.Equal(t, beforeCount+1, afterResp.Total)
+				assert.Equal(t, beforeCount+1, afterResp.GetTotal())
 
 				// 验证刚插入的数据是否被转义
 				// 由于 List 返回是按 ID 倒序，所以第一条应该是刚插入的
-				latest := afterResp.List[0]
-				assert.Equal(t, int32(resp.Id), latest.Id)
+				latest := afterResp.GetList()[0]
+				assert.Equal(t, int32(resp.GetId()), latest.GetId())
 
 				if tt.name == "XSS防护" {
-					assert.Equal(t, "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;", latest.Name)
-					assert.Equal(t, "&lt;img src=x onerror=alert(&#39;xss&#39;)&gt;", latest.Content)
+					assert.Equal(t, "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;", latest.GetName())
+					assert.Equal(t, "&lt;img src=x onerror=alert(&#39;xss&#39;)&gt;", latest.GetContent())
 				} else {
-					assert.Equal(t, tt.req.Name, latest.Name)
-					assert.Equal(t, tt.req.Content, latest.Content)
+					assert.Equal(t, tt.req.GetName(), latest.GetName())
+					assert.Equal(t, tt.req.GetContent(), latest.GetContent())
 				}
 			})
 		})
@@ -191,11 +187,10 @@ func TestGuestbook_Create_WithoutModerator(t *testing.T) {
 		// 不设置自定义审核器，应该也能正常创建
 		svc := NewGuestbook(store.New(db))
 
-		resp, err := svc.Create(ctx, &apiv1.GuestbookCreateRequest{
-			Name:    "测试",
-			Content: "无审核器测试",
-		})
+		resp, err := svc.Create(ctx, apiv1.GuestbookCreateRequest_builder{Name: "测试",
+			Content: "无审核器测试"}.Build(),
+		)
 		require.NoError(t, err)
-		assert.Greater(t, resp.Id, int32(0))
+		assert.Greater(t, resp.GetId(), int32(0))
 	})
 }

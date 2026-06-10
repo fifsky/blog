@@ -19,7 +19,7 @@ func TestSetting_Get(t *testing.T) {
 		svc := NewSetting(store.New(db))
 		resp, err := svc.Get(context.Background(), &emptypb.Empty{})
 		require.NoError(t, err)
-		assert.NotEmpty(t, resp.SiteName)
+		assert.NotEmpty(t, resp.GetSiteName())
 	})
 }
 

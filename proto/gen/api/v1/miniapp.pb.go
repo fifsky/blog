@@ -12,7 +12,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -24,11 +23,10 @@ const (
 )
 
 type MiniAppLoginRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 微信小程序前端 wx.login 返回的 code
-	Code          string `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Code string                 `protobuf:"bytes,1,opt,name=code,proto3"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *MiniAppLoginRequest) Reset() {
@@ -56,24 +54,37 @@ func (x *MiniAppLoginRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MiniAppLoginRequest.ProtoReflect.Descriptor instead.
-func (*MiniAppLoginRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_miniapp_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *MiniAppLoginRequest) GetCode() string {
 	if x != nil {
-		return x.Code
+		return x.xxx_hidden_Code
 	}
 	return ""
 }
 
+func (x *MiniAppLoginRequest) SetCode(v string) {
+	x.xxx_hidden_Code = v
+}
+
+type MiniAppLoginRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// 微信小程序前端 wx.login 返回的 code
+	Code string
+}
+
+func (b0 MiniAppLoginRequest_builder) Build() *MiniAppLoginRequest {
+	m0 := &MiniAppLoginRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Code = b.Code
+	return m0
+}
+
 type MiniAppLoginResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 和 Web 端保持一致的 JWT Access Token
-	AccessToken   string `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_AccessToken string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *MiniAppLoginResponse) Reset() {
@@ -101,16 +112,30 @@ func (x *MiniAppLoginResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MiniAppLoginResponse.ProtoReflect.Descriptor instead.
-func (*MiniAppLoginResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_miniapp_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *MiniAppLoginResponse) GetAccessToken() string {
 	if x != nil {
-		return x.AccessToken
+		return x.xxx_hidden_AccessToken
 	}
 	return ""
+}
+
+func (x *MiniAppLoginResponse) SetAccessToken(v string) {
+	x.xxx_hidden_AccessToken = v
+}
+
+type MiniAppLoginResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// 和 Web 端保持一致的 JWT Access Token
+	AccessToken string
+}
+
+func (b0 MiniAppLoginResponse_builder) Build() *MiniAppLoginResponse {
+	m0 := &MiniAppLoginResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_AccessToken = b.AccessToken
+	return m0
 }
 
 var File_api_v1_miniapp_proto protoreflect.FileDescriptor
@@ -125,18 +150,6 @@ const file_api_v1_miniapp_proto_rawDesc = "" +
 	"\x0eMiniAppService\x12~\n" +
 	"\tLoginCode\x12'.fifsky.blog.api.v1.MiniAppLoginRequest\x1a(.fifsky.blog.api.v1.MiniAppLoginResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/blog/miniapp/loginB\xad\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\fMiniappProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
-
-var (
-	file_api_v1_miniapp_proto_rawDescOnce sync.Once
-	file_api_v1_miniapp_proto_rawDescData []byte
-)
-
-func file_api_v1_miniapp_proto_rawDescGZIP() []byte {
-	file_api_v1_miniapp_proto_rawDescOnce.Do(func() {
-		file_api_v1_miniapp_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_v1_miniapp_proto_rawDesc), len(file_api_v1_miniapp_proto_rawDesc)))
-	})
-	return file_api_v1_miniapp_proto_rawDescData
-}
 
 var file_api_v1_miniapp_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_api_v1_miniapp_proto_goTypes = []any{

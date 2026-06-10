@@ -216,7 +216,7 @@ Current Time: %s
 }
 
 func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest) (*adminv1.GenerateTagsResponse, error) {
-	content := strings.TrimSpace(req.Content)
+	content := strings.TrimSpace(req.GetContent())
 	if content == "" {
 		return nil, errors.BadRequest("EMPTY_CONTENT", "Content cannot be empty")
 	}
@@ -230,7 +230,7 @@ func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest)
 2) 标签去重，不要包含无意义的词（比如"文章""随笔""记录"）。
 3) 只输出 JSON 数组（例如：["Go","数据库","性能优化"]），不要输出其它任何文字。`
 
-	userInput := fmt.Sprintf("标题：%s\n正文：\n%s", strings.TrimSpace(req.Title), content)
+	userInput := fmt.Sprintf("标题：%s\n正文：\n%s", strings.TrimSpace(req.GetTitle()), content)
 
 	aiReq := openai.ChatCompletionNewParams{
 		Model: openai.ChatModel(aiModel),
@@ -245,23 +245,23 @@ func (a *AI) GenerateTags(ctx context.Context, req *adminv1.GenerateTagsRequest)
 		return nil, errors.InternalServer("AI_GENERATE_TAGS_ERROR", err.Error())
 	}
 	if len(completion.Choices) == 0 {
-		return &adminv1.GenerateTagsResponse{Tags: []string{}}, nil
+		return adminv1.GenerateTagsResponse_builder{Tags: []string{}}.Build(), nil
 	}
 
 	raw := strings.TrimSpace(completion.Choices[0].Message.Content)
 	tags := parseTagsFromAIResponse(raw)
-	return &adminv1.GenerateTagsResponse{Tags: tags}, nil
+	return adminv1.GenerateTagsResponse_builder{Tags: tags}.Build(), nil
 }
 
 func (a *AI) RemindSmartCreate(ctx context.Context, req *adminv1.RemindSmartCreateRequest) (*types.IDResponse, error) {
 	aiClient := a.agent.GetClient(ctx)
 	aiModel := a.agent.GetModel(ctx)
 
-	lastID, err := mcptool.SmartCreateRemind(ctx, aiClient, aiModel, a.store, req.Content)
+	lastID, err := mcptool.SmartCreateRemind(ctx, aiClient, aiModel, a.store, req.GetContent())
 	if err != nil {
 		return nil, err
 	}
-	return &types.IDResponse{Id: int32(lastID)}, nil
+	return types.IDResponse_builder{Id: int32(lastID)}.Build(), nil
 }
 
 func (a *AI) GenerateMood(ctx context.Context, _ *emptypb.Empty) (*adminv1.GenerateMoodResponse, error) {
@@ -272,9 +272,8 @@ func (a *AI) GenerateMood(ctx context.Context, _ *emptypb.Empty) (*adminv1.Gener
 		return nil, err
 	}
 
-	return &adminv1.GenerateMoodResponse{
-		Content: content,
-	}, nil
+	return adminv1.GenerateMoodResponse_builder{Content: content}.Build(),
+		nil
 }
 
 func parseTagsFromAIResponse(text string) []string {

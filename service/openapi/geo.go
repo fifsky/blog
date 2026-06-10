@@ -21,7 +21,7 @@ func NewGeo(s *store.Store) *Geo {
 }
 
 func (g *Geo) GetNearestRegion(ctx context.Context, req *apiv1.GetNearestRegionRequest) (*apiv1.GetNearestRegionResponse, error) {
-	city, province, err := g.store.FindNearestCity(ctx, req.Latitude, req.Longitude)
+	city, province, err := g.store.FindNearestCity(ctx, req.GetLatitude(), req.GetLongitude())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.NotFound("REGION_NOT_FOUND", "未找到匹配的城市")
@@ -29,10 +29,9 @@ func (g *Geo) GetNearestRegion(ctx context.Context, req *apiv1.GetNearestRegionR
 		return nil, errors.ErrSystem.WithCause(err)
 	}
 
-	return &apiv1.GetNearestRegionResponse{
-		ProvinceId:   int32(province.RegionId),
-		ProvinceName: province.RegionName,
-		CityId:       int32(city.RegionId),
-		CityName:     city.RegionName,
-	}, nil
+	return apiv1.GetNearestRegionResponse_builder{ProvinceId: int32(province.RegionId),
+			ProvinceName: province.RegionName,
+			CityId:       int32(city.RegionId),
+			CityName:     city.RegionName}.Build(),
+		nil
 }

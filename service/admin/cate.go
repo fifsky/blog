@@ -31,28 +31,26 @@ func (c *Cate) List(ctx context.Context, _ *emptypb.Empty) (*adminv1.CateListRes
 	}
 	items := make([]*adminv1.CateListItem, 0, len(cates))
 	for _, v := range cates {
-		items = append(items, &adminv1.CateListItem{
-			Id:        int32(v.Id),
+		items = append(items, adminv1.CateListItem_builder{Id: int32(v.Id),
 			Name:      v.Name,
 			Desc:      v.Desc,
 			Domain:    v.Domain,
 			CreatedAt: v.CreatedAt.Format(time.DateTime),
 			UpdatedAt: v.UpdatedAt.Format(time.DateTime),
-			Num:       int32(v.Num),
-		})
+			Num:       int32(v.Num)}.Build(),
+		)
 	}
-	return &adminv1.CateListResponse{
-		List:  items,
-		Total: int32(len(items)),
-	}, nil
+	return adminv1.CateListResponse_builder{List: items,
+			Total: int32(len(items))}.Build(),
+		nil
 }
 
 func (c *Cate) Create(ctx context.Context, req *adminv1.CateCreateRequest) (*types.IDResponse, error) {
 	now := time.Now()
 	m := &model.Cate{
-		Name:      req.Name,
-		Desc:      req.Desc,
-		Domain:    req.Domain,
+		Name:      req.GetName(),
+		Desc:      req.GetDesc(),
+		Domain:    req.GetDomain(),
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
@@ -60,37 +58,37 @@ func (c *Cate) Create(ctx context.Context, req *adminv1.CateCreateRequest) (*typ
 	if err != nil {
 		return nil, err
 	}
-	return &types.IDResponse{Id: int32(lastId)}, nil
+	return types.IDResponse_builder{Id: int32(lastId)}.Build(), nil
 }
 
 func (c *Cate) Update(ctx context.Context, req *adminv1.CateUpdateRequest) (*types.IDResponse, error) {
 	now := time.Now()
-	u := &model.UpdateCate{Id: int(req.Id)}
-	if req.Name != "" {
-		v := req.Name
+	u := &model.UpdateCate{Id: int(req.GetId())}
+	if req.GetName() != "" {
+		v := req.GetName()
 		u.Name = &v
 	}
-	if req.Desc != "" {
-		v := req.Desc
+	if req.GetDesc() != "" {
+		v := req.GetDesc()
 		u.Desc = &v
 	}
-	if req.Domain != "" {
-		v := req.Domain
+	if req.GetDomain() != "" {
+		v := req.GetDomain()
 		u.Domain = &v
 	}
 	u.UpdatedAt = &now
 	if err := c.store.UpdateCate(ctx, u); err != nil {
 		return nil, err
 	}
-	return &types.IDResponse{Id: int32(req.Id)}, nil
+	return types.IDResponse_builder{Id: int32(req.GetId())}.Build(), nil
 }
 
 func (c *Cate) Delete(ctx context.Context, req *adminv1.CateDeleteRequest) (*emptypb.Empty, error) {
-	total, _ := c.store.PostsCount(ctx, int(req.Id))
+	total, _ := c.store.PostsCount(ctx, int(req.GetId()))
 	if total > 0 {
 		return nil, fmt.Errorf("该分类下面还有文章，不能删除")
 	}
-	if err := c.store.DeleteCate(ctx, int(req.Id)); err != nil {
+	if err := c.store.DeleteCate(ctx, int(req.GetId())); err != nil {
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil

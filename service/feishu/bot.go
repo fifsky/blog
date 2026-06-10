@@ -111,7 +111,7 @@ func (b *Bot) handleCardAction(ctx context.Context, event *callback.CardActionTr
 	var result *apiv1.TextResponse
 	var err error
 
-	req := &apiv1.RemindActionRequest{Token: token}
+	req := apiv1.RemindActionRequest_builder{Token: token}.Build()
 	switch actionKey {
 	case "remind_completed":
 		result, err = b.remind.Change(ctx, req)
@@ -125,7 +125,7 @@ func (b *Bot) handleCardAction(ctx context.Context, event *callback.CardActionTr
 		return nil, fmt.Errorf("操作失败: %w", err)
 	}
 
-	id, err := aesutil.AesDecode(b.conf.Common.TokenSecret, req.Token)
+	id, err := aesutil.AesDecode(b.conf.Common.TokenSecret, req.GetToken())
 	if err != nil {
 		return nil, fmt.Errorf("token错误:%w", err)
 	}
@@ -138,7 +138,7 @@ func (b *Bot) handleCardAction(ctx context.Context, event *callback.CardActionTr
 	// Get response text
 	responseText := "操作完成"
 	if result != nil {
-		responseText = result.Text
+		responseText = result.GetText()
 	}
 
 	// Return only toast response

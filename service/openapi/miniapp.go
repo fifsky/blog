@@ -35,7 +35,7 @@ func (m *MiniApp) LoginCode(ctx context.Context, req *apiv1.MiniAppLoginRequest)
 		return nil, errors.ErrSystem.WithCause(fmt.Errorf("miniapp config missing"))
 	}
 
-	sess, err := m.client.Code2Session(ctx, req.Code)
+	sess, err := m.client.Code2Session(ctx, req.GetCode())
 	if err != nil {
 		return nil, errors.BadRequest("MINIAPP_LOGIN_FAILED", "小程序登录失败").WithCause(err)
 	}
@@ -61,7 +61,6 @@ func (m *MiniApp) LoginCode(ctx context.Context, req *apiv1.MiniAppLoginRequest)
 		return nil, errors.ErrSystem.WithCause(err)
 	}
 
-	return &apiv1.MiniAppLoginResponse{
-		AccessToken: token,
-	}, nil
+	return apiv1.MiniAppLoginResponse_builder{AccessToken: token}.Build(),
+		nil
 }

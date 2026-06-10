@@ -14,7 +14,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -26,8 +25,8 @@ const (
 )
 
 type Generate2FARequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id int32                  `protobuf:"varint,1,opt,name=id,proto3"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -57,24 +56,37 @@ func (x *Generate2FARequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Generate2FARequest.ProtoReflect.Descriptor instead.
-func (*Generate2FARequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Generate2FARequest) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
+func (x *Generate2FARequest) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+type Generate2FARequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id int32
+}
+
+func (b0 Generate2FARequest_builder) Build() *Generate2FARequest {
+	m0 := &Generate2FARequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	return m0
+}
+
 type Generate2FAResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Secret        string                 `protobuf:"bytes,1,opt,name=secret,proto3" json:"secret,omitempty"`
-	QrCodeUri     string                 `protobuf:"bytes,2,opt,name=qr_code_uri,json=qrCodeUri,proto3" json:"qr_code_uri,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Secret    string                 `protobuf:"bytes,1,opt,name=secret,proto3"`
+	xxx_hidden_QrCodeUri string                 `protobuf:"bytes,2,opt,name=qr_code_uri,json=qrCodeUri,proto3"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *Generate2FAResponse) Reset() {
@@ -102,32 +114,51 @@ func (x *Generate2FAResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Generate2FAResponse.ProtoReflect.Descriptor instead.
-func (*Generate2FAResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *Generate2FAResponse) GetSecret() string {
 	if x != nil {
-		return x.Secret
+		return x.xxx_hidden_Secret
 	}
 	return ""
 }
 
 func (x *Generate2FAResponse) GetQrCodeUri() string {
 	if x != nil {
-		return x.QrCodeUri
+		return x.xxx_hidden_QrCodeUri
 	}
 	return ""
 }
 
+func (x *Generate2FAResponse) SetSecret(v string) {
+	x.xxx_hidden_Secret = v
+}
+
+func (x *Generate2FAResponse) SetQrCodeUri(v string) {
+	x.xxx_hidden_QrCodeUri = v
+}
+
+type Generate2FAResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Secret    string
+	QrCodeUri string
+}
+
+func (b0 Generate2FAResponse_builder) Build() *Generate2FAResponse {
+	m0 := &Generate2FAResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Secret = b.Secret
+	x.xxx_hidden_QrCodeUri = b.QrCodeUri
+	return m0
+}
+
 type Bind2FARequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Secret        string                 `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
-	Code          string                 `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id     int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Secret string                 `protobuf:"bytes,2,opt,name=secret,proto3"`
+	xxx_hidden_Code   string                 `protobuf:"bytes,3,opt,name=code,proto3"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *Bind2FARequest) Reset() {
@@ -155,35 +186,60 @@ func (x *Bind2FARequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Bind2FARequest.ProtoReflect.Descriptor instead.
-func (*Bind2FARequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *Bind2FARequest) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *Bind2FARequest) GetSecret() string {
 	if x != nil {
-		return x.Secret
+		return x.xxx_hidden_Secret
 	}
 	return ""
 }
 
 func (x *Bind2FARequest) GetCode() string {
 	if x != nil {
-		return x.Code
+		return x.xxx_hidden_Code
 	}
 	return ""
 }
 
+func (x *Bind2FARequest) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *Bind2FARequest) SetSecret(v string) {
+	x.xxx_hidden_Secret = v
+}
+
+func (x *Bind2FARequest) SetCode(v string) {
+	x.xxx_hidden_Code = v
+}
+
+type Bind2FARequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id     int32
+	Secret string
+	Code   string
+}
+
+func (b0 Bind2FARequest_builder) Build() *Bind2FARequest {
+	m0 := &Bind2FARequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Secret = b.Secret
+	x.xxx_hidden_Code = b.Code
+	return m0
+}
+
 type GetUserRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id int32                  `protobuf:"varint,1,opt,name=id,proto3"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -213,24 +269,37 @@ func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetUserRequest.ProtoReflect.Descriptor instead.
-func (*GetUserRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *GetUserRequest) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
+func (x *GetUserRequest) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+type GetUserRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id int32
+}
+
+func (b0 GetUserRequest_builder) Build() *GetUserRequest {
+	m0 := &GetUserRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	return m0
+}
+
 // UserListRequest 分页请求
 type UserListRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Page int32                  `protobuf:"varint,1,opt,name=page,proto3"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *UserListRequest) Reset() {
@@ -258,22 +327,35 @@ func (x *UserListRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserListRequest.ProtoReflect.Descriptor instead.
-func (*UserListRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *UserListRequest) GetPage() int32 {
 	if x != nil {
-		return x.Page
+		return x.xxx_hidden_Page
 	}
 	return 0
 }
 
+func (x *UserListRequest) SetPage(v int32) {
+	x.xxx_hidden_Page = v
+}
+
+type UserListRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Page int32
+}
+
+func (b0 UserListRequest_builder) Build() *UserListRequest {
+	m0 := &UserListRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Page = b.Page
+	return m0
+}
+
 // UserStatusRequest 用户状态切换请求
 type UserStatusRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id int32                  `protobuf:"varint,1,opt,name=id,proto3"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -303,31 +385,44 @@ func (x *UserStatusRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserStatusRequest.ProtoReflect.Descriptor instead.
-func (*UserStatusRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *UserStatusRequest) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
+func (x *UserStatusRequest) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+type UserStatusRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id int32
+}
+
+func (b0 UserStatusRequest_builder) Build() *UserStatusRequest {
+	m0 := &UserStatusRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	return m0
+}
+
 type User struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	NickName      string                 `protobuf:"bytes,3,opt,name=nick_name,json=nickName,proto3" json:"nick_name,omitempty"`
-	Email         string                 `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
-	Status        int32                  `protobuf:"varint,5,opt,name=status,proto3" json:"status,omitempty"`
-	Type          int32                  `protobuf:"varint,6,opt,name=type,proto3" json:"type,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	HasTotp       bool                   `protobuf:"varint,9,opt,name=has_totp,json=hasTotp,proto3" json:"has_totp,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id        int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Name      string                 `protobuf:"bytes,2,opt,name=name,proto3"`
+	xxx_hidden_NickName  string                 `protobuf:"bytes,3,opt,name=nick_name,json=nickName,proto3"`
+	xxx_hidden_Email     string                 `protobuf:"bytes,4,opt,name=email,proto3"`
+	xxx_hidden_Status    int32                  `protobuf:"varint,5,opt,name=status,proto3"`
+	xxx_hidden_Type      int32                  `protobuf:"varint,6,opt,name=type,proto3"`
+	xxx_hidden_CreatedAt string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3"`
+	xxx_hidden_UpdatedAt string                 `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3"`
+	xxx_hidden_HasTotp   bool                   `protobuf:"varint,9,opt,name=has_totp,json=hasTotp,proto3"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *User) Reset() {
@@ -355,83 +450,144 @@ func (x *User) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use User.ProtoReflect.Descriptor instead.
-func (*User) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *User) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *User) GetName() string {
 	if x != nil {
-		return x.Name
+		return x.xxx_hidden_Name
 	}
 	return ""
 }
 
 func (x *User) GetNickName() string {
 	if x != nil {
-		return x.NickName
+		return x.xxx_hidden_NickName
 	}
 	return ""
 }
 
 func (x *User) GetEmail() string {
 	if x != nil {
-		return x.Email
+		return x.xxx_hidden_Email
 	}
 	return ""
 }
 
 func (x *User) GetStatus() int32 {
 	if x != nil {
-		return x.Status
+		return x.xxx_hidden_Status
 	}
 	return 0
 }
 
 func (x *User) GetType() int32 {
 	if x != nil {
-		return x.Type
+		return x.xxx_hidden_Type
 	}
 	return 0
 }
 
 func (x *User) GetCreatedAt() string {
 	if x != nil {
-		return x.CreatedAt
+		return x.xxx_hidden_CreatedAt
 	}
 	return ""
 }
 
 func (x *User) GetUpdatedAt() string {
 	if x != nil {
-		return x.UpdatedAt
+		return x.xxx_hidden_UpdatedAt
 	}
 	return ""
 }
 
 func (x *User) GetHasTotp() bool {
 	if x != nil {
-		return x.HasTotp
+		return x.xxx_hidden_HasTotp
 	}
 	return false
 }
 
+func (x *User) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *User) SetName(v string) {
+	x.xxx_hidden_Name = v
+}
+
+func (x *User) SetNickName(v string) {
+	x.xxx_hidden_NickName = v
+}
+
+func (x *User) SetEmail(v string) {
+	x.xxx_hidden_Email = v
+}
+
+func (x *User) SetStatus(v int32) {
+	x.xxx_hidden_Status = v
+}
+
+func (x *User) SetType(v int32) {
+	x.xxx_hidden_Type = v
+}
+
+func (x *User) SetCreatedAt(v string) {
+	x.xxx_hidden_CreatedAt = v
+}
+
+func (x *User) SetUpdatedAt(v string) {
+	x.xxx_hidden_UpdatedAt = v
+}
+
+func (x *User) SetHasTotp(v bool) {
+	x.xxx_hidden_HasTotp = v
+}
+
+type User_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id        int32
+	Name      string
+	NickName  string
+	Email     string
+	Status    int32
+	Type      int32
+	CreatedAt string
+	UpdatedAt string
+	HasTotp   bool
+}
+
+func (b0 User_builder) Build() *User {
+	m0 := &User{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Name = b.Name
+	x.xxx_hidden_NickName = b.NickName
+	x.xxx_hidden_Email = b.Email
+	x.xxx_hidden_Status = b.Status
+	x.xxx_hidden_Type = b.Type
+	x.xxx_hidden_CreatedAt = b.CreatedAt
+	x.xxx_hidden_UpdatedAt = b.UpdatedAt
+	x.xxx_hidden_HasTotp = b.HasTotp
+	return m0
+}
+
 type UserCreateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	NickName      string                 `protobuf:"bytes,3,opt,name=nick_name,json=nickName,proto3" json:"nick_name,omitempty"`
-	Email         string                 `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
-	Type          int32                  `protobuf:"varint,5,opt,name=type,proto3" json:"type,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Name     string                 `protobuf:"bytes,1,opt,name=name,proto3"`
+	xxx_hidden_Password string                 `protobuf:"bytes,2,opt,name=password,proto3"`
+	xxx_hidden_NickName string                 `protobuf:"bytes,3,opt,name=nick_name,json=nickName,proto3"`
+	xxx_hidden_Email    string                 `protobuf:"bytes,4,opt,name=email,proto3"`
+	xxx_hidden_Type     int32                  `protobuf:"varint,5,opt,name=type,proto3"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *UserCreateRequest) Reset() {
@@ -459,56 +615,93 @@ func (x *UserCreateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserCreateRequest.ProtoReflect.Descriptor instead.
-func (*UserCreateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *UserCreateRequest) GetName() string {
 	if x != nil {
-		return x.Name
+		return x.xxx_hidden_Name
 	}
 	return ""
 }
 
 func (x *UserCreateRequest) GetPassword() string {
 	if x != nil {
-		return x.Password
+		return x.xxx_hidden_Password
 	}
 	return ""
 }
 
 func (x *UserCreateRequest) GetNickName() string {
 	if x != nil {
-		return x.NickName
+		return x.xxx_hidden_NickName
 	}
 	return ""
 }
 
 func (x *UserCreateRequest) GetEmail() string {
 	if x != nil {
-		return x.Email
+		return x.xxx_hidden_Email
 	}
 	return ""
 }
 
 func (x *UserCreateRequest) GetType() int32 {
 	if x != nil {
-		return x.Type
+		return x.xxx_hidden_Type
 	}
 	return 0
 }
 
+func (x *UserCreateRequest) SetName(v string) {
+	x.xxx_hidden_Name = v
+}
+
+func (x *UserCreateRequest) SetPassword(v string) {
+	x.xxx_hidden_Password = v
+}
+
+func (x *UserCreateRequest) SetNickName(v string) {
+	x.xxx_hidden_NickName = v
+}
+
+func (x *UserCreateRequest) SetEmail(v string) {
+	x.xxx_hidden_Email = v
+}
+
+func (x *UserCreateRequest) SetType(v int32) {
+	x.xxx_hidden_Type = v
+}
+
+type UserCreateRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name     string
+	Password string
+	NickName string
+	Email    string
+	Type     int32
+}
+
+func (b0 UserCreateRequest_builder) Build() *UserCreateRequest {
+	m0 := &UserCreateRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Name = b.Name
+	x.xxx_hidden_Password = b.Password
+	x.xxx_hidden_NickName = b.NickName
+	x.xxx_hidden_Email = b.Email
+	x.xxx_hidden_Type = b.Type
+	return m0
+}
+
 type UserUpdateRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
-	NickName      string                 `protobuf:"bytes,4,opt,name=nick_name,json=nickName,proto3" json:"nick_name,omitempty"`
-	Email         string                 `protobuf:"bytes,5,opt,name=email,proto3" json:"email,omitempty"`
-	Type          int32                  `protobuf:"varint,6,opt,name=type,proto3" json:"type,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id       int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Name     string                 `protobuf:"bytes,2,opt,name=name,proto3"`
+	xxx_hidden_Password string                 `protobuf:"bytes,3,opt,name=password,proto3"`
+	xxx_hidden_NickName string                 `protobuf:"bytes,4,opt,name=nick_name,json=nickName,proto3"`
+	xxx_hidden_Email    string                 `protobuf:"bytes,5,opt,name=email,proto3"`
+	xxx_hidden_Type     int32                  `protobuf:"varint,6,opt,name=type,proto3"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *UserUpdateRequest) Reset() {
@@ -536,66 +729,109 @@ func (x *UserUpdateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserUpdateRequest.ProtoReflect.Descriptor instead.
-func (*UserUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *UserUpdateRequest) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *UserUpdateRequest) GetName() string {
 	if x != nil {
-		return x.Name
+		return x.xxx_hidden_Name
 	}
 	return ""
 }
 
 func (x *UserUpdateRequest) GetPassword() string {
 	if x != nil {
-		return x.Password
+		return x.xxx_hidden_Password
 	}
 	return ""
 }
 
 func (x *UserUpdateRequest) GetNickName() string {
 	if x != nil {
-		return x.NickName
+		return x.xxx_hidden_NickName
 	}
 	return ""
 }
 
 func (x *UserUpdateRequest) GetEmail() string {
 	if x != nil {
-		return x.Email
+		return x.xxx_hidden_Email
 	}
 	return ""
 }
 
 func (x *UserUpdateRequest) GetType() int32 {
 	if x != nil {
-		return x.Type
+		return x.xxx_hidden_Type
 	}
 	return 0
 }
 
+func (x *UserUpdateRequest) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *UserUpdateRequest) SetName(v string) {
+	x.xxx_hidden_Name = v
+}
+
+func (x *UserUpdateRequest) SetPassword(v string) {
+	x.xxx_hidden_Password = v
+}
+
+func (x *UserUpdateRequest) SetNickName(v string) {
+	x.xxx_hidden_NickName = v
+}
+
+func (x *UserUpdateRequest) SetEmail(v string) {
+	x.xxx_hidden_Email = v
+}
+
+func (x *UserUpdateRequest) SetType(v int32) {
+	x.xxx_hidden_Type = v
+}
+
+type UserUpdateRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id       int32
+	Name     string
+	Password string
+	NickName string
+	Email    string
+	Type     int32
+}
+
+func (b0 UserUpdateRequest_builder) Build() *UserUpdateRequest {
+	m0 := &UserUpdateRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Name = b.Name
+	x.xxx_hidden_Password = b.Password
+	x.xxx_hidden_NickName = b.NickName
+	x.xxx_hidden_Email = b.Email
+	x.xxx_hidden_Type = b.Type
+	return m0
+}
+
 type UserItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	NickName      string                 `protobuf:"bytes,3,opt,name=nick_name,json=nickName,proto3" json:"nick_name,omitempty"`
-	Email         string                 `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
-	Status        int32                  `protobuf:"varint,5,opt,name=status,proto3" json:"status,omitempty"`
-	Type          int32                  `protobuf:"varint,6,opt,name=type,proto3" json:"type,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	HasTotp       bool                   `protobuf:"varint,9,opt,name=has_totp,json=hasTotp,proto3" json:"has_totp,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id        int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Name      string                 `protobuf:"bytes,2,opt,name=name,proto3"`
+	xxx_hidden_NickName  string                 `protobuf:"bytes,3,opt,name=nick_name,json=nickName,proto3"`
+	xxx_hidden_Email     string                 `protobuf:"bytes,4,opt,name=email,proto3"`
+	xxx_hidden_Status    int32                  `protobuf:"varint,5,opt,name=status,proto3"`
+	xxx_hidden_Type      int32                  `protobuf:"varint,6,opt,name=type,proto3"`
+	xxx_hidden_CreatedAt string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3"`
+	xxx_hidden_UpdatedAt string                 `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3"`
+	xxx_hidden_HasTotp   bool                   `protobuf:"varint,9,opt,name=has_totp,json=hasTotp,proto3"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *UserItem) Reset() {
@@ -623,80 +859,141 @@ func (x *UserItem) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserItem.ProtoReflect.Descriptor instead.
-func (*UserItem) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *UserItem) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *UserItem) GetName() string {
 	if x != nil {
-		return x.Name
+		return x.xxx_hidden_Name
 	}
 	return ""
 }
 
 func (x *UserItem) GetNickName() string {
 	if x != nil {
-		return x.NickName
+		return x.xxx_hidden_NickName
 	}
 	return ""
 }
 
 func (x *UserItem) GetEmail() string {
 	if x != nil {
-		return x.Email
+		return x.xxx_hidden_Email
 	}
 	return ""
 }
 
 func (x *UserItem) GetStatus() int32 {
 	if x != nil {
-		return x.Status
+		return x.xxx_hidden_Status
 	}
 	return 0
 }
 
 func (x *UserItem) GetType() int32 {
 	if x != nil {
-		return x.Type
+		return x.xxx_hidden_Type
 	}
 	return 0
 }
 
 func (x *UserItem) GetCreatedAt() string {
 	if x != nil {
-		return x.CreatedAt
+		return x.xxx_hidden_CreatedAt
 	}
 	return ""
 }
 
 func (x *UserItem) GetUpdatedAt() string {
 	if x != nil {
-		return x.UpdatedAt
+		return x.xxx_hidden_UpdatedAt
 	}
 	return ""
 }
 
 func (x *UserItem) GetHasTotp() bool {
 	if x != nil {
-		return x.HasTotp
+		return x.xxx_hidden_HasTotp
 	}
 	return false
 }
 
+func (x *UserItem) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *UserItem) SetName(v string) {
+	x.xxx_hidden_Name = v
+}
+
+func (x *UserItem) SetNickName(v string) {
+	x.xxx_hidden_NickName = v
+}
+
+func (x *UserItem) SetEmail(v string) {
+	x.xxx_hidden_Email = v
+}
+
+func (x *UserItem) SetStatus(v int32) {
+	x.xxx_hidden_Status = v
+}
+
+func (x *UserItem) SetType(v int32) {
+	x.xxx_hidden_Type = v
+}
+
+func (x *UserItem) SetCreatedAt(v string) {
+	x.xxx_hidden_CreatedAt = v
+}
+
+func (x *UserItem) SetUpdatedAt(v string) {
+	x.xxx_hidden_UpdatedAt = v
+}
+
+func (x *UserItem) SetHasTotp(v bool) {
+	x.xxx_hidden_HasTotp = v
+}
+
+type UserItem_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id        int32
+	Name      string
+	NickName  string
+	Email     string
+	Status    int32
+	Type      int32
+	CreatedAt string
+	UpdatedAt string
+	HasTotp   bool
+}
+
+func (b0 UserItem_builder) Build() *UserItem {
+	m0 := &UserItem{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Name = b.Name
+	x.xxx_hidden_NickName = b.NickName
+	x.xxx_hidden_Email = b.Email
+	x.xxx_hidden_Status = b.Status
+	x.xxx_hidden_Type = b.Type
+	x.xxx_hidden_CreatedAt = b.CreatedAt
+	x.xxx_hidden_UpdatedAt = b.UpdatedAt
+	x.xxx_hidden_HasTotp = b.HasTotp
+	return m0
+}
+
 type UserListResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*UserItem            `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_List  *[]*UserItem           `protobuf:"bytes,1,rep,name=list,proto3"`
+	xxx_hidden_Total int32                  `protobuf:"varint,2,opt,name=total,proto3"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *UserListResponse) Reset() {
@@ -724,23 +1021,44 @@ func (x *UserListResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserListResponse.ProtoReflect.Descriptor instead.
-func (*UserListResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_user_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *UserListResponse) GetList() []*UserItem {
 	if x != nil {
-		return x.List
+		if x.xxx_hidden_List != nil {
+			return *x.xxx_hidden_List
+		}
 	}
 	return nil
 }
 
 func (x *UserListResponse) GetTotal() int32 {
 	if x != nil {
-		return x.Total
+		return x.xxx_hidden_Total
 	}
 	return 0
+}
+
+func (x *UserListResponse) SetList(v []*UserItem) {
+	x.xxx_hidden_List = &v
+}
+
+func (x *UserListResponse) SetTotal(v int32) {
+	x.xxx_hidden_Total = v
+}
+
+type UserListResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	List  []*UserItem
+	Total int32
+}
+
+func (b0 UserListResponse_builder) Build() *UserListResponse {
+	m0 := &UserListResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_List = &b.List
+	x.xxx_hidden_Total = b.Total
+	return m0
 }
 
 var File_admin_v1_user_proto protoreflect.FileDescriptor
@@ -819,18 +1137,6 @@ const file_admin_v1_user_proto_rawDesc = "" +
 	"\vGenerate2FA\x12(.fifsky.blog.admin.v1.Generate2FARequest\x1a).fifsky.blog.admin.v1.Generate2FAResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/blog/admin/user/generate_2fa\x12m\n" +
 	"\aBind2FA\x12$.fifsky.blog.admin.v1.Bind2FARequest\x1a\x16.google.protobuf.Empty\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/blog/admin/user/bind_2faB\xb8\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\tUserProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
-
-var (
-	file_admin_v1_user_proto_rawDescOnce sync.Once
-	file_admin_v1_user_proto_rawDescData []byte
-)
-
-func file_admin_v1_user_proto_rawDescGZIP() []byte {
-	file_admin_v1_user_proto_rawDescOnce.Do(func() {
-		file_admin_v1_user_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_admin_v1_user_proto_rawDesc), len(file_admin_v1_user_proto_rawDesc)))
-	})
-	return file_admin_v1_user_proto_rawDescData
-}
 
 var file_admin_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_admin_v1_user_proto_goTypes = []any{

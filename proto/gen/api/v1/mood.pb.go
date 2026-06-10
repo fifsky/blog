@@ -14,7 +14,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -27,10 +26,10 @@ const (
 
 // MoodListRequest 心情列表分页请求
 type MoodListRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Page int32                  `protobuf:"varint,1,opt,name=page,proto3"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *MoodListRequest) Reset() {
@@ -58,26 +57,39 @@ func (x *MoodListRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MoodListRequest.ProtoReflect.Descriptor instead.
-func (*MoodListRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_mood_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *MoodListRequest) GetPage() int32 {
 	if x != nil {
-		return x.Page
+		return x.xxx_hidden_Page
 	}
 	return 0
 }
 
+func (x *MoodListRequest) SetPage(v int32) {
+	x.xxx_hidden_Page = v
+}
+
+type MoodListRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Page int32
+}
+
+func (b0 MoodListRequest_builder) Build() *MoodListRequest {
+	m0 := &MoodListRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Page = b.Page
+	return m0
+}
+
 type MoodItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	User          *types.UserSummary     `protobuf:"bytes,3,opt,name=user,proto3" json:"user,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id        int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Content   string                 `protobuf:"bytes,2,opt,name=content,proto3"`
+	xxx_hidden_User      *types.UserSummary     `protobuf:"bytes,3,opt,name=user,proto3"`
+	xxx_hidden_CreatedAt string                 `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *MoodItem) Reset() {
@@ -105,45 +117,87 @@ func (x *MoodItem) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MoodItem.ProtoReflect.Descriptor instead.
-func (*MoodItem) Descriptor() ([]byte, []int) {
-	return file_api_v1_mood_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *MoodItem) GetId() int32 {
 	if x != nil {
-		return x.Id
+		return x.xxx_hidden_Id
 	}
 	return 0
 }
 
 func (x *MoodItem) GetContent() string {
 	if x != nil {
-		return x.Content
+		return x.xxx_hidden_Content
 	}
 	return ""
 }
 
 func (x *MoodItem) GetUser() *types.UserSummary {
 	if x != nil {
-		return x.User
+		return x.xxx_hidden_User
 	}
 	return nil
 }
 
 func (x *MoodItem) GetCreatedAt() string {
 	if x != nil {
-		return x.CreatedAt
+		return x.xxx_hidden_CreatedAt
 	}
 	return ""
 }
 
+func (x *MoodItem) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *MoodItem) SetContent(v string) {
+	x.xxx_hidden_Content = v
+}
+
+func (x *MoodItem) SetUser(v *types.UserSummary) {
+	x.xxx_hidden_User = v
+}
+
+func (x *MoodItem) SetCreatedAt(v string) {
+	x.xxx_hidden_CreatedAt = v
+}
+
+func (x *MoodItem) HasUser() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_User != nil
+}
+
+func (x *MoodItem) ClearUser() {
+	x.xxx_hidden_User = nil
+}
+
+type MoodItem_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id        int32
+	Content   string
+	User      *types.UserSummary
+	CreatedAt string
+}
+
+func (b0 MoodItem_builder) Build() *MoodItem {
+	m0 := &MoodItem{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Content = b.Content
+	x.xxx_hidden_User = b.User
+	x.xxx_hidden_CreatedAt = b.CreatedAt
+	return m0
+}
+
 type MoodListResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	List          []*MoodItem            `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
-	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_List  *[]*MoodItem           `protobuf:"bytes,1,rep,name=list,proto3"`
+	xxx_hidden_Total int32                  `protobuf:"varint,2,opt,name=total,proto3"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *MoodListResponse) Reset() {
@@ -171,23 +225,44 @@ func (x *MoodListResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MoodListResponse.ProtoReflect.Descriptor instead.
-func (*MoodListResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_mood_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *MoodListResponse) GetList() []*MoodItem {
 	if x != nil {
-		return x.List
+		if x.xxx_hidden_List != nil {
+			return *x.xxx_hidden_List
+		}
 	}
 	return nil
 }
 
 func (x *MoodListResponse) GetTotal() int32 {
 	if x != nil {
-		return x.Total
+		return x.xxx_hidden_Total
 	}
 	return 0
+}
+
+func (x *MoodListResponse) SetList(v []*MoodItem) {
+	x.xxx_hidden_List = &v
+}
+
+func (x *MoodListResponse) SetTotal(v int32) {
+	x.xxx_hidden_Total = v
+}
+
+type MoodListResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	List  []*MoodItem
+	Total int32
+}
+
+func (b0 MoodListResponse_builder) Build() *MoodListResponse {
+	m0 := &MoodListResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_List = &b.List
+	x.xxx_hidden_Total = b.Total
+	return m0
 }
 
 var File_api_v1_mood_proto protoreflect.FileDescriptor
@@ -210,18 +285,6 @@ const file_api_v1_mood_proto_rawDesc = "" +
 	"\x04List\x12#.fifsky.blog.api.v1.MoodListRequest\x1a$.fifsky.blog.api.v1.MoodListResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/blog/mood/list\x12\\\n" +
 	"\x06Random\x12\x16.google.protobuf.Empty\x1a\x1c.fifsky.blog.api.v1.MoodItem\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/blog/mood/randomB\xaa\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\tMoodProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
-
-var (
-	file_api_v1_mood_proto_rawDescOnce sync.Once
-	file_api_v1_mood_proto_rawDescData []byte
-)
-
-func file_api_v1_mood_proto_rawDescGZIP() []byte {
-	file_api_v1_mood_proto_rawDescOnce.Do(func() {
-		file_api_v1_mood_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_v1_mood_proto_rawDesc), len(file_api_v1_mood_proto_rawDesc)))
-	})
-	return file_api_v1_mood_proto_rawDescData
-}
 
 var file_api_v1_mood_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_api_v1_mood_proto_goTypes = []any{

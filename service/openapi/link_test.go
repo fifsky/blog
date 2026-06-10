@@ -16,8 +16,8 @@ func TestLink_All(t *testing.T) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("links")...)
 		svc := NewLink(store.New(db))
 		resp, err := svc.All(context.Background(), &emptypb.Empty{})
-		if err != nil || len(resp.List) == 0 {
-			t.Fatalf("unexpected err=%v list=%v", err, resp.List)
+		if err != nil || len(resp.GetList()) == 0 {
+			t.Fatalf("unexpected err=%v list=%v", err, resp.GetList())
 		}
 	})
 }

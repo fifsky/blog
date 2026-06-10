@@ -26,8 +26,8 @@ func TestRemind_Change(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("reminds")...)
 		svc := NewRemind(store.New(db), conf)
-		resp, err := svc.Change(context.Background(), &apiv1.RemindActionRequest{Token: getRemindTestToken(8, conf)})
-		if err != nil || resp.Text == "" {
+		resp, err := svc.Change(context.Background(), apiv1.RemindActionRequest_builder{Token: getRemindTestToken(8, conf)}.Build())
+		if err != nil || resp.GetText() == "" {
 			t.Fatalf("unexpected err=%v resp=%v", err, resp)
 		}
 	})
@@ -40,8 +40,8 @@ func TestRemind_Delay(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("reminds")...)
 		svc := NewRemind(store.New(db), conf)
-		resp, err := svc.Delay(context.Background(), &apiv1.RemindActionRequest{Token: getRemindTestToken(8, conf)})
-		if err != nil || resp.Text == "" {
+		resp, err := svc.Delay(context.Background(), apiv1.RemindActionRequest_builder{Token: getRemindTestToken(8, conf)}.Build())
+		if err != nil || resp.GetText() == "" {
 			t.Fatalf("unexpected err=%v resp=%v", err, resp)
 		}
 	})

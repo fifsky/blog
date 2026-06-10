@@ -34,13 +34,13 @@ func TestAdminArticle_CreateDeleteUpload(t *testing.T) {
 
 		// Create
 		ctx := SetLoginUser(context.Background(), &model.User{Id: 1})
-		resp, err := svc.Create(ctx, &adminv1.ArticleCreateRequest{CateId: 1, Type: 1, Title: "test", Url: "", Content: "test"})
-		if err != nil || resp.Id == 0 {
+		resp, err := svc.Create(ctx, adminv1.ArticleCreateRequest_builder{CateId: 1, Type: 1, Title: "test", Url: "", Content: "test"}.Build())
+		if err != nil || resp.GetId() == 0 {
 			t.Fatalf("unexpected err=%v resp=%v", err, resp)
 		}
 
 		// Delete
-		_, err = svc.Delete(context.Background(), &adminv1.ArticleDeleteRequest{Ids: []int32{4}})
+		_, err = svc.Delete(context.Background(), adminv1.ArticleDeleteRequest_builder{Ids: []int32{4}}.Build())
 		if err != nil {
 			t.Fatalf("unexpected err=%v", err)
 		}

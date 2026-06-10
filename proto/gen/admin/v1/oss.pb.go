@@ -12,7 +12,6 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -25,10 +24,10 @@ const (
 
 // GetPresignURLRequest 获取预签名URL请求
 type GetPresignURLRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Filename string                 `protobuf:"bytes,1,opt,name=filename,proto3"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *GetPresignURLRequest) Reset() {
@@ -56,25 +55,38 @@ func (x *GetPresignURLRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetPresignURLRequest.ProtoReflect.Descriptor instead.
-func (*GetPresignURLRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_oss_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *GetPresignURLRequest) GetFilename() string {
 	if x != nil {
-		return x.Filename
+		return x.xxx_hidden_Filename
 	}
 	return ""
 }
 
+func (x *GetPresignURLRequest) SetFilename(v string) {
+	x.xxx_hidden_Filename = v
+}
+
+type GetPresignURLRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Filename string
+}
+
+func (b0 GetPresignURLRequest_builder) Build() *GetPresignURLRequest {
+	m0 := &GetPresignURLRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Filename = b.Filename
+	return m0
+}
+
 // GetPresignURLResponse 预签名URL响应
 type GetPresignURLResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`                     // 预签名上传URL
-	CdnUrl        string                 `protobuf:"bytes,2,opt,name=cdn_url,json=cdnUrl,proto3" json:"cdn_url,omitempty"` // CDN访问地址
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Url    string                 `protobuf:"bytes,1,opt,name=url,proto3"`
+	xxx_hidden_CdnUrl string                 `protobuf:"bytes,2,opt,name=cdn_url,json=cdnUrl,proto3"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *GetPresignURLResponse) Reset() {
@@ -102,23 +114,42 @@ func (x *GetPresignURLResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetPresignURLResponse.ProtoReflect.Descriptor instead.
-func (*GetPresignURLResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_oss_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *GetPresignURLResponse) GetUrl() string {
 	if x != nil {
-		return x.Url
+		return x.xxx_hidden_Url
 	}
 	return ""
 }
 
 func (x *GetPresignURLResponse) GetCdnUrl() string {
 	if x != nil {
-		return x.CdnUrl
+		return x.xxx_hidden_CdnUrl
 	}
 	return ""
+}
+
+func (x *GetPresignURLResponse) SetUrl(v string) {
+	x.xxx_hidden_Url = v
+}
+
+func (x *GetPresignURLResponse) SetCdnUrl(v string) {
+	x.xxx_hidden_CdnUrl = v
+}
+
+type GetPresignURLResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Url    string
+	CdnUrl string
+}
+
+func (b0 GetPresignURLResponse_builder) Build() *GetPresignURLResponse {
+	m0 := &GetPresignURLResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Url = b.Url
+	x.xxx_hidden_CdnUrl = b.CdnUrl
+	return m0
 }
 
 var File_admin_v1_oss_proto protoreflect.FileDescriptor
@@ -135,18 +166,6 @@ const file_admin_v1_oss_proto_rawDesc = "" +
 	"OSSService\x12\x8c\x01\n" +
 	"\rGetPresignURL\x12*.fifsky.blog.admin.v1.GetPresignURLRequest\x1a+.fifsky.blog.admin.v1.GetPresignURLResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/oss/presignB\xb7\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\bOssProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
-
-var (
-	file_admin_v1_oss_proto_rawDescOnce sync.Once
-	file_admin_v1_oss_proto_rawDescData []byte
-)
-
-func file_admin_v1_oss_proto_rawDescGZIP() []byte {
-	file_admin_v1_oss_proto_rawDescOnce.Do(func() {
-		file_admin_v1_oss_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_admin_v1_oss_proto_rawDesc), len(file_admin_v1_oss_proto_rawDesc)))
-	})
-	return file_admin_v1_oss_proto_rawDescData
-}
 
 var file_admin_v1_oss_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_admin_v1_oss_proto_goTypes = []any{

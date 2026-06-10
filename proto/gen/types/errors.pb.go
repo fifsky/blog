@@ -11,7 +11,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	_ "google.golang.org/protobuf/types/descriptorpb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -23,13 +22,13 @@ const (
 )
 
 type Status struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
-	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
-	Metadata      map[string]string      `protobuf:"bytes,4,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Code     int32                  `protobuf:"varint,1,opt,name=code,proto3"`
+	xxx_hidden_Reason   string                 `protobuf:"bytes,2,opt,name=reason,proto3"`
+	xxx_hidden_Message  string                 `protobuf:"bytes,3,opt,name=message,proto3"`
+	xxx_hidden_Metadata map[string]string      `protobuf:"bytes,4,rep,name=metadata,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *Status) Reset() {
@@ -57,37 +56,68 @@ func (x *Status) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Status.ProtoReflect.Descriptor instead.
-func (*Status) Descriptor() ([]byte, []int) {
-	return file_types_errors_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *Status) GetCode() int32 {
 	if x != nil {
-		return x.Code
+		return x.xxx_hidden_Code
 	}
 	return 0
 }
 
 func (x *Status) GetReason() string {
 	if x != nil {
-		return x.Reason
+		return x.xxx_hidden_Reason
 	}
 	return ""
 }
 
 func (x *Status) GetMessage() string {
 	if x != nil {
-		return x.Message
+		return x.xxx_hidden_Message
 	}
 	return ""
 }
 
 func (x *Status) GetMetadata() map[string]string {
 	if x != nil {
-		return x.Metadata
+		return x.xxx_hidden_Metadata
 	}
 	return nil
+}
+
+func (x *Status) SetCode(v int32) {
+	x.xxx_hidden_Code = v
+}
+
+func (x *Status) SetReason(v string) {
+	x.xxx_hidden_Reason = v
+}
+
+func (x *Status) SetMessage(v string) {
+	x.xxx_hidden_Message = v
+}
+
+func (x *Status) SetMetadata(v map[string]string) {
+	x.xxx_hidden_Metadata = v
+}
+
+type Status_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Code     int32
+	Reason   string
+	Message  string
+	Metadata map[string]string
+}
+
+func (b0 Status_builder) Build() *Status {
+	m0 := &Status{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Code = b.Code
+	x.xxx_hidden_Reason = b.Reason
+	x.xxx_hidden_Message = b.Message
+	x.xxx_hidden_Metadata = b.Metadata
+	return m0
 }
 
 var File_types_errors_proto protoreflect.FileDescriptor
@@ -104,18 +134,6 @@ const file_types_errors_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\xb5\x01\n" +
 	"\x19com.fifsky.blog.api.typesB\vErrorsProtoP\x01Z\x13app/proto/gen/types\xa2\x02\x04FBAT\xaa\x02\x15Fifsky.Blog.Api.Types\xca\x02\x15Fifsky\\Blog\\Api\\Types\xe2\x02!Fifsky\\Blog\\Api\\Types\\GPBMetadata\xea\x02\x18Fifsky::Blog::Api::Typesb\x06proto3"
-
-var (
-	file_types_errors_proto_rawDescOnce sync.Once
-	file_types_errors_proto_rawDescData []byte
-)
-
-func file_types_errors_proto_rawDescGZIP() []byte {
-	file_types_errors_proto_rawDescOnce.Do(func() {
-		file_types_errors_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_types_errors_proto_rawDesc), len(file_types_errors_proto_rawDesc)))
-	})
-	return file_types_errors_proto_rawDescData
-}
 
 var file_types_errors_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_types_errors_proto_goTypes = []any{
