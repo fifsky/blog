@@ -54,6 +54,9 @@
 .markdown-body {
   font-size: 16px;
   @apply font-sans;
+  letter-spacing: 0.5px;
+  text-align: justify;
+  line-height: 1.6;
 }
 
 .markdown-body ol,
@@ -85,8 +88,7 @@
 }
 
 .markdown-body p {
-  margin-block-start: 1em;
-  margin-block-end: 1em;
+  word-break: break-word;
 }
 
 .markdown-body blockquote p {
