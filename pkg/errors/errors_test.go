@@ -6,9 +6,6 @@ import (
 	"net/http"
 	"reflect"
 	"testing"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type TestError struct{ message string }
@@ -41,32 +38,20 @@ func TestErrors(t *testing.T) {
 		t.Errorf("should be matches: %v", err)
 	}
 
-	if reason := Reason(err); reason != err3.GetReason() {
+	if reason := Reason(err); reason != err3.Reason {
 		t.Errorf("got %s want: %s", reason, err)
 	}
 
-	if err3.GetMetadata()["foo"] != "bar" {
+	if err3.Metadata["foo"] != "bar" {
 		t.Error("not expected metadata")
 	}
 
-	gs := err.GRPCStatus()
-	se := FromError(gs.Err())
-	if se.GetReason() != "reason" {
-		t.Errorf("got %+v want %+v", se, err)
-	}
-
-	gs2 := status.New(codes.InvalidArgument, "bad request")
-	se2 := FromError(gs2.Err())
-	// codes.InvalidArgument should convert to http.StatusBadRequest
-	if se2.GetCode() != http.StatusBadRequest {
-		t.Errorf("convert code err, got %d want %d", UnknownCode, http.StatusBadRequest)
-	}
 	if FromError(nil) != nil {
 		t.Errorf("FromError(nil) should be nil")
 	}
 	e := FromError(errors.New("test"))
-	if !reflect.DeepEqual(e.GetCode(), int32(UnknownCode)) {
-		t.Errorf("no expect value: %v, but got: %v", e.GetCode(), int32(UnknownCode))
+	if !reflect.DeepEqual(e.Code, int32(UnknownCode)) {
+		t.Errorf("no expect value: %v, but got: %v", e.Code, int32(UnknownCode))
 	}
 }
 
@@ -136,10 +121,10 @@ func TestOther(t *testing.T) {
 	}
 	// Clone
 	err400 := Newf(http.StatusBadRequest, "BAD_REQUEST", "param invalid")
-	err400.SetMetadata(map[string]string{
+	err400.Metadata = map[string]string{
 		"key1": "val1",
 		"key2": "val2",
-	})
+	}
 	if cerr := Clone(err400); cerr == nil || cerr.Error() != err400.Error() {
 		t.Errorf("Clone(err) = %v, want %v", Clone(err400), err400)
 	}

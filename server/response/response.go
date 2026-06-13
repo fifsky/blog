@@ -7,33 +7,32 @@ import (
 	"net/http"
 
 	"app/pkg/errors"
-	"app/proto/gen/types"
 
 	"github.com/goapt/logger"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
 
+type ErrorResponse struct {
+	Code    string            `json:"code,omitempty"`
+	Message string            `json:"message,omitempty"`
+	Details map[string]string `json:"details,omitempty"`
+}
+
 var protoencoder = protojson.MarshalOptions{
 	UseProtoNames:   true,
 	EmitUnpopulated: true,
-}
-
-var errorEncoder = protojson.MarshalOptions{
-	UseProtoNames: true,
 }
 
 func encode[T any](w http.ResponseWriter, status int, v T) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	switch vv := any(v).(type) {
-	case *types.ErrorResponse:
-		buf, err := errorEncoder.Marshal(vv)
-		if err != nil {
-			return fmt.Errorf("encode error protojson: %w", err)
+	case *ErrorResponse:
+		if err := json.NewEncoder(w).Encode(v); err != nil {
+			return fmt.Errorf("encode json: %w", err)
 		}
-		_, err = w.Write(buf)
-		return err
+		return nil
 	case proto.Message:
 		buf, err := protoencoder.Marshal(vv)
 		if err != nil {
@@ -57,25 +56,22 @@ func Success(w http.ResponseWriter, data any) {
 }
 
 func Fail(w http.ResponseWriter, err *errors.Error) {
-	resp := types.ErrorResponse_builder{}.Build()
-	resp.SetCode(err.GetReason())
-	resp.SetMessage(err.GetMessage())
-	details := err.GetMetadata()
-	if len(err.GetMetadata()) > 0 {
-		details = err.GetMetadata()
+	resp := &ErrorResponse{
+		Code:    err.Reason,
+		Message: err.Message,
+	}
+	if len(err.Metadata) > 0 {
+		resp.Details = err.Metadata
 	}
 
 	if unErr := errors.Unwrap(err); unErr != nil {
-		if details == nil {
-			details = make(map[string]string)
+		if resp.Details == nil {
+			resp.Details = make(map[string]string)
 		}
-		details["cause"] = unErr.Error()
-	}
-	if len(details) > 0 {
-		resp.SetDetails(details)
+		resp.Details["cause"] = unErr.Error()
 	}
 
-	if e := encode(w, int(err.GetCode()), resp); e != nil {
+	if e := encode(w, int(err.Code), resp); e != nil {
 		logger.Error("response error", slog.String("err", e.Error()))
 	}
 }
