@@ -12,10 +12,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var _ adminv1.LinkServiceServer = (*Link)(nil)
+var _ adminv1.LinkServiceHTTPServer = (*Link)(nil)
 
 type Link struct {
-	adminv1.UnimplementedLinkServiceServer
 	store *store.Store
 }
 

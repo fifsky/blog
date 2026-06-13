@@ -15,10 +15,9 @@ import (
 	"github.com/samber/lo"
 )
 
-var _ apiv1.RemindServiceServer = (*Remind)(nil)
+var _ apiv1.RemindServiceHTTPServer = (*Remind)(nil)
 
 type Remind struct {
-	apiv1.UnimplementedRemindServiceServer
 	store *store.Store
 	conf  *config.Config
 }

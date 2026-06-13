@@ -13,10 +13,9 @@ import (
 	"github.com/goapt/gotp"
 )
 
-var _ apiv1.UserServiceServer = (*User)(nil)
+var _ apiv1.UserServiceHTTPServer = (*User)(nil)
 
 type User struct {
-	apiv1.UnimplementedUserServiceServer
 	store *store.Store
 	conf  *config.Config
 }

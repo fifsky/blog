@@ -150,7 +150,7 @@ func TestGuestbook_Create(t *testing.T) {
 					if tt.errCode != "" {
 						appErr, ok := err.(*errors.Error)
 						require.True(t, ok, "expected *errors.Error type")
-						assert.Equal(t, tt.errCode, appErr.GetReason())
+						assert.Equal(t, tt.errCode, appErr.Reason)
 					}
 					return
 				}

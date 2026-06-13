@@ -13,10 +13,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var _ apiv1.SettingServiceServer = (*Setting)(nil)
+var _ apiv1.SettingServiceHTTPServer = (*Setting)(nil)
 
 type Setting struct {
-	apiv1.UnimplementedSettingServiceServer
 	store *store.Store
 }
 

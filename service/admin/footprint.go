@@ -12,10 +12,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var _ adminv1.FootprintServiceServer = (*Footprint)(nil)
+var _ adminv1.FootprintServiceHTTPServer = (*Footprint)(nil)
 
 type Footprint struct {
-	adminv1.UnimplementedFootprintServiceServer
 	store *store.Store
 }
 

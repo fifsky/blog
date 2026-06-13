@@ -13,10 +13,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var _ apiv1.MoodServiceServer = (*Mood)(nil)
+var _ apiv1.MoodServiceHTTPServer = (*Mood)(nil)
 
 type Mood struct {
-	apiv1.UnimplementedMoodServiceServer
 	store *store.Store
 }
 

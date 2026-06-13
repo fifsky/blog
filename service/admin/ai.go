@@ -22,10 +22,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var _ adminv1.AIServiceServer = (*AI)(nil)
+var _ adminv1.AIServiceHTTPServer = (*AI)(nil)
 
 type AI struct {
-	adminv1.UnimplementedAIServiceServer
 	agent *aiagent.Agent
 	store *store.Store
 }

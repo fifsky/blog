@@ -10,10 +10,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var _ apiv1.CateServiceServer = (*Cate)(nil)
+var _ apiv1.CateServiceHTTPServer = (*Cate)(nil)
 
 type Cate struct {
-	apiv1.UnimplementedCateServiceServer
 	store *store.Store
 }
 

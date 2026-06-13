@@ -21,10 +21,9 @@ import (
 	"github.com/samber/lo"
 )
 
-var _ apiv1.ArticleServiceServer = (*Article)(nil)
+var _ apiv1.ArticleServiceHTTPServer = (*Article)(nil)
 
 type Article struct {
-	apiv1.UnimplementedArticleServiceServer
 	store *store.Store
 }
 

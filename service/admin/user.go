@@ -16,10 +16,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var _ adminv1.UserServiceServer = (*User)(nil)
+var _ adminv1.UserServiceHTTPServer = (*User)(nil)
 
 type User struct {
-	adminv1.UnimplementedUserServiceServer
 	store *store.Store
 	conf  *config.Config
 }

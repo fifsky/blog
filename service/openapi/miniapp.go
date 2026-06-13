@@ -13,10 +13,9 @@ import (
 	"app/store"
 )
 
-var _ apiv1.MiniAppServiceServer = (*MiniApp)(nil)
+var _ apiv1.MiniAppServiceHTTPServer = (*MiniApp)(nil)
 
 type MiniApp struct {
-	apiv1.UnimplementedMiniAppServiceServer
 	store  *store.Store
 	conf   *config.Config
 	client *miniapp.Client

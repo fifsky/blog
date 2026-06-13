@@ -21,10 +21,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var _ adminv1.ArticleServiceServer = (*Article)(nil)
+var _ adminv1.ArticleServiceHTTPServer = (*Article)(nil)
 
 type Article struct {
-	adminv1.UnimplementedArticleServiceServer
 	store *store.Store
 	conf  *config.Config
 	upl   ossutil.Uploader

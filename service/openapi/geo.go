@@ -9,10 +9,9 @@ import (
 	"app/store"
 )
 
-var _ apiv1.GeoServiceServer = (*Geo)(nil)
+var _ apiv1.GeoServiceHTTPServer = (*Geo)(nil)
 
 type Geo struct {
-	apiv1.UnimplementedGeoServiceServer
 	store *store.Store
 }
 

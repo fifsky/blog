@@ -14,10 +14,9 @@ import (
 	"github.com/aliyun/alibabacloud-oss-go-sdk-v2/oss/credentials"
 )
 
-var _ adminv1.OSSServiceServer = (*OSS)(nil)
+var _ adminv1.OSSServiceHTTPServer = (*OSS)(nil)
 
 type OSS struct {
-	adminv1.UnimplementedOSSServiceServer
 	conf *config.Config
 }
 

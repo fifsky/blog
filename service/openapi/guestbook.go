@@ -18,7 +18,7 @@ import (
 	"github.com/openai/openai-go/v3/option"
 )
 
-var _ apiv1.GuestbookServiceServer = (*Guestbook)(nil)
+var _ apiv1.GuestbookServiceHTTPServer = (*Guestbook)(nil)
 
 // ContentModerator 内容审核接口
 type ContentModerator interface {
@@ -26,7 +26,6 @@ type ContentModerator interface {
 }
 
 type Guestbook struct {
-	apiv1.UnimplementedGuestbookServiceServer
 	store     *store.Store
 	moderator ContentModerator
 }

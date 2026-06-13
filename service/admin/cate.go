@@ -13,10 +13,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var _ adminv1.CateServiceServer = (*Cate)(nil)
+var _ adminv1.CateServiceHTTPServer = (*Cate)(nil)
 
 type Cate struct {
-	adminv1.UnimplementedCateServiceServer
 	store *store.Store
 }
 

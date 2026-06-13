@@ -7,10 +7,9 @@ import (
 	"app/store"
 )
 
-var _ apiv1.TravelServiceServer = (*Travel)(nil)
+var _ apiv1.TravelServiceHTTPServer = (*Travel)(nil)
 
 type Travel struct {
-	apiv1.UnimplementedTravelServiceServer
 	store *store.Store
 }
 

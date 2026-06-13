@@ -8,10 +8,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var _ apiv1.LinkServiceServer = (*Link)(nil)
+var _ apiv1.LinkServiceHTTPServer = (*Link)(nil)
 
 type Link struct {
-	apiv1.UnimplementedLinkServiceServer
 	store *store.Store
 }
 

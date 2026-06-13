@@ -14,10 +14,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var _ adminv1.RemindServiceServer = (*Remind)(nil)
+var _ adminv1.RemindServiceHTTPServer = (*Remind)(nil)
 
 type Remind struct {
-	adminv1.UnimplementedRemindServiceServer
 	store *store.Store
 }
 

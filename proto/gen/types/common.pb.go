@@ -247,91 +247,6 @@ func (b0 CateSummary_builder) Build() *CateSummary {
 	return m0
 }
 
-type ErrorResponse struct {
-	state              protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Code    string                 `protobuf:"bytes,1,opt,name=code,proto3"`
-	xxx_hidden_Message string                 `protobuf:"bytes,2,opt,name=message,proto3"`
-	xxx_hidden_Details map[string]string      `protobuf:"bytes,3,rep,name=details,proto3" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
-}
-
-func (x *ErrorResponse) Reset() {
-	*x = ErrorResponse{}
-	mi := &file_types_common_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ErrorResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ErrorResponse) ProtoMessage() {}
-
-func (x *ErrorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_types_common_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-func (x *ErrorResponse) GetCode() string {
-	if x != nil {
-		return x.xxx_hidden_Code
-	}
-	return ""
-}
-
-func (x *ErrorResponse) GetMessage() string {
-	if x != nil {
-		return x.xxx_hidden_Message
-	}
-	return ""
-}
-
-func (x *ErrorResponse) GetDetails() map[string]string {
-	if x != nil {
-		return x.xxx_hidden_Details
-	}
-	return nil
-}
-
-func (x *ErrorResponse) SetCode(v string) {
-	x.xxx_hidden_Code = v
-}
-
-func (x *ErrorResponse) SetMessage(v string) {
-	x.xxx_hidden_Message = v
-}
-
-func (x *ErrorResponse) SetDetails(v map[string]string) {
-	x.xxx_hidden_Details = v
-}
-
-type ErrorResponse_builder struct {
-	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
-
-	Code    string
-	Message string
-	Details map[string]string
-}
-
-func (b0 ErrorResponse_builder) Build() *ErrorResponse {
-	m0 := &ErrorResponse{}
-	b, x := &b0, m0
-	_, _ = b, x
-	x.xxx_hidden_Code = b.Code
-	x.xxx_hidden_Message = b.Message
-	x.xxx_hidden_Details = b.Details
-	return m0
-}
-
 var File_types_common_proto protoreflect.FileDescriptor
 
 const file_types_common_proto_rawDesc = "" +
@@ -347,31 +262,21 @@ const file_types_common_proto_rawDesc = "" +
 	"\vCateSummary\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
-	"\x06domain\x18\x03 \x01(\tR\x06domain\"\xc2\x01\n" +
-	"\rErrorResponse\x12\x12\n" +
-	"\x04code\x18\x01 \x01(\tR\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x12G\n" +
-	"\adetails\x18\x03 \x03(\v2-.fifsky.blog.types.ErrorResponse.DetailsEntryR\adetails\x1a:\n" +
-	"\fDetailsEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x9f\x01\n" +
+	"\x06domain\x18\x03 \x01(\tR\x06domainB\x9f\x01\n" +
 	"\x15com.fifsky.blog.typesB\vCommonProtoP\x01Z\x13app/proto/gen/types\xa2\x02\x03FBT\xaa\x02\x11Fifsky.Blog.Types\xca\x02\x11Fifsky\\Blog\\Types\xe2\x02\x1dFifsky\\Blog\\Types\\GPBMetadata\xea\x02\x13Fifsky::Blog::Typesb\x06proto3"
 
-var file_types_common_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_types_common_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_types_common_proto_goTypes = []any{
-	(*IDResponse)(nil),    // 0: fifsky.blog.types.IDResponse
-	(*UserSummary)(nil),   // 1: fifsky.blog.types.UserSummary
-	(*CateSummary)(nil),   // 2: fifsky.blog.types.CateSummary
-	(*ErrorResponse)(nil), // 3: fifsky.blog.types.ErrorResponse
-	nil,                   // 4: fifsky.blog.types.ErrorResponse.DetailsEntry
+	(*IDResponse)(nil),  // 0: fifsky.blog.types.IDResponse
+	(*UserSummary)(nil), // 1: fifsky.blog.types.UserSummary
+	(*CateSummary)(nil), // 2: fifsky.blog.types.CateSummary
 }
 var file_types_common_proto_depIdxs = []int32{
-	4, // 0: fifsky.blog.types.ErrorResponse.details:type_name -> fifsky.blog.types.ErrorResponse.DetailsEntry
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0, // [0:0] is the sub-list for method output_type
+	0, // [0:0] is the sub-list for method input_type
+	0, // [0:0] is the sub-list for extension type_name
+	0, // [0:0] is the sub-list for extension extendee
+	0, // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_types_common_proto_init() }
@@ -385,7 +290,7 @@ func file_types_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_types_common_proto_rawDesc), len(file_types_common_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -9,10 +9,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var _ adminv1.SettingServiceServer = (*Setting)(nil)
+var _ adminv1.SettingServiceHTTPServer = (*Setting)(nil)
 
 type Setting struct {
-	adminv1.UnimplementedSettingServiceServer
 	store *store.Store
 }
 

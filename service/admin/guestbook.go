@@ -9,10 +9,9 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var _ adminv1.GuestbookServiceServer = (*Guestbook)(nil)
+var _ adminv1.GuestbookServiceHTTPServer = (*Guestbook)(nil)
 
 type Guestbook struct {
-	adminv1.UnimplementedGuestbookServiceServer
 	store *store.Store
 }
 
