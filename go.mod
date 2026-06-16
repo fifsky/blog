@@ -21,7 +21,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/samber/lo v1.53.0
 	github.com/stretchr/testify v1.11.1
-	github.com/urfave/cli/v3 v3.9.0
+	github.com/urfave/cli/v3 v3.10.0
 	go.uber.org/mock v0.6.0
 	go.yaml.in/yaml/v3 v3.0.4
 	golang.org/x/sync v0.20.0
