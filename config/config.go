@@ -50,7 +50,7 @@ type Config struct {
 	LogLevel string             `yaml:"log_level"`
 	AppName  string             `yaml:"app_name"`
 	Common   common             `yaml:"common"`
-	DB       DBConf             `yaml:"database"`
+	DB       Database           `yaml:"database"`
 	OSS      ossConf            `yaml:"oss"`
 	MCP      map[string]MCPConf `yaml:"mcp"`
 	MiniAPP  MiniAPPConf        `yaml:"miniapp"`

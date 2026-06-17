@@ -29,8 +29,12 @@ import (
 
 func main() {
 	conf := config.New()
-	db, clean := config.NewBlogDB(conf)
-	defer clean()
+	db := conf.DB.Connect()
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Printf("[db] database close error: %s", err)
+		}
+	}()
 
 	// logger
 	logger.SetDefault(config.NewLogger(conf, "app.log"))
