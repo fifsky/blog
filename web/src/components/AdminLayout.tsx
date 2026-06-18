@@ -105,6 +105,9 @@ export function AdminLayout() {
               <AdminNavItem to="/admin/remind" isActive={isPage("/admin/remind")}>
                 提醒
               </AdminNavItem>
+              <AdminNavItem to="/admin/clawbot" isActive={isPage("/admin/clawbot")}>
+                微信
+              </AdminNavItem>
               <AdminNavItem to="/admin/users" isActive={isPage("/admin/users")}>
                 用户
               </AdminNavItem>

@@ -212,7 +212,11 @@ func (a *Agent) Run(ctx context.Context, request Request, handler EventHandler) 
 	if strings.TrimSpace(request.SystemPrompt) != "" {
 		messages = append(messages, openai.SystemMessage(request.SystemPrompt))
 	}
-	messages = append(messages, request.Messages...)
+	for _, message := range request.Messages {
+		if messageParamHasAssistantPayload(message) {
+			messages = append(messages, message)
+		}
+	}
 
 	aiReq := openai.ChatCompletionNewParams{
 		Model:    openai.ChatModel(model),
@@ -241,14 +245,18 @@ func (a *Agent) Run(ctx context.Context, request Request, handler EventHandler) 
 			break
 		}
 
-		assistantMessage := assistantMessageWithReasoning(streamResult.acc.Choices[0].Message, streamResult.reasoningContent)
-		generatedMessages = append(generatedMessages, assistantMessage)
-		if len(streamResult.acc.Choices[0].Message.ToolCalls) == 0 {
+		message := streamResult.acc.Choices[0].Message
+		hasAssistantPayload := assistantMessageHasPayload(message)
+		assistantMessage := assistantMessageWithReasoning(message, streamResult.reasoningContent)
+		if hasAssistantPayload {
+			generatedMessages = append(generatedMessages, assistantMessage)
+		}
+		if len(message.ToolCalls) == 0 {
 			break
 		}
 
 		aiReq.Messages = append(aiReq.Messages, assistantMessage)
-		for _, toolCall := range streamResult.acc.Choices[0].Message.ToolCalls {
+		for _, toolCall := range message.ToolCalls {
 			event := ToolEvent{
 				ID:        toolCall.ID,
 				Name:      toolCall.Function.Name,
@@ -275,6 +283,51 @@ func (a *Agent) Run(ctx context.Context, request Request, handler EventHandler) 
 	}
 
 	return Result{Content: content.String(), Messages: generatedMessages}, nil
+}
+
+func assistantMessageHasPayload(message openai.ChatCompletionMessage) bool {
+	return strings.TrimSpace(message.Content) != "" || len(message.ToolCalls) > 0
+}
+
+func messageParamHasAssistantPayload(message openai.ChatCompletionMessageParamUnion) bool {
+	if message.OfAssistant == nil {
+		return true
+	}
+
+	raw, err := json.Marshal(message)
+	if err != nil {
+		return true
+	}
+	var payload struct {
+		Role      string            `json:"role"`
+		Content   json.RawMessage   `json:"content"`
+		ToolCalls []json.RawMessage `json:"tool_calls"`
+	}
+	if err := json.Unmarshal(raw, &payload); err != nil {
+		return true
+	}
+	if payload.Role != "assistant" {
+		return true
+	}
+	if len(payload.ToolCalls) > 0 {
+		return true
+	}
+	return rawContentHasValue(payload.Content)
+}
+
+func rawContentHasValue(content json.RawMessage) bool {
+	if len(content) == 0 || string(content) == "null" {
+		return false
+	}
+	var text string
+	if err := json.Unmarshal(content, &text); err == nil {
+		return strings.TrimSpace(text) != ""
+	}
+	var parts []any
+	if err := json.Unmarshal(content, &parts); err == nil {
+		return len(parts) > 0
+	}
+	return true
 }
 
 func (a *Agent) runStream(ctx context.Context, streamFactory chatStreamFactory, aiReq openai.ChatCompletionNewParams, handler EventHandler, content *strings.Builder) (streamResult, error) {

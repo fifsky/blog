@@ -17,6 +17,7 @@ type Service struct {
 	Setting   *Setting
 	AI        *AI
 	OSS       *OSS
+	ClawBot   *ClawBot
 	Guestbook *Guestbook
 	Footprint *Footprint
 }
@@ -32,6 +33,7 @@ func New(s *store.Store, conf *config.Config, agent *aiagent.Agent) *Service {
 		Setting:   NewSetting(s),
 		AI:        NewAI(agent, s),
 		OSS:       NewOSS(conf),
+		ClawBot:   NewClawBot(s, conf, agent),
 		Guestbook: NewGuestbook(s),
 		Footprint: NewFootprint(s),
 	}

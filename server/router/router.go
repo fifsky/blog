@@ -104,6 +104,7 @@ func (r *Router) Handler() http.Handler {
 	adminv1.RegisterSettingServiceHTTPServer(adminAuth, codec, r.admin.Setting)
 	adminv1.RegisterOSSServiceHTTPServer(adminAuth, codec, r.admin.OSS)
 	adminv1.RegisterAIServiceHTTPServer(adminAuth, codec, r.admin.AI)
+	adminv1.RegisterClawBotServiceHTTPServer(adminAuth, codec, r.admin.ClawBot)
 	adminv1.RegisterGuestbookServiceHTTPServer(adminAuth, codec, r.admin.Guestbook)
 	adminv1.RegisterFootprintServiceHTTPServer(adminAuth, codec, r.admin.Footprint)
 

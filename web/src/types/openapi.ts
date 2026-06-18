@@ -77,6 +77,45 @@ export type AdminSetting = Setting & {
   ai_token: string;
 };
 
+export type ClawBotAccount = {
+  account_id: string;
+  user_id: string;
+  base_url: string;
+  saved_at: string;
+};
+
+export type ClawBotStatusResponse = {
+  connected: boolean;
+  account?: ClawBotAccount;
+  monitoring: boolean;
+  monitor_status: string;
+  last_event_at: string;
+  last_error: string;
+};
+
+export type ClawBotStartLoginRequest = {
+  account_hint?: string;
+};
+
+export type ClawBotCheckLoginRequest = {
+  session_key: string;
+};
+
+export type ClawBotLoginSession = {
+  session_key: string;
+  qr_code: string;
+  qr_content: string;
+  expires_at: string;
+  status: string;
+};
+
+export type ClawBotCheckLoginResponse = {
+  status: string;
+  session?: ClawBotLoginSession;
+  account?: ClawBotAccount;
+  connected: boolean;
+};
+
 export type CateMenuItem = { url: string; content: string };
 export type CateMenuResponse = { list: CateMenuItem[] };
 export type LinkMenuItem = { url: string; content: string };

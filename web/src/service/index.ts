@@ -65,6 +65,11 @@ import type {
   GuestbookListRequest,
   GuestbookListResponse,
   GuestbookDeleteRequest,
+  ClawBotStatusResponse,
+  ClawBotStartLoginRequest,
+  ClawBotLoginSession,
+  ClawBotCheckLoginRequest,
+  ClawBotCheckLoginResponse,
 } from "@/types/openapi";
 
 export const loginApi = (data: LoginRequest, errorHandler?: (e: AppError) => void) =>
@@ -118,6 +123,18 @@ export const settingAdminApi = (errorHandler?: (e: AppError) => void) =>
   createApi<AdminSetting>("/blog/admin/setting", undefined, errorHandler);
 export const settingUpdateApi = (data: AdminSetting, errorHandler?: (e: AppError) => void) =>
   createApi<AdminSetting>("/blog/admin/setting/update", data, errorHandler);
+export const clawBotStatusApi = (errorHandler?: (e: AppError) => void) =>
+  createApi<ClawBotStatusResponse>("/blog/admin/clawbot/status", undefined, errorHandler);
+export const clawBotStartLoginApi = (
+  data?: ClawBotStartLoginRequest,
+  errorHandler?: (e: AppError) => void,
+) => createApi<ClawBotLoginSession>("/blog/admin/clawbot/login/start", data, errorHandler);
+export const clawBotCheckLoginApi = (
+  data: ClawBotCheckLoginRequest,
+  errorHandler?: (e: AppError) => void,
+) => createApi<ClawBotCheckLoginResponse>("/blog/admin/clawbot/login/check", data, errorHandler);
+export const clawBotDisconnectApi = (errorHandler?: (e: AppError) => void) =>
+  createApi<ClawBotStatusResponse>("/blog/admin/clawbot/disconnect", undefined, errorHandler);
 export const articleCreateApi = (
   data: ArticleCreateRequest,
   errorHandler?: (e: AppError) => void,

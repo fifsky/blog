@@ -259,6 +259,78 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
+    /blog/admin/clawbot/disconnect:
+        post:
+            tags:
+                - ClawBotService
+            description: Disconnect 断开当前连接
+            operationId: ClawBotService_Disconnect
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ClawBotStatusResponse'
+    /blog/admin/clawbot/login/check:
+        post:
+            tags:
+                - ClawBotService
+            description: CheckLogin 检查扫码登录状态
+            operationId: ClawBotService_CheckLogin
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ClawBotCheckLoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ClawBotCheckLoginResponse'
+    /blog/admin/clawbot/login/start:
+        post:
+            tags:
+                - ClawBotService
+            description: StartLogin 创建微信扫码登录会话
+            operationId: ClawBotService_StartLogin
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ClawBotStartLoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ClawBotLoginSession'
+    /blog/admin/clawbot/status:
+        post:
+            tags:
+                - ClawBotService
+            description: Status 获取当前连接状态
+            operationId: ClawBotService_Status
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ClawBotStatusResponse'
     /blog/admin/footprint/create:
         post:
             tags:
@@ -1420,6 +1492,74 @@ components:
                     type: string
                 domain:
                     type: string
+        ClawBotAccount:
+            type: object
+            properties:
+                account_id:
+                    type: string
+                user_id:
+                    type: string
+                base_url:
+                    type: string
+                saved_at:
+                    type: string
+            description: ClawBotAccount 表示已连接的微信账号
+        ClawBotCheckLoginRequest:
+            required:
+                - session_key
+            type: object
+            properties:
+                session_key:
+                    type: string
+            description: ClawBotCheckLoginRequest 检查扫码登录请求
+        ClawBotCheckLoginResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+                session:
+                    $ref: '#/components/schemas/ClawBotLoginSession'
+                account:
+                    $ref: '#/components/schemas/ClawBotAccount'
+                connected:
+                    type: boolean
+            description: ClawBotCheckLoginResponse 表示扫码登录状态检查结果
+        ClawBotLoginSession:
+            type: object
+            properties:
+                session_key:
+                    type: string
+                qr_code:
+                    type: string
+                qr_content:
+                    type: string
+                expires_at:
+                    type: string
+                status:
+                    type: string
+            description: ClawBotLoginSession 表示一次扫码登录会话
+        ClawBotStartLoginRequest:
+            type: object
+            properties:
+                account_hint:
+                    type: string
+            description: ClawBotStartLoginRequest 创建扫码登录请求
+        ClawBotStatusResponse:
+            type: object
+            properties:
+                connected:
+                    type: boolean
+                account:
+                    $ref: '#/components/schemas/ClawBotAccount'
+                monitoring:
+                    type: boolean
+                monitor_status:
+                    type: string
+                last_event_at:
+                    type: string
+                last_error:
+                    type: string
+            description: ClawBotStatusResponse 表示当前 ClawBot 状态
         DateArchiveItem:
             type: object
             properties:
@@ -2166,14 +2306,16 @@ tags:
       description: CateService 提供分类相关的接口
     - name: CateService
       description: CateService 提供分类相关的接口
+    - name: ClawBotService
+      description: ClawBotService 提供微信 ClawBot 连接管理接口
     - name: FootprintService
       description: FootprintService 提供足迹管理相关的接口
     - name: GeoService
       description: GeoService 提供地理位置相关的接口
     - name: GuestbookService
-      description: GuestbookService 提供留言相关的管理接口
-    - name: GuestbookService
       description: GuestbookService 提供留言本相关的接口
+    - name: GuestbookService
+      description: GuestbookService 提供留言相关的管理接口
     - name: LinkService
       description: LinkService 提供链接相关的接口
     - name: LinkService

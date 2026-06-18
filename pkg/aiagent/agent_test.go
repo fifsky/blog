@@ -295,6 +295,74 @@ func TestAgentRunReturnsReasoningContentAfterToolCalls(t *testing.T) {
 	assertMessageReasoningContent(t, result.Messages[2], "工具结果可用。")
 }
 
+func TestAgentRunSkipsReasoningOnlyAssistantMessages(t *testing.T) {
+	streamFactory := &fakeStreamFactory{
+		streams: []*fakeStream{
+			{
+				chunks: []openai.ChatCompletionChunk{
+					chunk(`{"choices":[{"index":0,"delta":{"role":"assistant","reasoning_content":"只思考，没有最终内容。"},"finish_reason":null}]}`),
+					chunk(`{"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}`),
+				},
+			},
+		},
+	}
+	agent := &Agent{
+		client:        openai.NewClient(option.WithAPIKey("test")),
+		model:         "deepseek-v4-pro",
+		streamFactory: streamFactory,
+	}
+
+	result, err := agent.Run(context.Background(), Request{
+		Messages: []openai.ChatCompletionMessageParamUnion{openai.UserMessage("继续")},
+	}, EventHandler{})
+	if err != nil {
+		t.Fatalf("Run() error = %v", err)
+	}
+
+	if len(result.Messages) != 0 {
+		raw, _ := json.Marshal(result.Messages[0])
+		t.Fatalf("result messages = %d, want 0; first=%s", len(result.Messages), raw)
+	}
+}
+
+func TestAgentRunDropsReasoningOnlyAssistantInputMessages(t *testing.T) {
+	streamFactory := &fakeStreamFactory{
+		streams: []*fakeStream{
+			{
+				chunks: []openai.ChatCompletionChunk{
+					chunk(`{"choices":[{"index":0,"delta":{"role":"assistant","content":"继续处理"},"finish_reason":null}]}`),
+					chunk(`{"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}`),
+				},
+			},
+		},
+	}
+	agent := &Agent{
+		client:        openai.NewClient(option.WithAPIKey("test")),
+		model:         "deepseek-v4-pro",
+		streamFactory: streamFactory,
+	}
+	invalidHistory := assistantMessageWithReasoning(openai.ChatCompletionMessage{}, "旧的思考内容")
+
+	_, err := agent.Run(context.Background(), Request{
+		Messages: []openai.ChatCompletionMessageParamUnion{
+			openai.UserMessage("上一轮问题"),
+			invalidHistory,
+			openai.UserMessage("继续"),
+		},
+	}, EventHandler{})
+	if err != nil {
+		t.Fatalf("Run() error = %v", err)
+	}
+
+	if len(streamFactory.requests) != 1 {
+		t.Fatalf("requests = %d, want 1", len(streamFactory.requests))
+	}
+	if got := len(streamFactory.requests[0].Messages); got != 2 {
+		raw, _ := json.Marshal(streamFactory.requests[0].Messages)
+		t.Fatalf("request messages = %d, want 2; raw=%s", got, raw)
+	}
+}
+
 func TestAssistantMessageReasoningContentSurvivesJSONRoundTrip(t *testing.T) {
 	message := openai.ChatCompletionMessage{
 		Content: "查好了",
