@@ -132,8 +132,8 @@ func TestJoinURLInvalidBase(t *testing.T) {
 	}
 }
 
-func TestMonitorTransportErrorCallsOnError(t *testing.T) {
-	syncPath := filepath.Join(t.TempDir(), "monitor.sync.json")
+func TestListenTransportErrorCallsOnError(t *testing.T) {
+	syncPath := filepath.Join(t.TempDir(), "listen.sync.json")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -147,7 +147,7 @@ func TestMonitorTransportErrorCallsOnError(t *testing.T) {
 		},
 	})
 
-	err := Monitor(ctx, MonitorOptions{
+	err := Listen(ctx, ListenOptions{
 		API:         api,
 		SyncBufPath: syncPath,
 		OnMessages:  func(context.Context, []WeixinMessage) error { return nil },
@@ -157,14 +157,14 @@ func TestMonitorTransportErrorCallsOnError(t *testing.T) {
 		},
 	})
 	if !errors.Is(err, context.Canceled) {
-		t.Fatalf("unexpected monitor error: %v", err)
+		t.Fatalf("unexpected listen error: %v", err)
 	}
 	if gotErr == nil || !strings.Contains(gotErr.Error(), "network boom") {
-		t.Fatalf("unexpected monitor transport error callback: %v", gotErr)
+		t.Fatalf("unexpected listen transport error callback: %v", gotErr)
 	}
 }
 
-func TestMonitorResponseErrorCallsOnError(t *testing.T) {
+func TestListenResponseErrorCallsOnError(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewEncoder(w).Encode(GetUpdatesResponse{
 			Ret:                  1,
@@ -175,12 +175,12 @@ func TestMonitorResponseErrorCallsOnError(t *testing.T) {
 	}))
 	defer server.Close()
 
-	syncPath := filepath.Join(t.TempDir(), "monitor.sync.json")
+	syncPath := filepath.Join(t.TempDir(), "listen.sync.json")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	var gotErr error
-	err := Monitor(ctx, MonitorOptions{
+	err := Listen(ctx, ListenOptions{
 		API:         NewAPIClient(APIOptions{BaseURL: server.URL, HTTPClient: server.Client()}),
 		SyncBufPath: syncPath,
 		OnMessages:  func(context.Context, []WeixinMessage) error { return nil },
@@ -190,14 +190,14 @@ func TestMonitorResponseErrorCallsOnError(t *testing.T) {
 		},
 	})
 	if !errors.Is(err, context.Canceled) {
-		t.Fatalf("unexpected monitor error: %v", err)
+		t.Fatalf("unexpected listen error: %v", err)
 	}
 	if gotErr == nil || !strings.Contains(gotErr.Error(), "getUpdates failed: ret=1 errcode=2 errmsg=bad update") {
-		t.Fatalf("unexpected monitor response error callback: %v", gotErr)
+		t.Fatalf("unexpected listen response error callback: %v", gotErr)
 	}
 }
 
-func TestMonitorSessionExpiredPausesAccount(t *testing.T) {
+func TestListenSessionExpiredPausesAccount(t *testing.T) {
 	resetSessionGuardForTest()
 	defer resetSessionGuardForTest()
 
@@ -206,7 +206,7 @@ func TestMonitorSessionExpiredPausesAccount(t *testing.T) {
 	}))
 	defer server.Close()
 
-	syncPath := filepath.Join(t.TempDir(), "monitor.sync.json")
+	syncPath := filepath.Join(t.TempDir(), "listen.sync.json")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go func() {
@@ -214,22 +214,22 @@ func TestMonitorSessionExpiredPausesAccount(t *testing.T) {
 		cancel()
 	}()
 
-	err := Monitor(ctx, MonitorOptions{
+	err := Listen(ctx, ListenOptions{
 		API:         NewAPIClient(APIOptions{BaseURL: server.URL, HTTPClient: server.Client()}),
 		AccountID:   "bot@im.bot",
 		SyncBufPath: syncPath,
 		OnMessages:  func(context.Context, []WeixinMessage) error { return nil },
 	})
 	if !errors.Is(err, context.Canceled) {
-		t.Fatalf("unexpected monitor session-expired error: %v", err)
+		t.Fatalf("unexpected listen session-expired error: %v", err)
 	}
 	if !IsSessionPaused("bot@im.bot") {
 		t.Fatalf("expected session to be paused")
 	}
 }
 
-func TestMonitorFilteredStatusAndSaveSyncError(t *testing.T) {
-	syncPath := filepath.Join(t.TempDir(), "monitor.sync.json")
+func TestListenFilteredStatusAndSaveSyncError(t *testing.T) {
+	syncPath := filepath.Join(t.TempDir(), "listen.sync.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if err := os.Mkdir(syncPath, 0o755); err != nil && !os.IsExist(err) {
 			t.Fatalf("mkdir syncPath: %v", err)
@@ -251,7 +251,7 @@ func TestMonitorFilteredStatusAndSaveSyncError(t *testing.T) {
 		statusCalls int
 		gotErr      error
 	)
-	err := Monitor(ctx, MonitorOptions{
+	err := Listen(ctx, ListenOptions{
 		API:         NewAPIClient(APIOptions{BaseURL: server.URL, HTTPClient: server.Client()}),
 		SyncBufPath: syncPath,
 		AllowFrom:   []string{"allowed"},
@@ -265,7 +265,7 @@ func TestMonitorFilteredStatusAndSaveSyncError(t *testing.T) {
 		},
 	})
 	if !errors.Is(err, context.Canceled) {
-		t.Fatalf("unexpected monitor status-loop error: %v", err)
+		t.Fatalf("unexpected listen status-loop error: %v", err)
 	}
 	if statusCalls == 0 {
 		t.Fatalf("expected OnStatus to run for filtered-empty path")
@@ -275,14 +275,14 @@ func TestMonitorFilteredStatusAndSaveSyncError(t *testing.T) {
 	}
 }
 
-func TestMonitorSyncBufferLoadErrorAndStatusAfterMessages(t *testing.T) {
+func TestListenSyncBufferLoadErrorAndStatusAfterMessages(t *testing.T) {
 	t.Run("invalid sync buffer returns error", func(t *testing.T) {
-		syncPath := filepath.Join(t.TempDir(), "monitor.sync.json")
+		syncPath := filepath.Join(t.TempDir(), "listen.sync.json")
 		if err := os.WriteFile(syncPath, []byte("{bad"), 0o600); err != nil {
 			t.Fatalf("write bad sync buffer: %v", err)
 		}
 
-		err := Monitor(context.Background(), MonitorOptions{
+		err := Listen(context.Background(), ListenOptions{
 			API:         NewAPIClient(APIOptions{}),
 			SyncBufPath: syncPath,
 			OnMessages:  func(context.Context, []WeixinMessage) error { return nil },
@@ -310,9 +310,9 @@ func TestMonitorSyncBufferLoadErrorAndStatusAfterMessages(t *testing.T) {
 			statusCalls    int
 			onMessageCalls int
 		)
-		err := Monitor(ctx, MonitorOptions{
+		err := Listen(ctx, ListenOptions{
 			API:         NewAPIClient(APIOptions{BaseURL: server.URL, HTTPClient: server.Client()}),
-			SyncBufPath: filepath.Join(t.TempDir(), "monitor.sync.json"),
+			SyncBufPath: filepath.Join(t.TempDir(), "listen.sync.json"),
 			AllowFrom:   []string{"allowed"},
 			OnMessages: func(context.Context, []WeixinMessage) error {
 				onMessageCalls++
@@ -324,7 +324,7 @@ func TestMonitorSyncBufferLoadErrorAndStatusAfterMessages(t *testing.T) {
 			},
 		})
 		if !errors.Is(err, context.Canceled) {
-			t.Fatalf("unexpected monitor status-after-message error: %v", err)
+			t.Fatalf("unexpected listen status-after-message error: %v", err)
 		}
 		if onMessageCalls != 1 || statusCalls == 0 {
 			t.Fatalf("unexpected callbacks: onMessage=%d status=%d", onMessageCalls, statusCalls)
@@ -332,8 +332,8 @@ func TestMonitorSyncBufferLoadErrorAndStatusAfterMessages(t *testing.T) {
 	})
 }
 
-func TestMonitorBackoffAfterConsecutiveFailures(t *testing.T) {
-	syncPath := filepath.Join(t.TempDir(), "monitor.sync.json")
+func TestListenBackoffAfterConsecutiveFailures(t *testing.T) {
+	syncPath := filepath.Join(t.TempDir(), "listen.sync.json")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -349,7 +349,7 @@ func TestMonitorBackoffAfterConsecutiveFailures(t *testing.T) {
 	})
 
 	start := time.Now()
-	err := Monitor(ctx, MonitorOptions{
+	err := Listen(ctx, ListenOptions{
 		API:         api,
 		SyncBufPath: syncPath,
 		OnMessages:  func(context.Context, []WeixinMessage) error { return nil },
@@ -360,7 +360,7 @@ func TestMonitorBackoffAfterConsecutiveFailures(t *testing.T) {
 		},
 	})
 	if !errors.Is(err, context.Canceled) {
-		t.Fatalf("unexpected monitor backoff error: %v", err)
+		t.Fatalf("unexpected listen backoff error: %v", err)
 	}
 	if calls != maxConsecutiveFailures {
 		t.Fatalf("expected %d failures before cancel, got %d", maxConsecutiveFailures, calls)

@@ -3,17 +3,22 @@ package admin
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"app/config"
+	"app/pkg/aiagent"
+	"app/pkg/clawbot"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/store"
 	"app/testutil"
 
 	"github.com/goapt/dbunit"
+	"github.com/openai/openai-go/v3"
+	"github.com/openai/openai-go/v3/option"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -151,4 +156,89 @@ func TestClawBotDisconnectClearsOptions(t *testing.T) {
 		require.Empty(t, opts["clawbot_account_id"])
 		require.Empty(t, opts["clawbot_bot_token"])
 	})
+}
+
+func TestClawBotHandleMessageSendsTypingAndCancelsBeforeReply(t *testing.T) {
+	events := make([]string, 0, 5)
+	replyText := ""
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/chat/completions":
+			events = append(events, "chat")
+			w.Header().Set("Content-Type", "text/event-stream")
+			fmt.Fprint(w, "data: {\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"AI 回复\"},\"finish_reason\":null}]}\n\n")
+			fmt.Fprint(w, "data: {\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}]}\n\n")
+			fmt.Fprint(w, "data: [DONE]\n\n")
+		case "/ilink/bot/getconfig":
+			events = append(events, "getconfig")
+			var req struct {
+				ILinkUserID  string `json:"ilink_user_id"`
+				ContextToken string `json:"context_token"`
+			}
+			require.NoError(t, json.NewDecoder(r.Body).Decode(&req))
+			require.Equal(t, "user@im.wechat", req.ILinkUserID)
+			require.Equal(t, "ctx-1", req.ContextToken)
+			_ = json.NewEncoder(w).Encode(clawbot.GetConfigResponse{
+				Ret:          0,
+				TypingTicket: "ticket-1",
+			})
+		case "/ilink/bot/sendtyping":
+			var req clawbot.SendTypingRequest
+			require.NoError(t, json.NewDecoder(r.Body).Decode(&req))
+			require.Equal(t, "user@im.wechat", req.ILinkUserID)
+			require.Equal(t, "ticket-1", req.TypingTicket)
+			switch req.Status {
+			case clawbot.TypingStatusTyping:
+				events = append(events, "typing")
+			case clawbot.TypingStatusCancel:
+				events = append(events, "cancel")
+			default:
+				t.Fatalf("unexpected typing status: %d", req.Status)
+			}
+			_ = json.NewEncoder(w).Encode(clawbot.SendTypingResponse{Ret: 0})
+		case "/ilink/bot/sendmessage":
+			events = append(events, "send")
+			var req clawbot.SendMessageRequest
+			require.NoError(t, json.NewDecoder(r.Body).Decode(&req))
+			require.NotNil(t, req.Message)
+			require.Len(t, req.Message.ItemList, 1)
+			require.NotNil(t, req.Message.ItemList[0].TextItem)
+			replyText = req.Message.ItemList[0].TextItem.Text
+			_ = json.NewEncoder(w).Encode(map[string]any{"ret": 0})
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	defer server.Close()
+
+	agent := aiagent.New(
+		aiagent.WithClient(openai.NewClient(option.WithAPIKey("test"), option.WithBaseURL(server.URL))),
+		aiagent.WithModel("test-model"),
+	)
+	svc := NewClawBot(nil, &config.Config{}, agent, WithClawBotMonitor(false))
+	account := &clawbot.Account{
+		AccountID: "bot@im.bot",
+		BotToken:  "bot-token",
+		BaseURL:   server.URL,
+	}
+	api := svc.newAPIClient(account)
+	sender := clawbot.NewSender(clawbot.SenderOptions{
+		API:       api,
+		AccountID: account.AccountID,
+		BaseURL:   account.BaseURL,
+		Token:     account.BotToken,
+	})
+
+	err := svc.handleMessage(context.Background(), account, api, clawbot.NewConfigManager(api), sender, clawbot.WeixinMessage{
+		FromUserID:   "user@im.wechat",
+		ContextToken: "ctx-1",
+		ItemList: []clawbot.MessageItem{{
+			Type:     clawbot.MessageItemTypeText,
+			TextItem: &clawbot.TextItem{Text: "你好"},
+		}},
+	})
+	require.NoError(t, err)
+	require.Equal(t, []string{"getconfig", "typing", "chat", "cancel", "send"}, events)
+	require.Equal(t, "AI 回复", replyText)
 }

@@ -7,13 +7,13 @@ import (
 )
 
 const (
-	defaultMonitorLongPoll = 35 * time.Second
+	defaultListenLongPoll  = 35 * time.Second
 	maxConsecutiveFailures = 3
 	backoffDelay           = 30 * time.Second
 	retryDelay             = 2 * time.Second
 )
 
-type MonitorOptions struct {
+type ListenOptions struct {
 	API             *APIClient
 	AccountID       string
 	SyncBufPath     string
@@ -24,12 +24,12 @@ type MonitorOptions struct {
 	OnStatus        func(lastEventAt time.Time)
 }
 
-func Monitor(ctx context.Context, opts MonitorOptions) error {
+func Listen(ctx context.Context, opts ListenOptions) error {
 	if opts.API == nil {
-		return fmt.Errorf("monitor API client is nil")
+		return fmt.Errorf("listen API client is nil")
 	}
 	if opts.OnMessages == nil {
-		return fmt.Errorf("monitor OnMessages callback is nil")
+		return fmt.Errorf("listen OnMessages callback is nil")
 	}
 
 	getUpdatesBuf, err := LoadSyncBuffer(opts.SyncBufPath)
@@ -38,7 +38,7 @@ func Monitor(ctx context.Context, opts MonitorOptions) error {
 	}
 	nextTimeout := opts.LongPollTimeout
 	if nextTimeout <= 0 {
-		nextTimeout = defaultMonitorLongPoll
+		nextTimeout = defaultListenLongPoll
 	}
 
 	consecutiveFailures := 0

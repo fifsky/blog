@@ -4,7 +4,7 @@
 
 ## 项目简介
 
-**weixin-clawbot** 是一个 Go 语言库，专为通过 [iLink](https://ilinkai.weixin.qq.com) Bot 平台接入微信（Weixin/WeChat）而设计，是 [OpenClaw](https://github.com/daemon365) 微信插件的底层客户端。
+**weixin-clawbot** 是一个 Go 语言库，专为通过 [iLink](https://ilinkai.weixin.qq.com) Bot 平台接入微信（Weixin/WeChat）而设计，是 OpenClaw 微信插件的底层客户端。
 
 它解决的核心问题是：如何用 Go 代码以机器人身份登录微信、接收消息并自动回复。整个流程包括：
 
@@ -14,6 +14,8 @@
 4. **媒体处理**：支持将媒体文件上传至 CDN（含 AES-ECB 加密），以及下载入站媒体文件到本地。
 
 如果你正在构建一个基于微信的聊天机器人、消息自动化系统或客服机器人，这个库提供了所需的底层能力。
+
+接口协议详见 [API 文档](doc/protocol.md)
 
 ## 功能
 
@@ -86,7 +88,7 @@ api := clawbot.NewAPIClient(clawbot.APIOptions{
 	Token:   "YOUR_BOT_TOKEN",
 })
 
-err := clawbot.Monitor(context.Background(), clawbot.MonitorOptions{
+err := clawbot.Listen(context.Background(), clawbot.ListenOptions{
 	API:         api,
 	AccountID:   "bot@im.bot",
 	SyncBufPath: clawbot.SyncBufFilePath(clawbot.ResolveStateDir(), "bot@im.bot"),
@@ -109,7 +111,7 @@ if err != nil {
 - `Sender`：可复用的消息发送器
 - `Conversation`：绑定单个 `ToUserID` + `ContextToken` 的会话发送器
 - `Target`：发送目标
-- `MonitorOptions`：长轮询监听配置
+- `ListenOptions`：长轮询监听配置
 - `UploadedFileInfo`：CDN 上传结果
 
 ## 说明

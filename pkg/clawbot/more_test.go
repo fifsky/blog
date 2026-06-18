@@ -785,15 +785,15 @@ func TestDownloadMediaFromItemImageEncryptedAndVoiceFallback(t *testing.T) {
 	}
 }
 
-func TestMonitorValidationAndFlow(t *testing.T) {
+func TestListenValidationAndFlow(t *testing.T) {
 	t.Parallel()
 
-	if err := Monitor(context.Background(), MonitorOptions{}); err == nil || !strings.Contains(err.Error(), "monitor API client is nil") {
+	if err := Listen(context.Background(), ListenOptions{}); err == nil || !strings.Contains(err.Error(), "listen API client is nil") {
 		t.Fatalf("unexpected nil API error: %v", err)
 	}
 
 	api := NewAPIClient(APIOptions{})
-	if err := Monitor(context.Background(), MonitorOptions{API: api}); err == nil || !strings.Contains(err.Error(), "monitor OnMessages callback is nil") {
+	if err := Listen(context.Background(), ListenOptions{API: api}); err == nil || !strings.Contains(err.Error(), "listen OnMessages callback is nil") {
 		t.Fatalf("unexpected nil callback error: %v", err)
 	}
 
@@ -816,9 +816,9 @@ func TestMonitorValidationAndFlow(t *testing.T) {
 	}))
 	defer server.Close()
 
-	syncPath := filepath.Join(t.TempDir(), "monitor.sync.json")
-	wantErr := errors.New("stop monitor")
-	err := Monitor(context.Background(), MonitorOptions{
+	syncPath := filepath.Join(t.TempDir(), "listen.sync.json")
+	wantErr := errors.New("stop listen")
+	err := Listen(context.Background(), ListenOptions{
 		API:         NewAPIClient(APIOptions{BaseURL: server.URL, HTTPClient: server.Client()}),
 		AccountID:   "bot@im.bot",
 		SyncBufPath: syncPath,
@@ -831,7 +831,7 @@ func TestMonitorValidationAndFlow(t *testing.T) {
 		},
 	})
 	if !errors.Is(err, wantErr) {
-		t.Fatalf("unexpected monitor error: %v", err)
+		t.Fatalf("unexpected listen error: %v", err)
 	}
 
 	buf, err := LoadSyncBuffer(syncPath)
@@ -843,7 +843,7 @@ func TestMonitorValidationAndFlow(t *testing.T) {
 	}
 }
 
-func TestMonitorStatusPathCancelsCleanly(t *testing.T) {
+func TestListenStatusPathCancelsCleanly(t *testing.T) {
 	t.Parallel()
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -855,7 +855,7 @@ func TestMonitorStatusPathCancelsCleanly(t *testing.T) {
 	defer cancel()
 
 	var statusCalls int
-	err := Monitor(ctx, MonitorOptions{
+	err := Listen(ctx, ListenOptions{
 		API: NewAPIClient(APIOptions{
 			BaseURL:    server.URL,
 			HTTPClient: server.Client(),
@@ -867,7 +867,7 @@ func TestMonitorStatusPathCancelsCleanly(t *testing.T) {
 		},
 	})
 	if !errors.Is(err, context.Canceled) {
-		t.Fatalf("unexpected monitor cancel error: %v", err)
+		t.Fatalf("unexpected listen cancel error: %v", err)
 	}
 	if statusCalls == 0 {
 		t.Fatalf("expected status callback to run")

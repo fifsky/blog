@@ -500,21 +500,29 @@ export default function AdminClawBot() {
             )}
           </section>
 
-          <section className="rounded-md border border-border bg-background">
-            <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-sm font-medium">登录二维码</span>
-                <span className="text-xs text-muted-foreground">
-                  图片内容会直接渲染，文本内容会生成二维码并保留原始值。
-                </span>
+          {!connected && (
+            <section className="rounded-md border border-border bg-background">
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-sm font-medium">登录二维码</span>
+                  <span className="text-xs text-muted-foreground">
+                    使用二维码组件渲染登录内容，并保留原始值用于排查。
+                  </span>
+                </div>
+                {loginSession && (
+                  <Badge variant="outline">Session {loginSession.session_key}</Badge>
+                )}
               </div>
-              {loginSession && <Badge variant="outline">Session {loginSession.session_key}</Badge>}
-            </div>
-            <Separator />
-            <div className="p-4">
-              <LoginPanel session={loginSession} checking={checking} onCopy={handleCopyQrContent} />
-            </div>
-          </section>
+              <Separator />
+              <div className="p-4">
+                <LoginPanel
+                  session={loginSession}
+                  checking={checking}
+                  onCopy={handleCopyQrContent}
+                />
+              </div>
+            </section>
+          )}
         </div>
       )}
     </div>
