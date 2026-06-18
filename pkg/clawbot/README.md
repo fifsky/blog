@@ -62,17 +62,16 @@ func main() {
 ```go
 ctx := context.Background()
 
-sender := clawbot.NewSender(clawbot.SenderOptions{
-	BaseURL:      "https://ilinkai.weixin.qq.com",
-	Token:        "YOUR_BOT_TOKEN",
-	Timeout:      15 * time.Second,
-})
-conversation := sender.Conversation(clawbot.Target{
-	ToUserID:     "user@im.wechat",
-	ContextToken: "YOUR_CONTEXT_TOKEN",
+client := clawbot.NewClient(clawbot.Options{}).UseAccount(&clawbot.Account{
+	AccountID: "bot@im.bot",
+	BotToken:  "YOUR_BOT_TOKEN",
+	BaseURL:   "https://ilinkai.weixin.qq.com",
 })
 
-clientID, err := conversation.SendText(ctx, "hello from bot")
+clientID, err := client.SendText(ctx, clawbot.Target{
+	ToUserID:     "user@im.wechat",
+	ContextToken: "YOUR_CONTEXT_TOKEN",
+}, "hello from bot")
 if err != nil {
 	log.Fatal(err)
 }
@@ -83,13 +82,13 @@ log.Println("sent:", clientID)
 ### 3. 监听消息
 
 ```go
-api := clawbot.NewAPIClient(clawbot.APIOptions{
-	BaseURL: "https://ilinkai.weixin.qq.com",
-	Token:   "YOUR_BOT_TOKEN",
+client := clawbot.NewClient(clawbot.Options{}).UseAccount(&clawbot.Account{
+	AccountID: "bot@im.bot",
+	BotToken:  "YOUR_BOT_TOKEN",
+	BaseURL:   "https://ilinkai.weixin.qq.com",
 })
 
-err := clawbot.Listen(context.Background(), clawbot.ListenOptions{
-	API:         api,
+err := client.Listen(context.Background(), clawbot.ListenOptions{
 	AccountID:   "bot@im.bot",
 	SyncBufPath: clawbot.SyncBufFilePath(clawbot.ResolveStateDir(), "bot@im.bot"),
 	OnMessages: func(ctx context.Context, messages []clawbot.WeixinMessage) error {
@@ -106,10 +105,7 @@ if err != nil {
 
 ## 主要类型
 
-- `Client`：扫码登录流程
-- `APIClient`：ilink bot API 封装
-- `Sender`：可复用的消息发送器
-- `Conversation`：绑定单个 `ToUserID` + `ContextToken` 的会话发送器
+- `Client`：统一入口，负责扫码登录、长轮询监听、消息发送、typing、媒体上传下载
 - `Target`：发送目标
 - `ListenOptions`：长轮询监听配置
 - `UploadedFileInfo`：CDN 上传结果

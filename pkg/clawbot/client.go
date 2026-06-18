@@ -15,7 +15,9 @@ import (
 
 const (
 	DefaultBaseURL           = "https://ilinkai.weixin.qq.com"
+	DefaultCDNBaseURL        = "https://novac2c.cdn.weixin.qq.com/c2c"
 	DefaultBotType           = "3"
+	DefaultChannelVersion    = "go-port"
 	DefaultQRSessionTTL      = 5 * time.Minute
 	DefaultQRLongPollTimeout = 35 * time.Second
 	DefaultLoginTimeout      = 8 * time.Minute
@@ -25,9 +27,15 @@ const (
 
 type Options struct {
 	BaseURL           string
+	CDNBaseURL        string
 	BotType           string
+	Token             string
+	AccountID         string
+	Account           *Account
 	RouteTag          string
+	ChannelVersion    string
 	HTTPClient        *http.Client
+	Timeout           time.Duration
 	QRSessionTTL      time.Duration
 	QRLongPollTimeout time.Duration
 	PollInterval      time.Duration
@@ -36,13 +44,19 @@ type Options struct {
 
 type Client struct {
 	baseURL           string
+	cdnBaseURL        string
 	botType           string
+	token             string
+	accountID         string
 	routeTag          string
+	channelVersion    string
 	httpClient        *http.Client
+	timeout           time.Duration
 	qrSessionTTL      time.Duration
 	qrLongPollTimeout time.Duration
 	pollInterval      time.Duration
 	maxQRRefresh      int
+	configManager     *configManager
 }
 
 type LoginSession struct {
@@ -98,14 +112,29 @@ func NewClient(opts Options) *Client {
 		baseURL = DefaultBaseURL
 	}
 
+	cdnBaseURL := strings.TrimSpace(opts.CDNBaseURL)
+	if cdnBaseURL == "" {
+		cdnBaseURL = DefaultCDNBaseURL
+	}
+
 	botType := strings.TrimSpace(opts.BotType)
 	if botType == "" {
 		botType = DefaultBotType
 	}
 
+	channelVersion := strings.TrimSpace(opts.ChannelVersion)
+	if channelVersion == "" {
+		channelVersion = DefaultChannelVersion
+	}
+
 	httpClient := opts.HTTPClient
 	if httpClient == nil {
 		httpClient = &http.Client{}
+	}
+
+	timeout := opts.Timeout
+	if timeout <= 0 {
+		timeout = defaultAPITimeout
 	}
 
 	qrSessionTTL := opts.QRSessionTTL
@@ -128,16 +157,38 @@ func NewClient(opts Options) *Client {
 		maxQRRefresh = DefaultMaxQRRefresh
 	}
 
-	return &Client{
+	client := &Client{
 		baseURL:           baseURL,
+		cdnBaseURL:        cdnBaseURL,
 		botType:           botType,
+		token:             strings.TrimSpace(opts.Token),
+		accountID:         strings.TrimSpace(opts.AccountID),
 		routeTag:          strings.TrimSpace(opts.RouteTag),
+		channelVersion:    channelVersion,
 		httpClient:        httpClient,
+		timeout:           timeout,
 		qrSessionTTL:      qrSessionTTL,
 		qrLongPollTimeout: qrLongPollTimeout,
 		pollInterval:      pollInterval,
 		maxQRRefresh:      maxQRRefresh,
 	}
+	if opts.Account != nil {
+		client.UseAccount(opts.Account)
+	}
+	return client
+}
+
+func (c *Client) UseAccount(account *Account) *Client {
+	if c == nil || account == nil {
+		return c
+	}
+	c.accountID = strings.TrimSpace(account.AccountID)
+	c.token = strings.TrimSpace(account.BotToken)
+	if baseURL := strings.TrimSpace(account.BaseURL); baseURL != "" {
+		c.baseURL = baseURL
+	}
+	c.configManager = nil
+	return c
 }
 
 func (c *Client) StartLogin(ctx context.Context, accountHint string) (*LoginSession, error) {

@@ -113,7 +113,7 @@ func TestSendTypingPausedSession(t *testing.T) {
 	defer resetSessionGuardForTest()
 
 	PauseSession("bot@im.bot")
-	api := NewAPIClient(APIOptions{AccountID: "bot@im.bot"})
+	api := NewClient(Options{AccountID: "bot@im.bot"})
 	err := api.SendTyping(context.Background(), SendTypingRequest{
 		ILinkUserID:  "user-1",
 		TypingTicket: "ticket-1",
@@ -138,7 +138,7 @@ func TestListenTransportErrorCallsOnError(t *testing.T) {
 	defer cancel()
 
 	var gotErr error
-	api := NewAPIClient(APIOptions{
+	api := NewClient(Options{
 		BaseURL: "https://example.com",
 		HTTPClient: &http.Client{
 			Transport: roundTripFunc(func(*http.Request) (*http.Response, error) {
@@ -147,8 +147,7 @@ func TestListenTransportErrorCallsOnError(t *testing.T) {
 		},
 	})
 
-	err := Listen(ctx, ListenOptions{
-		API:         api,
+	err := api.Listen(ctx, ListenOptions{
 		SyncBufPath: syncPath,
 		OnMessages:  func(context.Context, []WeixinMessage) error { return nil },
 		OnError: func(err error) {
@@ -180,8 +179,8 @@ func TestListenResponseErrorCallsOnError(t *testing.T) {
 	defer cancel()
 
 	var gotErr error
-	err := Listen(ctx, ListenOptions{
-		API:         NewAPIClient(APIOptions{BaseURL: server.URL, HTTPClient: server.Client()}),
+	client := NewClient(Options{BaseURL: server.URL, HTTPClient: server.Client()})
+	err := client.Listen(ctx, ListenOptions{
 		SyncBufPath: syncPath,
 		OnMessages:  func(context.Context, []WeixinMessage) error { return nil },
 		OnError: func(err error) {
@@ -214,8 +213,8 @@ func TestListenSessionExpiredPausesAccount(t *testing.T) {
 		cancel()
 	}()
 
-	err := Listen(ctx, ListenOptions{
-		API:         NewAPIClient(APIOptions{BaseURL: server.URL, HTTPClient: server.Client()}),
+	client := NewClient(Options{BaseURL: server.URL, HTTPClient: server.Client()})
+	err := client.Listen(ctx, ListenOptions{
 		AccountID:   "bot@im.bot",
 		SyncBufPath: syncPath,
 		OnMessages:  func(context.Context, []WeixinMessage) error { return nil },
@@ -251,8 +250,8 @@ func TestListenFilteredStatusAndSaveSyncError(t *testing.T) {
 		statusCalls int
 		gotErr      error
 	)
-	err := Listen(ctx, ListenOptions{
-		API:         NewAPIClient(APIOptions{BaseURL: server.URL, HTTPClient: server.Client()}),
+	client := NewClient(Options{BaseURL: server.URL, HTTPClient: server.Client()})
+	err := client.Listen(ctx, ListenOptions{
 		SyncBufPath: syncPath,
 		AllowFrom:   []string{"allowed"},
 		OnMessages:  func(context.Context, []WeixinMessage) error { return nil },
@@ -282,8 +281,8 @@ func TestListenSyncBufferLoadErrorAndStatusAfterMessages(t *testing.T) {
 			t.Fatalf("write bad sync buffer: %v", err)
 		}
 
-		err := Listen(context.Background(), ListenOptions{
-			API:         NewAPIClient(APIOptions{}),
+		client := NewClient(Options{})
+		err := client.Listen(context.Background(), ListenOptions{
 			SyncBufPath: syncPath,
 			OnMessages:  func(context.Context, []WeixinMessage) error { return nil },
 		})
@@ -310,8 +309,8 @@ func TestListenSyncBufferLoadErrorAndStatusAfterMessages(t *testing.T) {
 			statusCalls    int
 			onMessageCalls int
 		)
-		err := Listen(ctx, ListenOptions{
-			API:         NewAPIClient(APIOptions{BaseURL: server.URL, HTTPClient: server.Client()}),
+		client := NewClient(Options{BaseURL: server.URL, HTTPClient: server.Client()})
+		err := client.Listen(ctx, ListenOptions{
 			SyncBufPath: filepath.Join(t.TempDir(), "listen.sync.json"),
 			AllowFrom:   []string{"allowed"},
 			OnMessages: func(context.Context, []WeixinMessage) error {
@@ -338,7 +337,7 @@ func TestListenBackoffAfterConsecutiveFailures(t *testing.T) {
 	defer cancel()
 
 	var calls int
-	api := NewAPIClient(APIOptions{
+	api := NewClient(Options{
 		BaseURL: "https://example.com",
 		HTTPClient: &http.Client{
 			Transport: roundTripFunc(func(*http.Request) (*http.Response, error) {
@@ -349,8 +348,7 @@ func TestListenBackoffAfterConsecutiveFailures(t *testing.T) {
 	})
 
 	start := time.Now()
-	err := Listen(ctx, ListenOptions{
-		API:         api,
+	err := api.Listen(ctx, ListenOptions{
 		SyncBufPath: syncPath,
 		OnMessages:  func(context.Context, []WeixinMessage) error { return nil },
 		OnError: func(err error) {
@@ -498,7 +496,7 @@ func TestUploadMediaToCDNWithAPIErrors(t *testing.T) {
 	}
 }
 
-func TestUploadMediaToCDNWithAPIUsesAPIClientHTTPClient(t *testing.T) {
+func TestUploadMediaToCDNWithClientHTTPClient(t *testing.T) {
 	t.Parallel()
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -519,7 +517,7 @@ func TestUploadMediaToCDNWithAPIUsesAPIClientHTTPClient(t *testing.T) {
 		t.Fatalf("write temp media file: %v", err)
 	}
 
-	api := NewAPIClient(APIOptions{BaseURL: server.URL, HTTPClient: server.Client()})
+	api := NewClient(Options{BaseURL: server.URL, HTTPClient: server.Client()})
 	uploaded, err := uploadMediaToCDNWithAPI(context.Background(), filePath, "user-1", server.URL, UploadMediaTypeFile, api, nil, 0)
 	if err != nil {
 		t.Fatalf("uploadMediaToCDNWithAPI returned error: %v", err)
@@ -532,7 +530,7 @@ func TestUploadMediaToCDNWithAPIUsesAPIClientHTTPClient(t *testing.T) {
 func TestDownloadMediaFromItemAdditionalPaths(t *testing.T) {
 	t.Parallel()
 
-	result, err := DownloadMediaFromItem(context.Background(), MessageItem{Type: MessageItemTypeText}, "https://cdn.example.com", nil, func([]byte, string, string, int64, string) (string, error) {
+	result, err := downloadMediaFromItem(context.Background(), MessageItem{Type: MessageItemTypeText}, "https://cdn.example.com", nil, func([]byte, string, string, int64, string) (string, error) {
 		return "", nil
 	}, nil)
 	if err != nil {
@@ -547,7 +545,7 @@ func TestDownloadMediaFromItemAdditionalPaths(t *testing.T) {
 	}))
 	defer server.Close()
 
-	_, err = DownloadMediaFromItem(context.Background(), MessageItem{
+	_, err = downloadMediaFromItem(context.Background(), MessageItem{
 		Type: MessageItemTypeImage,
 		ImageItem: &ImageItem{
 			Media: &CDNMedia{EncryptQueryParam: "image"},
@@ -559,7 +557,7 @@ func TestDownloadMediaFromItemAdditionalPaths(t *testing.T) {
 		t.Fatalf("unexpected image save error: %v", err)
 	}
 
-	result, err = DownloadMediaFromItem(context.Background(), MessageItem{
+	result, err = downloadMediaFromItem(context.Background(), MessageItem{
 		Type:     MessageItemTypeFile,
 		FileItem: &FileItem{},
 	}, server.URL, server.Client(), func([]byte, string, string, int64, string) (string, error) {
@@ -573,12 +571,12 @@ func TestDownloadMediaFromItemAdditionalPaths(t *testing.T) {
 	}
 }
 
-func TestAPIClientSessionGuardBranches(t *testing.T) {
+func TestClientSessionGuardBranches(t *testing.T) {
 	resetSessionGuardForTest()
 	defer resetSessionGuardForTest()
 
 	PauseSession("bot@im.bot")
-	api := NewAPIClient(APIOptions{AccountID: "bot@im.bot"})
+	api := NewClient(Options{AccountID: "bot@im.bot"})
 
 	if _, err := api.GetUploadURL(context.Background(), GetUploadURLRequest{}, 0); err == nil || !strings.Contains(err.Error(), "session paused") {
 		t.Fatalf("unexpected GetUploadURL paused error: %v", err)
@@ -594,8 +592,8 @@ func TestAPIClientSessionGuardBranches(t *testing.T) {
 func TestSendMediaFileValidationAndPaddingBranches(t *testing.T) {
 	t.Parallel()
 
-	sender := NewSender(SenderOptions{})
-	if _, err := sender.Conversation(Target{ToUserID: "user-1"}).SendMediaFile(context.Background(), "demo.txt", "hello"); err == nil || !strings.Contains(err.Error(), "contextToken is required") {
+	sender := newSender(senderOptions{})
+	if _, err := sender.conversation(Target{ToUserID: "user-1"}).SendMediaFile(context.Background(), "demo.txt", "hello"); err == nil || !strings.Contains(err.Error(), "contextToken is required") {
 		t.Fatalf("unexpected SendMediaFile validation error: %v", err)
 	}
 
@@ -707,7 +705,7 @@ func TestPollQRStatusNonTimeoutErrorAndSendTypingDefaultTimeout(t *testing.T) {
 		}))
 		defer server.Close()
 
-		api := NewAPIClient(APIOptions{
+		api := NewClient(Options{
 			BaseURL:    server.URL,
 			HTTPClient: server.Client(),
 		})

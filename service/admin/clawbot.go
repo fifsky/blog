@@ -196,16 +196,6 @@ func (c *ClawBot) newClient() *clawbot.Client {
 	})
 }
 
-func (c *ClawBot) newAPIClient(account *clawbot.Account) *clawbot.APIClient {
-	return clawbot.NewAPIClient(clawbot.APIOptions{
-		BaseURL:    account.BaseURL,
-		Token:      account.BotToken,
-		AccountID:  account.AccountID,
-		RouteTag:   c.routeTag,
-		HTTPClient: c.httpClient,
-	})
-}
-
 func (c *ClawBot) saveAccount(ctx context.Context, account *clawbot.Account) error {
 	if account == nil {
 		return apperrors.BadRequest("CLAWBOT_ACCOUNT_EMPTY", "ClawBot 账号不能为空")
@@ -328,14 +318,7 @@ func (c *ClawBot) startMonitor(account *clawbot.Account) {
 		return
 	}
 
-	api := c.newAPIClient(account)
-	sender := clawbot.NewSender(clawbot.SenderOptions{
-		API:       api,
-		AccountID: account.AccountID,
-		BaseURL:   account.BaseURL,
-		Token:     account.BotToken,
-	})
-	configManager := clawbot.NewConfigManager(api)
+	client := c.newClient().UseAccount(account)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -350,12 +333,11 @@ func (c *ClawBot) startMonitor(account *clawbot.Account) {
 	c.monitorMu.Unlock()
 
 	go func() {
-		err := clawbot.Listen(ctx, clawbot.ListenOptions{
-			API:         api,
+		err := client.Listen(ctx, clawbot.ListenOptions{
 			AccountID:   account.AccountID,
 			SyncBufPath: c.syncBufPath(account.AccountID),
 			OnMessages: func(ctx context.Context, messages []clawbot.WeixinMessage) error {
-				c.handleMessages(ctx, account, api, configManager, sender, messages)
+				c.handleMessages(ctx, account, client, messages)
 				return nil
 			},
 			OnError: func(err error) {
@@ -387,15 +369,15 @@ func (c *ClawBot) stopMonitor() {
 	c.monitorMu.Unlock()
 }
 
-func (c *ClawBot) handleMessages(ctx context.Context, account *clawbot.Account, api *clawbot.APIClient, configManager *clawbot.ConfigManager, sender *clawbot.Sender, messages []clawbot.WeixinMessage) {
+func (c *ClawBot) handleMessages(ctx context.Context, account *clawbot.Account, client *clawbot.Client, messages []clawbot.WeixinMessage) {
 	for _, message := range messages {
-		if err := c.handleMessage(ctx, account, api, configManager, sender, message); err != nil {
+		if err := c.handleMessage(ctx, account, client, message); err != nil {
 			c.setMonitorError(err)
 		}
 	}
 }
 
-func (c *ClawBot) handleMessage(ctx context.Context, account *clawbot.Account, api *clawbot.APIClient, configManager *clawbot.ConfigManager, sender *clawbot.Sender, message clawbot.WeixinMessage) error {
+func (c *ClawBot) handleMessage(ctx context.Context, account *clawbot.Account, client *clawbot.Client, message clawbot.WeixinMessage) error {
 	body := strings.TrimSpace(clawbot.BodyFromItemList(message.ItemList))
 	if body == "" {
 		return nil
@@ -411,7 +393,11 @@ func (c *ClawBot) handleMessage(ctx context.Context, account *clawbot.Account, a
 		return fmt.Errorf("clawbot context token missing for user %s", message.FromUserID)
 	}
 
-	cancelTyping := c.sendMessageTyping(ctx, api, configManager, message.FromUserID, contextToken)
+	target := clawbot.Target{
+		ToUserID:     message.FromUserID,
+		ContextToken: contextToken,
+	}
+	cancelTyping := c.sendMessageTyping(ctx, client, target)
 	defer cancelTyping()
 
 	reply, err := c.runAI(ctx, account.AccountID+":"+message.FromUserID, body)
@@ -424,50 +410,17 @@ func (c *ClawBot) handleMessage(ctx context.Context, account *clawbot.Account, a
 	}
 
 	cancelTyping()
-	_, err = sender.Conversation(clawbot.Target{
-		ToUserID:     message.FromUserID,
-		ContextToken: contextToken,
-	}).SendText(ctx, reply)
+	_, err = client.SendText(ctx, target, reply)
 	return err
 }
 
-func (c *ClawBot) sendMessageTyping(ctx context.Context, api *clawbot.APIClient, configManager *clawbot.ConfigManager, userID, contextToken string) func() {
-	if api == nil || configManager == nil {
-		return func() {}
-	}
-
-	config, err := configManager.GetForUser(ctx, userID, contextToken)
+func (c *ClawBot) sendMessageTyping(ctx context.Context, client *clawbot.Client, target clawbot.Target) func() {
+	cancelTyping, err := client.StartTyping(ctx, target)
 	if err != nil {
-		c.setMonitorError(fmt.Errorf("clawbot get config: %w", err))
-		return func() {}
-	}
-
-	typingTicket := strings.TrimSpace(config.TypingTicket)
-	if typingTicket == "" {
-		return func() {}
-	}
-
-	req := clawbot.SendTypingRequest{
-		ILinkUserID:  userID,
-		TypingTicket: typingTicket,
-		Status:       clawbot.TypingStatusTyping,
-	}
-	if err := api.SendTyping(ctx, req, 0); err != nil {
 		c.setMonitorError(fmt.Errorf("clawbot send typing: %w", err))
 		return func() {}
 	}
-
-	cancelled := false
-	return func() {
-		if cancelled {
-			return
-		}
-		cancelled = true
-		req.Status = clawbot.TypingStatusCancel
-		if err := api.SendTyping(ctx, req, 0); err != nil {
-			c.setMonitorError(fmt.Errorf("clawbot cancel typing: %w", err))
-		}
-	}
+	return cancelTyping
 }
 
 func (c *ClawBot) runAI(ctx context.Context, memoryKey, userMessage string) (string, error) {

@@ -282,7 +282,7 @@ func SaveMediaToDir(rootDir string) SaveMediaFunc {
 	}
 }
 
-func DownloadMediaFromItem(ctx context.Context, item MessageItem, cdnBaseURL string, httpClient *http.Client, saveMedia SaveMediaFunc, silkToWAV SilkToWAVFunc) (*InboundMediaOptions, error) {
+func downloadMediaFromItem(ctx context.Context, item MessageItem, cdnBaseURL string, httpClient *http.Client, saveMedia SaveMediaFunc, silkToWAV SilkToWAVFunc) (*InboundMediaOptions, error) {
 	result := &InboundMediaOptions{}
 	switch item.Type {
 	case MessageItemTypeImage:
@@ -365,24 +365,23 @@ func DownloadMediaFromItem(ctx context.Context, item MessageItem, cdnBaseURL str
 	return result, nil
 }
 
-func UploadFileToWeixin(ctx context.Context, filePath, toUserID, cdnBaseURL string, apiOpts APIOptions) (*UploadedFileInfo, error) {
-	return uploadMediaToCDN(ctx, filePath, toUserID, cdnBaseURL, UploadMediaTypeImage, apiOpts)
+func (c *Client) UploadFile(ctx context.Context, filePath, toUserID string) (*UploadedFileInfo, error) {
+	return uploadMediaToCDNWithAPI(ctx, filePath, toUserID, c.cdnBaseURL, UploadMediaTypeImage, c, c.httpClient, c.timeout)
 }
 
-func UploadVideoToWeixin(ctx context.Context, filePath, toUserID, cdnBaseURL string, apiOpts APIOptions) (*UploadedFileInfo, error) {
-	return uploadMediaToCDN(ctx, filePath, toUserID, cdnBaseURL, UploadMediaTypeVideo, apiOpts)
+func (c *Client) UploadVideo(ctx context.Context, filePath, toUserID string) (*UploadedFileInfo, error) {
+	return uploadMediaToCDNWithAPI(ctx, filePath, toUserID, c.cdnBaseURL, UploadMediaTypeVideo, c, c.httpClient, c.timeout)
 }
 
-func UploadFileAttachmentToWeixin(ctx context.Context, filePath, toUserID, cdnBaseURL string, apiOpts APIOptions) (*UploadedFileInfo, error) {
-	return uploadMediaToCDN(ctx, filePath, toUserID, cdnBaseURL, UploadMediaTypeFile, apiOpts)
+func (c *Client) UploadFileAttachment(ctx context.Context, filePath, toUserID string) (*UploadedFileInfo, error) {
+	return uploadMediaToCDNWithAPI(ctx, filePath, toUserID, c.cdnBaseURL, UploadMediaTypeFile, c, c.httpClient, c.timeout)
 }
 
-func uploadMediaToCDN(ctx context.Context, filePath, toUserID, cdnBaseURL string, mediaType int, apiOpts APIOptions) (*UploadedFileInfo, error) {
-	api := NewAPIClient(apiOpts)
-	return uploadMediaToCDNWithAPI(ctx, filePath, toUserID, cdnBaseURL, mediaType, api, apiOpts.HTTPClient, 0)
+func (c *Client) DownloadMediaFromItem(ctx context.Context, item MessageItem, saveMedia SaveMediaFunc, silkToWAV SilkToWAVFunc) (*InboundMediaOptions, error) {
+	return downloadMediaFromItem(ctx, item, c.cdnBaseURL, c.httpClient, saveMedia, silkToWAV)
 }
 
-func uploadMediaToCDNWithAPI(ctx context.Context, filePath, toUserID, cdnBaseURL string, mediaType int, api MessageAPI, httpClient *http.Client, timeout time.Duration) (*UploadedFileInfo, error) {
+func uploadMediaToCDNWithAPI(ctx context.Context, filePath, toUserID, cdnBaseURL string, mediaType int, api messageAPI, httpClient *http.Client, timeout time.Duration) (*UploadedFileInfo, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
@@ -415,8 +414,8 @@ func uploadMediaToCDNWithAPI(ctx context.Context, filePath, toUserID, cdnBaseURL
 	}
 
 	if httpClient == nil {
-		if apiClient, ok := api.(*APIClient); ok && apiClient.httpClient != nil {
-			httpClient = apiClient.httpClient
+		if client, ok := api.(*Client); ok && client.httpClient != nil {
+			httpClient = client.httpClient
 		} else {
 			httpClient = &http.Client{}
 		}

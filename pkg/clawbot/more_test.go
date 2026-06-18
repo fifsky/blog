@@ -158,7 +158,7 @@ func TestAPIUploadURLAndSendTyping(t *testing.T) {
 	}))
 	defer server.Close()
 
-	api := NewAPIClient(APIOptions{
+	api := NewClient(Options{
 		BaseURL:        server.URL,
 		Token:          "bot-token",
 		RouteTag:       "route-a",
@@ -275,7 +275,7 @@ func TestDoJSONErrorPaths(t *testing.T) {
 	}
 }
 
-func TestAPIClientPostJSONErrorPaths(t *testing.T) {
+func TestClientPostJSONErrorPaths(t *testing.T) {
 	t.Parallel()
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -292,7 +292,7 @@ func TestAPIClientPostJSONErrorPaths(t *testing.T) {
 	}))
 	defer server.Close()
 
-	api := NewAPIClient(APIOptions{
+	api := NewClient(Options{
 		BaseURL:    server.URL,
 		HTTPClient: server.Client(),
 	})
@@ -327,12 +327,12 @@ func TestConversationSendVideoAndFile(t *testing.T) {
 	}))
 	defer server.Close()
 
-	sender := NewSender(SenderOptions{
+	sender := newSender(senderOptions{
 		BaseURL:    server.URL,
 		HTTPClient: server.Client(),
 	})
 
-	videoConversation := sender.Conversation(Target{
+	videoConversation := sender.conversation(Target{
 		ToUserID:     "user-1",
 		ContextToken: "ctx-1",
 	})
@@ -345,7 +345,7 @@ func TestConversationSendVideoAndFile(t *testing.T) {
 		t.Fatalf("SendVideo returned error: %v", err)
 	}
 
-	fileConversation := sender.Conversation(Target{
+	fileConversation := sender.conversation(Target{
 		ToUserID:     "user-1",
 		ContextToken: "ctx-2",
 	})
@@ -378,8 +378,8 @@ func TestConversationSendVideoAndFile(t *testing.T) {
 func TestConversationSendRequiresContextToken(t *testing.T) {
 	t.Parallel()
 
-	sender := NewSender(SenderOptions{})
-	conversation := sender.Conversation(Target{ToUserID: "user-1"})
+	sender := newSender(senderOptions{})
+	conversation := sender.conversation(Target{ToUserID: "user-1"})
 
 	if _, err := conversation.SendText(context.Background(), "hello"); err == nil || !strings.Contains(err.Error(), "contextToken is required") {
 		t.Fatalf("unexpected SendText error: %v", err)
@@ -393,7 +393,7 @@ func TestConversationSendRequiresContextToken(t *testing.T) {
 	if _, err := conversation.SendFile(context.Background(), "", "demo.txt", UploadedFileInfo{}); err == nil || !strings.Contains(err.Error(), "contextToken is required") {
 		t.Fatalf("unexpected SendFile error: %v", err)
 	}
-	if _, err := sender.Conversation(Target{ContextToken: "ctx-1"}).SendText(context.Background(), "hello"); err == nil || !strings.Contains(err.Error(), "toUserID is required") {
+	if _, err := sender.conversation(Target{ContextToken: "ctx-1"}).SendText(context.Background(), "hello"); err == nil || !strings.Contains(err.Error(), "toUserID is required") {
 		t.Fatalf("unexpected missing toUserID error: %v", err)
 	}
 }
@@ -533,7 +533,11 @@ func TestUploadWrappersAndConversationSendMediaFile(t *testing.T) {
 	}))
 	defer server.Close()
 
-	apiOpts := APIOptions{BaseURL: server.URL, HTTPClient: server.Client()}
+	client := NewClient(Options{
+		BaseURL:    server.URL,
+		CDNBaseURL: server.URL,
+		HTTPClient: server.Client(),
+	})
 	imageFile := filepath.Join(t.TempDir(), "image.png")
 	videoFile := filepath.Join(t.TempDir(), "video.mp4")
 	docFile := filepath.Join(t.TempDir(), "doc.pdf")
@@ -547,32 +551,27 @@ func TestUploadWrappersAndConversationSendMediaFile(t *testing.T) {
 		}
 	}
 
-	if _, err := UploadFileToWeixin(context.Background(), imageFile, "user-1", server.URL, apiOpts); err != nil {
-		t.Fatalf("UploadFileToWeixin returned error: %v", err)
+	if _, err := client.UploadFile(context.Background(), imageFile, "user-1"); err != nil {
+		t.Fatalf("UploadFile returned error: %v", err)
 	}
-	if _, err := UploadVideoToWeixin(context.Background(), videoFile, "user-1", server.URL, apiOpts); err != nil {
-		t.Fatalf("UploadVideoToWeixin returned error: %v", err)
+	if _, err := client.UploadVideo(context.Background(), videoFile, "user-1"); err != nil {
+		t.Fatalf("UploadVideo returned error: %v", err)
 	}
-	if _, err := UploadFileAttachmentToWeixin(context.Background(), docFile, "user-1", server.URL, apiOpts); err != nil {
-		t.Fatalf("UploadFileAttachmentToWeixin returned error: %v", err)
+	if _, err := client.UploadFileAttachment(context.Background(), docFile, "user-1"); err != nil {
+		t.Fatalf("UploadFileAttachment returned error: %v", err)
 	}
 
-	sender := NewSender(SenderOptions{
-		BaseURL:    server.URL,
-		HTTPClient: server.Client(),
-		CDNBaseURL: server.URL,
-	})
-	conversation := sender.Conversation(Target{
+	target := Target{
 		ToUserID:     "user-1",
 		ContextToken: "ctx-1",
-	})
-	if _, err := conversation.SendMediaFile(context.Background(), imageFile, "img"); err != nil {
+	}
+	if _, err := client.SendMediaFile(context.Background(), target, imageFile, "img"); err != nil {
 		t.Fatalf("SendMediaFile image returned error: %v", err)
 	}
-	if _, err := conversation.SendMediaFile(context.Background(), videoFile, ""); err != nil {
+	if _, err := client.SendMediaFile(context.Background(), target, videoFile, ""); err != nil {
 		t.Fatalf("SendMediaFile video returned error: %v", err)
 	}
-	if _, err := conversation.SendMediaFile(context.Background(), docFile, ""); err != nil {
+	if _, err := client.SendMediaFile(context.Background(), target, docFile, ""); err != nil {
 		t.Fatalf("SendMediaFile file returned error: %v", err)
 	}
 
@@ -644,7 +643,7 @@ func TestDownloadMediaFromItemVoiceFileAndVideo(t *testing.T) {
 	}
 	aesKey := base64.StdEncoding.EncodeToString(key)
 
-	voiceResult, err := DownloadMediaFromItem(context.Background(), MessageItem{
+	voiceResult, err := downloadMediaFromItem(context.Background(), MessageItem{
 		Type: MessageItemTypeVoice,
 		VoiceItem: &VoiceItem{
 			Media: &CDNMedia{EncryptQueryParam: "voice", AESKey: aesKey},
@@ -662,7 +661,7 @@ func TestDownloadMediaFromItemVoiceFileAndVideo(t *testing.T) {
 		t.Fatalf("unexpected voice result: %#v", voiceResult)
 	}
 
-	fileResult, err := DownloadMediaFromItem(context.Background(), MessageItem{
+	fileResult, err := downloadMediaFromItem(context.Background(), MessageItem{
 		Type: MessageItemTypeFile,
 		FileItem: &FileItem{
 			FileName: "demo.pdf",
@@ -676,7 +675,7 @@ func TestDownloadMediaFromItemVoiceFileAndVideo(t *testing.T) {
 		t.Fatalf("unexpected file result: %#v", fileResult)
 	}
 
-	videoResult, err := DownloadMediaFromItem(context.Background(), MessageItem{
+	videoResult, err := downloadMediaFromItem(context.Background(), MessageItem{
 		Type: MessageItemTypeVideo,
 		VideoItem: &VideoItem{
 			Media: &CDNMedia{EncryptQueryParam: "video", AESKey: aesKey},
@@ -740,7 +739,7 @@ func TestDownloadMediaFromItemImageEncryptedAndVoiceFallback(t *testing.T) {
 		return "/tmp/result.bin", nil
 	}
 
-	imageResult, err := DownloadMediaFromItem(context.Background(), MessageItem{
+	imageResult, err := downloadMediaFromItem(context.Background(), MessageItem{
 		Type: MessageItemTypeImage,
 		ImageItem: &ImageItem{
 			AESKeyHex: hexKey,
@@ -756,7 +755,7 @@ func TestDownloadMediaFromItemImageEncryptedAndVoiceFallback(t *testing.T) {
 		t.Fatalf("unexpected image result: %#v", imageResult)
 	}
 
-	voiceResult, err := DownloadMediaFromItem(context.Background(), MessageItem{
+	voiceResult, err := downloadMediaFromItem(context.Background(), MessageItem{
 		Type: MessageItemTypeVoice,
 		VoiceItem: &VoiceItem{
 			Media: &CDNMedia{
@@ -788,12 +787,13 @@ func TestDownloadMediaFromItemImageEncryptedAndVoiceFallback(t *testing.T) {
 func TestListenValidationAndFlow(t *testing.T) {
 	t.Parallel()
 
-	if err := Listen(context.Background(), ListenOptions{}); err == nil || !strings.Contains(err.Error(), "listen API client is nil") {
-		t.Fatalf("unexpected nil API error: %v", err)
+	var nilClient *Client
+	if err := nilClient.Listen(context.Background(), ListenOptions{}); err == nil || !strings.Contains(err.Error(), "listen client is nil") {
+		t.Fatalf("unexpected nil client error: %v", err)
 	}
 
-	api := NewAPIClient(APIOptions{})
-	if err := Listen(context.Background(), ListenOptions{API: api}); err == nil || !strings.Contains(err.Error(), "listen OnMessages callback is nil") {
+	client := NewClient(Options{})
+	if err := client.Listen(context.Background(), ListenOptions{}); err == nil || !strings.Contains(err.Error(), "listen OnMessages callback is nil") {
 		t.Fatalf("unexpected nil callback error: %v", err)
 	}
 
@@ -818,8 +818,8 @@ func TestListenValidationAndFlow(t *testing.T) {
 
 	syncPath := filepath.Join(t.TempDir(), "listen.sync.json")
 	wantErr := errors.New("stop listen")
-	err := Listen(context.Background(), ListenOptions{
-		API:         NewAPIClient(APIOptions{BaseURL: server.URL, HTTPClient: server.Client()}),
+	client = NewClient(Options{BaseURL: server.URL, HTTPClient: server.Client()})
+	err := client.Listen(context.Background(), ListenOptions{
 		AccountID:   "bot@im.bot",
 		SyncBufPath: syncPath,
 		AllowFrom:   []string{"allowed"},
@@ -855,11 +855,11 @@ func TestListenStatusPathCancelsCleanly(t *testing.T) {
 	defer cancel()
 
 	var statusCalls int
-	err := Listen(ctx, ListenOptions{
-		API: NewAPIClient(APIOptions{
-			BaseURL:    server.URL,
-			HTTPClient: server.Client(),
-		}),
+	client := NewClient(Options{
+		BaseURL:    server.URL,
+		HTTPClient: server.Client(),
+	})
+	err := client.Listen(ctx, ListenOptions{
 		OnMessages: func(context.Context, []WeixinMessage) error { return nil },
 		OnStatus: func(time.Time) {
 			statusCalls++

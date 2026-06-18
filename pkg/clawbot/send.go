@@ -49,13 +49,13 @@ func MarkdownToPlainText(text string) string {
 	return strings.TrimSpace(result)
 }
 
-type MessageAPI interface {
+type messageAPI interface {
 	SendMessage(ctx context.Context, req SendMessageRequest, timeout time.Duration) error
 	GetUploadURL(ctx context.Context, req GetUploadURLRequest, timeout time.Duration) (*GetUploadURLResponse, error)
 }
 
-type SenderOptions struct {
-	API            MessageAPI
+type senderOptions struct {
+	API            messageAPI
 	BaseURL        string
 	Token          string
 	RouteTag       string
@@ -66,8 +66,8 @@ type SenderOptions struct {
 	CDNBaseURL     string
 }
 
-type Sender struct {
-	api        MessageAPI
+type sender struct {
+	api        messageAPI
 	httpClient *http.Client
 	timeout    time.Duration
 	cdnBaseURL string
@@ -78,7 +78,7 @@ type Target struct {
 	ContextToken string
 }
 
-type MessageSender interface {
+type messageSender interface {
 	SendText(ctx context.Context, text string) (string, error)
 	SendImage(ctx context.Context, text string, uploaded UploadedFileInfo) (string, error)
 	SendVideo(ctx context.Context, text string, uploaded UploadedFileInfo) (string, error)
@@ -86,8 +86,8 @@ type MessageSender interface {
 	SendMediaFile(ctx context.Context, filePath, text string) (string, error)
 }
 
-type Conversation struct {
-	sender *Sender
+type conversation struct {
+	sender *sender
 	target Target
 }
 
@@ -119,10 +119,10 @@ type InboundMediaOptions struct {
 	DecryptedVideoPath string
 }
 
-func NewSender(opts SenderOptions) *Sender {
+func newSender(opts senderOptions) *sender {
 	api := opts.API
 	if api == nil {
-		api = NewAPIClient(APIOptions{
+		api = NewClient(Options{
 			BaseURL:        opts.BaseURL,
 			Token:          opts.Token,
 			RouteTag:       opts.RouteTag,
@@ -134,8 +134,8 @@ func NewSender(opts SenderOptions) *Sender {
 
 	httpClient := opts.HTTPClient
 	if httpClient == nil {
-		if apiClient, ok := api.(*APIClient); ok && apiClient.httpClient != nil {
-			httpClient = apiClient.httpClient
+		if client, ok := api.(*Client); ok && client.httpClient != nil {
+			httpClient = client.httpClient
 		} else {
 			httpClient = &http.Client{}
 		}
@@ -143,18 +143,18 @@ func NewSender(opts SenderOptions) *Sender {
 
 	cdnBaseURL := strings.TrimSpace(opts.CDNBaseURL)
 	if cdnBaseURL == "" {
-		if apiClient, ok := api.(*APIClient); ok {
-			cdnBaseURL = strings.TrimSpace(apiClient.baseURL)
+		if client, ok := api.(*Client); ok {
+			cdnBaseURL = strings.TrimSpace(client.cdnBaseURL)
 		}
 	}
 	if cdnBaseURL == "" {
 		cdnBaseURL = strings.TrimSpace(opts.BaseURL)
 	}
 	if cdnBaseURL == "" {
-		cdnBaseURL = DefaultBaseURL
+		cdnBaseURL = DefaultCDNBaseURL
 	}
 
-	return &Sender{
+	return &sender{
 		api:        api,
 		httpClient: httpClient,
 		timeout:    opts.Timeout,
@@ -162,34 +162,104 @@ func NewSender(opts SenderOptions) *Sender {
 	}
 }
 
-func (s *Sender) Conversation(target Target) *Conversation {
-	return &Conversation{
+func (c *Client) SendText(ctx context.Context, target Target, text string) (string, error) {
+	return c.newSender().sendText(ctx, target, text)
+}
+
+func (c *Client) SendImage(ctx context.Context, target Target, text string, uploaded UploadedFileInfo) (string, error) {
+	return c.newSender().sendImage(ctx, target, text, uploaded)
+}
+
+func (c *Client) SendVideo(ctx context.Context, target Target, text string, uploaded UploadedFileInfo) (string, error) {
+	return c.newSender().sendVideo(ctx, target, text, uploaded)
+}
+
+func (c *Client) SendFile(ctx context.Context, target Target, text, fileName string, uploaded UploadedFileInfo) (string, error) {
+	return c.newSender().sendFile(ctx, target, text, fileName, uploaded)
+}
+
+func (c *Client) SendMediaFile(ctx context.Context, target Target, filePath, text string) (string, error) {
+	return c.newSender().sendMediaFile(ctx, target, filePath, text)
+}
+
+func (c *Client) StartTyping(ctx context.Context, target Target) (func(), error) {
+	if err := target.validate("startTyping"); err != nil {
+		return func() {}, err
+	}
+
+	config, err := c.getConfigForUser(ctx, target.ToUserID, target.ContextToken)
+	if err != nil {
+		return func() {}, err
+	}
+	typingTicket := strings.TrimSpace(config.TypingTicket)
+	if typingTicket == "" {
+		return func() {}, nil
+	}
+
+	req := SendTypingRequest{
+		ILinkUserID:  target.ToUserID,
+		TypingTicket: typingTicket,
+		Status:       TypingStatusTyping,
+	}
+	if err := c.SendTyping(ctx, req, 0); err != nil {
+		return func() {}, err
+	}
+
+	cancelled := false
+	return func() {
+		if cancelled {
+			return
+		}
+		cancelled = true
+		req.Status = TypingStatusCancel
+		_ = c.SendTyping(ctx, req, 0)
+	}, nil
+}
+
+func (c *Client) getConfigForUser(ctx context.Context, userID, contextToken string) (cachedConfig, error) {
+	if c.configManager == nil {
+		c.configManager = newConfigManager(c)
+	}
+	return c.configManager.GetForUser(ctx, userID, contextToken)
+}
+
+func (c *Client) newSender() *sender {
+	return newSender(senderOptions{
+		API:        c,
+		HTTPClient: c.httpClient,
+		Timeout:    c.timeout,
+		CDNBaseURL: c.cdnBaseURL,
+	})
+}
+
+func (s *sender) conversation(target Target) *conversation {
+	return &conversation{
 		sender: s,
 		target: target,
 	}
 }
 
-func (c *Conversation) SendText(ctx context.Context, text string) (string, error) {
+func (c *conversation) SendText(ctx context.Context, text string) (string, error) {
 	return c.sender.sendText(ctx, c.target, text)
 }
 
-func (c *Conversation) SendImage(ctx context.Context, text string, uploaded UploadedFileInfo) (string, error) {
+func (c *conversation) SendImage(ctx context.Context, text string, uploaded UploadedFileInfo) (string, error) {
 	return c.sender.sendImage(ctx, c.target, text, uploaded)
 }
 
-func (c *Conversation) SendVideo(ctx context.Context, text string, uploaded UploadedFileInfo) (string, error) {
+func (c *conversation) SendVideo(ctx context.Context, text string, uploaded UploadedFileInfo) (string, error) {
 	return c.sender.sendVideo(ctx, c.target, text, uploaded)
 }
 
-func (c *Conversation) SendFile(ctx context.Context, text, fileName string, uploaded UploadedFileInfo) (string, error) {
+func (c *conversation) SendFile(ctx context.Context, text, fileName string, uploaded UploadedFileInfo) (string, error) {
 	return c.sender.sendFile(ctx, c.target, text, fileName, uploaded)
 }
 
-func (c *Conversation) SendMediaFile(ctx context.Context, filePath, text string) (string, error) {
+func (c *conversation) SendMediaFile(ctx context.Context, filePath, text string) (string, error) {
 	return c.sender.sendMediaFile(ctx, c.target, filePath, text)
 }
 
-func (s *Sender) sendText(ctx context.Context, target Target, text string) (string, error) {
+func (s *sender) sendText(ctx context.Context, target Target, text string) (string, error) {
 	if err := target.validate("sendText"); err != nil {
 		return "", err
 	}
@@ -202,28 +272,28 @@ func (s *Sender) sendText(ctx context.Context, target Target, text string) (stri
 	return clientID, nil
 }
 
-func (s *Sender) sendImage(ctx context.Context, target Target, text string, uploaded UploadedFileInfo) (string, error) {
+func (s *sender) sendImage(ctx context.Context, target Target, text string, uploaded UploadedFileInfo) (string, error) {
 	if err := target.validate("sendImage"); err != nil {
 		return "", err
 	}
 	return s.sendMediaItems(ctx, target, text, buildImageMessageItem(uploaded))
 }
 
-func (s *Sender) sendVideo(ctx context.Context, target Target, text string, uploaded UploadedFileInfo) (string, error) {
+func (s *sender) sendVideo(ctx context.Context, target Target, text string, uploaded UploadedFileInfo) (string, error) {
 	if err := target.validate("sendVideo"); err != nil {
 		return "", err
 	}
 	return s.sendMediaItems(ctx, target, text, buildVideoMessageItem(uploaded))
 }
 
-func (s *Sender) sendFile(ctx context.Context, target Target, text, fileName string, uploaded UploadedFileInfo) (string, error) {
+func (s *sender) sendFile(ctx context.Context, target Target, text, fileName string, uploaded UploadedFileInfo) (string, error) {
 	if err := target.validate("sendFile"); err != nil {
 		return "", err
 	}
 	return s.sendMediaItems(ctx, target, text, buildFileMessageItem(fileName, uploaded))
 }
 
-func (s *Sender) sendMediaFile(ctx context.Context, target Target, filePath, text string) (string, error) {
+func (s *sender) sendMediaFile(ctx context.Context, target Target, filePath, text string) (string, error) {
 	if err := target.validate("sendMediaFile"); err != nil {
 		return "", err
 	}
@@ -284,7 +354,7 @@ func buildItemMessageRequest(target Target, item MessageItem, clientID string) S
 	}
 }
 
-func (s *Sender) sendMediaItems(ctx context.Context, target Target, text string, mediaItem MessageItem) (string, error) {
+func (s *sender) sendMediaItems(ctx context.Context, target Target, text string, mediaItem MessageItem) (string, error) {
 	items := make([]MessageItem, 0, 2)
 	if text != "" {
 		items = append(items, MessageItem{Type: MessageItemTypeText, TextItem: &TextItem{Text: text}})

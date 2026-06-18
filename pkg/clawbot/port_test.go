@@ -90,7 +90,7 @@ func TestGetUpdatesTimeoutReturnsEmptyResponse(t *testing.T) {
 	}))
 	defer server.Close()
 
-	api := NewAPIClient(APIOptions{
+	api := NewClient(Options{
 		BaseURL:    server.URL,
 		HTTPClient: server.Client(),
 	})

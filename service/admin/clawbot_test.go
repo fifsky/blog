@@ -222,15 +222,13 @@ func TestClawBotHandleMessageSendsTypingAndCancelsBeforeReply(t *testing.T) {
 		BotToken:  "bot-token",
 		BaseURL:   server.URL,
 	}
-	api := svc.newAPIClient(account)
-	sender := clawbot.NewSender(clawbot.SenderOptions{
-		API:       api,
-		AccountID: account.AccountID,
-		BaseURL:   account.BaseURL,
-		Token:     account.BotToken,
+	client := clawbot.NewClient(clawbot.Options{
+		BaseURL:    account.BaseURL,
+		HTTPClient: server.Client(),
 	})
+	client.UseAccount(account)
 
-	err := svc.handleMessage(context.Background(), account, api, clawbot.NewConfigManager(api), sender, clawbot.WeixinMessage{
+	err := svc.handleMessage(context.Background(), account, client, clawbot.WeixinMessage{
 		FromUserID:   "user@im.wechat",
 		ContextToken: "ctx-1",
 		ItemList: []clawbot.MessageItem{{

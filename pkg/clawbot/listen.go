@@ -3,6 +3,7 @@ package clawbot
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -14,7 +15,6 @@ const (
 )
 
 type ListenOptions struct {
-	API             *APIClient
 	AccountID       string
 	SyncBufPath     string
 	LongPollTimeout time.Duration
@@ -24,9 +24,9 @@ type ListenOptions struct {
 	OnStatus        func(lastEventAt time.Time)
 }
 
-func Listen(ctx context.Context, opts ListenOptions) error {
-	if opts.API == nil {
-		return fmt.Errorf("listen API client is nil")
+func (c *Client) Listen(ctx context.Context, opts ListenOptions) error {
+	if c == nil {
+		return fmt.Errorf("listen client is nil")
 	}
 	if opts.OnMessages == nil {
 		return fmt.Errorf("listen OnMessages callback is nil")
@@ -40,6 +40,10 @@ func Listen(ctx context.Context, opts ListenOptions) error {
 	if nextTimeout <= 0 {
 		nextTimeout = defaultListenLongPoll
 	}
+	accountID := strings.TrimSpace(opts.AccountID)
+	if accountID == "" {
+		accountID = c.accountID
+	}
 
 	consecutiveFailures := 0
 	for {
@@ -49,7 +53,7 @@ func Listen(ctx context.Context, opts ListenOptions) error {
 		default:
 		}
 
-		resp, err := opts.API.GetUpdates(ctx, GetUpdatesRequest{GetUpdatesBuf: getUpdatesBuf}, nextTimeout)
+		resp, err := c.GetUpdates(ctx, GetUpdatesRequest{GetUpdatesBuf: getUpdatesBuf}, nextTimeout)
 		if err != nil {
 			consecutiveFailures++
 			if opts.OnError != nil {
@@ -71,8 +75,8 @@ func Listen(ctx context.Context, opts ListenOptions) error {
 		}
 		if resp.Ret != 0 || resp.ErrCode != 0 {
 			if resp.ErrCode == SessionExpiredErrCode || resp.Ret == SessionExpiredErrCode {
-				PauseSession(opts.AccountID)
-				if err := sleepContext(ctx, RemainingPause(opts.AccountID)); err != nil {
+				PauseSession(accountID)
+				if err := sleepContext(ctx, RemainingPause(accountID)); err != nil {
 					return err
 				}
 				continue

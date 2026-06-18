@@ -59,10 +59,10 @@ func TestNewClientDefaults(t *testing.T) {
 	}
 }
 
-func TestNewAPIClientDefaultsAndHeaders(t *testing.T) {
+func TestClientBotAPIDefaultsAndHeaders(t *testing.T) {
 	t.Parallel()
 
-	api := NewAPIClient(APIOptions{
+	api := NewClient(Options{
 		Token:    " bot-token ",
 		RouteTag: " route-a ",
 	})
@@ -107,16 +107,16 @@ func TestNewAPIClientDefaultsAndHeaders(t *testing.T) {
 	}
 }
 
-func TestNewSenderDefaults(t *testing.T) {
+func TestClientSenderDefaults(t *testing.T) {
 	t.Parallel()
 
-	sender := NewSender(SenderOptions{})
+	sender := newSender(senderOptions{})
 	if sender.api == nil {
 		t.Fatalf("expected sender API")
 	}
-	api, ok := sender.api.(*APIClient)
+	api, ok := sender.api.(*Client)
 	if !ok {
-		t.Fatalf("expected *APIClient, got %T", sender.api)
+		t.Fatalf("expected *Client, got %T", sender.api)
 	}
 	if api.baseURL != DefaultBaseURL {
 		t.Fatalf("unexpected sender API baseURL: %q", api.baseURL)
@@ -124,21 +124,21 @@ func TestNewSenderDefaults(t *testing.T) {
 	if sender.httpClient == nil {
 		t.Fatalf("expected sender HTTP client")
 	}
-	if sender.cdnBaseURL != DefaultBaseURL {
+	if sender.cdnBaseURL != DefaultCDNBaseURL {
 		t.Fatalf("unexpected sender CDN baseURL: %q", sender.cdnBaseURL)
 	}
 }
 
-func TestNewSenderUsesInjectedAPI(t *testing.T) {
+func TestInternalSenderUsesInjectedAPI(t *testing.T) {
 	t.Parallel()
 
 	api := &stubMessageAPI{}
-	sender := NewSender(SenderOptions{
+	sender := newSender(senderOptions{
 		API:     api,
 		Timeout: 3 * time.Second,
 	})
 
-	clientID, err := sender.Conversation(Target{
+	clientID, err := sender.conversation(Target{
 		ToUserID:     "user@im.wechat",
 		ContextToken: "ctx-1",
 	}).SendText(context.Background(), "hello")
@@ -177,7 +177,7 @@ func TestConversationSendTextBuildsExpectedRequest(t *testing.T) {
 	}))
 	defer server.Close()
 
-	sender := NewSender(SenderOptions{
+	sender := newSender(senderOptions{
 		BaseURL:        server.URL,
 		Token:          "bot-token",
 		RouteTag:       "route-a",
@@ -186,7 +186,7 @@ func TestConversationSendTextBuildsExpectedRequest(t *testing.T) {
 		AccountID:      "demo@im.bot",
 		Timeout:        time.Second,
 	})
-	conversation := sender.Conversation(Target{
+	conversation := sender.conversation(Target{
 		ToUserID:     "user@im.wechat",
 		ContextToken: "ctx-1",
 	})
@@ -247,12 +247,12 @@ func TestConversationSendImageSendsTextThenMedia(t *testing.T) {
 	}))
 	defer server.Close()
 
-	sender := NewSender(SenderOptions{
+	sender := newSender(senderOptions{
 		BaseURL:    server.URL,
 		HTTPClient: server.Client(),
 		Timeout:    time.Second,
 	})
-	conversation := sender.Conversation(Target{
+	conversation := sender.conversation(Target{
 		ToUserID:     "user@im.wechat",
 		ContextToken: "ctx-2",
 	})
@@ -299,7 +299,7 @@ func TestConversationSendImageSendsTextThenMedia(t *testing.T) {
 	}
 }
 
-func TestConfigManagerCachesSuccessfulResponse(t *testing.T) {
+func TestClientConfigManagerCachesSuccessfulResponse(t *testing.T) {
 	t.Parallel()
 
 	var calls int
@@ -315,7 +315,7 @@ func TestConfigManagerCachesSuccessfulResponse(t *testing.T) {
 	}))
 	defer server.Close()
 
-	manager := NewConfigManager(NewAPIClient(APIOptions{
+	manager := newConfigManager(NewClient(Options{
 		BaseURL:    server.URL,
 		HTTPClient: server.Client(),
 		Token:      "bot-token",
@@ -341,7 +341,7 @@ func TestConfigManagerCachesSuccessfulResponse(t *testing.T) {
 	}
 }
 
-func TestConfigManagerBacksOffAndReturnsCachedConfigOnFailure(t *testing.T) {
+func TestClientConfigManagerBacksOffAndReturnsCachedConfigOnFailure(t *testing.T) {
 	t.Parallel()
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -349,7 +349,7 @@ func TestConfigManagerBacksOffAndReturnsCachedConfigOnFailure(t *testing.T) {
 	}))
 	defer server.Close()
 
-	manager := NewConfigManager(NewAPIClient(APIOptions{
+	manager := newConfigManager(NewClient(Options{
 		BaseURL:    server.URL,
 		HTTPClient: server.Client(),
 		Token:      "bot-token",
@@ -357,7 +357,7 @@ func TestConfigManagerBacksOffAndReturnsCachedConfigOnFailure(t *testing.T) {
 	now := time.Date(2026, 3, 23, 12, 0, 0, 0, time.UTC)
 	manager.now = func() time.Time { return now }
 	manager.cache["user-1"] = configCacheEntry{
-		config:      CachedConfig{TypingTicket: "cached-ticket"},
+		config:      cachedConfig{TypingTicket: "cached-ticket"},
 		nextFetchAt: now.Add(-time.Second),
 		retryDelay:  configCacheInitialRetry,
 	}
@@ -478,7 +478,7 @@ func TestDownloadMediaFromItemUsesPlainImageDownloadWhenAESKeyAbsent(t *testing.
 		return "/tmp/image.png", nil
 	}
 
-	result, err := DownloadMediaFromItem(context.Background(), MessageItem{
+	result, err := downloadMediaFromItem(context.Background(), MessageItem{
 		Type: MessageItemTypeImage,
 		ImageItem: &ImageItem{
 			Media: &CDNMedia{

@@ -39,83 +39,39 @@ func init() {
 	pauseState.until = make(map[string]time.Time)
 }
 
-type APIOptions struct {
-	BaseURL        string
-	Token          string
-	RouteTag       string
-	ChannelVersion string
-	HTTPClient     *http.Client
-	AccountID      string
-}
-
-type APIClient struct {
-	baseURL        string
-	token          string
-	routeTag       string
-	channelVersion string
-	httpClient     *http.Client
-	accountID      string
-}
-
-type CachedConfig struct {
+type cachedConfig struct {
 	TypingTicket string
 }
 
 type configCacheEntry struct {
-	config        CachedConfig
+	config        cachedConfig
 	everSucceeded bool
 	nextFetchAt   time.Time
 	retryDelay    time.Duration
 }
 
-type ConfigManager struct {
-	api   *APIClient
-	now   func() time.Time
-	rand  *mathrand.Rand
-	mu    sync.Mutex
-	cache map[string]configCacheEntry
+type configManager struct {
+	client *Client
+	now    func() time.Time
+	rand   *mathrand.Rand
+	mu     sync.Mutex
+	cache  map[string]configCacheEntry
 }
 
-func NewAPIClient(opts APIOptions) *APIClient {
-	baseURL := strings.TrimSpace(opts.BaseURL)
-	if baseURL == "" {
-		baseURL = DefaultBaseURL
-	}
-
-	httpClient := opts.HTTPClient
-	if httpClient == nil {
-		httpClient = &http.Client{}
-	}
-
-	channelVersion := strings.TrimSpace(opts.ChannelVersion)
-	if channelVersion == "" {
-		channelVersion = "go-port"
-	}
-
-	return &APIClient{
-		baseURL:        baseURL,
-		token:          strings.TrimSpace(opts.Token),
-		routeTag:       strings.TrimSpace(opts.RouteTag),
-		channelVersion: channelVersion,
-		httpClient:     httpClient,
-		accountID:      strings.TrimSpace(opts.AccountID),
+func newConfigManager(client *Client) *configManager {
+	return &configManager{
+		client: client,
+		now:    time.Now,
+		rand:   mathrand.New(mathrand.NewSource(time.Now().UnixNano())),
+		cache:  make(map[string]configCacheEntry),
 	}
 }
 
-func NewConfigManager(api *APIClient) *ConfigManager {
-	return &ConfigManager{
-		api:   api,
-		now:   time.Now,
-		rand:  mathrand.New(mathrand.NewSource(time.Now().UnixNano())),
-		cache: make(map[string]configCacheEntry),
-	}
-}
-
-func (c *APIClient) BuildBaseInfo() BaseInfo {
+func (c *Client) BuildBaseInfo() BaseInfo {
 	return BaseInfo{ChannelVersion: c.channelVersion}
 }
 
-func (c *APIClient) GetUpdates(ctx context.Context, req GetUpdatesRequest, timeout time.Duration) (*GetUpdatesResponse, error) {
+func (c *Client) GetUpdates(ctx context.Context, req GetUpdatesRequest, timeout time.Duration) (*GetUpdatesResponse, error) {
 	if timeout <= 0 {
 		timeout = defaultLongPollTimeout
 	}
@@ -138,7 +94,7 @@ func (c *APIClient) GetUpdates(ctx context.Context, req GetUpdatesRequest, timeo
 	return &resp, nil
 }
 
-func (c *APIClient) GetUploadURL(ctx context.Context, req GetUploadURLRequest, timeout time.Duration) (*GetUploadURLResponse, error) {
+func (c *Client) GetUploadURL(ctx context.Context, req GetUploadURLRequest, timeout time.Duration) (*GetUploadURLResponse, error) {
 	if err := c.assertSession(); err != nil {
 		return nil, err
 	}
@@ -168,7 +124,7 @@ func (c *APIClient) GetUploadURL(ctx context.Context, req GetUploadURLRequest, t
 	return &resp, nil
 }
 
-func (c *APIClient) SendMessage(ctx context.Context, req SendMessageRequest, timeout time.Duration) error {
+func (c *Client) SendMessage(ctx context.Context, req SendMessageRequest, timeout time.Duration) error {
 	if err := c.assertSession(); err != nil {
 		return err
 	}
@@ -181,7 +137,7 @@ func (c *APIClient) SendMessage(ctx context.Context, req SendMessageRequest, tim
 	}, timeout, nil)
 }
 
-func (c *APIClient) GetConfig(ctx context.Context, ilinkUserID, contextToken string, timeout time.Duration) (*GetConfigResponse, error) {
+func (c *Client) GetConfig(ctx context.Context, ilinkUserID, contextToken string, timeout time.Duration) (*GetConfigResponse, error) {
 	if err := c.assertSession(); err != nil {
 		return nil, err
 	}
@@ -199,7 +155,7 @@ func (c *APIClient) GetConfig(ctx context.Context, ilinkUserID, contextToken str
 	return &resp, nil
 }
 
-func (c *APIClient) SendTyping(ctx context.Context, req SendTypingRequest, timeout time.Duration) error {
+func (c *Client) SendTyping(ctx context.Context, req SendTypingRequest, timeout time.Duration) error {
 	if err := c.assertSession(); err != nil {
 		return err
 	}
@@ -214,7 +170,7 @@ func (c *APIClient) SendTyping(ctx context.Context, req SendTypingRequest, timeo
 	}, timeout, nil)
 }
 
-func (c *APIClient) postJSON(ctx context.Context, endpoint string, payload any, timeout time.Duration, out any) error {
+func (c *Client) postJSON(ctx context.Context, endpoint string, payload any, timeout time.Duration, out any) error {
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return err
@@ -262,7 +218,7 @@ func (c *APIClient) postJSON(ctx context.Context, endpoint string, payload any, 
 	return nil
 }
 
-func (c *APIClient) buildHeaders(body []byte) map[string]string {
+func (c *Client) buildHeaders(body []byte) map[string]string {
 	headers := map[string]string{
 		"Content-Type":      "application/json",
 		"AuthorizationType": "ilink_bot_token",
@@ -278,7 +234,7 @@ func (c *APIClient) buildHeaders(body []byte) map[string]string {
 	return headers
 }
 
-func (c *APIClient) assertSession() error {
+func (c *Client) assertSession() error {
 	if c.accountID == "" {
 		return nil
 	}
@@ -333,7 +289,7 @@ func resetSessionGuardForTest() {
 	pauseState.until = make(map[string]time.Time)
 }
 
-func (m *ConfigManager) GetForUser(ctx context.Context, userID, contextToken string) (CachedConfig, error) {
+func (m *configManager) GetForUser(ctx context.Context, userID, contextToken string) (cachedConfig, error) {
 	m.mu.Lock()
 	entry, ok := m.cache[userID]
 	now := m.now()
@@ -341,10 +297,10 @@ func (m *ConfigManager) GetForUser(ctx context.Context, userID, contextToken str
 	m.mu.Unlock()
 
 	if shouldFetch {
-		resp, err := m.api.GetConfig(ctx, userID, contextToken, 0)
+		resp, err := m.client.GetConfig(ctx, userID, contextToken, 0)
 		if err == nil && resp.Ret == 0 {
 			next := configCacheEntry{
-				config:        CachedConfig{TypingTicket: resp.TypingTicket},
+				config:        cachedConfig{TypingTicket: resp.TypingTicket},
 				everSucceeded: true,
 				nextFetchAt:   now.Add(time.Duration(m.rand.Float64() * float64(configCacheTTL))),
 				retryDelay:    configCacheInitialRetry,
@@ -368,11 +324,11 @@ func (m *ConfigManager) GetForUser(ctx context.Context, userID, contextToken str
 		}
 
 		m.cache[userID] = configCacheEntry{
-			config:      CachedConfig{},
+			config:      cachedConfig{},
 			nextFetchAt: now.Add(configCacheInitialRetry),
 			retryDelay:  configCacheInitialRetry,
 		}
-		return CachedConfig{}, err
+		return cachedConfig{}, err
 	}
 
 	m.mu.Lock()
