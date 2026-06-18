@@ -1,0 +1,92 @@
+syntax = "proto3";
+package fifsky.blog.admin.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "gen/admin/v1";
+
+// ClawBotService 提供微信 ClawBot 连接管理接口
+service ClawBotService {
+  // Status 获取当前连接状态
+  rpc Status(google.protobuf.Empty) returns (ClawBotStatusResponse) {
+    option (google.api.http) = {
+      post: "/blog/admin/clawbot/status"
+      body: "*"
+    };
+  }
+
+  // StartLogin 创建微信扫码登录会话
+  rpc StartLogin(ClawBotStartLoginRequest) returns (ClawBotLoginSession) {
+    option (google.api.http) = {
+      post: "/blog/admin/clawbot/login/start"
+      body: "*"
+    };
+  }
+
+  // CheckLogin 检查扫码登录状态
+  rpc CheckLogin(ClawBotCheckLoginRequest) returns (ClawBotCheckLoginResponse) {
+    option (google.api.http) = {
+      post: "/blog/admin/clawbot/login/check"
+      body: "*"
+    };
+  }
+
+  // Disconnect 断开当前连接
+  rpc Disconnect(google.protobuf.Empty) returns (ClawBotStatusResponse) {
+    option (google.api.http) = {
+      post: "/blog/admin/clawbot/disconnect"
+      body: "*"
+    };
+  }
+}
+
+// ClawBotStartLoginRequest 创建扫码登录请求
+message ClawBotStartLoginRequest {
+  string account_hint = 1;
+}
+
+// ClawBotCheckLoginRequest 检查扫码登录请求
+message ClawBotCheckLoginRequest {
+  string session_key = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// ClawBotLoginSession 表示一次扫码登录会话
+message ClawBotLoginSession {
+  string session_key = 1;
+  string qr_code = 2;
+  string qr_content = 3;
+  string expires_at = 4;
+  string status = 5;
+}
+
+// ClawBotAccount 表示已连接的微信账号
+message ClawBotAccount {
+  string account_id = 1;
+  string user_id = 2;
+  string base_url = 3;
+  string saved_at = 4;
+}
+
+// ClawBotStatusResponse 表示当前 ClawBot 状态
+message ClawBotStatusResponse {
+  bool connected = 1;
+  ClawBotAccount account = 2;
+  bool monitoring = 3;
+  string monitor_status = 4;
+  string last_event_at = 5;
+  string last_error = 6;
+}
+
+// ClawBotCheckLoginResponse 表示扫码登录状态检查结果
+message ClawBotCheckLoginResponse {
+  string status = 1;
+  ClawBotLoginSession session = 2;
+  ClawBotAccount account = 3;
+  bool connected = 4;
+}
