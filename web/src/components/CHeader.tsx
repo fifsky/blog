@@ -39,7 +39,7 @@ export function CHeader() {
 
   const logoScale = 1 - progress * 0.3;
   const logoTranslateX = -progress * 24;
-  const menuTranslateX = progress * 24;
+  const menuTranslateX = progress * 32;
   const logoR = Math.round(255 - progress * 221);
   const logoG = Math.round(255 - progress * 221);
   const logoB = Math.round(255 - progress * 221);
