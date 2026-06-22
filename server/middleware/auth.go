@@ -19,7 +19,7 @@ type AuthLogin = func(next http.Handler) http.Handler
 func NewAuthLogin(s *store.Store, conf *config.Config) AuthLogin {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			accessToken := r.Header.Get("Access-Token")
+			accessToken := readBearerToken(r)
 
 			if accessToken == "" {
 				response.Fail(w, errors.ErrUnauthorized)

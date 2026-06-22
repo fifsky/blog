@@ -73,7 +73,9 @@ func TestNewAuthLogin(t *testing.T) {
 			handler := m(next)
 
 			req := httptest.NewRequest(http.MethodGet, "/dummy/impl", nil)
-			req.Header.Set("Access-Token", tt.Token)
+			if tt.Token != "" {
+				req.Header.Set("Authorization", "Bearer "+tt.Token)
+			}
 			rr := httptest.NewRecorder()
 
 			handler.ServeHTTP(rr, req)

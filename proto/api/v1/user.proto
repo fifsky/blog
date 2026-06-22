@@ -55,4 +55,6 @@ message LoginResponse {
   string access_token = 1;
   UserItem user = 2;
   bool require_totp = 3;
+  // token 过期时间（Unix 秒级时间戳）
+  int64 expires_at = 4;
 }

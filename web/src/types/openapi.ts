@@ -16,7 +16,7 @@ export type ArticleDestroyRequest = { ids: number[] };
 export type IDResponse = { id: number };
 
 export type LoginRequest = { user_name: string; password: string; totp_code?: string };
-export type LoginResponse = { access_token: string; user: UserItem; require_totp?: boolean };
+export type LoginResponse = { access_token: string; user: UserItem; require_totp?: boolean; expires_at?: number };
 
 export type UserItem = {
   id: number;

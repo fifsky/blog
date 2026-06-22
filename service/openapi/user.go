@@ -48,11 +48,12 @@ func (u *User) Login(ctx context.Context, in *apiv1.LoginRequest) (*apiv1.LoginR
 			return nil, fmt.Errorf("2FA验证码错误")
 		}
 	}
-	tokenString, err := signAccessToken(u.conf.Common.TokenSecret, user.Id)
+	tokenString, expiresAt, err := signAccessToken(u.conf.Common.TokenSecret, user.Id)
 	if err != nil {
 		return nil, fmt.Errorf("Access Token加密错误:%s", err)
 	}
 	return apiv1.LoginResponse_builder{AccessToken: tokenString,
+			ExpiresAt: expiresAt,
 			User: apiv1.UserItem_builder{Id: int32(user.Id),
 				Name:      user.Name,
 				NickName:  user.NickName,

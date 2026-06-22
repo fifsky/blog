@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useStore } from "@/store/context";
+import { clearAuth } from "@/utils/common";
 
 const SCROLL_THRESHOLD = 150;
 const HEADER_HEIGHT = 80;
 
 export function CHeader() {
   const userInfo = useStore((s) => s.userInfo);
-  const setUserInfo = useStore((s) => s.setUserInfo);
   const isLogin = !!userInfo.id;
   const navigate = useNavigate();
   const headerRef = useRef<HTMLDivElement>(null);
@@ -32,8 +32,7 @@ export function CHeader() {
   }, [handleScroll]);
 
   const logOut = () => {
-    localStorage.removeItem("access_token");
-    setUserInfo({});
+    clearAuth();
     navigate("/");
   };
 

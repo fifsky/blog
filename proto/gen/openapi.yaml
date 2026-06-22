@@ -1992,6 +1992,9 @@ components:
                     $ref: '#/components/schemas/UserItem'
                 require_totp:
                     type: boolean
+                expires_at:
+                    type: string
+                    description: token 过期时间（Unix 秒级时间戳）
         MiniAppLoginRequest:
             type: object
             properties:

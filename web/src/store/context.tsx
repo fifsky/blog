@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { loginApi, loginUserApi } from "@/service";
 import { LoginRequest } from "@/types/openapi";
+import { clearAuth, isTokenExpired } from "@/utils/common";
 
 export type UserInfo = Partial<{
   id: number;
@@ -32,15 +33,30 @@ export const useStore = create<Store>((set) => ({
     }
     if (!ret.access_token) throw "登录失败";
     localStorage.setItem("access_token", ret.access_token);
+    if (ret.expires_at) {
+      localStorage.setItem("expires_at", String(ret.expires_at));
+    }
     set({ userInfo: ret.user });
     return ret;
   },
   currentUserAction: async () => {
+    // token 已过期则静默清除，不发请求
+    if (isTokenExpired()) {
+      clearAuth();
+      return;
+    }
     try {
       const ret = await loginUserApi();
       set({ userInfo: ret });
     } catch {
-      localStorage.removeItem("access_token");
+      clearAuth();
     }
   },
 }));
+
+// 监听认证登出事件，统一清除 userInfo
+if (typeof window !== "undefined") {
+  window.addEventListener("auth:logout", () => {
+    useStore.setState({ userInfo: {} });
+  });
+}

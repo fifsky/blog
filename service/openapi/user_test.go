@@ -22,6 +22,9 @@ func TestUser_Login(t *testing.T) {
 		if err != nil || len(resp.GetAccessToken()) == 0 {
 			t.Fatalf("unexpected err=%v token=%s", err, resp.GetAccessToken())
 		}
+		if resp.GetExpiresAt() == 0 {
+			t.Fatalf("expected expires_at > 0, got %d", resp.GetExpiresAt())
+		}
 		_, err2 := svc.Login(context.Background(), apiv1.LoginRequest_builder{}.Build())
 		if err2 == nil {
 			t.Fatalf("expected validation error")

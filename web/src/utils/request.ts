@@ -1,4 +1,4 @@
-import { getApiUrl } from "./common";
+import { getApiUrl, clearAuth } from "./common";
 import { dialog } from "./dialog";
 import { AppError } from "./error";
 
@@ -57,9 +57,14 @@ export async function request<T = any>(
     }
 
     if (err.code === "UNAUTHORIZED") {
-      localStorage.removeItem("access_token");
-      window.location.href = "/login";
-      return new Promise<any>(() => {});
+      clearAuth();
+      // 仅后台页面跳转登录页，非后台页面静默清除不跳转
+      if (window.location.pathname.startsWith("/admin")) {
+        window.location.href = "/login";
+        return new Promise<any>(() => {});
+      }
+      // 非后台页面：throw 让调用方自行处理，不弹提示
+      throw err;
     }
 
     if (errorHandler) {
@@ -108,9 +113,11 @@ export const createApi = <TResp = any>(
   data?: any,
   errorHandler?: (e: AppError) => void,
 ) => {
-  const headers = {
-    "Access-Token": localStorage.getItem("access_token") || "",
-  };
+  const token = localStorage.getItem("access_token") || "";
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
   const param: RequestOptions = {
     url: getApiUrl(url),
     data,

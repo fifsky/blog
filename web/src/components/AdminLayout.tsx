@@ -4,7 +4,7 @@ import { CHeader } from "./CHeader";
 import { CFooter } from "./CFooter";
 import { AIChat } from "./ai/AIChat";
 import { useStore } from "@/store/context";
-import { getAccessToken } from "@/utils/common";
+import { getAccessToken, isTokenExpired, clearAuth } from "@/utils/common";
 import { cn } from "@/lib/utils";
 
 function AdminNavItem({
@@ -43,19 +43,24 @@ export function AdminLayout() {
   const isPage = (...paths: string[]) => paths.some((p) => location.pathname === p);
 
   useEffect(() => {
-    if (getAccessToken()) {
-      (async () => {
-        try {
-          await currentUserAction();
-        } catch {
-          navigate("/login");
-        }
-      })();
+    if (!getAccessToken() || isTokenExpired()) {
+      clearAuth();
+      navigate("/login");
+      return;
     }
+    (async () => {
+      try {
+        await currentUserAction();
+      } catch {
+        navigate("/login");
+      }
+    })();
   }, []);
 
   useEffect(() => {
-    if (!getAccessToken()) navigate("/login");
+    if (!getAccessToken() || isTokenExpired()) {
+      navigate("/login");
+    }
   }, [location.pathname]);
 
   return (

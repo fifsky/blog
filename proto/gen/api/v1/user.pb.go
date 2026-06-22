@@ -327,6 +327,7 @@ type LoginResponse struct {
 	xxx_hidden_AccessToken string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3"`
 	xxx_hidden_User        *UserItem              `protobuf:"bytes,2,opt,name=user,proto3"`
 	xxx_hidden_RequireTotp bool                   `protobuf:"varint,3,opt,name=require_totp,json=requireTotp,proto3"`
+	xxx_hidden_ExpiresAt   int64                  `protobuf:"varint,4,opt,name=expires_at,json=expiresAt,proto3"`
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
@@ -377,6 +378,13 @@ func (x *LoginResponse) GetRequireTotp() bool {
 	return false
 }
 
+func (x *LoginResponse) GetExpiresAt() int64 {
+	if x != nil {
+		return x.xxx_hidden_ExpiresAt
+	}
+	return 0
+}
+
 func (x *LoginResponse) SetAccessToken(v string) {
 	x.xxx_hidden_AccessToken = v
 }
@@ -387,6 +395,10 @@ func (x *LoginResponse) SetUser(v *UserItem) {
 
 func (x *LoginResponse) SetRequireTotp(v bool) {
 	x.xxx_hidden_RequireTotp = v
+}
+
+func (x *LoginResponse) SetExpiresAt(v int64) {
+	x.xxx_hidden_ExpiresAt = v
 }
 
 func (x *LoginResponse) HasUser() bool {
@@ -406,6 +418,8 @@ type LoginResponse_builder struct {
 	AccessToken string
 	User        *UserItem
 	RequireTotp bool
+	// token 过期时间（Unix 秒级时间戳）
+	ExpiresAt int64
 }
 
 func (b0 LoginResponse_builder) Build() *LoginResponse {
@@ -415,6 +429,7 @@ func (b0 LoginResponse_builder) Build() *LoginResponse {
 	x.xxx_hidden_AccessToken = b.AccessToken
 	x.xxx_hidden_User = b.User
 	x.xxx_hidden_RequireTotp = b.RequireTotp
+	x.xxx_hidden_ExpiresAt = b.ExpiresAt
 	return m0
 }
 
@@ -440,11 +455,13 @@ const file_api_v1_user_proto_rawDesc = "" +
 	"\fLoginRequest\x12&\n" +
 	"\tuser_name\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\buserName\x12%\n" +
 	"\bpassword\x18\x02 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\bpassword\x12\x1b\n" +
-	"\ttotp_code\x18\x03 \x01(\tR\btotpCode\"\x87\x01\n" +
+	"\ttotp_code\x18\x03 \x01(\tR\btotpCode\"\xa6\x01\n" +
 	"\rLoginResponse\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x120\n" +
 	"\x04user\x18\x02 \x01(\v2\x1c.fifsky.blog.api.v1.UserItemR\x04user\x12!\n" +
-	"\frequire_totp\x18\x03 \x01(\bR\vrequireTotp2s\n" +
+	"\frequire_totp\x18\x03 \x01(\bR\vrequireTotp\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\x04 \x01(\x03R\texpiresAt2s\n" +
 	"\vUserService\x12d\n" +
 	"\x05Login\x12 .fifsky.blog.api.v1.LoginRequest\x1a!.fifsky.blog.api.v1.LoginResponse\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/blog/loginB\xaa\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\tUserProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"

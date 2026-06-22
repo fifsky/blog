@@ -55,7 +55,7 @@ func (m *MiniApp) LoginCode(ctx context.Context, req *apiv1.MiniAppLoginRequest)
 		return nil, errors.BadRequest("USER_DISABLED", "用户已停用")
 	}
 
-	token, err := signAccessToken(m.conf.Common.TokenSecret, user.Id)
+	token, _, err := signAccessToken(m.conf.Common.TokenSecret, user.Id)
 	if err != nil {
 		return nil, errors.ErrSystem.WithCause(err)
 	}

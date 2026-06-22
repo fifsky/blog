@@ -52,7 +52,7 @@ func NewCors(next http.Handler) http.Handler {
 		if reqHeaders != "" {
 			w.Header().Set("Access-Control-Allow-Headers", reqHeaders)
 		} else {
-			w.Header().Set("Access-Control-Allow-Headers", "Authorization,Content-Length,Content-Type,Access-Token,X-Requested-With")
+			w.Header().Set("Access-Control-Allow-Headers", "Authorization,Content-Length,Content-Type,X-Requested-With")
 		}
 
 		if r.Method == "OPTIONS" {
