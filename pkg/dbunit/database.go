@@ -3,7 +3,6 @@ package dbunit
 import (
 	"database/sql"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"regexp"
 	"sync/atomic"
@@ -100,7 +99,7 @@ func (d *database) Import(schema string) error {
 		return fmt.Errorf("sql file not found:%s", schema)
 	}
 
-	content, err := ioutil.ReadFile(schema)
+	content, err := os.ReadFile(schema)
 	if err != nil {
 		return err
 	}

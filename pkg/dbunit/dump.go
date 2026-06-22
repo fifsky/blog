@@ -244,7 +244,7 @@ func asSliceForIn(i interface{}) (v reflect.Value, ok bool) {
 	v = reflect.ValueOf(i)
 	t := v.Type()
 
-	if t.Kind() == reflect.Ptr {
+	if t.Kind() == reflect.Pointer {
 		t = t.Elem()
 	}
 
