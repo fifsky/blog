@@ -5,11 +5,10 @@ import (
 	"testing"
 
 	"app/config"
+	"app/pkg/dbunit"
 	apiv1 "app/proto/gen/api/v1"
 	"app/store"
 	"app/testutil"
-
-	"github.com/goapt/dbunit"
 )
 
 func TestUser_Login(t *testing.T) {

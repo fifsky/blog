@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"app/pkg/dbunit"
 	"app/testutil"
-	"github.com/goapt/dbunit"
 )
 
 // the connect development environment database

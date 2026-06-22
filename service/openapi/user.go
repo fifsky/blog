@@ -7,10 +7,9 @@ import (
 	"time"
 
 	"app/config"
+	"app/pkg/gotp"
 	apiv1 "app/proto/gen/api/v1"
 	"app/store"
-
-	"github.com/goapt/gotp"
 )
 
 var _ apiv1.UserServiceHTTPServer = (*User)(nil)

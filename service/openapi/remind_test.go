@@ -7,11 +7,10 @@ import (
 
 	"app/config"
 	"app/pkg/aesutil"
+	"app/pkg/dbunit"
 	apiv1 "app/proto/gen/api/v1"
 	"app/store"
 	"app/testutil"
-
-	"github.com/goapt/dbunit"
 )
 
 func getRemindTestToken(id int, conf *config.Config) string {

@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"app/pkg/dbunit"
 	"app/testutil"
 
-	"github.com/goapt/dbunit"
 	"github.com/stretchr/testify/assert"
 )
 

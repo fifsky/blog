@@ -4,11 +4,10 @@ import (
 	"context"
 	"testing"
 
+	"app/pkg/dbunit"
 	apiv1 "app/proto/gen/api/v1"
 	"app/store"
 	"app/testutil"
-
-	"github.com/goapt/dbunit"
 )
 
 func TestMood_List(t *testing.T) {

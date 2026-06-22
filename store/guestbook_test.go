@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"app/pkg/dbunit"
 	"app/store/model"
 	"app/testutil"
 
-	"github.com/goapt/dbunit"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

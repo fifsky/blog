@@ -12,13 +12,13 @@ import (
 	"testing"
 
 	"app/config"
+	"app/pkg/dbunit"
 	"app/pkg/ossutil"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/store"
 	"app/store/model"
 	"app/testutil"
 
-	"github.com/goapt/dbunit"
 	"go.uber.org/mock/gomock"
 )
 

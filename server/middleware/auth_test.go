@@ -8,13 +8,12 @@ import (
 	"time"
 
 	"app/config"
+	"app/pkg/dbunit"
 	"app/store"
 	"app/testutil"
 
-	"github.com/stretchr/testify/assert"
-
-	"github.com/goapt/dbunit"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/stretchr/testify/assert"
 )
 
 func getUserTestToken(id int, conf *config.Config) string {

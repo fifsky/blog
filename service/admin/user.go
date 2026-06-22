@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"app/config"
+	"app/pkg/gotp"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
 	"app/store"
 	"app/store/model"
 
-	"github.com/goapt/gotp"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 

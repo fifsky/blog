@@ -4,12 +4,12 @@ import (
 	"context"
 	"testing"
 
+	"app/pkg/dbunit"
 	"app/pkg/errors"
 	apiv1 "app/proto/gen/api/v1"
 	"app/store"
 	"app/testutil"
 
-	"github.com/goapt/dbunit"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

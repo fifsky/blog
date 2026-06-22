@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"app/config"
+	"app/pkg/dbunit"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/store"
 	"app/store/model"
@@ -13,7 +14,6 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/goapt/dbunit"
 	"github.com/stretchr/testify/assert"
 )
 

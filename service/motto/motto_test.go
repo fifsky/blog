@@ -13,10 +13,10 @@ import (
 	"app/config"
 	"app/pkg/aiagent"
 	"app/pkg/bark"
+	"app/pkg/dbunit"
 	"app/store"
 	"app/testutil"
 
-	"github.com/goapt/dbunit"
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/option"
 	"github.com/stretchr/testify/assert"
