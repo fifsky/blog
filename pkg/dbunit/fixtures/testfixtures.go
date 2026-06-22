@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v3"
 )
 
 // Loader is the responsible to loading fixtures.
@@ -28,7 +28,7 @@ type Loader struct {
 
 type insertSQL struct {
 	sql    string
-	params []interface{}
+	params []any
 }
 
 var (
@@ -154,7 +154,7 @@ type InsertError struct {
 	Err    error
 	File   string
 	SQL    string
-	Params []interface{}
+	Params []any
 }
 
 func (e *InsertError) Error() string {
@@ -169,7 +169,7 @@ func (e *InsertError) Error() string {
 
 func (l *Loader) buildInsertSQLs() error {
 	for _, f := range l.fixturesFiles {
-		var records []map[string]interface{}
+		var records []map[string]any
 		if err := yaml.Unmarshal(f.content, &records); err != nil {
 			return fmt.Errorf("testfixtures: could not unmarshal YAML: %w", err)
 		}
@@ -197,7 +197,7 @@ func (l *Loader) buildInsertSQLs() error {
 				strings.Join(sqlColumnsQuote, ", "),
 				strings.Join(sqlBinds, ", "),
 			)
-			sqlValues = make([]interface{}, 0)
+			sqlValues = make([]any, 0)
 		)
 
 		for _, record := range records {
@@ -208,7 +208,7 @@ func (l *Loader) buildInsertSQLs() error {
 					if t, err := tryStrToDate(l.location, v); err == nil {
 						record[k] = t
 					}
-				case []interface{}, map[interface{}]interface{}:
+				case []any, map[any]any, map[string]any:
 					record[k] = recursiveToJSON(v)
 				}
 				sqlValues = append(sqlValues, record[k])

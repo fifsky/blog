@@ -13,7 +13,7 @@ import (
 
 	"app/pkg/dbunit/fixtures"
 
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v3"
 )
 
 func parseTableName(query string) string {
@@ -67,7 +67,7 @@ func getPrimaryKey(db *sql.DB, query string) (string, error) {
 	return pk, nil
 }
 
-func Dump(db *sql.DB, filePath, query string, args ...interface{}) ([]map[string]interface{}, error) {
+func Dump(db *sql.DB, filePath, query string, args ...any) ([]map[string]any, error) {
 	pk, err := getPrimaryKey(db, query)
 	if err != nil {
 		return nil, fmt.Errorf("get primary key error %w", err)
@@ -95,7 +95,7 @@ func Dump(db *sql.DB, filePath, query string, args ...interface{}) ([]map[string
 		return nil, err
 	}
 
-	var oldData = make([]map[string]interface{}, 0)
+	var oldData = make([]map[string]any, 0)
 	if isExists(filePath) {
 		d, err := os.ReadFile(filePath)
 		if err != nil {
@@ -112,11 +112,11 @@ func Dump(db *sql.DB, filePath, query string, args ...interface{}) ([]map[string
 		}
 	}
 
-	fixturesSlice := make([]yaml.MapSlice, 0, 10)
-	fixtureMaps := make([]map[string]interface{}, 0)
+	fixturesSlice := make([]*yaml.Node, 0, 10)
+	fixtureMaps := make([]map[string]any, 0)
 	for rows.Next() {
-		entries := make([]interface{}, len(columns))
-		entryPtrs := make([]interface{}, len(entries))
+		entries := make([]any, len(columns))
+		entryPtrs := make([]any, len(entries))
 		for i := range entries {
 			entryPtrs[i] = &entries[i]
 		}
@@ -124,19 +124,22 @@ func Dump(db *sql.DB, filePath, query string, args ...interface{}) ([]map[string
 			return nil, err
 		}
 
-		entryMap := make([]yaml.MapItem, len(entries))
-		entryMap2 := make(map[string]interface{})
+		// 保持列顺序的映射节点
+		rowNode := &yaml.Node{Kind: yaml.MappingNode}
+		entryMap2 := make(map[string]any)
 		for i, column := range columns {
 			v := convertValue(entries[i])
-			entryMap[i] = yaml.MapItem{
-				Key:   column,
-				Value: v,
+			keyNode := &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: column}
+			valNode := &yaml.Node{}
+			if err := valNode.Encode(v); err != nil {
+				return nil, err
 			}
+			rowNode.Content = append(rowNode.Content, keyNode, valNode)
 			entryMap2[column] = v
 		}
 
 		if !isDuplicate(oldData, entryMap2, pk) {
-			fixturesSlice = append(fixturesSlice, entryMap)
+			fixturesSlice = append(fixturesSlice, rowNode)
 		} else {
 			fmt.Printf("[duplicate] %s ignore primary key:%v\n", filePath, entryMap2[pk])
 		}
@@ -154,7 +157,7 @@ func Dump(db *sql.DB, filePath, query string, args ...interface{}) ([]map[string
 	return fixtureMaps, err
 }
 
-func writeYml(filePath string, fixtures []yaml.MapSlice, oldlen int) error {
+func writeYml(filePath string, fixtures []*yaml.Node, oldlen int) error {
 	var f *os.File
 	var err error
 	if isExists(filePath) && oldlen != 0 {
@@ -179,7 +182,7 @@ func writeYml(filePath string, fixtures []yaml.MapSlice, oldlen int) error {
 	return err
 }
 
-func convertValue(value interface{}) interface{} {
+func convertValue(value any) any {
 	switch v := value.(type) {
 	case []byte:
 		if utf8.Valid(v) {
@@ -189,7 +192,7 @@ func convertValue(value interface{}) interface{} {
 	return value
 }
 
-func isDuplicate(x []map[string]interface{}, y map[string]interface{}, pk string) bool {
+func isDuplicate(x []map[string]any, y map[string]any, pk string) bool {
 	for _, v := range x {
 		if pk != "" {
 			v1 := fmt.Sprintf("%v", v[pk])
@@ -209,8 +212,8 @@ func isDuplicate(x []map[string]interface{}, y map[string]interface{}, pk string
 	return false
 }
 
-func filterDate(m map[string]interface{}) map[string]interface{} {
-	newMap := make(map[string]interface{})
+func filterDate(m map[string]any) map[string]any {
+	newMap := make(map[string]any)
 	for k, v := range m {
 		if !tryParseDate(fmt.Sprintf("%s", v)) {
 			newMap[k] = v
@@ -236,7 +239,7 @@ func tryParseDate(s string) bool {
 	return false
 }
 
-func asSliceForIn(i interface{}) (v reflect.Value, ok bool) {
+func asSliceForIn(i any) (v reflect.Value, ok bool) {
 	if i == nil {
 		return reflect.Value{}, false
 	}
@@ -265,12 +268,12 @@ func asSliceForIn(i interface{}) (v reflect.Value, ok bool) {
 // inReplace expands slice values in args, returning the modified query string
 // and a new arg list that can be executed by a database. The `query` should
 // use the `?` bindVar.  The return value uses the `?` bindVar.
-func inReplace(query string, args ...interface{}) (string, []interface{}, error) {
+func inReplace(query string, args ...any) (string, []any, error) {
 	// argMeta stores reflect.Value and length for slices and
 	// the value itself for non-slice arguments
 	type argMeta struct {
 		v      reflect.Value
-		i      interface{}
+		i      any
 		length int
 	}
 
@@ -317,7 +320,7 @@ func inReplace(query string, args ...interface{}) (string, []interface{}, error)
 		return query, args, nil
 	}
 
-	newArgs := make([]interface{}, 0, flatArgsCount)
+	newArgs := make([]any, 0, flatArgsCount)
 
 	var buf strings.Builder
 	buf.Grow(len(query) + len(", ?")*flatArgsCount)
@@ -369,9 +372,9 @@ func inReplace(query string, args ...interface{}) (string, []interface{}, error)
 	return buf.String(), newArgs, nil
 }
 
-func appendReflectSlice(args []interface{}, v reflect.Value, vlen int) []interface{} {
+func appendReflectSlice(args []any, v reflect.Value, vlen int) []any {
 	switch val := v.Interface().(type) {
-	case []interface{}:
+	case []any:
 		args = append(args, val...)
 	case []int:
 		for i := range val {
