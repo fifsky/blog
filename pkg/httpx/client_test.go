@@ -30,6 +30,9 @@ func TestHttpError(t *testing.T) {
 }
 
 func TestNewClientWithTarce(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping external network test in short mode")
+	}
 	sr := &tracetest.SpanRecorder{}
 	tp := trace.NewTracerProvider(trace.WithSpanProcessor(sr))
 	otel.SetTracerProvider(tp)
@@ -57,6 +60,9 @@ func TestNewClientWithTarce(t *testing.T) {
 }
 
 func TestWithTransport(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping external network test in short mode")
+	}
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	transport.TLSClientConfig = &tls.Config{
 		CipherSuites: []uint16{
