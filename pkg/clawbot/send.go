@@ -78,14 +78,6 @@ type Target struct {
 	ContextToken string
 }
 
-type messageSender interface {
-	SendText(ctx context.Context, text string) (string, error)
-	SendImage(ctx context.Context, text string, uploaded UploadedFileInfo) (string, error)
-	SendVideo(ctx context.Context, text string, uploaded UploadedFileInfo) (string, error)
-	SendFile(ctx context.Context, text, fileName string, uploaded UploadedFileInfo) (string, error)
-	SendMediaFile(ctx context.Context, filePath, text string) (string, error)
-}
-
 type conversation struct {
 	sender *sender
 	target Target
