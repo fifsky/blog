@@ -90,7 +90,6 @@ export function Sidebar() {
       </div>
       <SidebarList title="文章分类" api="cateAllApi" />
       <SidebarList title="历史存档" api="archiveApi" />
-      <SidebarList title="我关注的" api="linkAllApi" />
       <div className="mt-5 flex items-center gap-4">
         <div>
           <i className="iconfont icon-rss" style={{ color: "orange" }}></i>

@@ -133,6 +133,14 @@ export function CHeader() {
               </li>
               <li className="bg-white">
                 <Link
+                  to="/links"
+                  className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
+                >
+                  友链
+                </Link>
+              </li>
+              <li className="bg-white">
+                <Link
                   to="/about"
                   className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
                 >
