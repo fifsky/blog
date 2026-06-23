@@ -4,7 +4,7 @@ import { useStore } from "@/store/context";
 import { SidebarList } from "./SidebarList";
 import { Calendar } from "./Calendar";
 import { InputGroup, InputGroupInput, InputGroupAddon } from "@/components/ui/input-group";
-import { Search } from "lucide-react";
+import { Search, Github, Mail, Send, FileText } from "lucide-react";
 
 export function Sidebar() {
   const keyword = useStore((s) => s.keyword);
@@ -51,6 +51,43 @@ export function Sidebar() {
       </div>
       {weather && <p className="mb-4 text-center text-xs text-[#8c8c8c]">{weather}</p>}
       <Calendar />
+      {/* 联系方式图标 */}
+      <div className="mb-5 flex items-center justify-center gap-3">
+        <a
+          href="https://github.com/fifsky"
+          target="_blank"
+          rel="noreferrer"
+          title="GitHub"
+          className="grid place-items-center leading-none w-7 h-7 rounded-full border border-gray-300 text-gray-500 hover:border-[#06c] hover:text-[#06c] transition-colors [&_svg]:block [&_svg]:m-auto"
+        >
+          <Github size={14} />
+        </a>
+        <a
+          href="mailto:fifsky@gmail.com"
+          title="邮箱"
+          className="grid place-items-center leading-none w-7 h-7 rounded-full border border-gray-300 text-gray-500 hover:border-[#06c] hover:text-[#06c] transition-colors [&_svg]:block [&_svg]:m-auto"
+        >
+          <Mail size={14} />
+        </a>
+        <a
+          href="https://t.me/+_Yk3wbIcqM82YTI1"
+          target="_blank"
+          rel="noreferrer"
+          title="Telegram"
+          className="grid place-items-center leading-none w-7 h-7 rounded-full border border-gray-300 text-gray-500 hover:border-[#06c] hover:text-[#06c] transition-colors [&_svg]:block [&_svg]:m-auto"
+        >
+          <Send size={14} />
+        </a>
+        <a
+          href="https://caixudong.com"
+          target="_blank"
+          rel="noreferrer"
+          title="简历"
+          className="grid place-items-center leading-none w-7 h-7 rounded-full border border-gray-300 text-gray-500 hover:border-[#06c] hover:text-[#06c] transition-colors [&_svg]:block [&_svg]:m-auto"
+        >
+          <FileText size={14} />
+        </a>
+      </div>
       <SidebarList title="文章分类" api="cateAllApi" />
       <SidebarList title="历史存档" api="archiveApi" />
       <SidebarList title="我关注的" api="linkAllApi" />

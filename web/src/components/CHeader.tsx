@@ -117,12 +117,10 @@ export function CHeader() {
               </li>
               <li className="bg-white">
                 <a
-                  href="https://github.com/fifsky"
-                  target="_blank"
-                  rel="noreferrer"
+                  href="https://windiness.fifsky.com"
                   className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
                 >
-                  Github
+                  有风
                 </a>
               </li>
               <li className="bg-white">
@@ -140,14 +138,6 @@ export function CHeader() {
                 >
                   关于
                 </Link>
-              </li>
-              <li className="bg-white">
-                <a
-                  href="https://windiness.fifsky.com"
-                  className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
-                >
-                  有风
-                </a>
               </li>
               <li className="bg-white">
                 <a
