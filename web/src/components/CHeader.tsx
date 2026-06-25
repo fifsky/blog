@@ -93,9 +93,7 @@ export function CHeader() {
                 textShadow: textShadow,
               }}
             >
-              <span className="text-4xl font-black tracking-wider">你好</span>
-              <span className="text-3xl font-bold">。</span>
-              <span className="text-2xl font-normal italic tracking-widest">旧时光</span>
+              <span className="text-3xl font-normal italic tracking-widest">無處告別</span>
               <i className="iconfont icon-zhifeiji text-4xl" />
             </Link>
           </div>
