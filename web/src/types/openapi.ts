@@ -217,18 +217,6 @@ export type MoodListResponse = { list: MoodItem[]; total: number };
 export type MoodCreateRequest = { content: string };
 export type MoodUpdateRequest = { id: number; content?: string };
 
-export type CommentItem = {
-  id: number;
-  article_title: string;
-  name: string;
-  content: string;
-  ip: string;
-  created_at: string;
-  type: number;
-  url?: string;
-};
-export type CommentListResponse = { list: CommentItem[]; total: number };
-
 // 缺失的类型定义
 export type ArticleDetailRequest = { id?: number; url?: string };
 export type GoogleProtobufAny = { "@type"?: string } & Record<string, any>;
@@ -369,3 +357,57 @@ export type GuestbookItem = {
 export type GuestbookListRequest = { page?: number; keyword?: string };
 export type GuestbookListResponse = { list: GuestbookItem[]; total: number };
 export type GuestbookDeleteRequest = { ids: number[] };
+
+// Comment types（原生评论）
+export type CommentItem = {
+  id: number;
+  pid: number; // 顶层主评论ID，主评论为0
+  name: string;
+  avatar: string; // gravatar 头像代理地址
+  website: string;
+  content: string;
+  reply_name: string; // 被回复人昵称
+  created_at: string;
+};
+export type CommentListRequest = { post_id: number };
+export type CommentListResponse = { list: CommentItem[] };
+export type CommentCreateRequest = {
+  post_id: number;
+  name: string;
+  email?: string;
+  website?: string;
+  pid?: number;
+  reply_name?: string;
+  content: string;
+};
+export type CommentCreateResponse = { id: number };
+export type CommentNewItem = {
+  id: number;
+  post_id: number;
+  name: string;
+  avatar: string;
+  content: string;
+  created_at: string;
+  post_title: string;
+  post_url: string;
+};
+export type CommentNewResponse = { list: CommentNewItem[] };
+
+// 后台评论类型
+export type AdminCommentItem = {
+  id: number;
+  post_id: number;
+  pid: number;
+  name: string;
+  email: string;
+  website: string;
+  content: string;
+  reply_name: string;
+  ip: string;
+  created_at: string;
+  post_title: string;
+  post_url: string;
+};
+export type AdminCommentListRequest = { page?: number; keyword?: string };
+export type AdminCommentListResponse = { list: AdminCommentItem[]; total: number };
+export type CommentDeleteRequest = { ids: number[] };

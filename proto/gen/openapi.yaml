@@ -331,6 +331,41 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ClawBotStatusResponse'
+    /blog/admin/comment/delete:
+        post:
+            tags:
+                - CommentService
+            description: Delete 删除评论
+            operationId: CommentService_Delete
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CommentDeleteRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /blog/admin/comment/list:
+        post:
+            tags:
+                - CommentService
+            description: List 获取评论列表
+            operationId: CommentService_List
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CommentListRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CommentListResponse'
     /blog/admin/footprint/create:
         post:
             tags:
@@ -957,6 +992,61 @@ paths:
                     description: OK
                     content:
                         '*/*': {}
+    /blog/comment/create:
+        post:
+            tags:
+                - CommentService
+            description: Create 创建评论
+            operationId: CommentService_Create
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CommentCreateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CommentCreateResponse'
+    /blog/comment/list:
+        post:
+            tags:
+                - CommentService
+            description: List 获取某篇文章的全部评论
+            operationId: CommentService_List
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CommentListRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CommentListResponse'
+    /blog/comment/new:
+        post:
+            tags:
+                - CommentService
+            description: New 获取最新评论（侧边栏）
+            operationId: CommentService_New
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CommentNewResponse'
     /blog/feed.xml:
         get:
             tags:
@@ -1560,6 +1650,116 @@ components:
                 last_error:
                     type: string
             description: ClawBotStatusResponse 表示当前 ClawBot 状态
+        CommentCreateRequest:
+            type: object
+            properties:
+                post_id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+                email:
+                    type: string
+                website:
+                    type: string
+                pid:
+                    type: integer
+                    format: int32
+                reply_name:
+                    type: string
+                content:
+                    type: string
+            description: CommentCreateRequest 创建评论请求
+        CommentCreateResponse:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+            description: CommentCreateResponse 创建评论响应
+        CommentDeleteRequest:
+            required:
+                - ids
+            type: object
+            properties:
+                ids:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+            description: CommentDeleteRequest 删除评论请求
+        CommentItem:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                pid:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+                avatar:
+                    type: string
+                website:
+                    type: string
+                content:
+                    type: string
+                reply_name:
+                    type: string
+                created_at:
+                    type: string
+            description: CommentItem 评论项（email 不对外展示，avatar 为服务端生成的头像代理地址）
+        CommentListRequest:
+            type: object
+            properties:
+                page:
+                    type: integer
+                    format: int32
+                keyword:
+                    type: string
+            description: CommentListRequest 获取评论列表请求
+        CommentListResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/CommentItem'
+                total:
+                    type: integer
+                    format: int32
+            description: CommentListResponse 获取评论列表响应
+        CommentNewItem:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                post_id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+                avatar:
+                    type: string
+                content:
+                    type: string
+                created_at:
+                    type: string
+                post_title:
+                    type: string
+                post_url:
+                    type: string
+            description: CommentNewItem 最新评论项（侧边栏用，关联文章信息）
+        CommentNewResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/CommentNewItem'
+            description: CommentNewResponse 最新评论响应
         DateArchiveItem:
             type: object
             properties:
@@ -2311,14 +2511,18 @@ tags:
       description: CateService 提供分类相关的接口
     - name: ClawBotService
       description: ClawBotService 提供微信 ClawBot 连接管理接口
+    - name: CommentService
+      description: CommentService 提供评论相关的管理接口
+    - name: CommentService
+      description: CommentService 提供文章评论相关的接口
     - name: FootprintService
       description: FootprintService 提供足迹管理相关的接口
     - name: GeoService
       description: GeoService 提供地理位置相关的接口
     - name: GuestbookService
-      description: GuestbookService 提供留言本相关的接口
-    - name: GuestbookService
       description: GuestbookService 提供留言相关的管理接口
+    - name: GuestbookService
+      description: GuestbookService 提供留言本相关的接口
     - name: LinkService
       description: LinkService 提供链接相关的接口
     - name: LinkService

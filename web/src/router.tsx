@@ -21,6 +21,7 @@ const AdminRemind = lazy(() => import("@/pages/admin/AdminRemind"));
 const AdminUser = lazy(() => import("@/pages/admin/AdminUser"));
 const AdminFootprint = lazy(() => import("@/pages/admin/AdminFootprint"));
 const AdminGuestbook = lazy(() => import("@/pages/admin/AdminGuestbook"));
+const AdminComment = lazy(() => import("@/pages/admin/AdminComment"));
 const AdminClawBot = lazy(() => import("@/pages/admin/AdminClawBot"));
 const PostArticle = lazy(() => import("@/pages/admin/PostArticle"));
 const PostUser = lazy(() => import("@/pages/admin/PostUser"));
@@ -132,6 +133,7 @@ const routesConfig: RouteObject[] = [
           { path: "users", element: <AdminUser /> },
           { path: "photos", element: <AdminFootprint /> },
           { path: "guestbooks", element: <AdminGuestbook /> },
+          { path: "comments", element: <AdminComment /> },
           { path: "post/user", element: <PostUser /> },
         ],
       },

@@ -65,6 +65,14 @@ import type {
   GuestbookListRequest,
   GuestbookListResponse,
   GuestbookDeleteRequest,
+  CommentListRequest,
+  CommentListResponse,
+  CommentCreateRequest,
+  CommentCreateResponse,
+  CommentNewResponse,
+  AdminCommentListRequest,
+  AdminCommentListResponse,
+  CommentDeleteRequest,
   ClawBotStatusResponse,
   ClawBotStartLoginRequest,
   ClawBotLoginSession,
@@ -90,10 +98,14 @@ export const moodListApi = (data: MoodListRequest, errorHandler?: (e: AppError) 
   createApi<MoodListResponse>("/blog/mood/list", data, errorHandler);
 export const moodRandomApi = (errorHandler?: (e: AppError) => void) =>
   createApi<MoodItem>("/blog/mood/random", undefined, errorHandler);
-export const commentListApi = (data: any, errorHandler?: (e: AppError) => void) =>
-  createApi("/blog/comment/list", data, errorHandler);
-export const commentPostApi = (data: any, errorHandler?: (e: AppError) => void) =>
-  createApi("/blog/comment/post", data, errorHandler);
+export const commentListApi = (
+  data: CommentListRequest,
+  errorHandler?: (e: AppError) => void,
+) => createApi<CommentListResponse>("/blog/comment/list", data, errorHandler);
+export const commentCreateApi = (
+  data: CommentCreateRequest,
+  errorHandler?: (e: AppError) => void,
+) => createApi<CommentCreateResponse>("/blog/comment/create", data, errorHandler);
 export const settingApi = (errorHandler?: (e: AppError) => void) =>
   createApi<Setting>("/blog/setting", undefined, errorHandler);
 export const settingChinaMapApi = (errorHandler?: (e: AppError) => void) =>
@@ -103,7 +115,7 @@ export const cateAllApi = (errorHandler?: (e: AppError) => void) =>
 export const archiveApi = (errorHandler?: (e: AppError) => void) =>
   createApi<ArchiveResponse>("/blog/article/archive", undefined, errorHandler);
 export const newCommentApi = (errorHandler?: (e: AppError) => void) =>
-  createApi<any>("/blog/comment/new", undefined, errorHandler);
+  createApi<CommentNewResponse>("/blog/comment/new", undefined, errorHandler);
 export const linkAllApi = (errorHandler?: (e: AppError) => void) =>
   createApi<LinkMenuResponse>("/blog/link/all", undefined, errorHandler);
 
@@ -163,9 +175,11 @@ export const adminArticleDetailApi = (data: { id: number }, errorHandler?: (e: A
   createApi<ArticleItem>("/blog/admin/article/detail", data, errorHandler);
 export const uploadApi = (data: any, errorHandler?: (e: AppError) => void) =>
   createApi("/blog/admin/upload", data, errorHandler);
-export const commentAdminListApi = (data: UserListRequest, errorHandler?: (e: AppError) => void) =>
-  createApi("/blog/admin/comment/list", data, errorHandler);
-export const commentDeleteApi = (data: { id: number }, errorHandler?: (e: AppError) => void) =>
+export const commentAdminListApi = (
+  data: AdminCommentListRequest,
+  errorHandler?: (e: AppError) => void,
+) => createApi<AdminCommentListResponse>("/blog/admin/comment/list", data, errorHandler);
+export const commentDeleteApi = (data: CommentDeleteRequest, errorHandler?: (e: AppError) => void) =>
   createApi("/blog/admin/comment/delete", data, errorHandler);
 export const moodCreateApi = (data: MoodCreateRequest, errorHandler?: (e: AppError) => void) =>
   createApi<IDResponse>("/blog/admin/mood/create", data, errorHandler);

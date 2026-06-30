@@ -84,7 +84,7 @@ export default function ArticleDetail() {
             </div>
           )}
         </div>
-        <Comment />
+        <Comment postId={article.id} />
       </PageTransition>
     </>
   );

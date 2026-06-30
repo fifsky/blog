@@ -1,0 +1,63 @@
+syntax = "proto3";
+package fifsky.blog.admin.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "gen/admin/v1";
+
+// CommentService 提供评论相关的管理接口
+service CommentService {
+  // List 获取评论列表
+  rpc List(CommentListRequest) returns (CommentListResponse) {
+    option (google.api.http) = {
+      post: "/blog/admin/comment/list"
+      body: "*"
+    };
+  }
+  // Delete 删除评论
+  rpc Delete(CommentDeleteRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/blog/admin/comment/delete"
+      body: "*"
+    };
+  }
+}
+
+// CommentListRequest 获取评论列表请求
+message CommentListRequest {
+  int32 page = 1;
+  string keyword = 2;
+}
+
+// CommentItem 评论项（后台含 email/ip 等完整信息）
+message CommentItem {
+  int32 id = 1;
+  int32 post_id = 2;
+  int32 pid = 3;
+  string name = 4;
+  string email = 5;
+  string website = 6;
+  string content = 7;
+  string reply_name = 8;
+  string ip = 9;
+  string created_at = 10;
+  string post_title = 11;   // 关联文章标题
+  string post_url = 12;     // 关联文章缩略名
+}
+
+// CommentListResponse 获取评论列表响应
+message CommentListResponse {
+  repeated CommentItem list = 1;
+  int32 total = 2;
+}
+
+// CommentDeleteRequest 删除评论请求
+message CommentDeleteRequest {
+  repeated int32 ids = 1 [
+    (buf.validate.field).repeated.min_items = 1,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}

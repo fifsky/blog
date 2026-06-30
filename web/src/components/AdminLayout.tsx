@@ -82,19 +82,9 @@ export function AdminLayout() {
               <AdminNavItem to="/admin/photos" isActive={isPage("/admin/photos")}>
                 足迹
               </AdminNavItem>
-              <li className="ml-1.5">
-                <a
-                  href="https://github.com/fifsky/blog/discussions/categories/comment"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={cn(
-                    "no-underline inline-flex text-gray-800 border border-[#89d5ef]",
-                    "mt-1.5 px-3.5 py-0.5 bg-[#89d5ef] hover:bg-white hover:text-[#ff7031]",
-                  )}
-                >
-                  评论
-                </a>
-              </li>
+              <AdminNavItem to="/admin/comments" isActive={isPage("/admin/comments")}>
+                评论
+              </AdminNavItem>
               <AdminNavItem to="/admin/moods" isActive={isPage("/admin/moods")}>
                 心情
               </AdminNavItem>

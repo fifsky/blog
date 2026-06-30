@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link2 } from "lucide-react";
-import { Comment } from "@/components/Comment";
 import { Empty } from "@/components/Empty";
 import { PageTransition } from "@/components/PageTransition";
 import { linkAllApi } from "@/service";
@@ -111,10 +110,6 @@ export default function Links() {
                 </a>
               );
             })}
-          </div>
-          {/* giscus 留言框 */}
-          <div className="mt-8">
-            <Comment />
           </div>
         </PageTransition>
       )}

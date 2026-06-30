@@ -12,7 +12,7 @@ CREATE TABLE `cates` (
                          `updated_at` datetime NOT NULL,
                          PRIMARY KEY (`id`),
                          UNIQUE KEY `un_domain` (`domain`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '文章分类表';
 
 # Dump of table links
 # ------------------------------------------------------------
@@ -26,7 +26,7 @@ CREATE TABLE `links` (
                          `desc` varchar(255) NOT NULL DEFAULT '',
                          `created_at` datetime NOT NULL,
                          PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '友情链接表';
 
 # Dump of table moods
 # ------------------------------------------------------------
@@ -39,7 +39,7 @@ CREATE TABLE `moods` (
                          `user_id` int(10) unsigned NOT NULL,
                          `created_at` datetime NOT NULL,
                          PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '心情表';
 
 # Dump of table options
 # ------------------------------------------------------------
@@ -52,7 +52,7 @@ CREATE TABLE `options` (
                            `option_value` varchar(200) NOT NULL DEFAULT '',
                            PRIMARY KEY (`id`),
                            UNIQUE KEY `un_option_key` (`option_key`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '配置表';
 
 # Dump of table posts
 # ------------------------------------------------------------
@@ -77,22 +77,25 @@ CREATE TABLE `posts` (
   KEY `idx_url` (`url`),
   KEY `idx_created_at` (`created_at`),
   KEY `idx_updated_at` (`updated_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '文章表';
 
 # Dump of table comments
 # ------------------------------------------------------------
 DROP TABLE IF EXISTS `comments`;
 
 CREATE TABLE `comments` (
-                            `id` int unsigned NOT NULL AUTO_INCREMENT,
-                            `post_id` int NOT NULL COMMENT '文章PID',
-                            `pid` int NOT NULL COMMENT '回复评论ID',
-                            `name` varchar(50) NOT NULL DEFAULT '' COMMENT '名称',
-                            `content` tinytext NOT NULL COMMENT '内容',
-                            `ip` varchar(100) NOT NULL DEFAULT '' COMMENT 'IP',
-                            `created_at` datetime NOT NULL COMMENT '评论时间',
-                            PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `post_id` int NOT NULL COMMENT '文章PID',
+  `pid` int NOT NULL COMMENT '回复评论ID',
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '名称',
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `website` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `reply_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '被回复人昵称',
+  `content` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '内容',
+  `ip` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'IP',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '评论时间',
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '评论表';
 
 # Dump of table users
 # ------------------------------------------------------------
@@ -114,7 +117,7 @@ CREATE TABLE `users` (
                          PRIMARY KEY (`id`),
                          UNIQUE KEY `un_user_name` (`name`),
                          UNIQUE KEY `un_users_email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '用户表';
 
 # Dump of table reminds
 # ------------------------------------------------------------
@@ -129,7 +132,7 @@ CREATE TABLE `reminds` (
                            `status` int NOT NULL DEFAULT '1',
                            `next_time` datetime NOT NULL COMMENT '下次提醒时间',
                            PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '提醒表';
 
 
 CREATE TABLE `regions` (
@@ -154,7 +157,7 @@ CREATE TABLE `guestbook` (
   `top` int NOT NULL DEFAULT '0' COMMENT '1置顶',
   `created_at` datetime NOT NULL COMMENT '留言时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = 'windiness 留言本';
 
 CREATE TABLE `footprints` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'PK',

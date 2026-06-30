@@ -1,0 +1,96 @@
+syntax = "proto3";
+package fifsky.blog.api.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "gen/api/v1";
+
+// CommentService 提供文章评论相关的接口
+service CommentService {
+  // List 获取某篇文章的全部评论
+  rpc List(CommentListRequest) returns (CommentListResponse) {
+    option (google.api.http) = {
+      post: "/blog/comment/list"
+      body: "*"
+    };
+  }
+
+  // Create 创建评论
+  rpc Create(CommentCreateRequest) returns (CommentCreateResponse) {
+    option (google.api.http) = {
+      post: "/blog/comment/create"
+      body: "*"
+    };
+  }
+
+  // New 获取最新评论（侧边栏）
+  rpc New(google.protobuf.Empty) returns (CommentNewResponse) {
+    option (google.api.http) = {
+      post: "/blog/comment/new"
+      body: "*"
+    };
+  }
+}
+
+// CommentListRequest 评论列表请求
+message CommentListRequest {
+  int32 post_id = 1 [(buf.validate.field).int32.gt = 0];
+}
+
+// CommentItem 评论项（email 不对外展示，avatar 为服务端生成的头像代理地址）
+message CommentItem {
+  int32 id = 1;
+  int32 pid = 2;            // 顶层主评论ID，主评论为0
+  string name = 3;          // 昵称
+  string avatar = 4;        // gravatar 头像代理地址
+  string website = 5;       // 网址
+  string content = 6;       // 内容
+  string reply_name = 7;    // 被回复人昵称（回复的回复时展示"A 回复 B"）
+  string created_at = 8;    // 评论时间
+}
+
+// CommentListResponse 评论列表响应
+message CommentListResponse {
+  repeated CommentItem list = 1;
+}
+
+// CommentCreateRequest 创建评论请求
+message CommentCreateRequest {
+  int32 post_id = 1 [(buf.validate.field).int32.gt = 0];
+  string name = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 50
+  ];
+  string email = 3 [(buf.validate.field).string.max_len = 255];
+  string website = 4 [(buf.validate.field).string.max_len = 255];
+  int32 pid = 5;            // 顶层主评论ID，主评论为0
+  string reply_name = 6 [(buf.validate.field).string.max_len = 50];
+  string content = 7 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 1000
+  ];
+}
+
+// CommentCreateResponse 创建评论响应
+message CommentCreateResponse {
+  int32 id = 1;
+}
+
+// CommentNewItem 最新评论项（侧边栏用，关联文章信息）
+message CommentNewItem {
+  int32 id = 1;
+  int32 post_id = 2;
+  string name = 3;
+  string avatar = 4;
+  string content = 5;
+  string created_at = 6;
+  string post_title = 7;   // 关联文章标题
+  string post_url = 8;     // 关联文章缩略名
+}
+
+// CommentNewResponse 最新评论响应
+message CommentNewResponse {
+  repeated CommentNewItem list = 1;
+}

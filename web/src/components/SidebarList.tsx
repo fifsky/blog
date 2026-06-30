@@ -4,12 +4,28 @@ import { archiveApi, cateAllApi, linkAllApi, newCommentApi } from "@/service";
 
 const apiMap = { cateAllApi, newCommentApi, archiveApi, linkAllApi };
 
+// 生成文章访问路径：有自定义路径则使用 /${url}，否则 /article/${id}
+function postLink(postId: number, postUrl: string): string {
+  return postUrl ? `/${postUrl}` : `/article/${postId}`;
+}
+
 export function SidebarList({ title, api }: { title: string; api: keyof typeof apiMap }) {
   const [items, setItems] = useState<{ url: string; content: string }[]>([]);
   useEffect(() => {
     (async () => {
       const data = await apiMap[api]();
-      setItems(data.list || []);
+      const list = data.list || [];
+      // newCommentApi 返回评论列表，需将其映射为侧边栏统一的 {url, content} 结构
+      if (api === "newCommentApi") {
+        setItems(
+          list.map((c: any) => ({
+            url: postLink(c.post_id, c.post_url),
+            content: c.content,
+          })),
+        );
+      } else {
+        setItems(list);
+      }
     })();
   }, [api]);
   return (

@@ -20,6 +20,7 @@ type Service struct {
 	ClawBot   *ClawBot
 	Guestbook *Guestbook
 	Footprint *Footprint
+	Comment   *Comment
 }
 
 func New(s *store.Store, conf *config.Config, agent *aiagent.Agent) *Service {
@@ -36,5 +37,6 @@ func New(s *store.Store, conf *config.Config, agent *aiagent.Agent) *Service {
 		ClawBot:   NewClawBot(s, conf, agent),
 		Guestbook: NewGuestbook(s),
 		Footprint: NewFootprint(s),
+		Comment:   NewComment(s),
 	}
 }

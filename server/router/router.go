@@ -83,6 +83,7 @@ func (r *Router) Handler() http.Handler {
 	apiv1.RegisterMiniAppServiceHTTPServer(api, codec, r.service.MiniApp)
 	apiv1.RegisterGeoServiceHTTPServer(api, codec, r.service.Geo)
 	apiv1.RegisterGuestbookServiceHTTPServer(api, codec, r.service.Guestbook)
+	apiv1.RegisterCommentServiceHTTPServer(api, codec, r.service.Comment)
 
 	mcpAuth := api.Use(middleware.NewToken(r.conf.Common.MCPToken))
 	mcpRemindHandler := mcptool.NewRemindHandler(r.store)
@@ -106,6 +107,7 @@ func (r *Router) Handler() http.Handler {
 	adminv1.RegisterAIServiceHTTPServer(adminAuth, codec, r.admin.AI)
 	adminv1.RegisterClawBotServiceHTTPServer(adminAuth, codec, r.admin.ClawBot)
 	adminv1.RegisterGuestbookServiceHTTPServer(adminAuth, codec, r.admin.Guestbook)
+	adminv1.RegisterCommentServiceHTTPServer(adminAuth, codec, r.admin.Comment)
 	adminv1.RegisterFootprintServiceHTTPServer(adminAuth, codec, r.admin.Footprint)
 
 	// AI chat endpoint (SSE streaming)
