@@ -5,6 +5,12 @@ import { Pagination } from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CTable, Column } from "@/components/CTable";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { AdminCommentItem } from "@/types/openapi";
 import { dialog } from "@/utils/dialog";
 
@@ -19,6 +25,8 @@ export default function AdminComment() {
   const [page, setPage] = useState(1);
   const [keyword, setKeyword] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  // 详情弹框当前查看的评论
+  const [detailItem, setDetailItem] = useState<AdminCommentItem | null>(null);
 
   const loadList = async () => {
     const ret = await commentAdminListApi({ page, keyword });
@@ -138,19 +146,32 @@ export default function AdminComment() {
       key: "created_at",
     },
     {
-      title: <div style={{ width: 60 }}>操作</div>,
+      title: <div style={{ width: 100 }}>操作</div>,
       key: "id",
       render: (_, record) => (
-        <Button
-          variant={"link"}
-          className="p-0 m-0 h-auto text-[13px]"
-          onClick={(e) => {
-            e.preventDefault();
-            deleteItem(record.id);
-          }}
-        >
-          删除
-        </Button>
+        <>
+          <Button
+            variant={"link"}
+            className="p-0 m-0 h-auto text-[13px]"
+            onClick={(e) => {
+              e.preventDefault();
+              setDetailItem(record);
+            }}
+          >
+            详情
+          </Button>
+          <span className="px-1.5 text-[#ccc]">|</span>
+          <Button
+            variant={"link"}
+            className="p-0 m-0 h-auto text-[13px]"
+            onClick={(e) => {
+              e.preventDefault();
+              deleteItem(record.id);
+            }}
+          >
+            删除
+          </Button>
+        </>
       ),
     },
   ];
@@ -179,6 +200,81 @@ export default function AdminComment() {
       <div className="my-2.5 flex items-center justify-end">
         <Pagination page={page} total={total} pageSize={10} onChange={setPage} />
       </div>
+
+      {/* 评论详情弹框 */}
+      <Dialog open={!!detailItem} onOpenChange={(open) => !open && setDetailItem(null)}>
+        <DialogContent className="sm:max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle>评论详情</DialogTitle>
+          </DialogHeader>
+          {detailItem && (
+            <div className="space-y-3 text-sm">
+              <div className="flex gap-2">
+                <span className="w-20 shrink-0 text-[#9ca3af]">评论ID</span>
+                <span className="text-[#374151]">{detailItem.id}</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="w-20 shrink-0 text-[#9ca3af]">昵称</span>
+                <span className="text-[#374151]">{detailItem.name}</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="w-20 shrink-0 text-[#9ca3af]">邮箱</span>
+                <span className="text-[#374151] break-all">{detailItem.email || "-"}</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="w-20 shrink-0 text-[#9ca3af]">网址</span>
+                {detailItem.website ? (
+                  <a
+                    href={detailItem.website}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[#0066cc] hover:underline break-all"
+                  >
+                    {detailItem.website}
+                  </a>
+                ) : (
+                  <span className="text-[#374151]">-</span>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <span className="w-20 shrink-0 text-[#9ca3af]">IP</span>
+                <span className="text-[#374151]">{detailItem.ip || "-"}</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="w-20 shrink-0 text-[#9ca3af]">时间</span>
+                <span className="text-[#374151]">{detailItem.created_at}</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="w-20 shrink-0 text-[#9ca3af]">所属文章</span>
+                {detailItem.post_title ? (
+                  <a
+                    href={postLink(detailItem)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[#0066cc] hover:underline"
+                  >
+                    {detailItem.post_title}
+                  </a>
+                ) : (
+                  <span className="text-[#374151]">-</span>
+                )}
+              </div>
+              {detailItem.reply_name && (
+                <div className="flex gap-2">
+                  <span className="w-20 shrink-0 text-[#9ca3af]">回复对象</span>
+                  <span className="text-[#374151]">@{detailItem.reply_name}</span>
+                </div>
+              )}
+              <div className="flex gap-2">
+                <span className="w-20 shrink-0 text-[#9ca3af]">内容</span>
+                <span className="text-[#374151] whitespace-pre-wrap break-words flex-1">
+                  {detailItem.content}
+                </span>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
