@@ -6,7 +6,7 @@ import { Loader2, Smile } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field";
+import { Field, FieldError, FieldGroup } from "@/components/ui/field";
 import { commentCreateApi } from "@/service";
 
 // 常用 emoji 表情集合
@@ -151,18 +151,13 @@ export function CommentForm({
             name="name"
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <div className="flex items-center gap-2">
-                  <FieldLabel htmlFor={field.name} className="text-xs text-[#6b7280] shrink-0">
-                    昵称 *
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    placeholder="昵称"
-                    className="h-8 bg-white flex-1 min-w-0"
-                  />
-                </div>
+              <Field orientation="horizontal" data-invalid={fieldState.invalid}>
+                <Input
+                  {...field}
+                  id={field.name}
+                  placeholder="昵称 *"
+                  className="h-8 bg-white flex-1 min-w-0"
+                />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
@@ -171,19 +166,14 @@ export function CommentForm({
             name="email"
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <div className="flex items-center gap-2">
-                  <FieldLabel htmlFor={field.name} className="text-xs text-[#6b7280] shrink-0">
-                    邮箱
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    type="email"
-                    placeholder="email@example.com"
-                    className="h-8 bg-white flex-1 min-w-0"
-                  />
-                </div>
+              <Field orientation="horizontal" data-invalid={fieldState.invalid}>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="email"
+                  placeholder="邮箱"
+                  className="h-8 bg-white flex-1 min-w-0"
+                />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
@@ -192,18 +182,13 @@ export function CommentForm({
             name="website"
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <div className="flex items-center gap-2">
-                  <FieldLabel htmlFor={field.name} className="text-xs text-[#6b7280] shrink-0">
-                    网址
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    placeholder="https://example.com"
-                    className="h-8 bg-white flex-1 min-w-0"
-                  />
-                </div>
+              <Field orientation="horizontal" data-invalid={fieldState.invalid}>
+                <Input
+                  {...field}
+                  id={field.name}
+                  placeholder="网址"
+                  className="h-8 bg-white flex-1 min-w-0"
+                />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
