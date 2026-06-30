@@ -159,20 +159,20 @@ export default function AdminComment() {
     <div>
       <title>管理评论 - 無處告別</title>
       <h2 className="border-b border-b-[#cccccc] text-base">管理评论</h2>
-      <div className="my-[10px] flex items-center gap-2">
-        <Input
-          placeholder="搜索昵称或内容，回车搜索"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          onKeyDown={onSearch}
-          className="max-w-[280px] h-8"
-        />
+      <div className="my-[10px] flex items-center justify-between">
         <BatchHandle
           selectedCount={selectedIds.size}
           totalCount={list.length}
           onSelectAll={handleSelectAll}
           onInverseSelected={handleInverseSelect}
           onBatchOperation={handleBatchOperation}
+        />
+        <Input
+          placeholder="搜索昵称或内容，回车搜索"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          onKeyDown={onSearch}
+          className="max-w-[280px] h-8"
         />
       </div>
       <CTable data={list} columns={columns} />
