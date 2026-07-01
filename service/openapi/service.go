@@ -23,9 +23,9 @@ type Service struct {
 	Comment   *Comment
 }
 
-func New(s *store.Store, conf *config.Config, httpClient *http.Client, linkCard *feishu.LinkCard, commentCard *feishu.CommentCard, sender *feishu.FeishuSender) *Service {
+func New(s *store.Store, conf *config.Config, httpClient *http.Client, linkCard *feishu.LinkCard, commentCard *feishu.CommentCard, notifyCard *feishu.NotifyCard, sender *feishu.FeishuSender) *Service {
 	return &Service{
-		User:      NewUser(s, conf),
+		User:      NewUser(s, conf, notifyCard, sender, httpClient),
 		Article:   NewArticle(s, conf),
 		Cate:      NewCate(s),
 		Link:      NewLink(s, conf, linkCard, sender),

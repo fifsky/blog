@@ -4,25 +4,38 @@ import (
 	"context"
 	"crypto/md5"
 	"fmt"
+	"log/slog"
+	"net/http"
 	"time"
 
 	"app/config"
 	"app/pkg/gotp"
+	"app/pkg/ipgeo"
 	apiv1 "app/proto/gen/api/v1"
+	"app/server/middleware"
+	"app/service/feishu"
 	"app/store"
+
+	"github.com/goapt/logger"
 )
 
 var _ apiv1.UserServiceHTTPServer = (*User)(nil)
 
 type User struct {
-	store *store.Store
-	conf  *config.Config
+	store      *store.Store
+	conf       *config.Config
+	notifyCard *feishu.NotifyCard
+	sender     *feishu.FeishuSender
+	httpClient *http.Client
 }
 
-func NewUser(s *store.Store, conf *config.Config) *User {
+func NewUser(s *store.Store, conf *config.Config, notifyCard *feishu.NotifyCard, sender *feishu.FeishuSender, httpClient *http.Client) *User {
 	return &User{
-		store: s,
-		conf:  conf,
+		store:      s,
+		conf:       conf,
+		notifyCard: notifyCard,
+		sender:     sender,
+		httpClient: httpClient,
 	}
 }
 
@@ -51,6 +64,10 @@ func (u *User) Login(ctx context.Context, in *apiv1.LoginRequest) (*apiv1.LoginR
 	if err != nil {
 		return nil, fmt.Errorf("Access Token加密错误:%s", err)
 	}
+
+	// 异步发送登录通知
+	u.notifyLogin(ctx, user.Name)
+
 	return apiv1.LoginResponse_builder{AccessToken: tokenString,
 			ExpiresAt: expiresAt,
 			User: apiv1.UserItem_builder{Id: int32(user.Id),
@@ -63,4 +80,60 @@ func (u *User) Login(ctx context.Context, in *apiv1.LoginRequest) (*apiv1.LoginR
 				UpdatedAt: user.UpdatedAt.Format(time.DateTime)}.Build()}.Build(),
 
 		nil
+}
+
+// notifyLogin 异步发送登录通知到飞书
+func (u *User) notifyLogin(ctx context.Context, userName string) {
+	if u.sender == nil || u.notifyCard == nil {
+		return
+	}
+
+	ip := middleware.ClientIPFromContext(ctx)
+	if ip == "" {
+		return
+	}
+
+	go func() {
+		region := ""
+		geo, err := ipgeo.Lookup(context.Background(), u.httpClient, ip)
+		if err != nil {
+			logger.Error("login notify ipgeo lookup error", slog.String("err", err.Error()), slog.String("ip", ip))
+		} else {
+			if geo.City != "" {
+				region = geo.City
+			}
+			if geo.Region != "" {
+				if region != "" {
+					region += ", " + geo.Region
+				} else {
+					region = geo.Region
+				}
+			}
+			if geo.Country != "" {
+				if region != "" {
+					region += ", " + geo.Country
+				} else {
+					region = geo.Country
+				}
+			}
+		}
+
+		content := fmt.Sprintf("%s 登录了博客", userName)
+		if ip != "" {
+			content += fmt.Sprintf("\n登录IP: %s", ip)
+		}
+		if region != "" {
+			content += fmt.Sprintf("\n地区: %s", region)
+		}
+
+		msg := feishu.NotifyMessage{
+			Content: content,
+			Time:    time.Now().Format("2006-01-02 15:04:05"),
+		}
+		cardJSON := u.notifyCard.BuildCard(msg)
+
+		if err := u.sender.Send(context.Background(), cardJSON); err != nil {
+			logger.Error("login notify send error", slog.String("err", err.Error()))
+		}
+	}()
 }

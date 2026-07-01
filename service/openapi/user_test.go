@@ -16,7 +16,7 @@ func TestUser_Login(t *testing.T) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users")...)
 		conf := &config.Config{}
 		conf.Common.TokenSecret = "abcdabcdabcdabcd"
-		svc := NewUser(store.New(db), conf)
+		svc := NewUser(store.New(db), conf, nil, nil, nil)
 		resp, err := svc.Login(context.Background(), apiv1.LoginRequest_builder{UserName: "test", Password: "test"}.Build())
 		if err != nil || len(resp.GetAccessToken()) == 0 {
 			t.Fatalf("unexpected err=%v token=%s", err, resp.GetAccessToken())

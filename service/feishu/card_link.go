@@ -120,7 +120,7 @@ const linkCardTemplate = `{
                 "content": {{.URL | json}},
                 "text_align": "left",
                 "text_size": "notation",
-                "margin": "0px 0px 0px 0px"
+                "margin": "0px 0px 0px 0px",
                 "icon": {
                     "tag": "standard_icon",
                     "token": "sharelink_outlined",
@@ -246,7 +246,7 @@ const linkResultCardTemplate = `{
                 "content": {{.URL | json}},
                 "text_align": "left",
                 "text_size": "notation",
-                "margin": "0px 0px 0px 0px"
+                "margin": "0px 0px 0px 0px",
                 "icon": {
                     "tag": "standard_icon",
                     "token": "sharelink_outlined",
