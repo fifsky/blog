@@ -148,8 +148,8 @@ func TestComment_Create(t *testing.T) {
 	}
 }
 
-func TestComment_Create_WebsiteIncludedInModeration(t *testing.T) {
-	// 验证网址也被拼入审核内容（通过自定义 mock 捕获传入的 content）
+func TestComment_Create_WebsiteNotIncludedInModeration(t *testing.T) {
+	// 验证网址不参与审核（避免被 AI 误判为广告），仅昵称和内容参与审核
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts")...)
 		ctx := context.Background()
@@ -164,9 +164,9 @@ func TestComment_Create_WebsiteIncludedInModeration(t *testing.T) {
 			Content: "正文",
 		}.Build())
 		require.NoError(t, err)
-		// 昵称、网址、内容都应在审核内容中
+		// 昵称、内容应在审核内容中，网址不应出现
 		assert.Contains(t, mock.captured, "张三")
-		assert.Contains(t, mock.captured, "https://spam.com")
+		assert.NotContains(t, mock.captured, "https://spam.com")
 		assert.Contains(t, mock.captured, "正文")
 	})
 }

@@ -86,9 +86,9 @@ func (c *Comment) List(ctx context.Context, req *apiv1.CommentListRequest) (*api
 	return apiv1.CommentListResponse_builder{List: items}.Build(), nil
 }
 
-// Create 创建评论，提交的昵称/网址/内容拼接后交由 AI 审核
+// Create 创建评论，提交的昵称/内容拼接后交由 AI 审核
 func (c *Comment) Create(ctx context.Context, req *apiv1.CommentCreateRequest) (*apiv1.CommentCreateResponse, error) {
-	// 内容审核：昵称、网址、内容拼接后检测
+	// 内容审核：昵称、内容拼接后检测（网址不参与，避免被误判为广告）
 	if c.moderator != nil {
 		content := strings.Join([]string{req.GetName(), req.GetContent()}, " ")
 		if err := c.moderator.Moderate(ctx, content); err != nil {
