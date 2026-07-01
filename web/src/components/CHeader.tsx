@@ -48,6 +48,9 @@ export function CHeader() {
   const bgOpacity = progress;
   const shadowOpacity = Math.max(0, (progress - 0.5) * 2);
   const headerPaddingY = 24 - progress * 20;
+  const blurAmount = progress * 12; // 磨玻璃模糊程度，随滚动加深
+  const isScrolled = progress > 0; // 是否已滚动，用于控制菜单背景切换
+  const menuBgClass = isScrolled ? "" : "bg-white";
 
   return (
     <>
@@ -63,9 +66,11 @@ export function CHeader() {
         }}
       >
         <div
-          className="absolute inset-0 bg-white pointer-events-none"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            opacity: bgOpacity,
+            background: `rgba(255, 255, 255, ${0.6 * bgOpacity})`,
+            backdropFilter: bgOpacity > 0 ? `blur(${blurAmount}px)` : "none",
+            WebkitBackdropFilter: bgOpacity > 0 ? `blur(${blurAmount}px)` : "none",
             boxShadow: shadowOpacity > 0 ? `0 1px 8px rgba(0,0,0,${shadowOpacity * 0.1})` : "none",
           }}
         />
@@ -98,14 +103,14 @@ export function CHeader() {
             </Link>
           </div>
           <div
-            className="inline-flex items-center h-[35px] bg-white rounded-lg whitespace-nowrap"
+            className={`inline-flex items-center h-[35px] rounded-lg whitespace-nowrap ${menuBgClass}`}
             style={{
               transform: `translateX(${menuTranslateX}px)`,
               willChange: "transform",
             }}
           >
             <ul className="flex items-center list-none px-4">
-              <li className="bg-white">
+              <li className={menuBgClass}>
                 <Link
                   to="/"
                   className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
@@ -113,7 +118,7 @@ export function CHeader() {
                   首页
                 </Link>
               </li>
-              <li className="bg-white">
+              <li className={menuBgClass}>
                 <a
                   href="https://windiness.fifsky.com"
                   className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
@@ -121,7 +126,7 @@ export function CHeader() {
                   有风
                 </a>
               </li>
-              <li className="bg-white">
+              <li className={menuBgClass}>
                 <Link
                   to="/archive"
                   className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
@@ -129,7 +134,7 @@ export function CHeader() {
                   归档
                 </Link>
               </li>
-              <li className="bg-white">
+              <li className={menuBgClass}>
                 <Link
                   to="/links"
                   className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
@@ -137,7 +142,7 @@ export function CHeader() {
                   友链
                 </Link>
               </li>
-              <li className="bg-white">
+              <li className={menuBgClass}>
                 <Link
                   to="/about"
                   className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
@@ -145,7 +150,7 @@ export function CHeader() {
                   关于
                 </Link>
               </li>
-              <li className="bg-white">
+              <li className={menuBgClass}>
                 <a
                   href="https://www.travellings.cn/go"
                   className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
@@ -155,7 +160,7 @@ export function CHeader() {
                 </a>
               </li>
               {isLogin && (
-                <li className="bg-white">
+                <li className={menuBgClass}>
                   <Link
                     to="/admin/index"
                     className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
@@ -165,7 +170,7 @@ export function CHeader() {
                 </li>
               )}
               {isLogin && (
-                <li className="bg-white">
+                <li className={menuBgClass}>
                   <a
                     href="#"
                     onClick={(e) => {
@@ -179,7 +184,7 @@ export function CHeader() {
                 </li>
               )}
               {!isLogin && (
-                <li className="bg-white">
+                <li className={menuBgClass}>
                   <Link
                     to="/login"
                     className="px-2.5 py-0.5 hover:bg-[#0066cc] hover:text-white hover:no-underline"
