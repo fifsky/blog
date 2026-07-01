@@ -3,7 +3,6 @@ package model
 import "time"
 
 // Comment 评论模型
-// Comment 评论模型
 type Comment struct {
 	Id        int    // PK
 	PostId    int    // 文章PID

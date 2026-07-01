@@ -90,12 +90,15 @@ CREATE TABLE `comments` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
   `post_id` int NOT NULL COMMENT '文章PID',
   `pid` int NOT NULL COMMENT '回复评论ID',
-  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '名称',
-  `content` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '内容',
-  `ip` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'IP',
+  `name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '名称',
+  `reply_name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '回复用户名',
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '邮箱',
+  `website` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '网址',
+  `content` tinytext COLLATE utf8mb4_general_ci NOT NULL COMMENT '内容',
+  `ip` varchar(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'IP',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '评论时间',
   PRIMARY KEY (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '文章评论表';
+) ENGINE = InnoDB AUTO_INCREMENT = 16 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '文章评论表';
 
 # Dump of table users
 # ------------------------------------------------------------
