@@ -55,7 +55,7 @@ const commentCardTemplate = `{
                 "margin": "0px 0px 0px 0px",
                 "icon": {
                     "tag": "standard_icon",
-                    "token": "doc_colorful",
+                    "token": "file-link-word_outlined",
                     "color": "blue"
                 }
             },
