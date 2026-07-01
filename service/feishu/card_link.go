@@ -14,9 +14,11 @@ import (
 
 // LinkMessage 友情链接卡片消息，驱动卡片模板渲染
 type LinkMessage struct {
-	Content string // 链接信息（markdown）
-	Token   string // 回调按钮携带的 token
-	Result  string // 操作结果文本，仅结果卡片使用
+	Name   string // 站点名称
+	URL    string // 站点地址
+	Desc   string // 站点描述
+	Token  string // 回调按钮携带的 token
+	Result string // 操作结果文本，仅结果卡片使用
 }
 
 // LinkCard 友情链接卡片处理器，合并卡片构建和回调处理
@@ -81,12 +83,11 @@ func (c *LinkCard) Handle(ctx context.Context, action, token string) (string, st
 		return "", "", nil
 	}
 
-	content := fmt.Sprintf("**站点名称**: %s\n**站点地址**: [%s](%s)\n**站点描述**: %s",
-		link.Name, link.Url, link.Url, link.Desc)
-
 	msg := LinkMessage{
-		Content: content,
-		Result:  responseText,
+		Name:   link.Name,
+		URL:    link.Url,
+		Desc:   link.Desc,
+		Result: responseText,
 	}
 	return c.BuildResultCard(msg), responseText, nil
 }
@@ -104,14 +105,31 @@ const linkCardTemplate = `{
         "elements": [
             {
                 "tag": "markdown",
-                "content": "**友情链接申请**",
+                "content": {{.Name | json}},
                 "text_align": "left",
-                "text_size": "heading",
-                "margin": "0px 0px 0px 0px"
+                "text_size": "normal",
+                "margin": "0px 0px 0px 0px",
+                "icon": {
+                    "tag": "standard_icon",
+                    "token": "pen_outlined",
+                    "color": "blue"
+                }
             },
             {
                 "tag": "markdown",
-                "content": {{.Content | json}},
+                "content": {{.URL | json}},
+                "text_align": "left",
+                "text_size": "notation",
+                "margin": "0px 0px 0px 0px"
+                "icon": {
+                    "tag": "standard_icon",
+                    "token": "sharelink_outlined",
+                    "color": "blue"
+                }
+            },
+            {
+                "tag": "markdown",
+                "content": {{.Desc | json}},
                 "text_align": "left",
                 "text_size": "normal",
                 "margin": "0px 0px 0px 0px"
@@ -213,14 +231,31 @@ const linkResultCardTemplate = `{
         "elements": [
             {
                 "tag": "markdown",
-                "content": "**友情链接申请**",
+                "content": {{.Name | json}},
                 "text_align": "left",
-                "text_size": "heading",
-                "margin": "0px 0px 0px 0px"
+                "text_size": "normal",
+                "margin": "0px 0px 0px 0px",
+                "icon": {
+                    "tag": "standard_icon",
+                    "token": "pen_outlined",
+                    "color": "blue"
+                }
             },
             {
                 "tag": "markdown",
-                "content": {{.Content | json}},
+                "content": {{.URL | json}},
+                "text_align": "left",
+                "text_size": "notation",
+                "margin": "0px 0px 0px 0px"
+                "icon": {
+                    "tag": "standard_icon",
+                    "token": "sharelink_outlined",
+                    "color": "blue"
+                }
+            },
+            {
+                "tag": "markdown",
+                "content": {{.Desc | json}},
                 "text_align": "left",
                 "text_size": "normal",
                 "margin": "0px 0px 0px 0px"

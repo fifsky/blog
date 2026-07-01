@@ -2,7 +2,6 @@ package openapi
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"strconv"
 	"time"
@@ -78,10 +77,11 @@ func (l *Link) notifyLinkSubmit(id int64, name, url, desc string) {
 		return
 	}
 
-	content := fmt.Sprintf("**站点名称**: %s\n**站点地址**: [%s](%s)\n**站点描述**: %s", name, url, url, desc)
 	msg := feishu.LinkMessage{
-		Content: content,
-		Token:   token,
+		Name:  name,
+		URL:   url,
+		Desc:  desc,
+		Token: token,
 	}
 	cardJSON := l.card.BuildCard(msg)
 

@@ -76,8 +76,10 @@ func TestRemindCard_SpecialChars(t *testing.T) {
 func TestLinkCard_BuildCard(t *testing.T) {
 	card := NewLinkCard(nil, nil)
 	msg := LinkMessage{
-		Content: "**站点名称**: 测试站点\n**站点地址**: [example.com](https://example.com)",
-		Token:   "link_token_123",
+		Name:  "测试站点",
+		URL:   "https://example.com",
+		Desc:  "一个测试站点",
+		Token: "link_token_123",
 	}
 
 	cardJSON := card.BuildCard(msg)
@@ -88,6 +90,12 @@ func TestLinkCard_BuildCard(t *testing.T) {
 	}
 	if !strings.Contains(cardJSON, "测试站点") {
 		t.Error("卡片内容应包含站点名称")
+	}
+	if !strings.Contains(cardJSON, "example.com") {
+		t.Error("卡片内容应包含站点地址")
+	}
+	if !strings.Contains(cardJSON, "一个测试站点") {
+		t.Error("卡片内容应包含站点描述")
 	}
 	if !strings.Contains(cardJSON, "link_approve") {
 		t.Error("卡片应包含通过按钮")
@@ -100,8 +108,10 @@ func TestLinkCard_BuildCard(t *testing.T) {
 func TestLinkCard_BuildResultCard(t *testing.T) {
 	card := NewLinkCard(nil, nil)
 	msg := LinkMessage{
-		Content: "**站点名称**: 测试站点",
-		Result:  "已通过审核",
+		Name:   "测试站点",
+		URL:    "https://example.com",
+		Desc:   "一个测试站点",
+		Result: "已通过审核",
 	}
 
 	cardJSON := card.BuildResultCard(msg)
@@ -112,6 +122,9 @@ func TestLinkCard_BuildResultCard(t *testing.T) {
 	}
 	if !strings.Contains(cardJSON, "已通过审核") {
 		t.Error("卡片内容应包含结果文本")
+	}
+	if !strings.Contains(cardJSON, "测试站点") {
+		t.Error("结果卡片应包含站点名称")
 	}
 	if strings.Contains(cardJSON, "link_approve") {
 		t.Error("结果卡片不应包含按钮")
