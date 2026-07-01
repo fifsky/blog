@@ -128,7 +128,7 @@ CREATE TABLE `reminds` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
   `cron` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'cron表达式或固定时间',
   `content` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '提醒内容',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  `status` varchar(64) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'ACTIVE' COMMENT '状态:ACTIVE正常,PENDING等待确认,DONE已完成',
   `next_time` datetime NOT NULL COMMENT '下次提醒时间',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',

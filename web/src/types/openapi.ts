@@ -236,7 +236,7 @@ export type RemindItem = {
   id: number;
   cron: string;
   content: string;
-  status: number;
+  status: string;
   next_time: string;
   created_at: string;
   updated_at: string;

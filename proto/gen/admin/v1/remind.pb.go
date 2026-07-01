@@ -29,7 +29,7 @@ type RemindItem struct {
 	xxx_hidden_Id        int32                  `protobuf:"varint,1,opt,name=id,proto3"`
 	xxx_hidden_Cron      string                 `protobuf:"bytes,2,opt,name=cron,proto3"`
 	xxx_hidden_Content   string                 `protobuf:"bytes,3,opt,name=content,proto3"`
-	xxx_hidden_Status    int32                  `protobuf:"varint,9,opt,name=status,proto3"`
+	xxx_hidden_Status    string                 `protobuf:"bytes,9,opt,name=status,proto3"`
 	xxx_hidden_NextTime  string                 `protobuf:"bytes,10,opt,name=next_time,json=nextTime,proto3"`
 	xxx_hidden_CreatedAt string                 `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3"`
 	xxx_hidden_UpdatedAt string                 `protobuf:"bytes,12,opt,name=updated_at,json=updatedAt,proto3"`
@@ -83,11 +83,11 @@ func (x *RemindItem) GetContent() string {
 	return ""
 }
 
-func (x *RemindItem) GetStatus() int32 {
+func (x *RemindItem) GetStatus() string {
 	if x != nil {
 		return x.xxx_hidden_Status
 	}
-	return 0
+	return ""
 }
 
 func (x *RemindItem) GetNextTime() string {
@@ -123,7 +123,7 @@ func (x *RemindItem) SetContent(v string) {
 	x.xxx_hidden_Content = v
 }
 
-func (x *RemindItem) SetStatus(v int32) {
+func (x *RemindItem) SetStatus(v string) {
 	x.xxx_hidden_Status = v
 }
 
@@ -145,7 +145,7 @@ type RemindItem_builder struct {
 	Id        int32
 	Cron      string
 	Content   string
-	Status    int32
+	Status    string
 	NextTime  string
 	CreatedAt string
 	UpdatedAt string
@@ -520,7 +520,7 @@ const file_admin_v1_remind_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04cron\x18\x02 \x01(\tR\x04cron\x12\x18\n" +
 	"\acontent\x18\x03 \x01(\tR\acontent\x12\x16\n" +
-	"\x06status\x18\t \x01(\x05R\x06status\x12\x1b\n" +
+	"\x06status\x18\t \x01(\tR\x06status\x12\x1b\n" +
 	"\tnext_time\x18\n" +
 	" \x01(\tR\bnextTime\x12\x1d\n" +
 	"\n" +

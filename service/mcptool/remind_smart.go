@@ -80,7 +80,7 @@ func SmartCreateRemind(ctx context.Context, aiClient openai.Client, aiModel stri
 	insert := &model.Remind{
 		Cron:      rule.Cron,
 		Content:   finalContent,
-		Status:    1,
+		Status:    model.RemindStatusActive,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}

@@ -84,15 +84,15 @@ export default function AdminRemind() {
       title: <div style={{ width: 60 }}>状态</div>,
       key: "status",
       render: (_, record) => {
-        const statusMap: Record<number, string> = {
-          1: "正常",
-          2: "等待确认",
-          3: "已完成",
+        const statusMap: Record<string, string> = {
+          ACTIVE: "正常",
+          PENDING: "等待确认",
+          DONE: "已完成",
         };
-        const colorMap: Record<number, string> = {
-          1: "text-green-600",
-          2: "text-orange-500",
-          3: "text-gray-400",
+        const colorMap: Record<string, string> = {
+          ACTIVE: "text-green-600",
+          PENDING: "text-orange-500",
+          DONE: "text-gray-400",
         };
         return (
           <span className={colorMap[record.status] || "text-gray-600"}>

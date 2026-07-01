@@ -38,7 +38,7 @@ func (s *Store) ListRemind(ctx context.Context, start int, num int) ([]*model.Re
 }
 
 func (s *Store) RemindAll(ctx context.Context) ([]model.Remind, error) {
-	rows, err := s.db.QueryContext(ctx, "select id,cron,content,status,next_time,created_at,updated_at from reminds where status in (1, 2) order by id desc")
+	rows, err := s.db.QueryContext(ctx, "select id,cron,content,status,next_time,created_at,updated_at from reminds where status in (?, ?) order by id desc", model.RemindStatusActive, model.RemindStatusPending)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (s *Store) CountRemindTotal(ctx context.Context) (int, error) {
 	return total, nil
 }
 
-func (s *Store) UpdateRemindStatus(ctx context.Context, id int, status int) error {
+func (s *Store) UpdateRemindStatus(ctx context.Context, id int, status model.RemindStatus) error {
 	_, err := s.db.ExecContext(ctx, "update reminds set status = ? where id = ?", status, id)
 	return err
 }

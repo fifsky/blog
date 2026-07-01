@@ -35,7 +35,7 @@ func (r *Remind) List(ctx context.Context, req *adminv1.RemindListRequest) (*adm
 		items = append(items, adminv1.RemindItem_builder{Id: int32(v.Id),
 			Cron:      v.Cron,
 			Content:   v.Content,
-			Status:    int32(v.Status),
+			Status:    string(v.Status),
 			NextTime:  v.NextTime.Format(time.DateTime),
 			CreatedAt: v.CreatedAt.Format(time.DateTime),
 			UpdatedAt: v.UpdatedAt.Format(time.DateTime)}.Build(),
@@ -54,7 +54,7 @@ func (r *Remind) Create(ctx context.Context, req *adminv1.RemindCreateRequest) (
 	c := &model.Remind{
 		Cron:      req.GetCron(),
 		Content:   req.GetContent(),
-		Status:    1,
+		Status:    model.RemindStatusActive,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}

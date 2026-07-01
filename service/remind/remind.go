@@ -67,7 +67,7 @@ func (r *Remind) message(content string, v *model.Remind) {
 func (r *Remind) changeNextTime(v *model.Remind) {
 	nextTime := NextTimeFromRule(time.Now(), v)
 
-	_ = r.store.UpdateRemindStatus(context.Background(), v.Id, 2)
+	_ = r.store.UpdateRemindStatus(context.Background(), v.Id, model.RemindStatusPending)
 	_ = r.store.UpdateRemindNextTime(context.Background(), v.Id, nextTime)
 }
 
@@ -78,7 +78,7 @@ func (r *Remind) run(t time.Time) {
 		content := v.Content
 
 		// 如果是等待确认的消息，则每天都需要提醒
-		if v.Status == 2 {
+		if v.Status == model.RemindStatusPending {
 			// 未确认的消息每天都需要在相同的时间点提醒
 			if t.Format("15:04") == v.NextTime.Format("15:04") {
 				v2 := v

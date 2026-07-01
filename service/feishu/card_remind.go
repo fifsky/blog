@@ -100,14 +100,14 @@ func (c *RemindCard) handleChange(ctx context.Context, remind *model.Remind) (st
 	isFixedDate := len(remind.Cron) >= 10 && remind.Cron[4] == '-'
 
 	if isFixedDate {
-		if err := c.store.UpdateRemindStatus(ctx, remind.Id, 3); err != nil {
+		if err := c.store.UpdateRemindStatus(ctx, remind.Id, model.RemindStatusDone); err != nil {
 			return "", err
 		}
 		return "已确认完成", nil
 	}
 
 	// 周期性任务，恢复状态并更新下次时间
-	if err := c.store.UpdateRemindStatus(ctx, remind.Id, 1); err != nil {
+	if err := c.store.UpdateRemindStatus(ctx, remind.Id, model.RemindStatusActive); err != nil {
 		return "", err
 	}
 	if err := c.store.UpdateRemindNextTime(ctx, remind.Id, nextTime); err != nil {
