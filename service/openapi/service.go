@@ -23,12 +23,13 @@ type Service struct {
 	Comment   *Comment
 }
 
-func New(s *store.Store, conf *config.Config, httpClient *http.Client, linkCard *feishu.LinkCard, commentCard *feishu.CommentCard, notifyCard *feishu.NotifyCard, sender *feishu.FeishuSender) *Service {
+func New(s *store.Store, conf *config.Config, httpClient *http.Client) *Service {
+	sender := feishu.NewFeishuSender(conf.Feishu)
 	return &Service{
-		User:      NewUser(s, conf, notifyCard, sender, httpClient),
+		User:      NewUser(s, conf, sender, httpClient),
 		Article:   NewArticle(s, conf),
 		Cate:      NewCate(s),
-		Link:      NewLink(s, conf, linkCard, sender),
+		Link:      NewLink(s, conf, sender),
 		Mood:      NewMood(s),
 		Remind:    NewRemind(s, conf),
 		Setting:   NewSetting(s),
@@ -36,6 +37,6 @@ func New(s *store.Store, conf *config.Config, httpClient *http.Client, linkCard 
 		MiniApp:   NewMiniApp(s, conf, httpClient),
 		Geo:       NewGeo(s),
 		Guestbook: NewGuestbook(s),
-		Comment:   NewComment(s, conf, commentCard, sender),
+		Comment:   NewComment(s, conf, sender),
 	}
 }

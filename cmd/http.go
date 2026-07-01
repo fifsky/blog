@@ -5,20 +5,22 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"app/config"
 	"app/pkg/aiagent"
+	"app/pkg/httpx"
 	"app/server"
 	"app/server/router"
 	"app/service/admin"
-	"app/service/feishu"
 	"app/service/openapi"
 	"app/store"
 
+	"github.com/goapt/logger/sloghttp"
 	"github.com/urfave/cli/v3"
 )
 
-func NewHttp(s *store.Store, conf *config.Config, httpClient *http.Client, agent *aiagent.Agent, accessLogger *slog.Logger, linkCard *feishu.LinkCard, commentCard *feishu.CommentCard, notifyCard *feishu.NotifyCard, sender *feishu.FeishuSender) *cli.Command {
+func NewHttp(s *store.Store, conf *config.Config, agent *aiagent.Agent) *cli.Command {
 	return &cli.Command{
 		Name:  "http",
 		Usage: "http command eg: ./app http --addr=:8080",
@@ -34,7 +36,23 @@ func NewHttp(s *store.Store, conf *config.Config, httpClient *http.Client, agent
 			}
 			log.Println("[Env] Run profile:" + conf.Env)
 
-			apiService := openapi.New(s, conf, httpClient, linkCard, commentCard, notifyCard, sender)
+			// 日志和 HTTP 客户端在 http 命令内就近创建，避免从 main 一路透传
+			accessLogger := config.NewLogger(conf, "access.log")
+			httpClient := httpx.NewClient(
+				httpx.WithTimeout(10*time.Second),
+				httpx.WithMiddleware(func(rt http.RoundTripper) http.RoundTripper {
+					return sloghttp.NewRoundTripper(accessLogger, rt, sloghttp.Config{
+						Level:              slog.LevelInfo,
+						WithUserAgent:      true,
+						WithRequestBody:    true,
+						WithRequestHeader:  true,
+						WithResponseBody:   true,
+						WithResponseHeader: true,
+					})
+				}),
+			)
+
+			apiService := openapi.New(s, conf, httpClient)
 			adminService := admin.New(s, conf, agent)
 			route := router.New(apiService, adminService, conf, s, accessLogger)
 			return server.New(

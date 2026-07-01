@@ -20,14 +20,19 @@ import (
 var _ apiv1.LinkServiceHTTPServer = (*Link)(nil)
 
 type Link struct {
-	store  *store.Store
-	conf   *config.Config
-	card   *feishu.LinkCard
-	sender *feishu.FeishuSender
+	store    *store.Store
+	conf     *config.Config
+	linkCard *feishu.LinkCard
+	sender   *feishu.FeishuSender
 }
 
-func NewLink(s *store.Store, conf *config.Config, card *feishu.LinkCard, sender *feishu.FeishuSender) *Link {
-	return &Link{store: s, conf: conf, card: card, sender: sender}
+func NewLink(s *store.Store, conf *config.Config, sender *feishu.FeishuSender) *Link {
+	return &Link{
+		store:    s,
+		conf:     conf,
+		linkCard: feishu.NewLinkCard(s, conf),
+		sender:   sender,
+	}
 }
 
 // All 获取所有已审核通过的链接
@@ -83,7 +88,7 @@ func (l *Link) notifyLinkSubmit(id int64, name, url, desc string) {
 		Desc:  desc,
 		Token: token,
 	}
-	cardJSON := l.card.BuildCard(msg)
+	cardJSON := l.linkCard.BuildCard(msg)
 
 	if err := l.sender.Send(context.Background(), cardJSON); err != nil {
 		logger.Error("link notify send error", slog.String("err", err.Error()))
