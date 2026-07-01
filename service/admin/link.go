@@ -33,7 +33,7 @@ func (l *Link) List(ctx context.Context, _ *emptypb.Empty) (*adminv1.LinkListRes
 			Name:      v.Name,
 			Url:       v.Url,
 			Desc:      v.Desc,
-			Status:    v.Status,
+			Status:    string(v.Status),
 			CreatedAt: v.CreatedAt.Format(time.DateTime),
 			UpdatedAt: v.UpdatedAt.Format(time.DateTime)}.Build(),
 		)
@@ -88,7 +88,7 @@ func (l *Link) Delete(ctx context.Context, req *adminv1.LinkDeleteRequest) (*emp
 
 // Approve 审核链接（通过或驳回）
 func (l *Link) Approve(ctx context.Context, req *adminv1.LinkApproveRequest) (*emptypb.Empty, error) {
-	status := req.GetStatus()
+	status := model.LinkStatus(req.GetStatus())
 	u := &model.UpdateLink{
 		Id:     int(req.GetId()),
 		Status: &status,
