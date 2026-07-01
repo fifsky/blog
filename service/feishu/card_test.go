@@ -12,7 +12,7 @@ func TestRemindCard_BuildCard(t *testing.T) {
 	msg := RemindMessage{
 		Content: "喝水时间到了",
 		Time:    "2026-07-01 12:00",
-		Token:   "abc123",
+		ID:      123,
 	}
 
 	cardJSON := card.BuildCard(msg)
@@ -62,7 +62,7 @@ func TestRemindCard_SpecialChars(t *testing.T) {
 	msg := RemindMessage{
 		Content: `包含"引号"和\反斜杠`,
 		Time:    "2026-07-01 12:00",
-		Token:   "tok\"en",
+		ID:      123,
 	}
 
 	cardJSON := card.BuildCard(msg)
@@ -76,10 +76,10 @@ func TestRemindCard_SpecialChars(t *testing.T) {
 func TestLinkCard_BuildCard(t *testing.T) {
 	card := NewLinkCard(nil, nil)
 	msg := LinkMessage{
-		Name:  "测试站点",
-		URL:   "https://example.com",
-		Desc:  "一个测试站点",
-		Token: "link_token_123",
+		Name: "测试站点",
+		URL:  "https://example.com",
+		Desc: "一个测试站点",
+		ID:   123,
 	}
 
 	cardJSON := card.BuildCard(msg)
@@ -137,13 +137,13 @@ func TestCardRegistry_Handle(t *testing.T) {
 	registry.Register(NewLinkCard(nil, nil))
 
 	// 未注册的 action 返回空
-	cardJSON, _, _ := registry.Handle(context.TODO(), map[string]any{"action": "unknown_action", "token": "token"})
+	cardJSON, _, _ := registry.Handle(context.TODO(), map[string]any{"action": "unknown_action", "id": 1})
 	if cardJSON != "" {
 		t.Error("未注册的 action 应返回空字符串")
 	}
 
 	// 缺少 action 字段返回空
-	cardJSON, _, _ = registry.Handle(context.TODO(), map[string]any{"token": "token"})
+	cardJSON, _, _ = registry.Handle(context.TODO(), map[string]any{"id": 1})
 	if cardJSON != "" {
 		t.Error("缺少 action 字段应返回空字符串")
 	}
@@ -153,7 +153,7 @@ func TestParseActionValue(t *testing.T) {
 	// 测试正常的 actionValue 解析
 	actionValue := map[string]any{
 		"action": "remind_completed",
-		"token":  "test_token_123",
+		"id":     123,
 	}
 	val, err := parseActionValue[RemindActionValue](actionValue)
 	if err != nil {
@@ -162,14 +162,14 @@ func TestParseActionValue(t *testing.T) {
 	if val.Action != "remind_completed" {
 		t.Errorf("Action 应为 remind_completed, got %s", val.Action)
 	}
-	if val.Token != "test_token_123" {
-		t.Errorf("Token 应为 test_token_123, got %s", val.Token)
+	if val.ID != 123 {
+		t.Errorf("ID 应为 123, got %d", val.ID)
 	}
 
 	// 测试 link actionValue
 	linkActionValue := map[string]any{
 		"action": "link_approve",
-		"token":  "link_token_456",
+		"id":     456,
 	}
 	linkVal, err := parseActionValue[LinkActionValue](linkActionValue)
 	if err != nil {
@@ -177,6 +177,9 @@ func TestParseActionValue(t *testing.T) {
 	}
 	if linkVal.Action != "link_approve" {
 		t.Errorf("Action 应为 link_approve, got %s", linkVal.Action)
+	}
+	if linkVal.ID != 456 {
+		t.Errorf("ID 应为 456, got %d", linkVal.ID)
 	}
 }
 

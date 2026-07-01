@@ -3,11 +3,9 @@ package feishu
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"text/template"
 
 	"app/config"
-	"app/pkg/aesutil"
 	"app/store"
 	"app/store/model"
 )
@@ -15,7 +13,7 @@ import (
 // LinkActionValue 友情链接卡片回调的 actionValue 结构体
 type LinkActionValue struct {
 	Action string `json:"action"` // 回调动作：link_approve / link_reject
-	Token  string `json:"token"`  // 加密的业务 ID
+	ID     int    `json:"id"`     // 友情链接业务 ID
 }
 
 // LinkMessage 友情链接卡片消息，驱动卡片模板渲染
@@ -23,7 +21,7 @@ type LinkMessage struct {
 	Name   string // 站点名称
 	URL    string // 站点地址
 	Desc   string // 站点描述
-	Token  string // 回调按钮携带的 token
+	ID     int    // 友情链接业务 ID
 	Result string // 操作结果文本，仅结果卡片使用
 }
 
@@ -61,18 +59,8 @@ func (c *LinkCard) Handle(ctx context.Context, actionValue map[string]any) (stri
 		return "", "", fmt.Errorf("解析actionValue失败: %w", err)
 	}
 
-	id, err := aesutil.AesDecode(c.conf.Common.TokenSecret, actionVal.Token)
-	if err != nil {
-		return "", "", fmt.Errorf("token错误:%w", err)
-	}
-
-	linkID, err := strconv.Atoi(id)
-	if err != nil {
-		return "", "", fmt.Errorf("链接ID错误:%w", err)
-	}
-
 	// 先查询链接信息用于结果卡片展示
-	link, err := c.store.GetLink(ctx, linkID)
+	link, err := c.store.GetLink(ctx, actionVal.ID)
 	if err != nil {
 		return "", "", fmt.Errorf("链接未找到:%w", err)
 	}
@@ -81,12 +69,12 @@ func (c *LinkCard) Handle(ctx context.Context, actionValue map[string]any) (stri
 	switch actionVal.Action {
 	case "link_approve":
 		status := model.LinkStatusApproved
-		if err := c.store.UpdateLink(ctx, &model.UpdateLink{Id: linkID, Status: &status}); err != nil {
+		if err := c.store.UpdateLink(ctx, &model.UpdateLink{Id: actionVal.ID, Status: &status}); err != nil {
 			return "", "", fmt.Errorf("审核失败:%w", err)
 		}
 		responseText = "已通过审核"
 	case "link_reject":
-		if err := c.store.DeleteLink(ctx, linkID); err != nil {
+		if err := c.store.DeleteLink(ctx, actionVal.ID); err != nil {
 			return "", "", fmt.Errorf("删除失败:%w", err)
 		}
 		responseText = "已拒绝并删除"
@@ -169,7 +157,7 @@ const linkCardTemplate = `{
                                         "type": "callback",
                                         "value": {
                                             "action": "link_approve",
-                                            "token": {{.Token | json}}
+                                            "id": {{.ID | json}}
                                         }
                                     }
                                 ],
@@ -198,7 +186,7 @@ const linkCardTemplate = `{
                                         "type": "callback",
                                         "value": {
                                             "action": "link_reject",
-                                            "token": {{.Token | json}}
+                                            "id": {{.ID | json}}
                                         }
                                     }
                                 ],

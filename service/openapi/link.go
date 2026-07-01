@@ -3,11 +3,9 @@ package openapi
 import (
 	"context"
 	"log/slog"
-	"strconv"
 	"time"
 
 	"app/config"
-	"app/pkg/aesutil"
 	apiv1 "app/proto/gen/api/v1"
 	"app/service/feishu"
 	"app/store"
@@ -76,17 +74,11 @@ func (l *Link) notifyLinkSubmit(id int64, name, url, desc string) {
 		return
 	}
 
-	token, err := aesutil.AesEncode(l.conf.Common.TokenSecret, strconv.FormatInt(id, 10))
-	if err != nil {
-		logger.Error("link notify aes encode error", slog.String("err", err.Error()))
-		return
-	}
-
 	msg := feishu.LinkMessage{
-		Name:  name,
-		URL:   url,
-		Desc:  desc,
-		Token: token,
+		Name: name,
+		URL:  url,
+		Desc: desc,
+		ID:   int(id),
 	}
 	cardJSON := l.linkCard.BuildCard(msg)
 

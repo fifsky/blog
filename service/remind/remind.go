@@ -3,11 +3,9 @@ package remind
 import (
 	"context"
 	"log/slog"
-	"strconv"
 	"time"
 
 	"app/config"
-	"app/pkg/aesutil"
 	"app/pkg/remindutil"
 	"app/service/feishu"
 	"app/store"
@@ -46,12 +44,10 @@ func NextTimeFromRule(from time.Time, m *model.Remind) time.Time {
 }
 
 func (r *Remind) buildMessage(content string, v *model.Remind) feishu.RemindMessage {
-	token, _ := aesutil.AesEncode(r.conf.Common.TokenSecret, strconv.Itoa(v.Id))
-
 	return feishu.RemindMessage{
 		Content: content,
 		Time:    time.Now().Format("2006-01-02 15:04"),
-		Token:   token,
+		ID:      v.Id,
 	}
 }
 

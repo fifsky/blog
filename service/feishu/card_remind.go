@@ -3,30 +3,26 @@ package feishu
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"text/template"
 	"time"
 
 	"app/config"
-	"app/pkg/aesutil"
 	"app/pkg/remindutil"
 	"app/store"
 	"app/store/model"
-
-	"github.com/samber/lo"
 )
 
 // RemindActionValue 提醒卡片回调的 actionValue 结构体
 type RemindActionValue struct {
 	Action string `json:"action"` // 回调动作：remind_completed / remind_later
-	Token  string `json:"token"`  // 加密的业务 ID
+	ID     int    `json:"id"`     // 提醒记录业务 ID
 }
 
 // RemindMessage 提醒卡片消息，驱动卡片模板渲染
 type RemindMessage struct {
 	Content string // 提醒内容
 	Time    string // 提醒时间
-	Token   string // 回调按钮携带的 token
+	ID      int    // 提醒记录业务 ID
 	Result  string // 操作结果文本，仅结果卡片使用
 }
 
@@ -64,13 +60,7 @@ func (c *RemindCard) Handle(ctx context.Context, actionValue map[string]any) (st
 		return "", "", fmt.Errorf("解析actionValue失败: %w", err)
 	}
 
-	// 解密 token 获取提醒 ID
-	id, err := aesutil.AesDecode(c.conf.Common.TokenSecret, actionVal.Token)
-	if err != nil {
-		return "", "", fmt.Errorf("token错误: %w", err)
-	}
-
-	remind, err := c.store.GetRemind(ctx, lo.Must(strconv.Atoi(id)))
+	remind, err := c.store.GetRemind(ctx, actionVal.ID)
 	if err != nil {
 		return "", "", fmt.Errorf("记录未找到: %w", err)
 	}
@@ -89,7 +79,7 @@ func (c *RemindCard) Handle(ctx context.Context, actionValue map[string]any) (st
 	}
 
 	// 重新查询获取更新后的 remind（nextTime 可能已变更）
-	remind, err = c.store.GetRemind(ctx, lo.Must(strconv.Atoi(id)))
+	remind, err = c.store.GetRemind(ctx, actionVal.ID)
 	if err != nil {
 		return "", "", fmt.Errorf("记录未找到: %w", err)
 	}
@@ -196,7 +186,7 @@ const remindCardTemplate = `{
                                         "type": "callback",
                                         "value": {
                                             "action": "remind_completed",
-                                            "token": {{.Token | json}}
+                                            "id": {{.ID | json}}
                                         }
                                     }
                                 ],
@@ -225,7 +215,7 @@ const remindCardTemplate = `{
                                         "type": "callback",
                                         "value": {
                                             "action": "remind_later",
-                                            "token": {{.Token | json}}
+                                            "id": {{.ID | json}}
                                         }
                                     }
                                 ],
