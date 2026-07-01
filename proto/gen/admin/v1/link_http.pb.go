@@ -17,6 +17,8 @@ import (
 
 // LinkService 提供链接相关的接口
 type LinkServiceHTTPServer interface {
+	// Approve 审核链接
+	Approve(context.Context, *LinkApproveRequest) (*emptypb.Empty, error)
 	// Create 创建链接
 	Create(context.Context, *LinkCreateRequest) (*types.IDResponse, error)
 	// Delete 删除链接
@@ -38,6 +40,7 @@ func (s *LinkService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/admin/link/create", s.Create)
 	s.mux.HandleFunc("POST /blog/admin/link/update", s.Update)
 	s.mux.HandleFunc("POST /blog/admin/link/delete", s.Delete)
+	s.mux.HandleFunc("POST /blog/admin/link/approve", s.Approve)
 }
 
 func RegisterLinkServiceHTTPServer(mux ServeMux, codec Codec, srv LinkServiceHTTPServer) {
@@ -116,6 +119,26 @@ func (s *LinkService) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err := s.server.Delete(r.Context(), &in)
+	if err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+	return
+}
+
+func (s *LinkService) Approve(w http.ResponseWriter, r *http.Request) {
+	var in LinkApproveRequest
+	if err := s.codec.Decode(r, &in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	if err := s.codec.Validate(&in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	_, err := s.server.Approve(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
 		return

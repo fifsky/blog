@@ -24,6 +24,7 @@ CREATE TABLE `links` (
                          `name` varchar(100) NOT NULL DEFAULT '',
                          `url` varchar(200) NOT NULL DEFAULT '',
                          `desc` varchar(255) NOT NULL DEFAULT '',
+                         `status` varchar(64) NOT NULL DEFAULT 'PENDING' COMMENT '状态:PENDING审核中,APPROVED审核通过',
                          `created_at` datetime NOT NULL,
                          PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '友情链接表';

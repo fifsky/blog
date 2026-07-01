@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link2 } from "lucide-react";
+import { Link2, Send } from "lucide-react";
+import { toast } from "sonner";
 import { Empty } from "@/components/Empty";
 import { PageTransition } from "@/components/PageTransition";
-import { linkAllApi } from "@/service";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { linkAllApi, linkSubmitApi } from "@/service";
 import type { LinkMenuItem } from "@/types/openapi";
 
 // 从 URL 中提取域名，用于获取 favicon
@@ -31,6 +35,10 @@ export default function Links() {
   const [list, setList] = useState<LinkMenuItem[]>();
   const [loading, setLoading] = useState(true);
 
+  // 提交表单状态
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({ name: "", url: "", desc: "" });
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -49,6 +57,27 @@ export default function Links() {
       cancelled = true;
     };
   }, []);
+
+  const handleSubmit = async () => {
+    if (!form.name.trim() || !form.url.trim()) {
+      toast.error("请填写链接名称和链接地址");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await linkSubmitApi({
+        name: form.name.trim(),
+        url: form.url.trim(),
+        desc: form.desc.trim(),
+      });
+      toast.success("提交成功，博主会尽快审核～～");
+      setForm({ name: "", url: "", desc: "" });
+    } catch {
+      toast.error("提交失败，请稍后重试");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (!list) return null;
 
@@ -113,6 +142,44 @@ export default function Links() {
           </div>
         </PageTransition>
       )}
+
+      {/* 提交友情链接表单 */}
+      <div className="mt-10 pt-6 border-t border-[#e5e7eb]">
+        <h3 className="text-base font-bold text-[#1f2937] flex items-center gap-2 mb-4">
+          <Send size={16} className="text-[#0066cc]" />
+          申请友链
+        </h3>
+        <div className="max-w-lg space-y-3">
+          <div>
+            <Input
+              placeholder="链接名称 *"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              disabled={submitting}
+            />
+          </div>
+          <div>
+            <Input
+              placeholder="链接地址 * (如 https://example.com)"
+              value={form.url}
+              onChange={(e) => setForm({ ...form, url: e.target.value })}
+              disabled={submitting}
+            />
+          </div>
+          <div>
+            <Textarea
+              placeholder="链接描述（选填）"
+              value={form.desc}
+              onChange={(e) => setForm({ ...form, desc: e.target.value })}
+              rows={3}
+              disabled={submitting}
+            />
+          </div>
+          <Button onClick={handleSubmit} loading={submitting} size="sm">
+            提交申请
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

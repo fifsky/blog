@@ -18,6 +18,8 @@ import (
 type LinkServiceHTTPServer interface {
 	// All 获取所有链接
 	All(context.Context, *emptypb.Empty) (*LinkMenuResponse, error)
+	// Submit 提交友情链接申请
+	Submit(context.Context, *LinkSubmitRequest) (*emptypb.Empty, error)
 }
 
 type LinkService struct {
@@ -28,6 +30,7 @@ type LinkService struct {
 
 func (s *LinkService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/link/all", s.All)
+	s.mux.HandleFunc("POST /blog/link/submit", s.Submit)
 }
 
 func RegisterLinkServiceHTTPServer(mux ServeMux, codec Codec, srv LinkServiceHTTPServer) {
@@ -48,5 +51,25 @@ func (s *LinkService) All(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.codec.Encode(w, r, out)
+	return
+}
+
+func (s *LinkService) Submit(w http.ResponseWriter, r *http.Request) {
+	var in LinkSubmitRequest
+	if err := s.codec.Decode(r, &in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	if err := s.codec.Validate(&in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	_, err := s.server.Submit(r.Context(), &in)
+	if err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
 	return
 }

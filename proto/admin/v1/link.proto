@@ -39,6 +39,13 @@ service LinkService {
       body: "*"
     };
   }
+  // Approve 审核链接
+  rpc Approve(LinkApproveRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/blog/admin/link/approve"
+      body: "*"
+    };
+  }
 }
 
 // LinkDeleteRequest 删除链接请求
@@ -55,6 +62,19 @@ message LinkItem {
   string url = 3;
   string desc = 4;
   string created_at = 5;
+  string status = 6;
+}
+
+// LinkApproveRequest 审核链接请求
+message LinkApproveRequest {
+  int32 id = 1 [
+    (buf.validate.field).int32.gt = 0,
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string status = 2 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
 }
 message LinkListResponse {
   repeated LinkItem list = 1;

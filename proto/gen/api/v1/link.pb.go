@@ -340,6 +340,92 @@ func (b0 LinkListResponse_builder) Build() *LinkListResponse {
 	return m0
 }
 
+// LinkSubmitRequest 提交友情链接申请
+type LinkSubmitRequest struct {
+	state           protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Name string                 `protobuf:"bytes,1,opt,name=name,proto3"`
+	xxx_hidden_Url  string                 `protobuf:"bytes,2,opt,name=url,proto3"`
+	xxx_hidden_Desc string                 `protobuf:"bytes,3,opt,name=desc,proto3"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *LinkSubmitRequest) Reset() {
+	*x = LinkSubmitRequest{}
+	mi := &file_api_v1_link_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LinkSubmitRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LinkSubmitRequest) ProtoMessage() {}
+
+func (x *LinkSubmitRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_link_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *LinkSubmitRequest) GetName() string {
+	if x != nil {
+		return x.xxx_hidden_Name
+	}
+	return ""
+}
+
+func (x *LinkSubmitRequest) GetUrl() string {
+	if x != nil {
+		return x.xxx_hidden_Url
+	}
+	return ""
+}
+
+func (x *LinkSubmitRequest) GetDesc() string {
+	if x != nil {
+		return x.xxx_hidden_Desc
+	}
+	return ""
+}
+
+func (x *LinkSubmitRequest) SetName(v string) {
+	x.xxx_hidden_Name = v
+}
+
+func (x *LinkSubmitRequest) SetUrl(v string) {
+	x.xxx_hidden_Url = v
+}
+
+func (x *LinkSubmitRequest) SetDesc(v string) {
+	x.xxx_hidden_Desc = v
+}
+
+type LinkSubmitRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name string
+	Url  string
+	Desc string
+}
+
+func (b0 LinkSubmitRequest_builder) Build() *LinkSubmitRequest {
+	m0 := &LinkSubmitRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Name = b.Name
+	x.xxx_hidden_Url = b.Url
+	x.xxx_hidden_Desc = b.Desc
+	return m0
+}
+
 var File_api_v1_link_proto protoreflect.FileDescriptor
 
 const file_api_v1_link_proto_rawDesc = "" +
@@ -359,26 +445,34 @@ const file_api_v1_link_proto_rawDesc = "" +
 	"created_at\x18\x05 \x01(\tR\tcreatedAt\"Z\n" +
 	"\x10LinkListResponse\x120\n" +
 	"\x04list\x18\x01 \x03(\v2\x1c.fifsky.blog.api.v1.LinkItemR\x04list\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total2m\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"c\n" +
+	"\x11LinkSubmitRequest\x12\x1d\n" +
+	"\x04name\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x04name\x12\x1b\n" +
+	"\x03url\x18\x02 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x03url\x12\x12\n" +
+	"\x04desc\x18\x03 \x01(\tR\x04desc2\xd4\x01\n" +
 	"\vLinkService\x12^\n" +
-	"\x03All\x12\x16.google.protobuf.Empty\x1a$.fifsky.blog.api.v1.LinkMenuResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/blog/link/allB\xaa\x01\n" +
+	"\x03All\x12\x16.google.protobuf.Empty\x1a$.fifsky.blog.api.v1.LinkMenuResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/blog/link/all\x12e\n" +
+	"\x06Submit\x12%.fifsky.blog.api.v1.LinkSubmitRequest\x1a\x16.google.protobuf.Empty\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/blog/link/submitB\xaa\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\tLinkProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
 
-var file_api_v1_link_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_api_v1_link_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_api_v1_link_proto_goTypes = []any{
-	(*LinkMenuItem)(nil),     // 0: fifsky.blog.api.v1.LinkMenuItem
-	(*LinkMenuResponse)(nil), // 1: fifsky.blog.api.v1.LinkMenuResponse
-	(*LinkItem)(nil),         // 2: fifsky.blog.api.v1.LinkItem
-	(*LinkListResponse)(nil), // 3: fifsky.blog.api.v1.LinkListResponse
-	(*emptypb.Empty)(nil),    // 4: google.protobuf.Empty
+	(*LinkMenuItem)(nil),      // 0: fifsky.blog.api.v1.LinkMenuItem
+	(*LinkMenuResponse)(nil),  // 1: fifsky.blog.api.v1.LinkMenuResponse
+	(*LinkItem)(nil),          // 2: fifsky.blog.api.v1.LinkItem
+	(*LinkListResponse)(nil),  // 3: fifsky.blog.api.v1.LinkListResponse
+	(*LinkSubmitRequest)(nil), // 4: fifsky.blog.api.v1.LinkSubmitRequest
+	(*emptypb.Empty)(nil),     // 5: google.protobuf.Empty
 }
 var file_api_v1_link_proto_depIdxs = []int32{
 	0, // 0: fifsky.blog.api.v1.LinkMenuResponse.list:type_name -> fifsky.blog.api.v1.LinkMenuItem
 	2, // 1: fifsky.blog.api.v1.LinkListResponse.list:type_name -> fifsky.blog.api.v1.LinkItem
-	4, // 2: fifsky.blog.api.v1.LinkService.All:input_type -> google.protobuf.Empty
-	1, // 3: fifsky.blog.api.v1.LinkService.All:output_type -> fifsky.blog.api.v1.LinkMenuResponse
-	3, // [3:4] is the sub-list for method output_type
-	2, // [2:3] is the sub-list for method input_type
+	5, // 2: fifsky.blog.api.v1.LinkService.All:input_type -> google.protobuf.Empty
+	4, // 3: fifsky.blog.api.v1.LinkService.Submit:input_type -> fifsky.blog.api.v1.LinkSubmitRequest
+	1, // 4: fifsky.blog.api.v1.LinkService.All:output_type -> fifsky.blog.api.v1.LinkMenuResponse
+	5, // 5: fifsky.blog.api.v1.LinkService.Submit:output_type -> google.protobuf.Empty
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
 	2, // [2:2] is the sub-list for extension extendee
 	0, // [0:2] is the sub-list for field type_name
@@ -395,7 +489,7 @@ func file_api_v1_link_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_v1_link_proto_rawDesc), len(file_api_v1_link_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

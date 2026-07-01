@@ -18,6 +18,13 @@ service LinkService {
       body: "*"
     };
   }
+  // Submit 提交友情链接申请
+  rpc Submit(LinkSubmitRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/blog/link/submit"
+      body: "*"
+    };
+  }
 }
 
 message LinkMenuItem {
@@ -40,4 +47,17 @@ message LinkItem {
 message LinkListResponse {
   repeated LinkItem list = 1;
   int32 total = 2;
+}
+
+// LinkSubmitRequest 提交友情链接申请
+message LinkSubmitRequest {
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string url = 2 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+  string desc = 3;
 }

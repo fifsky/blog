@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Store) GetAllLinks(ctx context.Context) ([]*model.Link, error) {
-	rows, err := s.db.QueryContext(ctx, "select id,name,url,`desc`,created_at from links")
+	rows, err := s.db.QueryContext(ctx, "select id,name,url,`desc`,status,created_at from links order by id asc")
 	if err != nil {
 		return nil, err
 	}
@@ -16,7 +16,26 @@ func (s *Store) GetAllLinks(ctx context.Context) ([]*model.Link, error) {
 	ret := make([]*model.Link, 0)
 	for rows.Next() {
 		var item model.Link
-		if err := rows.Scan(&item.Id, &item.Name, &item.Url, &item.Desc, &item.CreatedAt); err != nil {
+		if err := rows.Scan(&item.Id, &item.Name, &item.Url, &item.Desc, &item.Status, &item.CreatedAt); err != nil {
+			return nil, err
+		}
+		tmp := item
+		ret = append(ret, &tmp)
+	}
+	return ret, nil
+}
+
+// GetApprovedLinks 获取审核通过的链接列表
+func (s *Store) GetApprovedLinks(ctx context.Context) ([]*model.Link, error) {
+	rows, err := s.db.QueryContext(ctx, "select id,name,url,`desc`,status,created_at from links where status = ? order by id asc", model.LinkStatusApproved)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	ret := make([]*model.Link, 0)
+	for rows.Next() {
+		var item model.Link
+		if err := rows.Scan(&item.Id, &item.Name, &item.Url, &item.Desc, &item.Status, &item.CreatedAt); err != nil {
 			return nil, err
 		}
 		tmp := item
@@ -26,8 +45,8 @@ func (s *Store) GetAllLinks(ctx context.Context) ([]*model.Link, error) {
 }
 
 func (s *Store) CreateLink(ctx context.Context, link *model.Link) (int64, error) {
-	res, err := s.db.ExecContext(ctx, "insert into links (name,url,`desc`,created_at) values (?,?,?,?)",
-		link.Name, link.Url, link.Desc, link.CreatedAt)
+	res, err := s.db.ExecContext(ctx, "insert into links (name,url,`desc`,status,created_at) values (?,?,?,?,?)",
+		link.Name, link.Url, link.Desc, link.Status, link.CreatedAt)
 	if err != nil {
 		return 0, err
 	}
@@ -45,6 +64,9 @@ func (s *Store) UpdateLink(ctx context.Context, link *model.UpdateLink) error {
 	}
 	if v := link.Desc; v != nil {
 		set, args = append(set, "`desc` = ?"), append(args, *v)
+	}
+	if v := link.Status; v != nil {
+		set, args = append(set, "`status` = ?"), append(args, *v)
 	}
 	args = append(args, link.Id)
 	query := "update links set " + strings.Join(set, ", ") + " where id = ?"

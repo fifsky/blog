@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { linkDeleteApi, linkListApi, linkCreateApi, linkUpdateApi } from "@/service";
+import { linkDeleteApi, linkListApi, linkCreateApi, linkUpdateApi, linkApproveApi } from "@/service";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { CTable, Column } from "@/components/CTable";
 import { LinkItem } from "@/types/openapi";
 import { dialog } from "@/utils/dialog";
@@ -54,6 +55,10 @@ export default function AdminLink() {
       },
     });
   };
+  const approveItem = async (id: number, status: string) => {
+    await linkApproveApi({ id, status });
+    loadList();
+  };
   const cancel = () => {
     setItem(undefined);
     form.reset({ name: "", url: "", desc: "" });
@@ -91,10 +96,35 @@ export default function AdminLink() {
       render: (value) => <a href={value}>{value}</a>,
     },
     {
-      title: <div style={{ width: 90 }}>操作</div>,
+      title: "状态",
+      key: "status",
+      render: (value: string) =>
+        value === "APPROVED" ? (
+          <Badge variant="default">已通过</Badge>
+        ) : (
+          <Badge variant="secondary">审核中</Badge>
+        ),
+    },
+    {
+      title: <div style={{ width: 130 }}>操作</div>,
       key: "id",
       render: (_, record) => (
         <>
+          {record.status !== "APPROVED" && (
+            <>
+              <Button
+                variant={"link"}
+                className="p-0 m-0 h-auto text-[13px] text-green-600"
+                onClick={(e) => {
+                  e.preventDefault();
+                  approveItem(record.id, "APPROVED");
+                }}
+              >
+                通过
+              </Button>
+              <span className="px-1.5 text-[#ccc]">|</span>
+            </>
+          )}
           <Button
             variant={"link"}
             className="p-0 m-0 h-auto text-[13px]"
@@ -126,7 +156,7 @@ export default function AdminLink() {
       <title>管理链接 - 無處告別</title>
       <h2 className="border-b border-b-[#cccccc] text-base">管理链接</h2>
       <div className="flex justify-between mt-3">
-        <div className="w-[700px]">
+        <div className="w-[800px]">
           {/* 使用自定义表格组件 */}
           <CTable data={list} columns={columns} />
         </div>

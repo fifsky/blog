@@ -225,6 +225,7 @@ export type LinkItem = {
   name: string;
   url: string;
   desc?: string;
+  status: string;
   created_at: string;
 };
 export type LinkListResponse = { list: LinkItem[]; total: number };
@@ -265,6 +266,17 @@ export type LinkUpdateRequest = {
   id: number;
   name?: string;
   url?: string;
+  desc?: string;
+};
+
+export type LinkApproveRequest = {
+  id: number;
+  status: string;
+};
+
+export type LinkSubmitRequest = {
+  name: string;
+  url: string;
   desc?: string;
 };
 

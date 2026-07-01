@@ -33,6 +33,7 @@ func (l *Link) List(ctx context.Context, _ *emptypb.Empty) (*adminv1.LinkListRes
 			Name:      v.Name,
 			Url:       v.Url,
 			Desc:      v.Desc,
+			Status:    v.Status,
 			CreatedAt: v.CreatedAt.Format(time.DateTime)}.Build(),
 		)
 	}
@@ -46,6 +47,7 @@ func (l *Link) Create(ctx context.Context, req *adminv1.LinkCreateRequest) (*typ
 		Name:      req.GetName(),
 		Url:       req.GetUrl(),
 		Desc:      req.GetDesc(),
+		Status:    model.LinkStatusPending,
 		CreatedAt: time.Now(),
 	}
 	lastId, err := l.store.CreateLink(ctx, m)
@@ -77,6 +79,19 @@ func (l *Link) Update(ctx context.Context, req *adminv1.LinkUpdateRequest) (*typ
 
 func (l *Link) Delete(ctx context.Context, req *adminv1.LinkDeleteRequest) (*emptypb.Empty, error) {
 	if err := l.store.DeleteLink(ctx, int(req.GetId())); err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
+}
+
+// Approve 审核链接（通过或驳回）
+func (l *Link) Approve(ctx context.Context, req *adminv1.LinkApproveRequest) (*emptypb.Empty, error) {
+	status := req.GetStatus()
+	u := &model.UpdateLink{
+		Id:     int(req.GetId()),
+		Status: &status,
+	}
+	if err := l.store.UpdateLink(ctx, u); err != nil {
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil

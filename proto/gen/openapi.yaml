@@ -474,6 +474,22 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/GuestbookListResponse'
+    /blog/admin/link/approve:
+        post:
+            tags:
+                - LinkService
+            description: Approve 审核链接
+            operationId: LinkService_Approve
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LinkApproveRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /blog/admin/link/create:
         post:
             tags:
@@ -1113,6 +1129,22 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LinkMenuResponse'
+    /blog/link/submit:
+        post:
+            tags:
+                - LinkService
+            description: Submit 提交友情链接申请
+            operationId: LinkService_Submit
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LinkSubmitRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /blog/login:
         post:
             tags:
@@ -2098,6 +2130,18 @@ components:
                 id:
                     type: integer
                     format: int32
+        LinkApproveRequest:
+            required:
+                - id
+                - status
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                status:
+                    type: string
+            description: LinkApproveRequest 审核链接请求
         LinkCreateRequest:
             required:
                 - name
@@ -2157,6 +2201,19 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/LinkMenuItem'
+        LinkSubmitRequest:
+            required:
+                - name
+                - url
+            type: object
+            properties:
+                name:
+                    type: string
+                url:
+                    type: string
+                desc:
+                    type: string
+            description: LinkSubmitRequest 提交友情链接申请
         LinkUpdateRequest:
             required:
                 - id

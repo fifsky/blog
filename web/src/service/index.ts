@@ -27,6 +27,8 @@ import type {
   CateUpdateRequest,
   LinkCreateRequest,
   LinkUpdateRequest,
+  LinkApproveRequest,
+  LinkSubmitRequest,
   User,
   UserListResponse,
   UserCreateRequest,
@@ -118,6 +120,8 @@ export const newCommentApi = (errorHandler?: (e: AppError) => void) =>
   createApi<CommentNewResponse>("/blog/comment/new", undefined, errorHandler);
 export const linkAllApi = (errorHandler?: (e: AppError) => void) =>
   createApi<LinkMenuResponse>("/blog/link/all", undefined, errorHandler);
+export const linkSubmitApi = (data: LinkSubmitRequest, errorHandler?: (e: AppError) => void) =>
+  createApi("/blog/link/submit", data, errorHandler);
 
 export const loginUserApi = (errorHandler?: (e: AppError) => void) =>
   createApi<User>("/blog/admin/loginuser", undefined, errorHandler);
@@ -203,6 +207,8 @@ export const linkUpdateApi = (data: LinkUpdateRequest, errorHandler?: (e: AppErr
   createApi<IDResponse>("/blog/admin/link/update", data, errorHandler);
 export const linkDeleteApi = (data: LinkDeleteRequest, errorHandler?: (e: AppError) => void) =>
   createApi("/blog/admin/link/delete", data, errorHandler);
+export const linkApproveApi = (data: LinkApproveRequest, errorHandler?: (e: AppError) => void) =>
+  createApi("/blog/admin/link/approve", data, errorHandler);
 export const remindListApi = (data: RemindListRequest, errorHandler?: (e: AppError) => void) =>
   createApi<RemindListResponse>("/blog/admin/remind/list", data, errorHandler);
 export const remindCreateApi = (data: RemindCreateRequest, errorHandler?: (e: AppError) => void) =>

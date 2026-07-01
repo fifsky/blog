@@ -89,6 +89,7 @@ type LinkItem struct {
 	xxx_hidden_Url       string                 `protobuf:"bytes,3,opt,name=url,proto3"`
 	xxx_hidden_Desc      string                 `protobuf:"bytes,4,opt,name=desc,proto3"`
 	xxx_hidden_CreatedAt string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3"`
+	xxx_hidden_Status    string                 `protobuf:"bytes,6,opt,name=status,proto3"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -153,6 +154,13 @@ func (x *LinkItem) GetCreatedAt() string {
 	return ""
 }
 
+func (x *LinkItem) GetStatus() string {
+	if x != nil {
+		return x.xxx_hidden_Status
+	}
+	return ""
+}
+
 func (x *LinkItem) SetId(v int32) {
 	x.xxx_hidden_Id = v
 }
@@ -173,6 +181,10 @@ func (x *LinkItem) SetCreatedAt(v string) {
 	x.xxx_hidden_CreatedAt = v
 }
 
+func (x *LinkItem) SetStatus(v string) {
+	x.xxx_hidden_Status = v
+}
+
 type LinkItem_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
@@ -181,6 +193,7 @@ type LinkItem_builder struct {
 	Url       string
 	Desc      string
 	CreatedAt string
+	Status    string
 }
 
 func (b0 LinkItem_builder) Build() *LinkItem {
@@ -192,6 +205,79 @@ func (b0 LinkItem_builder) Build() *LinkItem {
 	x.xxx_hidden_Url = b.Url
 	x.xxx_hidden_Desc = b.Desc
 	x.xxx_hidden_CreatedAt = b.CreatedAt
+	x.xxx_hidden_Status = b.Status
+	return m0
+}
+
+// LinkApproveRequest 审核链接请求
+type LinkApproveRequest struct {
+	state             protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id     int32                  `protobuf:"varint,1,opt,name=id,proto3"`
+	xxx_hidden_Status string                 `protobuf:"bytes,2,opt,name=status,proto3"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *LinkApproveRequest) Reset() {
+	*x = LinkApproveRequest{}
+	mi := &file_admin_v1_link_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LinkApproveRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LinkApproveRequest) ProtoMessage() {}
+
+func (x *LinkApproveRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_link_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *LinkApproveRequest) GetId() int32 {
+	if x != nil {
+		return x.xxx_hidden_Id
+	}
+	return 0
+}
+
+func (x *LinkApproveRequest) GetStatus() string {
+	if x != nil {
+		return x.xxx_hidden_Status
+	}
+	return ""
+}
+
+func (x *LinkApproveRequest) SetId(v int32) {
+	x.xxx_hidden_Id = v
+}
+
+func (x *LinkApproveRequest) SetStatus(v string) {
+	x.xxx_hidden_Status = v
+}
+
+type LinkApproveRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id     int32
+	Status string
+}
+
+func (b0 LinkApproveRequest_builder) Build() *LinkApproveRequest {
+	m0 := &LinkApproveRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Id = b.Id
+	x.xxx_hidden_Status = b.Status
 	return m0
 }
 
@@ -205,7 +291,7 @@ type LinkListResponse struct {
 
 func (x *LinkListResponse) Reset() {
 	*x = LinkListResponse{}
-	mi := &file_admin_v1_link_proto_msgTypes[2]
+	mi := &file_admin_v1_link_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -217,7 +303,7 @@ func (x *LinkListResponse) String() string {
 func (*LinkListResponse) ProtoMessage() {}
 
 func (x *LinkListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_link_proto_msgTypes[2]
+	mi := &file_admin_v1_link_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -279,7 +365,7 @@ type LinkCreateRequest struct {
 
 func (x *LinkCreateRequest) Reset() {
 	*x = LinkCreateRequest{}
-	mi := &file_admin_v1_link_proto_msgTypes[3]
+	mi := &file_admin_v1_link_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -291,7 +377,7 @@ func (x *LinkCreateRequest) String() string {
 func (*LinkCreateRequest) ProtoMessage() {}
 
 func (x *LinkCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_link_proto_msgTypes[3]
+	mi := &file_admin_v1_link_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -365,7 +451,7 @@ type LinkUpdateRequest struct {
 
 func (x *LinkUpdateRequest) Reset() {
 	*x = LinkUpdateRequest{}
-	mi := &file_admin_v1_link_proto_msgTypes[4]
+	mi := &file_admin_v1_link_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -377,7 +463,7 @@ func (x *LinkUpdateRequest) String() string {
 func (*LinkUpdateRequest) ProtoMessage() {}
 
 func (x *LinkUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_link_proto_msgTypes[4]
+	mi := &file_admin_v1_link_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -459,14 +545,19 @@ const file_admin_v1_link_proto_rawDesc = "" +
 	"\x13admin/v1/link.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"/\n" +
 	"\x11LinkDeleteRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
-	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"s\n" +
+	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"\x8b\x01\n" +
 	"\bLinkItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x10\n" +
 	"\x03url\x18\x03 \x01(\tR\x03url\x12\x12\n" +
 	"\x04desc\x18\x04 \x01(\tR\x04desc\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\tR\tcreatedAt\"\\\n" +
+	"created_at\x18\x05 \x01(\tR\tcreatedAt\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\"S\n" +
+	"\x12LinkApproveRequest\x12\x1a\n" +
+	"\x02id\x18\x01 \x01(\x05B\n" +
+	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\x12!\n" +
+	"\x06status\x18\x02 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x06status\"\\\n" +
 	"\x10LinkListResponse\x122\n" +
 	"\x04list\x18\x01 \x03(\v2\x1e.fifsky.blog.admin.v1.LinkItemR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\"c\n" +
@@ -479,36 +570,40 @@ const file_admin_v1_link_proto_rawDesc = "" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x10\n" +
 	"\x03url\x18\x03 \x01(\tR\x03url\x12\x12\n" +
-	"\x04desc\x18\x04 \x01(\tR\x04desc2\xd2\x03\n" +
+	"\x04desc\x18\x04 \x01(\tR\x04desc2\xc4\x04\n" +
 	"\vLinkService\x12h\n" +
 	"\x04List\x12\x16.google.protobuf.Empty\x1a&.fifsky.blog.admin.v1.LinkListResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/blog/admin/link/list\x12t\n" +
 	"\x06Create\x12'.fifsky.blog.admin.v1.LinkCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/link/create\x12t\n" +
 	"\x06Update\x12'.fifsky.blog.admin.v1.LinkUpdateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/link/update\x12m\n" +
-	"\x06Delete\x12'.fifsky.blog.admin.v1.LinkDeleteRequest\x1a\x16.google.protobuf.Empty\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/link/deleteB\xb8\x01\n" +
+	"\x06Delete\x12'.fifsky.blog.admin.v1.LinkDeleteRequest\x1a\x16.google.protobuf.Empty\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/link/delete\x12p\n" +
+	"\aApprove\x12(.fifsky.blog.admin.v1.LinkApproveRequest\x1a\x16.google.protobuf.Empty\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/blog/admin/link/approveB\xb8\x01\n" +
 	"\x18com.fifsky.blog.admin.v1B\tLinkProtoP\x01Z\x1eapp/proto/gen/admin/v1;adminv1\xa2\x02\x03FBA\xaa\x02\x14Fifsky.Blog.Admin.V1\xca\x02\x14Fifsky\\Blog\\Admin\\V1\xe2\x02 Fifsky\\Blog\\Admin\\V1\\GPBMetadata\xea\x02\x17Fifsky::Blog::Admin::V1b\x06proto3"
 
-var file_admin_v1_link_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_admin_v1_link_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_admin_v1_link_proto_goTypes = []any{
-	(*LinkDeleteRequest)(nil), // 0: fifsky.blog.admin.v1.LinkDeleteRequest
-	(*LinkItem)(nil),          // 1: fifsky.blog.admin.v1.LinkItem
-	(*LinkListResponse)(nil),  // 2: fifsky.blog.admin.v1.LinkListResponse
-	(*LinkCreateRequest)(nil), // 3: fifsky.blog.admin.v1.LinkCreateRequest
-	(*LinkUpdateRequest)(nil), // 4: fifsky.blog.admin.v1.LinkUpdateRequest
-	(*emptypb.Empty)(nil),     // 5: google.protobuf.Empty
-	(*types.IDResponse)(nil),  // 6: fifsky.blog.types.IDResponse
+	(*LinkDeleteRequest)(nil),  // 0: fifsky.blog.admin.v1.LinkDeleteRequest
+	(*LinkItem)(nil),           // 1: fifsky.blog.admin.v1.LinkItem
+	(*LinkApproveRequest)(nil), // 2: fifsky.blog.admin.v1.LinkApproveRequest
+	(*LinkListResponse)(nil),   // 3: fifsky.blog.admin.v1.LinkListResponse
+	(*LinkCreateRequest)(nil),  // 4: fifsky.blog.admin.v1.LinkCreateRequest
+	(*LinkUpdateRequest)(nil),  // 5: fifsky.blog.admin.v1.LinkUpdateRequest
+	(*emptypb.Empty)(nil),      // 6: google.protobuf.Empty
+	(*types.IDResponse)(nil),   // 7: fifsky.blog.types.IDResponse
 }
 var file_admin_v1_link_proto_depIdxs = []int32{
 	1, // 0: fifsky.blog.admin.v1.LinkListResponse.list:type_name -> fifsky.blog.admin.v1.LinkItem
-	5, // 1: fifsky.blog.admin.v1.LinkService.List:input_type -> google.protobuf.Empty
-	3, // 2: fifsky.blog.admin.v1.LinkService.Create:input_type -> fifsky.blog.admin.v1.LinkCreateRequest
-	4, // 3: fifsky.blog.admin.v1.LinkService.Update:input_type -> fifsky.blog.admin.v1.LinkUpdateRequest
+	6, // 1: fifsky.blog.admin.v1.LinkService.List:input_type -> google.protobuf.Empty
+	4, // 2: fifsky.blog.admin.v1.LinkService.Create:input_type -> fifsky.blog.admin.v1.LinkCreateRequest
+	5, // 3: fifsky.blog.admin.v1.LinkService.Update:input_type -> fifsky.blog.admin.v1.LinkUpdateRequest
 	0, // 4: fifsky.blog.admin.v1.LinkService.Delete:input_type -> fifsky.blog.admin.v1.LinkDeleteRequest
-	2, // 5: fifsky.blog.admin.v1.LinkService.List:output_type -> fifsky.blog.admin.v1.LinkListResponse
-	6, // 6: fifsky.blog.admin.v1.LinkService.Create:output_type -> fifsky.blog.types.IDResponse
-	6, // 7: fifsky.blog.admin.v1.LinkService.Update:output_type -> fifsky.blog.types.IDResponse
-	5, // 8: fifsky.blog.admin.v1.LinkService.Delete:output_type -> google.protobuf.Empty
-	5, // [5:9] is the sub-list for method output_type
-	1, // [1:5] is the sub-list for method input_type
+	2, // 5: fifsky.blog.admin.v1.LinkService.Approve:input_type -> fifsky.blog.admin.v1.LinkApproveRequest
+	3, // 6: fifsky.blog.admin.v1.LinkService.List:output_type -> fifsky.blog.admin.v1.LinkListResponse
+	7, // 7: fifsky.blog.admin.v1.LinkService.Create:output_type -> fifsky.blog.types.IDResponse
+	7, // 8: fifsky.blog.admin.v1.LinkService.Update:output_type -> fifsky.blog.types.IDResponse
+	6, // 9: fifsky.blog.admin.v1.LinkService.Delete:output_type -> google.protobuf.Empty
+	6, // 10: fifsky.blog.admin.v1.LinkService.Approve:output_type -> google.protobuf.Empty
+	6, // [6:11] is the sub-list for method output_type
+	1, // [1:6] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -525,7 +620,7 @@ func file_admin_v1_link_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_link_proto_rawDesc), len(file_admin_v1_link_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
