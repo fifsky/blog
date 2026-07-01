@@ -2,16 +2,21 @@ package openapi
 
 import (
 	"context"
+	"fmt"
 	"html"
+	"log/slog"
 	"strings"
 	"time"
 
+	"app/config"
 	"app/pkg/gravatar"
 	apiv1 "app/proto/gen/api/v1"
 	"app/server/middleware"
+	"app/service/feishu"
 	"app/store"
 	"app/store/model"
 
+	"github.com/goapt/logger"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -20,7 +25,10 @@ var _ apiv1.CommentServiceHTTPServer = (*Comment)(nil)
 // Comment 文章评论服务
 type Comment struct {
 	store     *store.Store
+	conf      *config.Config
 	moderator ContentModerator
+	card      *feishu.CommentCard
+	sender    *feishu.FeishuSender
 }
 
 // CommentOption 用于配置 Comment 的选项函数
@@ -34,9 +42,12 @@ func WithCommentModerator(m ContentModerator) CommentOption {
 }
 
 // NewComment 创建评论服务，默认使用 AI 审核器
-func NewComment(s *store.Store, opts ...CommentOption) *Comment {
+func NewComment(s *store.Store, conf *config.Config, card *feishu.CommentCard, sender *feishu.FeishuSender, opts ...CommentOption) *Comment {
 	c := &Comment{
-		store: s,
+		store:  s,
+		conf:   conf,
+		card:   card,
+		sender: sender,
 	}
 
 	for _, opt := range opts {
@@ -105,7 +116,37 @@ func (c *Comment) Create(ctx context.Context, req *apiv1.CommentCreateRequest) (
 		return nil, err
 	}
 
+	// 发送飞书评论通知
+	c.notifyComment(ctx, req.GetName(), req.GetContent(), int(req.GetPostId()), cm.CreatedAt)
+
 	return apiv1.CommentCreateResponse_builder{Id: int32(id)}.Build(), nil
+}
+
+// notifyComment 发送新评论飞书通知
+func (c *Comment) notifyComment(ctx context.Context, name, content string, postID int, createdAt time.Time) {
+	if c.sender == nil || c.card == nil {
+		return
+	}
+
+	// 查询文章信息用于展示
+	post, err := c.store.GetPost(ctx, postID, "")
+	if err != nil {
+		logger.Error("comment notify get article error", slog.String("err", err.Error()))
+		return
+	}
+
+	msg := feishu.CommentMessage{
+		Name:      name,
+		Content:   content,
+		PostTitle: post.Title,
+		PostURL:   fmt.Sprintf("https://fifsky.com/article/%d/%s", post.Id, post.Url),
+		Time:      createdAt.Format("2006-01-02 15:04"),
+	}
+	cardJSON := c.card.BuildCard(msg)
+
+	if err := c.sender.Send(ctx, cardJSON); err != nil {
+		logger.Error("comment notify send error", slog.String("err", err.Error()))
+	}
 }
 
 // New 获取最新评论（侧边栏用），返回关联文章信息便于跳转

@@ -23,7 +23,7 @@ type Service struct {
 	Comment   *Comment
 }
 
-func New(s *store.Store, conf *config.Config, httpClient *http.Client, linkCard *feishu.LinkCard, sender *feishu.FeishuSender) *Service {
+func New(s *store.Store, conf *config.Config, httpClient *http.Client, linkCard *feishu.LinkCard, commentCard *feishu.CommentCard, sender *feishu.FeishuSender) *Service {
 	return &Service{
 		User:      NewUser(s, conf),
 		Article:   NewArticle(s, conf),
@@ -36,6 +36,6 @@ func New(s *store.Store, conf *config.Config, httpClient *http.Client, linkCard 
 		MiniApp:   NewMiniApp(s, conf, httpClient),
 		Geo:       NewGeo(s),
 		Guestbook: NewGuestbook(s),
-		Comment:   NewComment(s),
+		Comment:   NewComment(s, conf, commentCard, sender),
 	}
 }

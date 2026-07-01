@@ -129,3 +129,37 @@ func TestCardRegistry_Handle(t *testing.T) {
 		t.Error("未注册的 action 应返回空字符串")
 	}
 }
+
+func TestCommentCard_BuildCard(t *testing.T) {
+	card := NewCommentCard()
+	msg := CommentMessage{
+		Name:      "张三",
+		Content:   "文章写得不错",
+		PostTitle: "Go 并发编程指南",
+		PostURL:   "https://fifsky.com/article/1/go-concurrency",
+		Time:      "2026-07-01 14:00",
+	}
+
+	cardJSON := card.BuildCard(msg)
+
+	var data map[string]any
+	if err := json.Unmarshal([]byte(cardJSON), &data); err != nil {
+		t.Fatalf("BuildCard 生成的 JSON 无效: %v\n%s", err, cardJSON)
+	}
+	if data["schema"] != "2.0" {
+		t.Errorf("schema 应为 2.0, got %v", data["schema"])
+	}
+	if !strings.Contains(cardJSON, "张三") {
+		t.Error("卡片内容应包含评论者昵称")
+	}
+	if !strings.Contains(cardJSON, "文章写得不错") {
+		t.Error("卡片内容应包含评论内容")
+	}
+	if !strings.Contains(cardJSON, "Go 并发编程指南") {
+		t.Error("卡片内容应包含文章标题")
+	}
+	// 通知卡片不应包含回调按钮
+	if strings.Contains(cardJSON, "callback") {
+		t.Error("评论通知卡片不应包含回调按钮")
+	}
+}

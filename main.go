@@ -64,6 +64,7 @@ func main() {
 	remindSvc := openapi.NewRemind(s, conf)
 	remindCard := feishu.NewRemindCard(remindSvc, s, conf)
 	linkCard := feishu.NewLinkCard(s, conf)
+	commentCard := feishu.NewCommentCard()
 
 	// 创建卡片注册表（用于 bot 回调分发）
 	registry := feishu.NewCardRegistry()
@@ -100,7 +101,7 @@ func main() {
 		Name:  "blog",
 		Usage: "fifsky blog",
 		Commands: []*cli.Command{
-			cmd.NewHttp(s, conf, httpClient, agent, accessLogger, linkCard, sender),
+			cmd.NewHttp(s, conf, httpClient, agent, accessLogger, linkCard, commentCard, sender),
 			cmd.NewTmp(db, conf),
 		},
 	}

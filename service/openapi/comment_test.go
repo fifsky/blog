@@ -17,7 +17,7 @@ import (
 func TestComment_List(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts")...)
-		svc := NewComment(store.New(db), WithCommentModerator(&MockModerator{ShouldPass: true}))
+		svc := NewComment(store.New(db), nil, nil, nil, WithCommentModerator(&MockModerator{ShouldPass: true}))
 
 		resp, err := svc.List(context.Background(), apiv1.CommentListRequest_builder{PostId: 7}.Build())
 		require.NoError(t, err)
@@ -113,7 +113,7 @@ func TestComment_Create(t *testing.T) {
 				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts")...)
 				ctx := context.Background()
 
-				svc := NewComment(store.New(db), WithCommentModerator(tt.moderator))
+				svc := NewComment(store.New(db), nil, nil, nil, WithCommentModerator(tt.moderator))
 
 				beforeResp, err := svc.List(ctx, apiv1.CommentListRequest_builder{PostId: 7}.Build())
 				require.NoError(t, err)
@@ -155,7 +155,7 @@ func TestComment_Create_WebsiteIncludedInModeration(t *testing.T) {
 		ctx := context.Background()
 
 		mock := &captureModerator{}
-		svc := NewComment(store.New(db), WithCommentModerator(mock))
+		svc := NewComment(store.New(db), nil, nil, nil, WithCommentModerator(mock))
 
 		_, err := svc.Create(ctx, apiv1.CommentCreateRequest_builder{
 			PostId:  7,
@@ -174,7 +174,7 @@ func TestComment_Create_WebsiteIncludedInModeration(t *testing.T) {
 func TestComment_New(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts")...)
-		svc := NewComment(store.New(db), WithCommentModerator(&MockModerator{ShouldPass: true}))
+		svc := NewComment(store.New(db), nil, nil, nil, WithCommentModerator(&MockModerator{ShouldPass: true}))
 
 		resp, err := svc.New(context.Background(), nil)
 		require.NoError(t, err)
