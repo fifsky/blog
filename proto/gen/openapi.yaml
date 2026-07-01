@@ -1243,42 +1243,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/GetNearestRegionResponse'
-    /blog/remind/change:
-        get:
-            tags:
-                - RemindService
-            description: Change 切换提醒状态
-            operationId: RemindService_Change
-            parameters:
-                - name: token
-                  in: query
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/TextResponse'
-    /blog/remind/delay:
-        get:
-            tags:
-                - RemindService
-            description: Delay 延迟提醒
-            operationId: RemindService_Delay
-            parameters:
-                - name: token
-                  in: query
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/TextResponse'
     /blog/setting:
         post:
             tags:
@@ -2430,11 +2394,6 @@ components:
                 post_num:
                     type: integer
                     format: int32
-        TextResponse:
-            type: object
-            properties:
-                text:
-                    type: string
         User:
             type: object
             properties:
@@ -2592,8 +2551,6 @@ tags:
       description: MoodService 提供心情相关的接口
     - name: OSSService
       description: OSSService 提供OSS相关的接口
-    - name: RemindService
-      description: RemindService 提供提醒相关的接口
     - name: RemindService
       description: RemindService 提供提醒相关的接口
     - name: SettingService

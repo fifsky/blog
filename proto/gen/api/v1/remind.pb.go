@@ -342,7 +342,7 @@ var File_api_v1_remind_proto protoreflect.FileDescriptor
 
 const file_api_v1_remind_proto_rawDesc = "" +
 	"\n" +
-	"\x13api/v1/remind.proto\x12\x12fifsky.blog.api.v1\x1a\x12types/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\"6\n" +
+	"\x13api/v1/remind.proto\x12\x12fifsky.blog.api.v1\x1a\x12types/common.proto\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\"6\n" +
 	"\x13RemindActionRequest\x12\x1f\n" +
 	"\x05token\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x05token\"\"\n" +
 	"\fTextResponse\x12\x12\n" +
@@ -359,10 +359,7 @@ const file_api_v1_remind_proto_rawDesc = "" +
 	"created_at\x18\v \x01(\tR\tcreatedAt\"^\n" +
 	"\x12RemindListResponse\x122\n" +
 	"\x04list\x18\x01 \x03(\v2\x1e.fifsky.blog.api.v1.RemindItemR\x04list\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total2\xf1\x01\n" +
-	"\rRemindService\x12p\n" +
-	"\x06Change\x12'.fifsky.blog.api.v1.RemindActionRequest\x1a .fifsky.blog.api.v1.TextResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/blog/remind/change\x12n\n" +
-	"\x05Delay\x12'.fifsky.blog.api.v1.RemindActionRequest\x1a .fifsky.blog.api.v1.TextResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/blog/remind/delayB\xac\x01\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05totalB\xac\x01\n" +
 	"\x16com.fifsky.blog.api.v1B\vRemindProtoP\x01Z\x1aapp/proto/gen/api/v1;apiv1\xa2\x02\x03FBA\xaa\x02\x12Fifsky.Blog.Api.V1\xca\x02\x12Fifsky\\Blog\\Api\\V1\xe2\x02\x1eFifsky\\Blog\\Api\\V1\\GPBMetadata\xea\x02\x15Fifsky::Blog::Api::V1b\x06proto3"
 
 var file_api_v1_remind_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
@@ -374,12 +371,8 @@ var file_api_v1_remind_proto_goTypes = []any{
 }
 var file_api_v1_remind_proto_depIdxs = []int32{
 	2, // 0: fifsky.blog.api.v1.RemindListResponse.list:type_name -> fifsky.blog.api.v1.RemindItem
-	0, // 1: fifsky.blog.api.v1.RemindService.Change:input_type -> fifsky.blog.api.v1.RemindActionRequest
-	0, // 2: fifsky.blog.api.v1.RemindService.Delay:input_type -> fifsky.blog.api.v1.RemindActionRequest
-	1, // 3: fifsky.blog.api.v1.RemindService.Change:output_type -> fifsky.blog.api.v1.TextResponse
-	1, // 4: fifsky.blog.api.v1.RemindService.Delay:output_type -> fifsky.blog.api.v1.TextResponse
-	3, // [3:5] is the sub-list for method output_type
-	1, // [1:3] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -398,7 +391,7 @@ func file_api_v1_remind_proto_init() {
 			NumEnums:      0,
 			NumMessages:   4,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   0,
 		},
 		GoTypes:           file_api_v1_remind_proto_goTypes,
 		DependencyIndexes: file_api_v1_remind_proto_depIdxs,

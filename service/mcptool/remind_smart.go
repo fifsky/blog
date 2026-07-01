@@ -9,7 +9,7 @@ import (
 
 	"app/pkg/errors"
 	"app/pkg/promptutil"
-	"app/service/remind"
+	"app/pkg/remindutil"
 	"app/store"
 	"app/store/model"
 	_ "embed"
@@ -83,7 +83,7 @@ func SmartCreateRemind(ctx context.Context, aiClient openai.Client, aiModel stri
 		Status:    1,
 		CreatedAt: time.Now(),
 	}
-	insert.NextTime = remind.NextTimeFromRule(insert.CreatedAt, insert)
+	insert.NextTime = remindutil.NextTimeFromRule(insert.CreatedAt, insert)
 
 	lastID, err := s.CreateRemind(ctx, insert)
 	if err != nil {

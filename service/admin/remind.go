@@ -7,7 +7,7 @@ import (
 
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
-	"app/service/remind"
+	"app/pkg/remindutil"
 	"app/store"
 	"app/store/model"
 
@@ -56,7 +56,7 @@ func (r *Remind) Create(ctx context.Context, req *adminv1.RemindCreateRequest) (
 		Status:    1,
 		CreatedAt: time.Now(),
 	}
-	c.NextTime = remind.NextTimeFromRule(c.CreatedAt, c)
+	c.NextTime = remindutil.NextTimeFromRule(c.CreatedAt, c)
 
 	// 如果由于解析失败等原因获取到了零值，返回错误，不存入数据库
 	if c.NextTime.IsZero() {
@@ -82,7 +82,7 @@ func (r *Remind) Update(ctx context.Context, req *adminv1.RemindUpdateRequest) (
 		u.Content = &v
 	}
 
-	nextTime := remind.NextTimeFromRule(time.Now(), &model.Remind{
+	nextTime := remindutil.NextTimeFromRule(time.Now(), &model.Remind{
 		Cron:      req.GetCron(),
 		CreatedAt: time.Now(),
 	})

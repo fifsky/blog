@@ -11,7 +11,6 @@ import (
 	"app/pkg/aiagent"
 	"app/service/feishu"
 	"app/service/motto"
-	"app/service/openapi"
 	"app/service/remind"
 	"app/store"
 
@@ -39,8 +38,7 @@ func main() {
 
 	// 创建飞书发送器和卡片处理器（仅保留跨服务共享的部分）
 	sender := feishu.NewFeishuSender(conf.Feishu)
-	remindSvc := openapi.NewRemind(s, conf)
-	remindCard := feishu.NewRemindCard(remindSvc, s, conf)
+	remindCard := feishu.NewRemindCard(s, conf)
 	linkCard := feishu.NewLinkCard(s, conf)
 
 	// 创建卡片注册表（用于 bot 回调分发）

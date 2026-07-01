@@ -3,23 +3,10 @@ package fifsky.blog.api.v1;
 
 import "types/common.proto";
 import "buf/validate/validate.proto";
-import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
 option go_package = "gen/api/v1";
-
-// RemindService 提供提醒相关的接口
-service RemindService {
-  // Change 切换提醒状态
-  rpc Change(RemindActionRequest) returns (TextResponse) {
-    option (google.api.http) = {get: "/blog/remind/change"};
-  }
-  // Delay 延迟提醒
-  rpc Delay(RemindActionRequest) returns (TextResponse) {
-    option (google.api.http) = {get: "/blog/remind/delay"};
-  }
-}
 
 message RemindActionRequest {
   string token = 1 [

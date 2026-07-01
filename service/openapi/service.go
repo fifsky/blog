@@ -14,7 +14,6 @@ type Service struct {
 	Cate      *Cate
 	Link      *Link
 	Mood      *Mood
-	Remind    *Remind
 	Setting   *Setting
 	Travel    *Travel
 	MiniApp   *MiniApp
@@ -31,7 +30,6 @@ func New(s *store.Store, conf *config.Config, httpClient *http.Client) *Service 
 		Cate:      NewCate(s),
 		Link:      NewLink(s, conf, sender),
 		Mood:      NewMood(s),
-		Remind:    NewRemind(s, conf),
 		Setting:   NewSetting(s),
 		Travel:    NewTravel(s),
 		MiniApp:   NewMiniApp(s, conf, httpClient),

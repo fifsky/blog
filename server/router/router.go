@@ -76,7 +76,6 @@ func (r *Router) Handler() http.Handler {
 	apiv1.RegisterMoodServiceHTTPServer(api, codec, r.service.Mood)
 	apiv1.RegisterCateServiceHTTPServer(api, codec, r.service.Cate)
 	apiv1.RegisterLinkServiceHTTPServer(api, codec, r.service.Link)
-	apiv1.RegisterRemindServiceHTTPServer(api, codec, r.service.Remind)
 	apiv1.RegisterUserServiceHTTPServer(api, codec, r.service.User)
 	apiv1.RegisterSettingServiceHTTPServer(api, codec, r.service.Setting)
 	apiv1.RegisterTravelServiceHTTPServer(api, codec, r.service.Travel)

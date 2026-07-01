@@ -8,7 +8,7 @@ import (
 )
 
 func TestRemindCard_BuildCard(t *testing.T) {
-	card := NewRemindCard(nil, nil, nil)
+	card := NewRemindCard(nil, nil)
 	msg := RemindMessage{
 		Content: "喝水时间到了",
 		Time:    "2026-07-01 12:00",
@@ -36,7 +36,7 @@ func TestRemindCard_BuildCard(t *testing.T) {
 }
 
 func TestRemindCard_BuildResultCard(t *testing.T) {
-	card := NewRemindCard(nil, nil, nil)
+	card := NewRemindCard(nil, nil)
 	msg := RemindMessage{
 		Content: "喝水时间到了",
 		Time:    "2026-07-01 12:00",
@@ -58,7 +58,7 @@ func TestRemindCard_BuildResultCard(t *testing.T) {
 }
 
 func TestRemindCard_SpecialChars(t *testing.T) {
-	card := NewRemindCard(nil, nil, nil)
+	card := NewRemindCard(nil, nil)
 	msg := RemindMessage{
 		Content: `包含"引号"和\反斜杠`,
 		Time:    "2026-07-01 12:00",
@@ -133,7 +133,7 @@ func TestLinkCard_BuildResultCard(t *testing.T) {
 
 func TestCardRegistry_Handle(t *testing.T) {
 	registry := NewCardRegistry()
-	registry.Register(NewRemindCard(nil, nil, nil))
+	registry.Register(NewRemindCard(nil, nil))
 	registry.Register(NewLinkCard(nil, nil))
 
 	// 未注册的 action 返回空

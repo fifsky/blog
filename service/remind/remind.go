@@ -8,12 +8,12 @@ import (
 
 	"app/config"
 	"app/pkg/aesutil"
+	"app/pkg/remindutil"
 	"app/service/feishu"
 	"app/store"
 	"app/store/model"
 
 	"github.com/goapt/logger"
-	"github.com/robfig/cron/v3"
 )
 
 type Remind struct {
@@ -40,31 +40,9 @@ func (r *Remind) Start() {
 	}
 }
 
+// NextTimeFromRule 根据提醒规则计算下一次触发时间，委托给 remindutil 包
 func NextTimeFromRule(from time.Time, m *model.Remind) time.Time {
-	if m.Cron == "" {
-		return time.Time{}
-	}
-
-	location, _ := time.LoadLocation("Asia/Shanghai")
-	if location == nil {
-		location = time.Local
-	}
-	base := from.In(location)
-
-	// If Cron looks like a specific date "2006-01-02 15:04:00"
-	if len(m.Cron) >= 10 && m.Cron[4] == '-' {
-		t, err := time.ParseInLocation(time.DateTime, m.Cron, location)
-		if err == nil {
-			return t
-		}
-	}
-
-	parser := cron.NewParser(cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow)
-	schedule, err := parser.Parse(m.Cron)
-	if err != nil {
-		return time.Time{}
-	}
-	return schedule.Next(base)
+	return remindutil.NextTimeFromRule(from, m)
 }
 
 func (r *Remind) buildMessage(content string, v *model.Remind) feishu.RemindMessage {
