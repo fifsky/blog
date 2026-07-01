@@ -89,31 +89,30 @@ func (u *User) notifyLogin(ctx context.Context, userName string) {
 	}
 
 	ip := middleware.ClientIPFromContext(ctx)
-	if ip == "" {
-		return
-	}
 
 	go func() {
 		region := ""
-		geo, err := ipgeo.Lookup(context.Background(), u.httpClient, ip)
-		if err != nil {
-			logger.Error("login notify ipgeo lookup error", slog.String("err", err.Error()), slog.String("ip", ip))
-		} else {
-			if geo.City != "" {
-				region = geo.City
-			}
-			if geo.Region != "" {
-				if region != "" {
-					region += ", " + geo.Region
-				} else {
-					region = geo.Region
+		if ip != "" {
+			geo, err := ipgeo.Lookup(context.Background(), u.httpClient, ip)
+			if err != nil {
+				logger.Error("login notify ipgeo lookup error", slog.String("err", err.Error()), slog.String("ip", ip))
+			} else {
+				if geo.City != "" {
+					region = geo.City
 				}
-			}
-			if geo.Country != "" {
-				if region != "" {
-					region += ", " + geo.Country
-				} else {
-					region = geo.Country
+				if geo.Region != "" {
+					if region != "" {
+						region += ", " + geo.Region
+					} else {
+						region = geo.Region
+					}
+				}
+				if geo.Country != "" {
+					if region != "" {
+						region += ", " + geo.Country
+					} else {
+						region = geo.Country
+					}
 				}
 			}
 		}

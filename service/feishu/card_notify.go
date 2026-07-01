@@ -61,7 +61,7 @@ const notifyCardTemplate = `{
     "header": {
         "title": {
             "tag": "plain_text",
-            "content": "系统通知"
+            "content": "通知"
         },
         "subtitle": {
             "tag": "plain_text",
