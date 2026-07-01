@@ -5,27 +5,30 @@ import (
 	"time"
 )
 
+// Footprint 旅行足迹模型
 type Footprint struct {
-	Id          int
-	Name        string
-	Description string
-	Longitude   string
-	Latitude    string
-	Date        string
-	MarkerColor string
-	Categories  []string
-	Url         string
-	UrlLabel    string
-	Photos      []FootprintPhoto
+	Id          int              // PK
+	Name        string           // 地点名称
+	Description string           // 描述
+	Longitude   string           // 经度
+	Latitude    string           // 纬度
+	Date        string           // 到访日期
+	MarkerColor string           // 标记颜色
+	Categories  []string         // 分类标签数组
+	Url         string           // 关联链接
+	UrlLabel    string           // 链接按钮文案
+	Photos      []FootprintPhoto // 照片列表
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
 
+// FootprintPhoto 足迹照片
 type FootprintPhoto struct {
-	Src       string
-	Thumbnail string
+	Src       string // 原图地址
+	Thumbnail string // 缩略图地址
 }
 
+// UpdateFootprint 更新足迹参数
 type UpdateFootprint struct {
 	Id          int
 	Name        *string
@@ -40,6 +43,7 @@ type UpdateFootprint struct {
 	PhotoUrls   []string
 }
 
+// FootprintJSON 足迹JSON序列化模型
 type FootprintJSON struct {
 	Id          int              `json:"id"`
 	Name        string           `json:"name"`

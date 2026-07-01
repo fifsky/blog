@@ -3,16 +3,17 @@ package model
 import "time"
 
 // Comment 评论模型
+// Comment 评论模型
 type Comment struct {
-	Id        int
-	PostId    int    // 文章ID
-	Pid       int    // 顶层主评论ID，主评论为0
-	Name      string // 昵称
+	Id        int    // PK
+	PostId    int    // 文章PID
+	Pid       int    // 回复评论ID，顶层主评论为0
+	Name      string // 名称
 	Email     string // 邮箱（不对外展示，仅用于生成头像）
 	Website   string // 网址
 	Content   string // 内容
 	ReplyName string // 被回复人昵称，回复的回复时用于平铺展示"A 回复 B"
-	IP        string
+	IP        string // IP
 	CreatedAt time.Time
 }
 
