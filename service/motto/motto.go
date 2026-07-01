@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"app/pkg/aiagent"
-	"app/pkg/bark"
 	"app/store"
 	"app/store/model"
 
@@ -78,16 +77,14 @@ func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (
 }
 
 type Motto struct {
-	store      *store.Store
-	barkClient *bark.Client
-	ai         AIProvider
+	store *store.Store
+	ai    AIProvider
 }
 
-func New(s *store.Store, barkClient *bark.Client, ai AIProvider) *Motto {
+func New(s *store.Store, ai AIProvider) *Motto {
 	return &Motto{
-		store:      s,
-		barkClient: barkClient,
-		ai:         ai,
+		store: s,
+		ai:    ai,
 	}
 }
 
@@ -132,22 +129,5 @@ func (m *Motto) GenerateDailyMotto() error {
 		return err
 	}
 
-	// 发送提醒
-	if err := m.sendBark(content); err != nil {
-		logger.Error("motto request bark error", slog.String("err", err.Error()))
-	}
-
 	return nil
-}
-
-func (m *Motto) sendBark(content string) error {
-	msg := bark.Message{
-		Title: "每日一言",
-		Body:  content,
-		Badge: 1,
-		Group: "Motto",
-		Level: "timeSensitive",
-	}
-
-	return m.barkClient.Send(msg)
 }

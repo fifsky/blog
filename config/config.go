@@ -12,10 +12,7 @@ import (
 
 type common struct {
 	StoragePath string `yaml:"storage_path"`
-	RobotToken  string `yaml:"robot_token"`
 	TokenSecret string `yaml:"token_secret"`
-	NotifyUrl   string `yaml:"notify_url"`
-	NotifyToken string `yaml:"notify_token"`
 	MCPToken    string `yaml:"mcp_token"`
 }
 
@@ -38,11 +35,9 @@ type MiniAPPConf struct {
 }
 
 type FeishuConf struct {
-	Appid                  string `yaml:"appid"`
-	AppSecret              string `yaml:"app_secret"`
-	UserID                 string `yaml:"user_id"`
-	RemindTemplateID       string `yaml:"remind_template_id"`
-	RemindResultTemplateID string `yaml:"remind_result_template_id"`
+	Appid     string `yaml:"appid"`
+	AppSecret string `yaml:"app_secret"`
+	UserID    string `yaml:"user_id"`
 }
 
 type Config struct {

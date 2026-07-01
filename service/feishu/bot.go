@@ -6,14 +6,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"strconv"
 	"strings"
 
 	"app/config"
-	"app/pkg/aesutil"
 	"app/pkg/aiagent"
-	apiv1 "app/proto/gen/api/v1"
-	"app/service/openapi"
 	"app/store"
 
 	lark "github.com/larksuite/oapi-sdk-go/v3"
@@ -22,7 +18,6 @@ import (
 	"github.com/larksuite/oapi-sdk-go/v3/event/dispatcher/callback"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
 	"github.com/larksuite/oapi-sdk-go/v3/ws"
-	"github.com/samber/lo"
 )
 
 // Bot represents the Feishu bot service that listens for messages via WebSocket
@@ -32,12 +27,11 @@ type Bot struct {
 	larkClient *lark.Client
 	wsClient   *ws.Client
 	aiChat     *AIChat
-	remind     *openapi.Remind
-	store      *store.Store
+	registry   *CardRegistry
 }
 
 // NewBot creates a new Feishu bot instance.
-func NewBot(conf *config.Config, s *store.Store, agent *aiagent.Agent) *Bot {
+func NewBot(conf *config.Config, s *store.Store, agent *aiagent.Agent, registry *CardRegistry) *Bot {
 	// Create Lark client for API calls
 	larkClient := lark.NewClient(
 		conf.Feishu.Appid,
@@ -48,16 +42,12 @@ func NewBot(conf *config.Config, s *store.Store, agent *aiagent.Agent) *Bot {
 	// Create AI chat handler
 	aiChat := NewAIChat(agent, larkClient, s)
 
-	// Create remind service for card callback handling
-	remind := openapi.NewRemind(s, conf)
-
 	// Create bot instance first so we can reference it in the handler
 	bot := &Bot{
 		conf:       conf,
 		larkClient: larkClient,
 		aiChat:     aiChat,
-		remind:     remind,
-		store:      s,
+		registry:   registry,
 	}
 
 	// Create event dispatcher with fluent handler registration
@@ -87,9 +77,9 @@ func (b *Bot) Start(ctx context.Context) {
 }
 
 // handleCardAction handles card button callback actions.
+// 逻辑固定不变：解析 action/token -> 委托 registry 分发 -> 返回结果卡片。
+// 新增卡片类型只需实现 ActionHandler 并在 NewBot 中注册，无需修改此方法。
 func (b *Bot) handleCardAction(ctx context.Context, event *callback.CardActionTriggerEvent) (*callback.CardActionTriggerResponse, error) {
-	// fmt.Printf("[Feishu Bot] Card action received: %s\n", larkcore.Prettify(event))
-	// Parse action value from event
 	actionValue := event.Event.Action.Value
 	if actionValue == nil {
 		return nil, nil
@@ -107,56 +97,27 @@ func (b *Bot) handleCardAction(ctx context.Context, event *callback.CardActionTr
 
 	fmt.Printf("[Feishu Bot] Card action: %s, token: %s\n", actionKey, token)
 
-	// Execute action based on key
-	var result *apiv1.TextResponse
-	var err error
-
-	req := apiv1.RemindActionRequest_builder{Token: token}.Build()
-	switch actionKey {
-	case "remind_completed":
-		result, err = b.remind.Change(ctx, req)
-	case "remind_later":
-		result, err = b.remind.Delay(ctx, req)
-	default:
+	cardJSON, resultText, err := b.registry.Handle(ctx, actionKey, token)
+	if err != nil {
+		return nil, err
+	}
+	if cardJSON == "" {
 		return nil, nil
 	}
 
-	if err != nil {
-		return nil, fmt.Errorf("操作失败: %w", err)
+	var cardData map[string]any
+	if err := json.Unmarshal([]byte(cardJSON), &cardData); err != nil {
+		return nil, fmt.Errorf("解析卡片JSON失败: %w", err)
 	}
 
-	id, err := aesutil.AesDecode(b.conf.Common.TokenSecret, req.GetToken())
-	if err != nil {
-		return nil, fmt.Errorf("token错误:%w", err)
-	}
-
-	remind, err := b.store.GetRemind(ctx, lo.Must(strconv.Atoi(id)))
-	if err != nil {
-		return nil, fmt.Errorf("记录未找到:%w", err)
-	}
-
-	// Get response text
-	responseText := "操作完成"
-	if result != nil {
-		responseText = result.GetText()
-	}
-
-	// Return only toast response
 	return &callback.CardActionTriggerResponse{
 		Toast: &callback.Toast{
 			Type:    "success",
-			Content: responseText,
+			Content: resultText,
 		},
 		Card: &callback.Card{
-			Type: "template",
-			Data: &callback.TemplateCard{
-				TemplateID: b.conf.Feishu.RemindResultTemplateID,
-				TemplateVariable: map[string]any{
-					"remind_content": remind.Content,
-					"remind_time":    remind.NextTime.Format("2006-01-02 15:04"),
-					"remind_result":  responseText,
-				},
-			},
+			Type: "raw",
+			Data: cardData,
 		},
 	}, nil
 }

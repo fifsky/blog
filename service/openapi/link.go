@@ -2,23 +2,33 @@ package openapi
 
 import (
 	"context"
+	"fmt"
+	"log/slog"
+	"strconv"
 	"time"
 
+	"app/config"
+	"app/pkg/aesutil"
 	apiv1 "app/proto/gen/api/v1"
+	"app/service/feishu"
 	"app/store"
 	"app/store/model"
 
+	"github.com/goapt/logger"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var _ apiv1.LinkServiceHTTPServer = (*Link)(nil)
 
 type Link struct {
-	store *store.Store
+	store  *store.Store
+	conf   *config.Config
+	card   *feishu.LinkCard
+	sender *feishu.FeishuSender
 }
 
-func NewLink(s *store.Store) *Link {
-	return &Link{store: s}
+func NewLink(s *store.Store, conf *config.Config, card *feishu.LinkCard, sender *feishu.FeishuSender) *Link {
+	return &Link{store: s, conf: conf, card: card, sender: sender}
 }
 
 // All 获取所有已审核通过的链接
@@ -36,7 +46,7 @@ func (l *Link) All(ctx context.Context, _ *emptypb.Empty) (*apiv1.LinkMenuRespon
 	return resp, nil
 }
 
-// Submit 提交友情链接申请（状态为审核中）
+// Submit 提交友情链接申请（状态为审核中），并发送飞书审核通知
 func (l *Link) Submit(ctx context.Context, req *apiv1.LinkSubmitRequest) (*emptypb.Empty, error) {
 	m := &model.Link{
 		Name:      req.GetName(),
@@ -45,9 +55,37 @@ func (l *Link) Submit(ctx context.Context, req *apiv1.LinkSubmitRequest) (*empty
 		Status:    model.LinkStatusPending,
 		CreatedAt: time.Now(),
 	}
-	_, err := l.store.CreateLink(ctx, m)
+	id, err := l.store.CreateLink(ctx, m)
 	if err != nil {
 		return nil, err
 	}
+
+	// 发送飞书审核通知
+	l.notifyLinkSubmit(id, req.GetName(), req.GetUrl(), req.GetDesc())
+
 	return &emptypb.Empty{}, nil
+}
+
+// notifyLinkSubmit 发送友情链接提交审核通知
+func (l *Link) notifyLinkSubmit(id int64, name, url, desc string) {
+	if l.sender == nil {
+		return
+	}
+
+	token, err := aesutil.AesEncode(l.conf.Common.TokenSecret, strconv.FormatInt(id, 10))
+	if err != nil {
+		logger.Error("link notify aes encode error", slog.String("err", err.Error()))
+		return
+	}
+
+	content := fmt.Sprintf("**站点名称**: %s\n**站点地址**: [%s](%s)\n**站点描述**: %s", name, url, url, desc)
+	msg := feishu.LinkMessage{
+		Content: content,
+		Token:   token,
+	}
+	cardJSON := l.card.BuildCard(msg)
+
+	if err := l.sender.Send(context.Background(), cardJSON); err != nil {
+		logger.Error("link notify send error", slog.String("err", err.Error()))
+	}
 }

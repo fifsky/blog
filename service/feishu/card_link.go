@@ -1,0 +1,258 @@
+package feishu
+
+import (
+	"context"
+	"fmt"
+	"strconv"
+	"text/template"
+
+	"app/config"
+	"app/pkg/aesutil"
+	"app/store"
+	"app/store/model"
+)
+
+// LinkMessage 友情链接卡片消息，驱动卡片模板渲染
+type LinkMessage struct {
+	Content string // 链接信息（markdown）
+	Token   string // 回调按钮携带的 token
+	Result  string // 操作结果文本，仅结果卡片使用
+}
+
+// LinkCard 友情链接卡片处理器，合并卡片构建和回调处理
+type LinkCard struct {
+	tplBuilder
+	store *store.Store
+	conf  *config.Config
+}
+
+// NewLinkCard 创建友情链接卡片处理器
+func NewLinkCard(store *store.Store, conf *config.Config) *LinkCard {
+	return &LinkCard{
+		tplBuilder: tplBuilder{
+			cardTpl:   template.Must(template.New("link").Funcs(tplFuncs).Parse(linkCardTemplate)),
+			resultTpl: template.Must(template.New("linkResult").Funcs(tplFuncs).Parse(linkResultCardTemplate)),
+		},
+		store: store,
+		conf:  conf,
+	}
+}
+
+func (c *LinkCard) Actions() []string { return []string{"link_approve", "link_reject"} }
+
+// BuildCard 构建友情链接审核卡片
+func (c *LinkCard) BuildCard(msg LinkMessage) string { return c.execCard(msg) }
+
+// BuildResultCard 构建友情链接审核结果卡片
+func (c *LinkCard) BuildResultCard(msg LinkMessage) string { return c.execResult(msg) }
+
+// Handle 处理友情链接卡片回调，返回结果卡片 JSON 和结果文本
+func (c *LinkCard) Handle(ctx context.Context, action, token string) (string, string, error) {
+	id, err := aesutil.AesDecode(c.conf.Common.TokenSecret, token)
+	if err != nil {
+		return "", "", fmt.Errorf("token错误:%w", err)
+	}
+
+	linkID, err := strconv.Atoi(id)
+	if err != nil {
+		return "", "", fmt.Errorf("链接ID错误:%w", err)
+	}
+
+	// 先查询链接信息用于结果卡片展示
+	link, err := c.store.GetLink(ctx, linkID)
+	if err != nil {
+		return "", "", fmt.Errorf("链接未找到:%w", err)
+	}
+
+	var responseText string
+	switch action {
+	case "link_approve":
+		status := model.LinkStatusApproved
+		if err := c.store.UpdateLink(ctx, &model.UpdateLink{Id: linkID, Status: &status}); err != nil {
+			return "", "", fmt.Errorf("审核失败:%w", err)
+		}
+		responseText = "已通过审核"
+	case "link_reject":
+		if err := c.store.DeleteLink(ctx, linkID); err != nil {
+			return "", "", fmt.Errorf("删除失败:%w", err)
+		}
+		responseText = "已拒绝并删除"
+	default:
+		return "", "", nil
+	}
+
+	content := fmt.Sprintf("**站点名称**: %s\n**站点地址**: [%s](%s)\n**站点描述**: %s",
+		link.Name, link.Url, link.Url, link.Desc)
+
+	msg := LinkMessage{
+		Content: content,
+		Result:  responseText,
+	}
+	return c.BuildResultCard(msg), responseText, nil
+}
+
+// linkCardTemplate 友情链接审核卡片模板，包含"通过"和"拒绝"两个回调按钮
+const linkCardTemplate = `{
+    "schema": "2.0",
+    "config": {
+        "update_multi": true
+    },
+    "body": {
+        "direction": "vertical",
+        "vertical_spacing": "12px",
+        "padding": "20px 20px 20px 20px",
+        "elements": [
+            {
+                "tag": "markdown",
+                "content": "**友情链接申请**",
+                "text_align": "left",
+                "text_size": "heading",
+                "margin": "0px 0px 0px 0px"
+            },
+            {
+                "tag": "markdown",
+                "content": {{.Content | json}},
+                "text_align": "left",
+                "text_size": "normal",
+                "margin": "0px 0px 0px 0px"
+            },
+            {
+                "tag": "column_set",
+                "flex_mode": "stretch",
+                "horizontal_spacing": "8px",
+                "horizontal_align": "left",
+                "columns": [
+                    {
+                        "tag": "column",
+                        "width": "auto",
+                        "elements": [
+                            {
+                                "tag": "button",
+                                "text": {
+                                    "tag": "plain_text",
+                                    "content": "通过"
+                                },
+                                "type": "primary_filled",
+                                "width": "fill",
+                                "size": "medium",
+                                "behaviors": [
+                                    {
+                                        "type": "callback",
+                                        "value": {
+                                            "action": "link_approve",
+                                            "token": {{.Token | json}}
+                                        }
+                                    }
+                                ],
+                                "margin": "4px 0px 4px 0px"
+                            }
+                        ],
+                        "vertical_spacing": "8px",
+                        "horizontal_align": "left",
+                        "vertical_align": "top"
+                    },
+                    {
+                        "tag": "column",
+                        "width": "auto",
+                        "elements": [
+                            {
+                                "tag": "button",
+                                "text": {
+                                    "tag": "plain_text",
+                                    "content": "拒绝"
+                                },
+                                "type": "default",
+                                "width": "fill",
+                                "size": "medium",
+                                "behaviors": [
+                                    {
+                                        "type": "callback",
+                                        "value": {
+                                            "action": "link_reject",
+                                            "token": {{.Token | json}}
+                                        }
+                                    }
+                                ],
+                                "margin": "4px 0px 4px 0px"
+                            }
+                        ],
+                        "vertical_spacing": "8px",
+                        "horizontal_align": "left",
+                        "vertical_align": "top"
+                    }
+                ],
+                "margin": "0px 0px 0px 0px",
+                "element_id": "action"
+            }
+        ]
+    },
+    "header": {
+        "title": {
+            "tag": "plain_text",
+            "content": "友情链接审核"
+        },
+        "subtitle": {
+            "tag": "plain_text",
+            "content": ""
+        },
+        "template": "wathet",
+        "padding": "12px 12px 12px 12px"
+    }
+}`
+
+// linkResultCardTemplate 友情链接审核结果卡片模板，展示审核结果文本
+const linkResultCardTemplate = `{
+    "schema": "2.0",
+    "config": {
+        "update_multi": true
+    },
+    "body": {
+        "direction": "vertical",
+        "vertical_spacing": "12px",
+        "padding": "20px 20px 20px 20px",
+        "elements": [
+            {
+                "tag": "markdown",
+                "content": "**友情链接申请**",
+                "text_align": "left",
+                "text_size": "heading",
+                "margin": "0px 0px 0px 0px"
+            },
+            {
+                "tag": "markdown",
+                "content": {{.Content | json}},
+                "text_align": "left",
+                "text_size": "normal",
+                "margin": "0px 0px 0px 0px"
+            },
+            {
+                "tag": "div",
+                "text": {
+                    "tag": "plain_text",
+                    "content": {{.Result | json}},
+                    "text_size": "notation",
+                    "text_align": "left",
+                    "text_color": "default"
+                },
+                "icon": {
+                    "tag": "standard_icon",
+                    "token": "warning_outlined",
+                    "color": "blue"
+                },
+                "margin": "0px 0px 0px 0px"
+            }
+        ]
+    },
+    "header": {
+        "title": {
+            "tag": "plain_text",
+            "content": "友情链接审核"
+        },
+        "subtitle": {
+            "tag": "plain_text",
+            "content": ""
+        },
+        "template": "wathet",
+        "padding": "12px 12px 12px 12px"
+    }
+}`

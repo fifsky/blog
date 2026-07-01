@@ -11,11 +11,10 @@ import (
 	"app/cmd"
 	"app/config"
 	"app/pkg/aiagent"
-	"app/pkg/bark"
 	"app/pkg/httpx"
-	"app/pkg/messenger"
 	"app/service/feishu"
 	"app/service/motto"
+	"app/service/openapi"
 	"app/service/remind"
 	"app/store"
 
@@ -57,17 +56,21 @@ func main() {
 		}),
 	)
 
-	barkClient := bark.New(httpClient, conf.Common.NotifyUrl, conf.Common.NotifyToken)
-
-	// Create message senders for remind service
-	var senders []messenger.Sender
-	// senders = append(senders, messenger.NewWechatSender(conf.Common.RobotToken))
-	senders = append(senders, messenger.NewBarkSender(barkClient), messenger.NewFeishuSender(conf.Feishu))
-	multiSender := messenger.NewMultiSender(senders...)
-
 	// crontab setup
 	s := store.New(db)
-	r := remind.New(s, conf, multiSender)
+
+	// 创建飞书发送器和卡片处理器
+	sender := feishu.NewFeishuSender(conf.Feishu)
+	remindSvc := openapi.NewRemind(s, conf)
+	remindCard := feishu.NewRemindCard(remindSvc, s, conf)
+	linkCard := feishu.NewLinkCard(s, conf)
+
+	// 创建卡片注册表（用于 bot 回调分发）
+	registry := feishu.NewCardRegistry()
+	registry.Register(remindCard)
+	registry.Register(linkCard)
+
+	r := remind.New(s, conf, remindCard, sender)
 	go r.Start()
 
 	agent := aiagent.New(
@@ -83,20 +86,21 @@ func main() {
 		aiagent.WithMCP(conf.MCP),
 	)
 
-	ai := motto.NewOpenAIProvider(agent)
-	m := motto.New(s, barkClient, ai)
-	go m.Start("0 7 * * *")
-
 	// Feishu bot service
 	if conf.Feishu.Appid != "" {
-		feishuBot := feishu.NewBot(conf, s, agent)
+		feishuBot := feishu.NewBot(conf, s, agent, registry)
 		go feishuBot.Start(context.Background())
 	}
+
+	ai := motto.NewOpenAIProvider(agent)
+	m := motto.New(s, ai)
+	go m.Start("0 7 * * *")
+
 	app := &cli.Command{
 		Name:  "blog",
 		Usage: "fifsky blog",
 		Commands: []*cli.Command{
-			cmd.NewHttp(s, conf, httpClient, agent, accessLogger),
+			cmd.NewHttp(s, conf, httpClient, agent, accessLogger, linkCard, sender),
 			cmd.NewTmp(db, conf),
 		},
 	}

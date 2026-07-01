@@ -12,7 +12,6 @@ import (
 
 	"app/config"
 	"app/pkg/aiagent"
-	"app/pkg/bark"
 	"app/pkg/dbunit"
 	"app/store"
 	"app/testutil"
@@ -34,26 +33,17 @@ func (m *MockAIProvider) Generate(ctx context.Context, prompt, content string) (
 }
 
 func TestMotto_GenerateDailyMotto(t *testing.T) {
-	// Mock Bark Server
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	}))
-	defer ts.Close()
-
 	// Prepare DB
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("moods", "users")...)
 		s := store.New(db)
-
-		// Prepare Bark Client
-		barkClient := bark.New(http.DefaultClient, ts.URL, "test-token")
 
 		// Prepare Mock AI
 		ai := &MockAIProvider{
 			Result: "Test Motto Content",
 		}
 
-		m := New(s, barkClient, ai)
+		m := New(s, ai)
 
 		// Execute
 		err := m.GenerateDailyMotto()

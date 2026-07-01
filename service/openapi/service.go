@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"app/config"
+	"app/service/feishu"
 	"app/store"
 )
 
@@ -22,12 +23,12 @@ type Service struct {
 	Comment   *Comment
 }
 
-func New(s *store.Store, conf *config.Config, httpClient *http.Client) *Service {
+func New(s *store.Store, conf *config.Config, httpClient *http.Client, linkCard *feishu.LinkCard, sender *feishu.FeishuSender) *Service {
 	return &Service{
 		User:      NewUser(s, conf),
 		Article:   NewArticle(s, conf),
 		Cate:      NewCate(s),
-		Link:      NewLink(s),
+		Link:      NewLink(s, conf, linkCard, sender),
 		Mood:      NewMood(s),
 		Remind:    NewRemind(s, conf),
 		Setting:   NewSetting(s),

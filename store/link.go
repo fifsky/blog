@@ -44,6 +44,17 @@ func (s *Store) GetApprovedLinks(ctx context.Context) ([]*model.Link, error) {
 	return ret, nil
 }
 
+// GetLink 根据 ID 获取链接信息
+func (s *Store) GetLink(ctx context.Context, id int) (*model.Link, error) {
+	var item model.Link
+	err := s.db.QueryRowContext(ctx, "select id,name,url,`desc`,status,created_at from links where id = ?", id).
+		Scan(&item.Id, &item.Name, &item.Url, &item.Desc, &item.Status, &item.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return &item, nil
+}
+
 func (s *Store) CreateLink(ctx context.Context, link *model.Link) (int64, error) {
 	res, err := s.db.ExecContext(ctx, "insert into links (name,url,`desc`,status,created_at) values (?,?,?,?,?)",
 		link.Name, link.Url, link.Desc, link.Status, link.CreatedAt)

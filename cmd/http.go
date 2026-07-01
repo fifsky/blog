@@ -11,13 +11,14 @@ import (
 	"app/server"
 	"app/server/router"
 	"app/service/admin"
+	"app/service/feishu"
 	"app/service/openapi"
 	"app/store"
 
 	"github.com/urfave/cli/v3"
 )
 
-func NewHttp(s *store.Store, conf *config.Config, httpClient *http.Client, agent *aiagent.Agent, accessLogger *slog.Logger) *cli.Command {
+func NewHttp(s *store.Store, conf *config.Config, httpClient *http.Client, agent *aiagent.Agent, accessLogger *slog.Logger, linkCard *feishu.LinkCard, sender *feishu.FeishuSender) *cli.Command {
 	return &cli.Command{
 		Name:  "http",
 		Usage: "http command eg: ./app http --addr=:8080",
@@ -33,7 +34,7 @@ func NewHttp(s *store.Store, conf *config.Config, httpClient *http.Client, agent
 			}
 			log.Println("[Env] Run profile:" + conf.Env)
 
-			apiService := openapi.New(s, conf, httpClient)
+			apiService := openapi.New(s, conf, httpClient, linkCard, sender)
 			adminService := admin.New(s, conf, agent)
 			route := router.New(apiService, adminService, conf, s, accessLogger)
 			return server.New(
