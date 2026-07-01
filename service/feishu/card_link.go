@@ -12,6 +12,12 @@ import (
 	"app/store/model"
 )
 
+// LinkActionValue 友情链接卡片回调的 actionValue 结构体
+type LinkActionValue struct {
+	Action string `json:"action"` // 回调动作：link_approve / link_reject
+	Token  string `json:"token"`  // 加密的业务 ID
+}
+
 // LinkMessage 友情链接卡片消息，驱动卡片模板渲染
 type LinkMessage struct {
 	Name   string // 站点名称
@@ -49,8 +55,13 @@ func (c *LinkCard) BuildCard(msg LinkMessage) string { return c.execCard(msg) }
 func (c *LinkCard) BuildResultCard(msg LinkMessage) string { return c.execResult(msg) }
 
 // Handle 处理友情链接卡片回调，返回结果卡片 JSON 和结果文本
-func (c *LinkCard) Handle(ctx context.Context, action, token string) (string, string, error) {
-	id, err := aesutil.AesDecode(c.conf.Common.TokenSecret, token)
+func (c *LinkCard) Handle(ctx context.Context, actionValue map[string]any) (string, string, error) {
+	actionVal, err := parseActionValue[LinkActionValue](actionValue)
+	if err != nil {
+		return "", "", fmt.Errorf("解析actionValue失败: %w", err)
+	}
+
+	id, err := aesutil.AesDecode(c.conf.Common.TokenSecret, actionVal.Token)
 	if err != nil {
 		return "", "", fmt.Errorf("token错误:%w", err)
 	}
@@ -67,7 +78,7 @@ func (c *LinkCard) Handle(ctx context.Context, action, token string) (string, st
 	}
 
 	var responseText string
-	switch action {
+	switch actionVal.Action {
 	case "link_approve":
 		status := model.LinkStatusApproved
 		if err := c.store.UpdateLink(ctx, &model.UpdateLink{Id: linkID, Status: &status}); err != nil {

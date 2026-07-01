@@ -137,10 +137,65 @@ func TestCardRegistry_Handle(t *testing.T) {
 	registry.Register(NewLinkCard(nil, nil))
 
 	// 未注册的 action 返回空
-	cardJSON, _, _ := registry.Handle(context.TODO(), "unknown_action", "token")
+	cardJSON, _, _ := registry.Handle(context.TODO(), map[string]any{"action": "unknown_action", "token": "token"})
 	if cardJSON != "" {
 		t.Error("未注册的 action 应返回空字符串")
 	}
+
+	// 缺少 action 字段返回空
+	cardJSON, _, _ = registry.Handle(context.TODO(), map[string]any{"token": "token"})
+	if cardJSON != "" {
+		t.Error("缺少 action 字段应返回空字符串")
+	}
+}
+
+func TestParseActionValue(t *testing.T) {
+	// 测试正常的 actionValue 解析
+	actionValue := map[string]any{
+		"action": "remind_completed",
+		"token":  "test_token_123",
+	}
+	val, err := parseActionValue[RemindActionValue](actionValue)
+	if err != nil {
+		t.Fatalf("parseActionValue 失败: %v", err)
+	}
+	if val.Action != "remind_completed" {
+		t.Errorf("Action 应为 remind_completed, got %s", val.Action)
+	}
+	if val.Token != "test_token_123" {
+		t.Errorf("Token 应为 test_token_123, got %s", val.Token)
+	}
+
+	// 测试 link actionValue
+	linkActionValue := map[string]any{
+		"action": "link_approve",
+		"token":  "link_token_456",
+	}
+	linkVal, err := parseActionValue[LinkActionValue](linkActionValue)
+	if err != nil {
+		t.Fatalf("parseActionValue(link) 失败: %v", err)
+	}
+	if linkVal.Action != "link_approve" {
+		t.Errorf("Action 应为 link_approve, got %s", linkVal.Action)
+	}
+}
+
+func TestCardRegistry_Register(t *testing.T) {
+	// 正常注册
+	r1 := NewCardRegistry()
+	r1.Register(NewRemindCard(nil, nil))
+	r1.Register(NewLinkCard(nil, nil))
+
+	// 重复注册同一个 action 应触发 panic
+	r2 := NewCardRegistry()
+	r2.Register(NewRemindCard(nil, nil))
+
+	defer func() {
+		if r := recover(); r == nil {
+			t.Error("重复注册 action 应触发 panic")
+		}
+	}()
+	r2.Register(NewRemindCard(nil, nil))
 }
 
 func TestCommentCard_BuildCard(t *testing.T) {

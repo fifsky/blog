@@ -16,6 +16,12 @@ import (
 	"github.com/samber/lo"
 )
 
+// RemindActionValue 提醒卡片回调的 actionValue 结构体
+type RemindActionValue struct {
+	Action string `json:"action"` // 回调动作：remind_completed / remind_later
+	Token  string `json:"token"`  // 加密的业务 ID
+}
+
 // RemindMessage 提醒卡片消息，驱动卡片模板渲染
 type RemindMessage struct {
 	Content string // 提醒内容
@@ -52,9 +58,14 @@ func (c *RemindCard) BuildCard(msg RemindMessage) string { return c.execCard(msg
 func (c *RemindCard) BuildResultCard(msg RemindMessage) string { return c.execResult(msg) }
 
 // Handle 处理提醒卡片回调，返回结果卡片 JSON 和结果文本
-func (c *RemindCard) Handle(ctx context.Context, action, token string) (string, string, error) {
+func (c *RemindCard) Handle(ctx context.Context, actionValue map[string]any) (string, string, error) {
+	actionVal, err := parseActionValue[RemindActionValue](actionValue)
+	if err != nil {
+		return "", "", fmt.Errorf("解析actionValue失败: %w", err)
+	}
+
 	// 解密 token 获取提醒 ID
-	id, err := aesutil.AesDecode(c.conf.Common.TokenSecret, token)
+	id, err := aesutil.AesDecode(c.conf.Common.TokenSecret, actionVal.Token)
 	if err != nil {
 		return "", "", fmt.Errorf("token错误: %w", err)
 	}
@@ -65,7 +76,7 @@ func (c *RemindCard) Handle(ctx context.Context, action, token string) (string, 
 	}
 
 	var resultText string
-	switch action {
+	switch actionVal.Action {
 	case "remind_completed":
 		resultText, err = c.handleChange(ctx, remind)
 	case "remind_later":

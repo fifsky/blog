@@ -77,27 +77,15 @@ func (b *Bot) Start(ctx context.Context) {
 }
 
 // handleCardAction handles card button callback actions.
-// 逻辑固定不变：解析 action/token -> 委托 registry 分发 -> 返回结果卡片。
-// 新增卡片类型只需实现 ActionHandler 并在 NewBot 中注册，无需修改此方法。
+// 逻辑固定不变：委托 registry 分发 -> 返回结果卡片。
+// 新增卡片类型只需实现 CardHandler 并在注册表中注册，无需修改此方法。
 func (b *Bot) handleCardAction(ctx context.Context, event *callback.CardActionTriggerEvent) (*callback.CardActionTriggerResponse, error) {
 	actionValue := event.Event.Action.Value
 	if actionValue == nil {
 		return nil, nil
 	}
 
-	actionKey, ok := actionValue["action"].(string)
-	if !ok {
-		return nil, nil
-	}
-
-	token, ok := actionValue["token"].(string)
-	if !ok {
-		return nil, nil
-	}
-
-	fmt.Printf("[Feishu Bot] Card action: %s, token: %s\n", actionKey, token)
-
-	cardJSON, resultText, err := b.registry.Handle(ctx, actionKey, token)
+	cardJSON, resultText, err := b.registry.Handle(ctx, actionValue)
 	if err != nil {
 		return nil, err
 	}
