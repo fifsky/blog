@@ -32,6 +32,7 @@ type RemindItem struct {
 	xxx_hidden_Status    int32                  `protobuf:"varint,9,opt,name=status,proto3"`
 	xxx_hidden_NextTime  string                 `protobuf:"bytes,10,opt,name=next_time,json=nextTime,proto3"`
 	xxx_hidden_CreatedAt string                 `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3"`
+	xxx_hidden_UpdatedAt string                 `protobuf:"bytes,12,opt,name=updated_at,json=updatedAt,proto3"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -103,6 +104,13 @@ func (x *RemindItem) GetCreatedAt() string {
 	return ""
 }
 
+func (x *RemindItem) GetUpdatedAt() string {
+	if x != nil {
+		return x.xxx_hidden_UpdatedAt
+	}
+	return ""
+}
+
 func (x *RemindItem) SetId(v int32) {
 	x.xxx_hidden_Id = v
 }
@@ -127,6 +135,10 @@ func (x *RemindItem) SetCreatedAt(v string) {
 	x.xxx_hidden_CreatedAt = v
 }
 
+func (x *RemindItem) SetUpdatedAt(v string) {
+	x.xxx_hidden_UpdatedAt = v
+}
+
 type RemindItem_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
@@ -136,6 +148,7 @@ type RemindItem_builder struct {
 	Status    int32
 	NextTime  string
 	CreatedAt string
+	UpdatedAt string
 }
 
 func (b0 RemindItem_builder) Build() *RemindItem {
@@ -148,6 +161,7 @@ func (b0 RemindItem_builder) Build() *RemindItem {
 	x.xxx_hidden_Status = b.Status
 	x.xxx_hidden_NextTime = b.NextTime
 	x.xxx_hidden_CreatedAt = b.CreatedAt
+	x.xxx_hidden_UpdatedAt = b.UpdatedAt
 	return m0
 }
 
@@ -500,7 +514,7 @@ var File_admin_v1_remind_proto protoreflect.FileDescriptor
 
 const file_admin_v1_remind_proto_rawDesc = "" +
 	"\n" +
-	"\x15admin/v1/remind.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"\x9e\x01\n" +
+	"\x15admin/v1/remind.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"\xbd\x01\n" +
 	"\n" +
 	"RemindItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
@@ -510,7 +524,9 @@ const file_admin_v1_remind_proto_rawDesc = "" +
 	"\tnext_time\x18\n" +
 	" \x01(\tR\bnextTime\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\v \x01(\tR\tcreatedAt\"0\n" +
+	"created_at\x18\v \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\f \x01(\tR\tupdatedAt\"0\n" +
 	"\x11RemindListRequest\x12\x1b\n" +
 	"\x04page\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02 \x00R\x04page\"1\n" +
 	"\x13RemindDeleteRequest\x12\x1a\n" +

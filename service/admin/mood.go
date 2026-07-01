@@ -28,6 +28,7 @@ func (m *Mood) Create(ctx context.Context, req *adminv1.MoodCreateRequest) (*typ
 		Content:   req.GetContent(),
 		UserId:    loginUser.Id,
 		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 	lastId, err := m.store.CreateMood(ctx, c)
 	if err != nil {

@@ -90,6 +90,7 @@ type LinkItem struct {
 	xxx_hidden_Desc      string                 `protobuf:"bytes,4,opt,name=desc,proto3"`
 	xxx_hidden_CreatedAt string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3"`
 	xxx_hidden_Status    string                 `protobuf:"bytes,6,opt,name=status,proto3"`
+	xxx_hidden_UpdatedAt string                 `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt,proto3"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -161,6 +162,13 @@ func (x *LinkItem) GetStatus() string {
 	return ""
 }
 
+func (x *LinkItem) GetUpdatedAt() string {
+	if x != nil {
+		return x.xxx_hidden_UpdatedAt
+	}
+	return ""
+}
+
 func (x *LinkItem) SetId(v int32) {
 	x.xxx_hidden_Id = v
 }
@@ -185,6 +193,10 @@ func (x *LinkItem) SetStatus(v string) {
 	x.xxx_hidden_Status = v
 }
 
+func (x *LinkItem) SetUpdatedAt(v string) {
+	x.xxx_hidden_UpdatedAt = v
+}
+
 type LinkItem_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
@@ -194,6 +206,7 @@ type LinkItem_builder struct {
 	Desc      string
 	CreatedAt string
 	Status    string
+	UpdatedAt string
 }
 
 func (b0 LinkItem_builder) Build() *LinkItem {
@@ -206,6 +219,7 @@ func (b0 LinkItem_builder) Build() *LinkItem {
 	x.xxx_hidden_Desc = b.Desc
 	x.xxx_hidden_CreatedAt = b.CreatedAt
 	x.xxx_hidden_Status = b.Status
+	x.xxx_hidden_UpdatedAt = b.UpdatedAt
 	return m0
 }
 
@@ -545,7 +559,7 @@ const file_admin_v1_link_proto_rawDesc = "" +
 	"\x13admin/v1/link.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\"/\n" +
 	"\x11LinkDeleteRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
-	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"\x8b\x01\n" +
+	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\"\xaa\x01\n" +
 	"\bLinkItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x10\n" +
@@ -553,7 +567,9 @@ const file_admin_v1_link_proto_rawDesc = "" +
 	"\x04desc\x18\x04 \x01(\tR\x04desc\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\x05 \x01(\tR\tcreatedAt\x12\x16\n" +
-	"\x06status\x18\x06 \x01(\tR\x06status\"S\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\a \x01(\tR\tupdatedAt\"S\n" +
 	"\x12LinkApproveRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\x12!\n" +

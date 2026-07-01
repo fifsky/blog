@@ -42,6 +42,7 @@ message LinkItem {
   string url = 3;
   string desc = 4;
   string created_at = 5;
+  string updated_at = 6;
 }
 
 message LinkListResponse {

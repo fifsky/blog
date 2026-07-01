@@ -161,6 +161,7 @@ type LinkItem struct {
 	xxx_hidden_Url       string                 `protobuf:"bytes,3,opt,name=url,proto3"`
 	xxx_hidden_Desc      string                 `protobuf:"bytes,4,opt,name=desc,proto3"`
 	xxx_hidden_CreatedAt string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3"`
+	xxx_hidden_UpdatedAt string                 `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -225,6 +226,13 @@ func (x *LinkItem) GetCreatedAt() string {
 	return ""
 }
 
+func (x *LinkItem) GetUpdatedAt() string {
+	if x != nil {
+		return x.xxx_hidden_UpdatedAt
+	}
+	return ""
+}
+
 func (x *LinkItem) SetId(v int32) {
 	x.xxx_hidden_Id = v
 }
@@ -245,6 +253,10 @@ func (x *LinkItem) SetCreatedAt(v string) {
 	x.xxx_hidden_CreatedAt = v
 }
 
+func (x *LinkItem) SetUpdatedAt(v string) {
+	x.xxx_hidden_UpdatedAt = v
+}
+
 type LinkItem_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
@@ -253,6 +265,7 @@ type LinkItem_builder struct {
 	Url       string
 	Desc      string
 	CreatedAt string
+	UpdatedAt string
 }
 
 func (b0 LinkItem_builder) Build() *LinkItem {
@@ -264,6 +277,7 @@ func (b0 LinkItem_builder) Build() *LinkItem {
 	x.xxx_hidden_Url = b.Url
 	x.xxx_hidden_Desc = b.Desc
 	x.xxx_hidden_CreatedAt = b.CreatedAt
+	x.xxx_hidden_UpdatedAt = b.UpdatedAt
 	return m0
 }
 
@@ -435,14 +449,16 @@ const file_api_v1_link_proto_rawDesc = "" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x18\n" +
 	"\acontent\x18\x02 \x01(\tR\acontent\"H\n" +
 	"\x10LinkMenuResponse\x124\n" +
-	"\x04list\x18\x01 \x03(\v2 .fifsky.blog.api.v1.LinkMenuItemR\x04list\"s\n" +
+	"\x04list\x18\x01 \x03(\v2 .fifsky.blog.api.v1.LinkMenuItemR\x04list\"\x92\x01\n" +
 	"\bLinkItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x10\n" +
 	"\x03url\x18\x03 \x01(\tR\x03url\x12\x12\n" +
 	"\x04desc\x18\x04 \x01(\tR\x04desc\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\tR\tcreatedAt\"Z\n" +
+	"created_at\x18\x05 \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\x06 \x01(\tR\tupdatedAt\"Z\n" +
 	"\x10LinkListResponse\x120\n" +
 	"\x04list\x18\x01 \x03(\v2\x1c.fifsky.blog.api.v1.LinkItemR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\"c\n" +

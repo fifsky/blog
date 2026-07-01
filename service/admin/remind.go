@@ -37,7 +37,8 @@ func (r *Remind) List(ctx context.Context, req *adminv1.RemindListRequest) (*adm
 			Content:   v.Content,
 			Status:    int32(v.Status),
 			NextTime:  v.NextTime.Format(time.DateTime),
-			CreatedAt: v.CreatedAt.Format(time.DateTime)}.Build(),
+			CreatedAt: v.CreatedAt.Format(time.DateTime),
+			UpdatedAt: v.UpdatedAt.Format(time.DateTime)}.Build(),
 		)
 	}
 	total, err := r.store.CountRemindTotal(ctx)
@@ -55,6 +56,7 @@ func (r *Remind) Create(ctx context.Context, req *adminv1.RemindCreateRequest) (
 		Content:   req.GetContent(),
 		Status:    1,
 		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 	c.NextTime = remindutil.NextTimeFromRule(c.CreatedAt, c)
 

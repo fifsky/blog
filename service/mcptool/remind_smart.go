@@ -82,6 +82,7 @@ func SmartCreateRemind(ctx context.Context, aiClient openai.Client, aiModel stri
 		Content:   finalContent,
 		Status:    1,
 		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 	insert.NextTime = remindutil.NextTimeFromRule(insert.CreatedAt, insert)
 

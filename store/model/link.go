@@ -15,6 +15,7 @@ type Link struct {
 	Desc      string
 	Status    string
 	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type UpdateLink struct {

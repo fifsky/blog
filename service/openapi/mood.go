@@ -60,7 +60,8 @@ func (m *Mood) Random(ctx context.Context, _ *emptypb.Empty) (*apiv1.MoodItem, e
 	um, _ := m.store.GetUserByIds(ctx, []int{md.UserId})
 	item := apiv1.MoodItem_builder{Id: int32(md.Id),
 		Content:   md.Content,
-		CreatedAt: md.CreatedAt.Format(time.DateTime)}.Build()
+		CreatedAt: md.CreatedAt.Format(time.DateTime),
+		UpdatedAt: md.UpdatedAt.Format(time.DateTime)}.Build()
 
 	if u, ok := um[md.UserId]; ok {
 		item.SetUser(types.UserSummary_builder{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}.Build())

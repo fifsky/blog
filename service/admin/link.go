@@ -34,7 +34,8 @@ func (l *Link) List(ctx context.Context, _ *emptypb.Empty) (*adminv1.LinkListRes
 			Url:       v.Url,
 			Desc:      v.Desc,
 			Status:    v.Status,
-			CreatedAt: v.CreatedAt.Format(time.DateTime)}.Build(),
+			CreatedAt: v.CreatedAt.Format(time.DateTime),
+			UpdatedAt: v.UpdatedAt.Format(time.DateTime)}.Build(),
 		)
 	}
 	return adminv1.LinkListResponse_builder{List: items,
@@ -49,6 +50,7 @@ func (l *Link) Create(ctx context.Context, req *adminv1.LinkCreateRequest) (*typ
 		Desc:      req.GetDesc(),
 		Status:    model.LinkStatusPending,
 		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 	lastId, err := l.store.CreateLink(ctx, m)
 	if err != nil {

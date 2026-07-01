@@ -146,6 +146,7 @@ type RemindItem struct {
 	xxx_hidden_Status    int32                  `protobuf:"varint,9,opt,name=status,proto3"`
 	xxx_hidden_NextTime  string                 `protobuf:"bytes,10,opt,name=next_time,json=nextTime,proto3"`
 	xxx_hidden_CreatedAt string                 `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3"`
+	xxx_hidden_UpdatedAt string                 `protobuf:"bytes,12,opt,name=updated_at,json=updatedAt,proto3"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -217,6 +218,13 @@ func (x *RemindItem) GetCreatedAt() string {
 	return ""
 }
 
+func (x *RemindItem) GetUpdatedAt() string {
+	if x != nil {
+		return x.xxx_hidden_UpdatedAt
+	}
+	return ""
+}
+
 func (x *RemindItem) SetId(v int32) {
 	x.xxx_hidden_Id = v
 }
@@ -241,6 +249,10 @@ func (x *RemindItem) SetCreatedAt(v string) {
 	x.xxx_hidden_CreatedAt = v
 }
 
+func (x *RemindItem) SetUpdatedAt(v string) {
+	x.xxx_hidden_UpdatedAt = v
+}
+
 type RemindItem_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
@@ -250,6 +262,7 @@ type RemindItem_builder struct {
 	Status    int32
 	NextTime  string
 	CreatedAt string
+	UpdatedAt string
 }
 
 func (b0 RemindItem_builder) Build() *RemindItem {
@@ -262,6 +275,7 @@ func (b0 RemindItem_builder) Build() *RemindItem {
 	x.xxx_hidden_Status = b.Status
 	x.xxx_hidden_NextTime = b.NextTime
 	x.xxx_hidden_CreatedAt = b.CreatedAt
+	x.xxx_hidden_UpdatedAt = b.UpdatedAt
 	return m0
 }
 
@@ -346,7 +360,7 @@ const file_api_v1_remind_proto_rawDesc = "" +
 	"\x13RemindActionRequest\x12\x1f\n" +
 	"\x05token\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x05token\"\"\n" +
 	"\fTextResponse\x12\x12\n" +
-	"\x04text\x18\x01 \x01(\tR\x04text\"\x9e\x01\n" +
+	"\x04text\x18\x01 \x01(\tR\x04text\"\xbd\x01\n" +
 	"\n" +
 	"RemindItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
@@ -356,7 +370,9 @@ const file_api_v1_remind_proto_rawDesc = "" +
 	"\tnext_time\x18\n" +
 	" \x01(\tR\bnextTime\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\v \x01(\tR\tcreatedAt\"^\n" +
+	"created_at\x18\v \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\f \x01(\tR\tupdatedAt\"^\n" +
 	"\x12RemindListResponse\x122\n" +
 	"\x04list\x18\x01 \x03(\v2\x1e.fifsky.blog.api.v1.RemindItemR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05totalB\xac\x01\n" +

@@ -212,6 +212,7 @@ export type MoodItem = {
   content: string;
   user: UserSummary;
   created_at: string;
+  updated_at: string;
 };
 export type MoodListResponse = { list: MoodItem[]; total: number };
 export type MoodCreateRequest = { content: string };
@@ -227,6 +228,7 @@ export type LinkItem = {
   desc?: string;
   status: string;
   created_at: string;
+  updated_at: string;
 };
 export type LinkListResponse = { list: LinkItem[]; total: number };
 export type PrevNextRequest = { id: number };
@@ -237,6 +239,7 @@ export type RemindItem = {
   status: number;
   next_time: string;
   created_at: string;
+  updated_at: string;
 };
 export type RemindListResponse = { list: RemindItem[]; total: number };
 export type Status = {

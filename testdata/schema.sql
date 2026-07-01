@@ -4,15 +4,15 @@
 DROP TABLE IF EXISTS `cates`;
 
 CREATE TABLE `cates` (
-                         `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                         `name` varchar(100) NOT NULL DEFAULT '',
-                         `desc` varchar(255) NOT NULL DEFAULT '',
-                         `domain` varchar(100) NOT NULL DEFAULT '',
-                         `created_at` datetime NOT NULL,
-                         `updated_at` datetime NOT NULL,
-                         PRIMARY KEY (`id`),
-                         UNIQUE KEY `un_domain` (`domain`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '文章分类表';
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
+  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '分类名称',
+  `desc` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '分类描述',
+  `domain` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '分类域名path',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `un_domain` (`domain`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '文章分类表';
 
 # Dump of table links
 # ------------------------------------------------------------
@@ -20,14 +20,15 @@ CREATE TABLE `cates` (
 DROP TABLE IF EXISTS `links`;
 
 CREATE TABLE `links` (
-                         `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                         `name` varchar(100) NOT NULL DEFAULT '',
-                         `url` varchar(200) NOT NULL DEFAULT '',
-                         `desc` varchar(255) NOT NULL DEFAULT '',
-                         `status` varchar(64) NOT NULL DEFAULT 'PENDING' COMMENT '状态:PENDING审核中,APPROVED审核通过',
-                         `created_at` datetime NOT NULL,
-                         PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '友情链接表';
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
+  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '链接名称',
+  `url` varchar(200) COLLATE utf8mb4_general_ci NOT NULL COMMENT '链接地址',
+  `desc` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '链接描述',
+  `status` varchar(64) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'PENDING' COMMENT '状态:PENDING审核中,APPROVED审核通过',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '友情链接表';
 
 # Dump of table moods
 # ------------------------------------------------------------
@@ -38,7 +39,8 @@ CREATE TABLE `moods` (
                          `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
                          `content` varchar(2048) NOT NULL DEFAULT '',
                          `user_id` int(10) unsigned NOT NULL,
-                         `created_at` datetime NOT NULL,
+                         `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                         `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                          PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '心情表';
 
@@ -48,12 +50,12 @@ CREATE TABLE `moods` (
 DROP TABLE IF EXISTS `options`;
 
 CREATE TABLE `options` (
-                           `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-                           `option_key` varchar(100) NOT NULL DEFAULT '',
-                           `option_value` varchar(200) NOT NULL DEFAULT '',
-                           PRIMARY KEY (`id`),
-                           UNIQUE KEY `un_option_key` (`option_key`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '配置表';
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
+  `option_key` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置项唯一key',
+  `option_value` varchar(2048) COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置内容',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `option_name` (`option_key`) USING BTREE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '配置表';
 
 # Dump of table posts
 # ------------------------------------------------------------
@@ -71,8 +73,8 @@ CREATE TABLE `posts` (
   `view_num` int NOT NULL DEFAULT '1' COMMENT '浏览次数',
   `tags` json DEFAULT NULL COMMENT '文章标签',
   `status` int NOT NULL DEFAULT '1' COMMENT '状态，1正常 2删除 3草稿',
-  `created_at` datetime NOT NULL COMMENT '创建时间',
-  `updated_at` datetime NOT NULL COMMENT '更新时间',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   KEY `idx_user` (`user_id`),
   KEY `idx_url` (`url`),
@@ -85,18 +87,15 @@ CREATE TABLE `posts` (
 DROP TABLE IF EXISTS `comments`;
 
 CREATE TABLE `comments` (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
   `post_id` int NOT NULL COMMENT '文章PID',
   `pid` int NOT NULL COMMENT '回复评论ID',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '名称',
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `website` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `reply_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '被回复人昵称',
   `content` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '内容',
   `ip` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'IP',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '评论时间',
   PRIMARY KEY (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '评论表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '文章评论表';
 
 # Dump of table users
 # ------------------------------------------------------------
@@ -113,8 +112,8 @@ CREATE TABLE `users` (
                          `type` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '1:管理员,2:编辑',
                          `totp_secret` varchar(64) NOT NULL DEFAULT '',
                          `openid` varchar(256) COLLATE utf8mb4_general_ci NOT NULL COMMENT '小程序openid',
-                         `created_at` datetime NOT NULL,
-                         `updated_at` datetime NOT NULL,
+                         `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                         `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                          PRIMARY KEY (`id`),
                          UNIQUE KEY `un_user_name` (`name`),
                          UNIQUE KEY `un_users_email` (`email`)
@@ -126,14 +125,15 @@ CREATE TABLE `users` (
 DROP TABLE IF EXISTS `reminds`;
 
 CREATE TABLE `reminds` (
-                           `id` int unsigned NOT NULL AUTO_INCREMENT,
-                           `cron` varchar(255) NOT NULL DEFAULT '' COMMENT 'cron表达式或固定时间',
-                           `content` varchar(255) NOT NULL DEFAULT '' COMMENT '内容',
-                           `created_at` datetime NOT NULL COMMENT '创建时间',
-                           `status` int NOT NULL DEFAULT '1',
-                           `next_time` datetime NOT NULL COMMENT '下次提醒时间',
-                           PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '提醒表';
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
+  `cron` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'cron表达式或固定时间',
+  `content` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '提醒内容',
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  `next_time` datetime NOT NULL COMMENT '下次提醒时间',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB AUTO_INCREMENT = 2 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '提醒表';
 
 
 CREATE TABLE `regions` (
@@ -156,7 +156,7 @@ CREATE TABLE `guestbook` (
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '内容',
   `ip` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'IP',
   `top` int NOT NULL DEFAULT '0' COMMENT '1置顶',
-  `created_at` datetime NOT NULL COMMENT '留言时间',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '留言时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = 'windiness 留言本';
 

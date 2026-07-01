@@ -53,6 +53,7 @@ func NewMoodHandler(s *store.Store) http.Handler {
 			Content:   input.Content,
 			UserId:    1, // 默认用户ID
 			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 		}
 		lastID, err := s.CreateMood(ctx, md)
 		if err != nil {

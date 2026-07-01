@@ -63,6 +63,7 @@ message LinkItem {
   string desc = 4;
   string created_at = 5;
   string status = 6;
+  string updated_at = 7;
 }
 
 // LinkApproveRequest 审核链接请求

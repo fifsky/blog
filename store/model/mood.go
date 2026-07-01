@@ -7,6 +7,7 @@ type Mood struct {
 	Content   string
 	UserId    int
 	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type UserMood struct {

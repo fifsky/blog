@@ -88,6 +88,7 @@ type MoodItem struct {
 	xxx_hidden_Content   string                 `protobuf:"bytes,2,opt,name=content,proto3"`
 	xxx_hidden_User      *types.UserSummary     `protobuf:"bytes,3,opt,name=user,proto3"`
 	xxx_hidden_CreatedAt string                 `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3"`
+	xxx_hidden_UpdatedAt string                 `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,proto3"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -145,6 +146,13 @@ func (x *MoodItem) GetCreatedAt() string {
 	return ""
 }
 
+func (x *MoodItem) GetUpdatedAt() string {
+	if x != nil {
+		return x.xxx_hidden_UpdatedAt
+	}
+	return ""
+}
+
 func (x *MoodItem) SetId(v int32) {
 	x.xxx_hidden_Id = v
 }
@@ -159,6 +167,10 @@ func (x *MoodItem) SetUser(v *types.UserSummary) {
 
 func (x *MoodItem) SetCreatedAt(v string) {
 	x.xxx_hidden_CreatedAt = v
+}
+
+func (x *MoodItem) SetUpdatedAt(v string) {
+	x.xxx_hidden_UpdatedAt = v
 }
 
 func (x *MoodItem) HasUser() bool {
@@ -179,6 +191,7 @@ type MoodItem_builder struct {
 	Content   string
 	User      *types.UserSummary
 	CreatedAt string
+	UpdatedAt string
 }
 
 func (b0 MoodItem_builder) Build() *MoodItem {
@@ -189,6 +202,7 @@ func (b0 MoodItem_builder) Build() *MoodItem {
 	x.xxx_hidden_Content = b.Content
 	x.xxx_hidden_User = b.User
 	x.xxx_hidden_CreatedAt = b.CreatedAt
+	x.xxx_hidden_UpdatedAt = b.UpdatedAt
 	return m0
 }
 
@@ -271,13 +285,15 @@ const file_api_v1_mood_proto_rawDesc = "" +
 	"\n" +
 	"\x11api/v1/mood.proto\x12\x12fifsky.blog.api.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x12types/common.proto\".\n" +
 	"\x0fMoodListRequest\x12\x1b\n" +
-	"\x04page\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02 \x00R\x04page\"\x87\x01\n" +
+	"\x04page\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02 \x00R\x04page\"\xa6\x01\n" +
 	"\bMoodItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x18\n" +
 	"\acontent\x18\x02 \x01(\tR\acontent\x122\n" +
 	"\x04user\x18\x03 \x01(\v2\x1e.fifsky.blog.types.UserSummaryR\x04user\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x04 \x01(\tR\tcreatedAt\"Z\n" +
+	"created_at\x18\x04 \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\x05 \x01(\tR\tupdatedAt\"Z\n" +
 	"\x10MoodListResponse\x120\n" +
 	"\x04list\x18\x01 \x03(\v2\x1c.fifsky.blog.api.v1.MoodItemR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total2\xda\x01\n" +

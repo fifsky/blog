@@ -37,6 +37,7 @@ message MoodItem {
   string content = 2;
   fifsky.blog.types.UserSummary user = 3;
   string created_at = 4;
+  string updated_at = 5;
 }
 
 message MoodListResponse {

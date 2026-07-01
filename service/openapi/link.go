@@ -56,6 +56,7 @@ func (l *Link) Submit(ctx context.Context, req *apiv1.LinkSubmitRequest) (*empty
 		Desc:      req.GetDesc(),
 		Status:    model.LinkStatusPending,
 		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 	id, err := l.store.CreateLink(ctx, m)
 	if err != nil {

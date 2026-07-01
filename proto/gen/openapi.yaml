@@ -2141,6 +2141,8 @@ components:
                     type: string
                 created_at:
                     type: string
+                updated_at:
+                    type: string
         LinkListResponse:
             type: object
             properties:
@@ -2258,6 +2260,8 @@ components:
                     $ref: '#/components/schemas/UserSummary'
                 created_at:
                     type: string
+                updated_at:
+                    type: string
         MoodListRequest:
             type: object
             properties:
@@ -2344,6 +2348,8 @@ components:
                 next_time:
                     type: string
                 created_at:
+                    type: string
+                updated_at:
                     type: string
         RemindListRequest:
             type: object

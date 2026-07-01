@@ -9,6 +9,7 @@ type Remind struct {
 	Status    int
 	NextTime  time.Time
 	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type UpdateRemind struct {
