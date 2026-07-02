@@ -1,8 +1,3 @@
-# Dump of table cates
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `cates`;
-
 CREATE TABLE `cates` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
   `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '分类名称',
@@ -13,11 +8,6 @@ CREATE TABLE `cates` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `un_domain` (`domain`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '文章分类表';
-
-# Dump of table links
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `links`;
 
 CREATE TABLE `links` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
@@ -30,24 +20,14 @@ CREATE TABLE `links` (
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '友情链接表';
 
-# Dump of table moods
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `moods`;
-
 CREATE TABLE `moods` (
-                         `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-                         `content` varchar(2048) NOT NULL DEFAULT '',
-                         `user_id` int(10) unsigned NOT NULL,
-                         `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                         `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                         PRIMARY KEY (`id`)
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `content` varchar(2048) NOT NULL DEFAULT '',
+  `user_id` int(10) unsigned NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '心情表';
-
-# Dump of table options
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `options`;
 
 CREATE TABLE `options` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
@@ -56,11 +36,6 @@ CREATE TABLE `options` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `option_name` (`option_key`) USING BTREE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '配置表';
-
-# Dump of table posts
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `posts`;
 
 CREATE TABLE `posts` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'PK',
@@ -82,10 +57,6 @@ CREATE TABLE `posts` (
   KEY `idx_updated_at` (`updated_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '文章表';
 
-# Dump of table comments
-# ------------------------------------------------------------
-DROP TABLE IF EXISTS `comments`;
-
 CREATE TABLE `comments` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
   `post_id` int NOT NULL COMMENT '文章PID',
@@ -100,32 +71,24 @@ CREATE TABLE `comments` (
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 16 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '文章评论表';
 
-# Dump of table users
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
-                         `id` int unsigned NOT NULL AUTO_INCREMENT,
-                         `name` varchar(100) NOT NULL DEFAULT '用户名',
-                         `password` varchar(100) NOT NULL DEFAULT '密码',
-                         `nick_name` varchar(100) NOT NULL DEFAULT '昵称',
-                         `email` varchar(100) NOT NULL DEFAULT '邮箱',
-                         `status` varchar(64) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'ACTIVE' COMMENT '状态:ACTIVE正常,DELETED删除',
-                         `type` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '1:管理员,2:编辑',
-                         `totp_secret` varchar(64) NOT NULL DEFAULT '',
-                         `openid` varchar(256) COLLATE utf8mb4_general_ci NOT NULL COMMENT '小程序openid',
-                         `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                         `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                         PRIMARY KEY (`id`),
-                         UNIQUE KEY `un_user_name` (`name`),
-                         UNIQUE KEY `un_users_email` (`email`)
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL DEFAULT '用户名',
+  `password` varchar(100) NOT NULL DEFAULT '密码',
+  `nick_name` varchar(100) NOT NULL DEFAULT '昵称',
+  `email` varchar(100) NOT NULL DEFAULT '邮箱',
+  `status` varchar(64) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'ACTIVE' COMMENT '状态:ACTIVE正常,DELETED删除',
+  `type` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '1:管理员,2:编辑',
+  `totp_secret` varchar(64) NOT NULL DEFAULT '',
+  `openid` varchar(256) COLLATE utf8mb4_general_ci NOT NULL COMMENT '小程序openid',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `un_user_name` (`name`),
+  UNIQUE KEY `un_users_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '用户表';
 
-# Dump of table reminds
-# ------------------------------------------------------------
-
-DROP TABLE IF EXISTS `reminds`;
 
 CREATE TABLE `reminds` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
