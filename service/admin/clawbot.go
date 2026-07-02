@@ -516,7 +516,7 @@ func splitLongOption(baseKey, chunkKey, value string) (map[string]string, error)
 		return values, nil
 	}
 	if len(value) > clawBotOptionValueLimit*clawBotTokenChunkCount {
-		return nil, fmt.Errorf("clawbot option value is too long")
+		return nil, apperrors.BadRequest("CLAWBOT_OPTION_TOO_LONG", "clawbot option value is too long")
 	}
 
 	for index, start := 0, 0; start < len(value); index, start = index+1, start+clawBotOptionValueLimit {

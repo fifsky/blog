@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	apperrors "app/pkg/errors"
 	"app/pkg/remindutil"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
@@ -62,7 +63,7 @@ func (r *Remind) Create(ctx context.Context, req *adminv1.RemindCreateRequest) (
 
 	// 如果由于解析失败等原因获取到了零值，返回错误，不存入数据库
 	if c.NextTime.IsZero() {
-		return nil, fmt.Errorf("无效的 Cron 表达式或时间格式: %s", req.GetCron())
+		return nil, apperrors.BadRequest("INVALID_CRON", fmt.Sprintf("无效的 Cron 表达式或时间格式: %s", req.GetCron()))
 	}
 
 	lastId, err := r.store.CreateRemind(ctx, c)
@@ -83,6 +84,10 @@ func (r *Remind) Update(ctx context.Context, req *adminv1.RemindUpdateRequest) (
 		v := req.GetContent()
 		u.Content = &v
 	}
+	if req.GetStatus() != "" {
+		v := model.RemindStatus(req.GetStatus())
+		u.Status = &v
+	}
 
 	nextTime := remindutil.NextTimeFromRule(time.Now(), &model.Remind{
 		Cron:      req.GetCron(),
@@ -91,7 +96,7 @@ func (r *Remind) Update(ctx context.Context, req *adminv1.RemindUpdateRequest) (
 
 	// 更新时如果包含了 Cron，则校验有效性
 	if req.GetCron() != "" && nextTime.IsZero() {
-		return nil, fmt.Errorf("无效的 Cron 表达式或时间格式: %s", req.GetCron())
+		return nil, apperrors.BadRequest("INVALID_CRON", fmt.Sprintf("无效的 Cron 表达式或时间格式: %s", req.GetCron()))
 	}
 
 	u.NextTime = &nextTime

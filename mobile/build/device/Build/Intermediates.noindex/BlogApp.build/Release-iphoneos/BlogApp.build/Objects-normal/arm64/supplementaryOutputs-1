@@ -1,0 +1,12 @@
+{
+  "/Users/fifsky/wwwroot/github.com/fifsky/blog/mobile/App/Config.swift" : {
+    "abi-baseline-json" : "/Users/fifsky/wwwroot/github.com/fifsky/blog/mobile/build/device/Build/Intermediates.noindex/BlogApp.build/Release-iphoneos/BlogApp.build/Objects-normal/arm64/BlogApp.abi.json",
+    "const-values" : "/Users/fifsky/wwwroot/github.com/fifsky/blog/mobile/build/device/Build/Intermediates.noindex/BlogApp.build/Release-iphoneos/BlogApp.build/Objects-normal/arm64/BlogApp-primary.swiftconstvalues",
+    "dependencies" : "/Users/fifsky/wwwroot/github.com/fifsky/blog/mobile/build/device/Build/Intermediates.noindex/BlogApp.build/Release-iphoneos/BlogApp.build/Objects-normal/arm64/BlogApp-primary.d",
+    "diagnostics" : "/Users/fifsky/wwwroot/github.com/fifsky/blog/mobile/build/device/Build/Intermediates.noindex/BlogApp.build/Release-iphoneos/BlogApp.build/Objects-normal/arm64/BlogApp-primary.dia",
+    "objc-header" : "/Users/fifsky/wwwroot/github.com/fifsky/blog/mobile/build/device/Build/Intermediates.noindex/BlogApp.build/Release-iphoneos/BlogApp.build/Objects-normal/arm64/BlogApp-Swift.h",
+    "swiftdoc" : "/Users/fifsky/wwwroot/github.com/fifsky/blog/mobile/build/device/Build/Intermediates.noindex/BlogApp.build/Release-iphoneos/BlogApp.build/Objects-normal/arm64/BlogApp.swiftdoc",
+    "swiftmodule" : "/Users/fifsky/wwwroot/github.com/fifsky/blog/mobile/build/device/Build/Intermediates.noindex/BlogApp.build/Release-iphoneos/BlogApp.build/Objects-normal/arm64/BlogApp.swiftmodule",
+    "swiftsourceinfo" : "/Users/fifsky/wwwroot/github.com/fifsky/blog/mobile/build/device/Build/Intermediates.noindex/BlogApp.build/Release-iphoneos/BlogApp.build/Objects-normal/arm64/BlogApp.swiftsourceinfo"
+  }
+}

@@ -24,6 +24,7 @@ message GetPresignURLRequest {
     (buf.validate.field).required = true,
     (google.api.field_behavior) = REQUIRED
   ];
+  string content_type = 2;
 }
 
 // GetPresignURLResponse 预签名URL响应

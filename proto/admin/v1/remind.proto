@@ -83,4 +83,5 @@ message RemindUpdateRequest {
   ];
   string cron = 2;
   string content = 3;
+  string status = 4;
 }

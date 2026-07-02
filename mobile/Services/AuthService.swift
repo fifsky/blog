@@ -1,0 +1,14 @@
+import Foundation
+
+// AuthService 认证服务，处理用户登录相关接口
+class AuthService {
+    static let shared = AuthService()
+
+    private init() {}
+
+    // 登录接口
+    func login(userName: String, password: String, totpCode: String? = nil) async throws -> LoginResponse {
+        let request = LoginRequest(user_name: userName, password: password, totp_code: totpCode)
+        return try await APIClient.shared.request(path: "/blog/login", body: request)
+    }
+}

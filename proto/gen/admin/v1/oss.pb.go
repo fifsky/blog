@@ -24,10 +24,11 @@ const (
 
 // GetPresignURLRequest 获取预签名URL请求
 type GetPresignURLRequest struct {
-	state               protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Filename string                 `protobuf:"bytes,1,opt,name=filename,proto3"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Filename    string                 `protobuf:"bytes,1,opt,name=filename,proto3"`
+	xxx_hidden_ContentType string                 `protobuf:"bytes,2,opt,name=content_type,json=contentType,proto3"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *GetPresignURLRequest) Reset() {
@@ -62,14 +63,26 @@ func (x *GetPresignURLRequest) GetFilename() string {
 	return ""
 }
 
+func (x *GetPresignURLRequest) GetContentType() string {
+	if x != nil {
+		return x.xxx_hidden_ContentType
+	}
+	return ""
+}
+
 func (x *GetPresignURLRequest) SetFilename(v string) {
 	x.xxx_hidden_Filename = v
+}
+
+func (x *GetPresignURLRequest) SetContentType(v string) {
+	x.xxx_hidden_ContentType = v
 }
 
 type GetPresignURLRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	Filename string
+	Filename    string
+	ContentType string
 }
 
 func (b0 GetPresignURLRequest_builder) Build() *GetPresignURLRequest {
@@ -77,6 +90,7 @@ func (b0 GetPresignURLRequest_builder) Build() *GetPresignURLRequest {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Filename = b.Filename
+	x.xxx_hidden_ContentType = b.ContentType
 	return m0
 }
 
@@ -156,9 +170,10 @@ var File_admin_v1_oss_proto protoreflect.FileDescriptor
 
 const file_admin_v1_oss_proto_rawDesc = "" +
 	"\n" +
-	"\x12admin/v1/oss.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\"=\n" +
+	"\x12admin/v1/oss.proto\x12\x14fifsky.blog.admin.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\"`\n" +
 	"\x14GetPresignURLRequest\x12%\n" +
-	"\bfilename\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\bfilename\"B\n" +
+	"\bfilename\x18\x01 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\bfilename\x12!\n" +
+	"\fcontent_type\x18\x02 \x01(\tR\vcontentType\"B\n" +
 	"\x15GetPresignURLResponse\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x17\n" +
 	"\acdn_url\x18\x02 \x01(\tR\x06cdnUrl2\x9b\x01\n" +

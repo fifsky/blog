@@ -2003,6 +2003,8 @@ components:
             properties:
                 filename:
                     type: string
+                content_type:
+                    type: string
             description: GetPresignURLRequest 获取预签名URL请求
         GetPresignURLResponse:
             type: object
@@ -2382,6 +2384,8 @@ components:
                 cron:
                     type: string
                 content:
+                    type: string
+                status:
                     type: string
         Setting:
             type: object

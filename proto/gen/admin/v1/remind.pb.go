@@ -430,6 +430,7 @@ type RemindUpdateRequest struct {
 	xxx_hidden_Id      int32                  `protobuf:"varint,1,opt,name=id,proto3"`
 	xxx_hidden_Cron    string                 `protobuf:"bytes,2,opt,name=cron,proto3"`
 	xxx_hidden_Content string                 `protobuf:"bytes,3,opt,name=content,proto3"`
+	xxx_hidden_Status  string                 `protobuf:"bytes,4,opt,name=status,proto3"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -480,6 +481,13 @@ func (x *RemindUpdateRequest) GetContent() string {
 	return ""
 }
 
+func (x *RemindUpdateRequest) GetStatus() string {
+	if x != nil {
+		return x.xxx_hidden_Status
+	}
+	return ""
+}
+
 func (x *RemindUpdateRequest) SetId(v int32) {
 	x.xxx_hidden_Id = v
 }
@@ -492,12 +500,17 @@ func (x *RemindUpdateRequest) SetContent(v string) {
 	x.xxx_hidden_Content = v
 }
 
+func (x *RemindUpdateRequest) SetStatus(v string) {
+	x.xxx_hidden_Status = v
+}
+
 type RemindUpdateRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	Id      int32
 	Cron    string
 	Content string
+	Status  string
 }
 
 func (b0 RemindUpdateRequest_builder) Build() *RemindUpdateRequest {
@@ -507,6 +520,7 @@ func (b0 RemindUpdateRequest_builder) Build() *RemindUpdateRequest {
 	x.xxx_hidden_Id = b.Id
 	x.xxx_hidden_Cron = b.Cron
 	x.xxx_hidden_Content = b.Content
+	x.xxx_hidden_Status = b.Status
 	return m0
 }
 
@@ -537,12 +551,13 @@ const file_admin_v1_remind_proto_rawDesc = "" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\"N\n" +
 	"\x13RemindCreateRequest\x12\x12\n" +
 	"\x04cron\x18\x01 \x01(\tR\x04cron\x12#\n" +
-	"\acontent\x18\x02 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\acontent\"_\n" +
+	"\acontent\x18\x02 \x01(\tB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\acontent\"w\n" +
 	"\x13RemindUpdateRequest\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x05B\n" +
 	"\xe0A\x02\xbaH\x04\x1a\x02 \x00R\x02id\x12\x12\n" +
 	"\x04cron\x18\x02 \x01(\tR\x04cron\x12\x18\n" +
-	"\acontent\x18\x03 \x01(\tR\acontent2\xf5\x03\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status2\xf5\x03\n" +
 	"\rRemindService\x12}\n" +
 	"\x04List\x12'.fifsky.blog.admin.v1.RemindListRequest\x1a(.fifsky.blog.admin.v1.RemindListResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/blog/admin/remind/list\x12x\n" +
 	"\x06Create\x12).fifsky.blog.admin.v1.RemindCreateRequest\x1a\x1d.fifsky.blog.types.IDResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/blog/admin/remind/create\x12x\n" +

@@ -8,7 +8,9 @@ import (
 
 const (
 	// UnknownCode is unknown code for error info.
-	UnknownCode = 500
+	// 默认 400：未经 pkg/errors 构造器包装的裸 error 视为客户端错误，
+	// 避免把业务错误（如 fmt.Errorf）误判为服务器内部错误。
+	UnknownCode = 400
 	// UnknownReason is unknown reason for error info.
 	UnknownReason = ""
 	// SupportPackageIsVersion1 this constant should not be referenced by any other code.

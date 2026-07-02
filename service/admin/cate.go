@@ -2,9 +2,9 @@ package admin
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	apperrors "app/pkg/errors"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
 	"app/store"
@@ -85,7 +85,7 @@ func (c *Cate) Update(ctx context.Context, req *adminv1.CateUpdateRequest) (*typ
 func (c *Cate) Delete(ctx context.Context, req *adminv1.CateDeleteRequest) (*emptypb.Empty, error) {
 	total, _ := c.store.PostsCount(ctx, int(req.GetId()))
 	if total > 0 {
-		return nil, fmt.Errorf("该分类下面还有文章，不能删除")
+		return nil, apperrors.BadRequest("CATE_HAS_POSTS", "该分类下面还有文章，不能删除")
 	}
 	if err := c.store.DeleteCate(ctx, int(req.GetId())); err != nil {
 		return nil, err

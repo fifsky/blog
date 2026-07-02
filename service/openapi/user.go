@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"app/config"
+	apperrors "app/pkg/errors"
 	"app/pkg/gotp"
 	"app/pkg/ipgeo"
 	apiv1 "app/proto/gen/api/v1"
@@ -43,13 +44,14 @@ func NewUser(s *store.Store, conf *config.Config, sender *feishu.FeishuSender, h
 func (u *User) Login(ctx context.Context, in *apiv1.LoginRequest) (*apiv1.LoginResponse, error) {
 	user, err := u.store.GetUserByName(ctx, in.GetUserName())
 	if err != nil {
-		return nil, fmt.Errorf("用户名或密码错误")
+		// 用户不存在：与密码错误返回完全一致的提示，防止账号枚举
+		return nil, apperrors.Unauthorized("INVALID_CREDENTIALS", "用户名或密码错误")
 	}
 	if user.Password != fmt.Sprintf("%x", md5.Sum([]byte(in.GetPassword()))) {
-		return nil, fmt.Errorf("用户名或密码错误")
+		return nil, apperrors.Unauthorized("INVALID_CREDENTIALS", "用户名或密码错误")
 	}
 	if user.Status != model.UserStatusActive {
-		return nil, fmt.Errorf("用户已停用")
+		return nil, apperrors.Unauthorized("USER_DISABLED", "用户已停用")
 	}
 	if user.TotpSecret != "" {
 		if in.GetTotpCode() == "" {
@@ -58,12 +60,12 @@ func (u *User) Login(ctx context.Context, in *apiv1.LoginRequest) (*apiv1.LoginR
 		totp := gotp.NewDefaultTOTP(user.TotpSecret)
 		ok, err := totp.Verify(in.GetTotpCode(), int64(time.Now().Unix()))
 		if err != nil || !ok {
-			return nil, fmt.Errorf("2FA验证码错误")
+			return nil, apperrors.Unauthorized("TOTP_INVALID", "2FA验证码错误")
 		}
 	}
 	tokenString, expiresAt, err := signAccessToken(u.conf.Common.TokenSecret, user.Id)
 	if err != nil {
-		return nil, fmt.Errorf("Access Token加密错误:%s", err)
+		return nil, apperrors.InternalServer("TOKEN_SIGN_ERROR", "Access Token 加密失败").WithCause(err)
 	}
 
 	// 异步发送登录通知

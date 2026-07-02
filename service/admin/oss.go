@@ -52,12 +52,31 @@ func (o *OSS) GetPresignURL(ctx context.Context, req *adminv1.GetPresignURLReque
 	filename := fmt.Sprintf("%d%s", now.UnixNano(), ext)
 	objectKey := fmt.Sprintf("blog/photos/%d/%02d/%02d/%s", now.Year(), now.Month(), now.Day(), filename)
 
+	// 确定 Content-Type：优先使用客户端指定的，否则根据扩展名推断，默认 text/plain;charset=utf8
+	contentType := "text/plain;charset=utf8"
+	if ct := req.GetContentType(); ct != "" {
+		contentType = ct
+	} else if ext != "" {
+		switch ext {
+		case ".jpg", ".jpeg":
+			contentType = "image/jpeg"
+		case ".png":
+			contentType = "image/png"
+		case ".gif":
+			contentType = "image/gif"
+		case ".webp":
+			contentType = "image/webp"
+		case ".mp4":
+			contentType = "video/mp4"
+		}
+	}
+
 	// Generate presigned PUT URL
 	expiration := 10 * time.Minute
 	result, err := client.Presign(ctx, &oss.PutObjectRequest{
 		Bucket:      new(o.conf.OSS.Bucket),
 		Key:         new(objectKey),
-		ContentType: new("text/plain;charset=utf8"), // 请确保在服务端生成该签名URL时设置的ContentType与在使用URL时设置的ContentType一致
+		ContentType: new(contentType), // 请确保在服务端生成该签名URL时设置的ContentType与在使用URL时设置的ContentType一致
 	}, oss.PresignExpires(expiration))
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate presign URL: %w", err)

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"app/config"
+	apperrors "app/pkg/errors"
 	"app/pkg/gotp"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
@@ -50,7 +51,7 @@ func (u *User) Get(ctx context.Context, request *adminv1.GetUserRequest) (*admin
 
 func (u *User) Create(ctx context.Context, in *adminv1.UserCreateRequest) (*types.IDResponse, error) {
 	if in.GetPassword() == "" {
-		return nil, fmt.Errorf("密码不能为空")
+		return nil, apperrors.BadRequest("PASSWORD_EMPTY", "密码不能为空")
 	}
 	hashed := fmt.Sprintf("%x", md5.Sum([]byte(in.GetPassword())))
 	now := time.Now()
@@ -188,12 +189,12 @@ func (u *User) Generate2FA(ctx context.Context, req *adminv1.Generate2FARequest)
 
 func (u *User) Bind2FA(ctx context.Context, req *adminv1.Bind2FARequest) (*emptypb.Empty, error) {
 	if req.GetSecret() == "" || req.GetCode() == "" {
-		return nil, fmt.Errorf("无效的绑定请求")
+		return nil, apperrors.BadRequest("INVALID_BIND_REQUEST", "无效的绑定请求")
 	}
 	totp := gotp.NewDefaultTOTP(req.GetSecret())
 	ok, err := totp.Verify(req.GetCode(), int64(time.Now().Unix()))
 	if err != nil || !ok {
-		return nil, fmt.Errorf("2FA验证码错误")
+		return nil, apperrors.BadRequest("TOTP_INVALID", "2FA验证码错误")
 	}
 	secret := req.GetSecret()
 	err = u.store.UpdateUser(ctx, &model.UpdateUser{
