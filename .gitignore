@@ -25,5 +25,5 @@ config.yml
 test.sh
 /.codebuddy
 /.uploads
-/mobile/build/
-/mobile/*.ipa
+/ios/build/
+/ios/*.ipa

@@ -45,7 +45,7 @@
 ### 架构：MVVM + Service Layer
 
 ```
-mobile/
+ios/
 ├── BlogApp.swift
 ├── ContentView.swift                    // TabView 主界面
 │
