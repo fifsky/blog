@@ -121,7 +121,7 @@ message User {
   string name = 2;
   string nick_name = 3;
   string email = 4;
-  int32 status = 5;
+  string status = 5;
   int32 type = 6;
   string created_at = 7;
   string updated_at = 8;
@@ -164,7 +164,7 @@ message UserItem {
   string name = 2;
   string nick_name = 3;
   string email = 4;
-  int32 status = 5;
+  string status = 5;
   int32 type = 6;
   string created_at = 7;
   string updated_at = 8;

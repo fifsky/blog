@@ -29,7 +29,7 @@ func TestAdminUser_LoginUserGetListStatusCreate(t *testing.T) {
 				Password:  "test",
 				NickName:  "test",
 				Email:     "test@test.com",
-				Status:    1,
+				Status:    model.UserStatusActive,
 				Type:      1,
 				CreatedAt: time.Time{},
 				UpdatedAt: time.Time{},

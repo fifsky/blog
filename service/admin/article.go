@@ -40,9 +40,9 @@ func NewArticle(s *store.Store, conf *config.Config) *Article {
 func (a *Article) Create(ctx context.Context, req *adminv1.ArticleCreateRequest) (*types.IDResponse, error) {
 	loginUser := GetLoginUser(ctx)
 	now := time.Now()
-	status := int32(1)
-	if req.GetStatus() > 0 {
-		status = req.GetStatus()
+	status := model.PostStatusActive
+	if req.GetStatus() != "" {
+		status = model.PostStatus(req.GetStatus())
 	}
 	c := &model.Post{
 		CateId:    int(req.GetCateId()),
@@ -52,7 +52,7 @@ func (a *Article) Create(ctx context.Context, req *adminv1.ArticleCreateRequest)
 		Url:       req.GetUrl(),
 		Content:   req.GetContent(),
 		Tags:      model.Tags(req.GetTags()),
-		Status:    int(status),
+		Status:    status,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
@@ -74,8 +74,8 @@ func (a *Article) Update(ctx context.Context, req *adminv1.ArticleUpdateRequest)
 		v := int(req.GetType())
 		u.Type = &v
 	}
-	if req.GetStatus() > 0 {
-		v := int(req.GetStatus())
+	if req.GetStatus() != "" {
+		v := model.PostStatus(req.GetStatus())
 		u.Status = &v
 	}
 	if req.GetTitle() != "" {
@@ -166,7 +166,7 @@ func (a *Article) Detail(ctx context.Context, req *adminv1.ArticleDetailRequest)
 		Url:       post.Url,
 		Content:   post.Content,
 		Tags:      []string(post.Tags),
-		Status:    int32(post.Status),
+		Status:    string(post.Status),
 		ViewNum:   int32(post.ViewNum),
 		CreatedAt: post.CreatedAt.Format(time.DateTime),
 		UpdatedAt: post.UpdatedAt.Format(time.DateTime)}.Build()
@@ -190,7 +190,7 @@ func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*a
 	num := 20
 	posts, err := a.store.ListPostForAdmin(ctx, &model.Post{
 		Type:   int(req.GetType()),
-		Status: int(req.GetStatus()),
+		Status: model.PostStatus(req.GetStatus()),
 	}, page, num, req.GetKeyword())
 	if err != nil {
 		return nil, err
@@ -219,7 +219,7 @@ func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*a
 			Url:       p.Url,
 			Content:   p.Content,
 			Tags:      []string(p.Tags),
-			Status:    int32(p.Status),
+			Status:    string(p.Status),
 			ViewNum:   int32(p.ViewNum),
 			CreatedAt: p.CreatedAt.Format(time.DateTime),
 			UpdatedAt: p.UpdatedAt.Format(time.DateTime)}.Build()
@@ -234,7 +234,7 @@ func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*a
 	}
 	total, err := a.store.CountPostsForAdmin(ctx, &model.Post{
 		Type:   int(req.GetType()),
-		Status: int(req.GetStatus()),
+		Status: model.PostStatus(req.GetStatus()),
 	}, req.GetKeyword())
 	if err != nil {
 		return nil, err

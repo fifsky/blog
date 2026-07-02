@@ -88,7 +88,7 @@ export default function AdminUser() {
     {
       title: <div style={{ width: 100 }}>状态</div>,
       key: "status",
-      render: (value) => <>{value === 1 ? "启用" : "停用"}</>,
+      render: (value) => <>{value === "ACTIVE" ? "启用" : "停用"}</>,
     },
     {
       title: <div style={{ width: 140 }}>操作</div>,
@@ -105,7 +105,7 @@ export default function AdminUser() {
               deleteItem(record.id);
             }}
           >
-            {record.status === 1 ? "停用" : "启用"}
+            {record.status === "ACTIVE" ? "停用" : "启用"}
           </Button>
           <span className="px-1.5 text-[#ccc]">|</span>
           <Button

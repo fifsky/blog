@@ -8,7 +8,7 @@ export type UserInfo = Partial<{
   name: string;
   nickName: string;
   email: string;
-  status: number;
+  status: string;
   type: number;
 }>;
 

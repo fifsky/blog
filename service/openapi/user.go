@@ -15,6 +15,7 @@ import (
 	"app/server/middleware"
 	"app/service/feishu"
 	"app/store"
+	"app/store/model"
 
 	"github.com/goapt/logger"
 )
@@ -47,7 +48,7 @@ func (u *User) Login(ctx context.Context, in *apiv1.LoginRequest) (*apiv1.LoginR
 	if user.Password != fmt.Sprintf("%x", md5.Sum([]byte(in.GetPassword()))) {
 		return nil, fmt.Errorf("用户名或密码错误")
 	}
-	if user.Status != 1 {
+	if user.Status != model.UserStatusActive {
 		return nil, fmt.Errorf("用户已停用")
 	}
 	if user.TotpSecret != "" {
@@ -74,7 +75,7 @@ func (u *User) Login(ctx context.Context, in *apiv1.LoginRequest) (*apiv1.LoginR
 				Name:      user.Name,
 				NickName:  user.NickName,
 				Email:     user.Email,
-				Status:    int32(user.Status),
+				Status:    string(user.Status),
 				Type:      int32(user.Type),
 				CreatedAt: user.CreatedAt.Format(time.DateTime),
 				UpdatedAt: user.UpdatedAt.Format(time.DateTime)}.Build()}.Build(),

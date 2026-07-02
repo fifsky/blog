@@ -17,7 +17,7 @@ func (s *Store) GetCate(ctx context.Context, id int) (*model.Cate, error) {
 }
 
 func (s *Store) GetAllCates(ctx context.Context) ([]model.CateArtivleCount, error) {
-	rows, err := s.db.QueryContext(ctx, "select c.id,c.name,c.desc,c.domain,c.created_at,c.updated_at,ifnull(p.num,0) num from cates c left join (select count(*) num ,cate_id from posts where status = 1 and type = 1 group by cate_id) p on c.id = p.cate_id")
+	rows, err := s.db.QueryContext(ctx, "select c.id,c.name,c.desc,c.domain,c.created_at,c.updated_at,ifnull(p.num,0) num from cates c left join (select count(*) num ,cate_id from posts where status = 'ACTIVE' and type = 1 group by cate_id) p on c.id = p.cate_id")
 	if err != nil {
 		return nil, err
 	}

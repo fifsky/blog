@@ -119,7 +119,7 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 			Url:       p.Url,
 			Content:   p.Content,
 			Tags:      []string(p.Tags),
-			Status:    int32(p.Status),
+			Status:    string(p.Status),
 			CreatedAt: p.CreatedAt.Format(time.DateTime),
 			UpdatedAt: p.UpdatedAt.Format(time.DateTime)}.Build()
 
@@ -160,7 +160,7 @@ func (a *Article) Detail(ctx context.Context, req *apiv1.ArticleDetailRequest) (
 		return nil, errors.ErrSystem.WithCause(err)
 	}
 
-	if post.Status != 1 {
+	if post.Status != model.PostStatusActive {
 		return nil, errors.ErrArticleNotFound
 	}
 
@@ -175,7 +175,7 @@ func (a *Article) Detail(ctx context.Context, req *apiv1.ArticleDetailRequest) (
 		Url:       post.Url,
 		Content:   post.Content,
 		Tags:      []string(post.Tags),
-		Status:    int32(post.Status),
+		Status:    string(post.Status),
 		ViewNum:   int32(post.ViewNum + 1), // Return incremented value
 		CreatedAt: post.CreatedAt.Format(time.DateTime),
 		UpdatedAt: post.UpdatedAt.Format(time.DateTime)}.Build()

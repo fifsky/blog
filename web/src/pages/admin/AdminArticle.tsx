@@ -24,12 +24,12 @@ import { Input } from "@/components/ui/input";
 import { dialog } from "@/utils/dialog";
 
 const STATUS_MAP: Record<
-  number,
+  string,
   { label: string; variant: "default" | "secondary" | "destructive" | "outline" }
 > = {
-  1: { label: "已发布", variant: "default" },
-  2: { label: "已删除", variant: "secondary" },
-  3: { label: "草稿", variant: "outline" },
+  ACTIVE: { label: "已发布", variant: "default" },
+  DELETED: { label: "已删除", variant: "secondary" },
+  DRAFT: { label: "草稿", variant: "outline" },
 };
 
 export default function AdminArticle() {
@@ -37,7 +37,7 @@ export default function AdminArticle() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-  const [statusFilter, setStatusFilter] = useState<number | undefined>(undefined);
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
   const [keyword, setKeyword] = useState<string>("");
   const [searchInput, setSearchInput] = useState<string>("");
   const [batchLoading, setBatchLoading] = useState(false);
@@ -169,7 +169,7 @@ export default function AdminArticle() {
   }, [page]);
 
   const batchOptions =
-    statusFilter === 2 ? [{ value: "3", label: "永久删除" }] : [{ value: "2", label: "删除" }];
+    statusFilter === "DELETED" ? [{ value: "3", label: "永久删除" }] : [{ value: "2", label: "删除" }];
 
   // 定义表格列配置
   const columns: Column<ArticleItem>[] = [
@@ -226,7 +226,7 @@ export default function AdminArticle() {
       title: <div style={{ width: 80 }}>状态</div>,
       key: "status",
       render: (value) => {
-        const statusInfo = STATUS_MAP[value] || STATUS_MAP[1];
+        const statusInfo = STATUS_MAP[value] || STATUS_MAP["ACTIVE"];
         return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
       },
     },
@@ -239,13 +239,13 @@ export default function AdminArticle() {
       key: "id",
       render: (_, record) => (
         <>
-          {record.status !== 2 && (
+          {record.status !== "DELETED" && (
             <>
               <Link to={`/admin/post/article?id=${record.id}`}>编辑</Link>
               <span className="px-1.5 text-[#ccc]">|</span>
             </>
           )}
-          {record.status === 2 ? (
+          {record.status === "DELETED" ? (
             <>
               <Button
                 variant={"link"}
@@ -311,9 +311,9 @@ export default function AdminArticle() {
             搜索
           </Button>
           <Select
-            value={statusFilter?.toString() || "all"}
+            value={statusFilter || "all"}
             onValueChange={(value) =>
-              setStatusFilter(value === "all" ? undefined : parseInt(value))
+              setStatusFilter(value === "all" ? undefined : value)
             }
           >
             <SelectTrigger className="w-[120px]" size={"sm"}>
@@ -321,9 +321,9 @@ export default function AdminArticle() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">全部状态</SelectItem>
-              <SelectItem value="1">已发布</SelectItem>
-              <SelectItem value="3">草稿</SelectItem>
-              <SelectItem value="2">已删除</SelectItem>
+              <SelectItem value="ACTIVE">已发布</SelectItem>
+              <SelectItem value="DRAFT">草稿</SelectItem>
+              <SelectItem value="DELETED">已删除</SelectItem>
             </SelectContent>
           </Select>
         </div>

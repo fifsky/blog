@@ -23,7 +23,7 @@ export type UserItem = {
   name: string;
   nick_name: string;
   email: string;
-  status: number;
+  status: string;
   type: number;
   has_totp: boolean;
   created_at: string;
@@ -35,7 +35,7 @@ export type User = {
   name: string;
   nick_name: string;
   email: string;
-  status: number;
+  status: string;
   type: number;
   created_at: string;
   updated_at: string;
@@ -153,7 +153,7 @@ export type ArticleItem = {
   url?: string;
   content: string;
   tags?: string[];
-  status: number;
+  status: string;
   view_num: number;
   created_at: string;
   updated_at: string;
@@ -178,7 +178,7 @@ export type ArticleCreateRequest = {
   title: string;
   url?: string;
   content: string;
-  status?: number;
+  status?: string;
   tags?: string[];
 };
 export type ArticleUpdateRequest = {
@@ -188,14 +188,14 @@ export type ArticleUpdateRequest = {
   title?: string;
   url?: string;
   content?: string;
-  status?: number;
+  status?: string;
   tags?: string[];
 };
 
 export type AdminArticleListRequest = {
   page?: number;
   type?: number;
-  status?: number;
+  status?: string;
   keyword?: string;
 };
 

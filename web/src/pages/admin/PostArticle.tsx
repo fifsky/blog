@@ -53,7 +53,7 @@ const articleSchema = z.object({
   content: z.string().optional(),
   tags: z.array(z.string()).optional(),
   type: z.literal(1),
-  status: z.number().optional(),
+  status: z.string().optional(),
 });
 
 type ArticleFormValues = z.infer<typeof articleSchema>;
@@ -144,7 +144,7 @@ export default function PostArticle() {
     setLoading(true);
     try {
       const { id, cate_id, title, content, type, url, status, tags } = values;
-      // 构造通用请求载荷，status 默认为 1 (发布)
+      // 构造通用请求载荷，status 默认为 ACTIVE (发布)
       const payload = {
         cate_id,
         title,
@@ -152,7 +152,7 @@ export default function PostArticle() {
         tags: tags || [],
         type,
         url: url || "",
-        status: status || 1,
+        status: status || "ACTIVE",
       };
 
       if (id) {
@@ -170,13 +170,13 @@ export default function PostArticle() {
 
   // 发布文章：设置为发布状态并提交
   const handlePublish = () => {
-    form.setValue("status", 1);
+    form.setValue("status", "ACTIVE");
     form.handleSubmit(submit)();
   };
 
   // 保存草稿：设置为草稿状态并提交
   const handleSaveDraft = () => {
-    form.setValue("status", 3); // 3 代表草稿
+    form.setValue("status", "DRAFT");
     form.handleSubmit(submit)();
   };
 
@@ -420,7 +420,7 @@ export default function PostArticle() {
               <Button type="button" size={"sm"} loading={loading} onClick={handlePublish}>
                 发布
               </Button>
-              {(isEditing && articleStatus !== 1) || !isEditing ? (
+              {(isEditing && articleStatus !== "ACTIVE") || !isEditing ? (
                 <Button
                   type="button"
                   size={"sm"}

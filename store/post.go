@@ -36,7 +36,7 @@ func (s *Store) IncrementPostViewNum(ctx context.Context, id int) error {
 }
 
 func (s *Store) GetPostDaysInMonth(ctx context.Context, year, month int) ([]int32, error) {
-	query := "select distinct DAY(created_at) from posts where status = 1 and YEAR(created_at) = ? and MONTH(created_at) = ?"
+	query := "select distinct DAY(created_at) from posts where status = 'ACTIVE' and YEAR(created_at) = ? and MONTH(created_at) = ?"
 	rows, err := s.db.QueryContext(ctx, query, year, month)
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (s *Store) GetPostDaysInMonth(ctx context.Context, year, month int) ([]int3
 
 func (s *Store) PrevPost(ctx context.Context, id int) (*model.Post, error) {
 	var p model.Post
-	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where (created_at > (select created_at from posts p2 where p2.id = ?) or (created_at = (select created_at from posts p3 where p3.id = ?) and id > ?)) and status = 1 order by created_at asc, id asc limit 1", id, id, id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
+	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where (created_at > (select created_at from posts p2 where p2.id = ?) or (created_at = (select created_at from posts p3 where p3.id = ?) and id > ?)) and status = 'ACTIVE' order by created_at asc, id asc limit 1", id, id, id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (s *Store) PrevPost(ctx context.Context, id int) (*model.Post, error) {
 
 func (s *Store) NextPost(ctx context.Context, id int) (*model.Post, error) {
 	var p model.Post
-	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where (created_at < (select created_at from posts p2 where p2.id = ?) or (created_at = (select created_at from posts p3 where p3.id = ?) and id < ?)) and status = 1 order by created_at desc, id desc limit 1", id, id, id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
+	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where (created_at < (select created_at from posts p2 where p2.id = ?) or (created_at = (select created_at from posts p3 where p3.id = ?) and id < ?)) and status = 'ACTIVE' order by created_at desc, id desc limit 1", id, id, id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (s *Store) NextPost(ctx context.Context, id int) (*model.Post, error) {
 
 func (s *Store) PostArchive(ctx context.Context) ([]model.PostArchive, error) {
 	res := make([]model.PostArchive, 0)
-	rows, err := s.db.QueryContext(ctx, "select ym,count(ym) total from (select DATE_FORMAT(created_at,'%Y/%m') as ym from posts where status = 1) s group by ym order by ym desc")
+	rows, err := s.db.QueryContext(ctx, "select ym,count(ym) total from (select DATE_FORMAT(created_at,'%Y/%m') as ym from posts where status = 'ACTIVE') s group by ym order by ym desc")
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (s *Store) ListPost(ctx context.Context, p *model.Post, start int, num int,
 	offset := (start - 1) * num
 
 	args := make([]any, 0)
-	where := "status = 1"
+	where := "status = 'ACTIVE'"
 
 	if p.CateId > 0 {
 		where += " and cate_id = ?"
@@ -144,7 +144,7 @@ func (s *Store) ListPost(ctx context.Context, p *model.Post, start int, num int,
 
 func (s *Store) CountPosts(ctx context.Context, p *model.Post, artdate, keyword, tag string) (int, error) {
 	args := make([]any, 0)
-	where := "status = 1"
+	where := "status = 'ACTIVE'"
 	if p.CateId > 0 {
 		where += " and cate_id = ?"
 		args = append(args, p.CateId)
@@ -237,13 +237,13 @@ func (s *Store) SoftDeletePost(ctx context.Context, ids []int) error {
 		return nil
 	}
 	placeholders, args := In(ids)
-	query := "update posts set status = 2 where id in (" + placeholders + ")"
+	query := "update posts set status = 'DELETED' where id in (" + placeholders + ")"
 	_, err := s.db.ExecContext(ctx, query, args...)
 	return err
 }
 
 func (s *Store) RestorePost(ctx context.Context, id int) error {
-	_, err := s.db.ExecContext(ctx, "update posts set status = 3 where id = ?", id)
+	_, err := s.db.ExecContext(ctx, "update posts set status = 'DRAFT' where id = ?", id)
 	return err
 }
 
@@ -262,7 +262,7 @@ func (s *Store) ListPostForAdmin(ctx context.Context, p *model.Post, start int, 
 		where += " and type = ?"
 		args = append(args, p.Type)
 	}
-	if p.Status > 0 {
+	if p.Status != "" {
 		where += " and status = ?"
 		args = append(args, p.Status)
 	}
@@ -300,7 +300,7 @@ func (s *Store) CountPostsForAdmin(ctx context.Context, p *model.Post, keyword s
 		where += " and type = ?"
 		args = append(args, p.Type)
 	}
-	if p.Status > 0 {
+	if p.Status != "" {
 		where += " and status = ?"
 		args = append(args, p.Status)
 	}
@@ -322,7 +322,7 @@ func (s *Store) DestroyPost(ctx context.Context, ids []int) error {
 		return nil
 	}
 	placeholders, args := In(ids)
-	query := "delete from posts where status = 2 and id in (" + placeholders + ")"
+	query := "delete from posts where status = 'DELETED' and id in (" + placeholders + ")"
 	_, err := s.db.ExecContext(ctx, query, args...)
 	return err
 }

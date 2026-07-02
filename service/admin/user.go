@@ -40,7 +40,7 @@ func (u *User) Get(ctx context.Context, request *adminv1.GetUserRequest) (*admin
 			Name:      user.Name,
 			NickName:  user.NickName,
 			Email:     user.Email,
-			Status:    int32(user.Status),
+			Status:    string(user.Status),
 			Type:      int32(user.Type),
 			HasTotp:   user.TotpSecret != "",
 			CreatedAt: user.CreatedAt.Format(time.DateTime),
@@ -59,7 +59,7 @@ func (u *User) Create(ctx context.Context, in *adminv1.UserCreateRequest) (*type
 		Password:  hashed,
 		NickName:  in.GetNickName(),
 		Email:     in.GetEmail(),
-		Status:    1,
+		Status:    model.UserStatusActive,
 		Type:      int(in.GetType()),
 		CreatedAt: now,
 		UpdatedAt: now,
@@ -116,7 +116,7 @@ func (u *User) List(ctx context.Context, req *adminv1.UserListRequest) (*adminv1
 			Name:      user.Name,
 			NickName:  user.NickName,
 			Email:     user.Email,
-			Status:    int32(user.Status),
+			Status:    string(user.Status),
 			Type:      int32(user.Type),
 			HasTotp:   user.TotpSecret != "",
 			CreatedAt: user.CreatedAt.Format(time.DateTime),
@@ -138,10 +138,10 @@ func (u *User) Status(ctx context.Context, req *adminv1.UserStatusRequest) (*emp
 		return nil, err
 	}
 	status := user.Status
-	if status == 1 {
-		status = 2
+	if status == model.UserStatusActive {
+		status = model.UserStatusDeleted
 	} else {
-		status = 1
+		status = model.UserStatusActive
 	}
 	if err := u.store.UpdateUser(ctx, &model.UpdateUser{Id: int(req.GetId()), Status: &status}); err != nil {
 		return nil, err
@@ -155,7 +155,7 @@ func (u *User) LoginUser(ctx context.Context, _ *emptypb.Empty) (*adminv1.User, 
 			Name:      user.Name,
 			NickName:  user.NickName,
 			Email:     user.Email,
-			Status:    int32(user.Status),
+			Status:    string(user.Status),
 			Type:      int32(user.Type),
 			HasTotp:   user.TotpSecret != "",
 			CreatedAt: user.CreatedAt.Format(time.DateTime),

@@ -11,6 +11,7 @@ import (
 	"app/pkg/miniapp"
 	apiv1 "app/proto/gen/api/v1"
 	"app/store"
+	"app/store/model"
 )
 
 var _ apiv1.MiniAppServiceHTTPServer = (*MiniApp)(nil)
@@ -51,7 +52,7 @@ func (m *MiniApp) LoginCode(ctx context.Context, req *apiv1.MiniAppLoginRequest)
 	if err != nil {
 		return nil, errors.ErrSystem.WithCause(err)
 	}
-	if user.Status != 1 {
+	if user.Status != model.UserStatusActive {
 		return nil, errors.BadRequest("USER_DISABLED", "用户已停用")
 	}
 

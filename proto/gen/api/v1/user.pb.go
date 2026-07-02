@@ -88,7 +88,7 @@ type UserItem struct {
 	xxx_hidden_Name      string                 `protobuf:"bytes,2,opt,name=name,proto3"`
 	xxx_hidden_NickName  string                 `protobuf:"bytes,3,opt,name=nick_name,json=nickName,proto3"`
 	xxx_hidden_Email     string                 `protobuf:"bytes,4,opt,name=email,proto3"`
-	xxx_hidden_Status    int32                  `protobuf:"varint,5,opt,name=status,proto3"`
+	xxx_hidden_Status    string                 `protobuf:"bytes,5,opt,name=status,proto3"`
 	xxx_hidden_Type      int32                  `protobuf:"varint,6,opt,name=type,proto3"`
 	xxx_hidden_CreatedAt string                 `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3"`
 	xxx_hidden_UpdatedAt string                 `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3"`
@@ -149,11 +149,11 @@ func (x *UserItem) GetEmail() string {
 	return ""
 }
 
-func (x *UserItem) GetStatus() int32 {
+func (x *UserItem) GetStatus() string {
 	if x != nil {
 		return x.xxx_hidden_Status
 	}
-	return 0
+	return ""
 }
 
 func (x *UserItem) GetType() int32 {
@@ -193,7 +193,7 @@ func (x *UserItem) SetEmail(v string) {
 	x.xxx_hidden_Email = v
 }
 
-func (x *UserItem) SetStatus(v int32) {
+func (x *UserItem) SetStatus(v string) {
 	x.xxx_hidden_Status = v
 }
 
@@ -216,7 +216,7 @@ type UserItem_builder struct {
 	Name      string
 	NickName  string
 	Email     string
-	Status    int32
+	Status    string
 	Type      int32
 	CreatedAt string
 	UpdatedAt string
@@ -446,7 +446,7 @@ const file_api_v1_user_proto_rawDesc = "" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
 	"\tnick_name\x18\x03 \x01(\tR\bnickName\x12\x14\n" +
 	"\x05email\x18\x04 \x01(\tR\x05email\x12\x16\n" +
-	"\x06status\x18\x05 \x01(\x05R\x06status\x12\x12\n" +
+	"\x06status\x18\x05 \x01(\tR\x06status\x12\x12\n" +
 	"\x04type\x18\x06 \x01(\x05R\x04type\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\a \x01(\tR\tcreatedAt\x12\x1d\n" +

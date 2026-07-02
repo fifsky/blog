@@ -461,7 +461,7 @@ type ArticleItem struct {
 	xxx_hidden_Title     string                 `protobuf:"bytes,5,opt,name=title,proto3"`
 	xxx_hidden_Url       string                 `protobuf:"bytes,6,opt,name=url,proto3"`
 	xxx_hidden_Content   string                 `protobuf:"bytes,7,opt,name=content,proto3"`
-	xxx_hidden_Status    int32                  `protobuf:"varint,8,opt,name=status,proto3"`
+	xxx_hidden_Status    string                 `protobuf:"bytes,8,opt,name=status,proto3"`
 	xxx_hidden_CreatedAt string                 `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3"`
 	xxx_hidden_UpdatedAt string                 `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3"`
 	xxx_hidden_User      *types.UserSummary     `protobuf:"bytes,11,opt,name=user,proto3"`
@@ -546,11 +546,11 @@ func (x *ArticleItem) GetContent() string {
 	return ""
 }
 
-func (x *ArticleItem) GetStatus() int32 {
+func (x *ArticleItem) GetStatus() string {
 	if x != nil {
 		return x.xxx_hidden_Status
 	}
-	return 0
+	return ""
 }
 
 func (x *ArticleItem) GetCreatedAt() string {
@@ -623,7 +623,7 @@ func (x *ArticleItem) SetContent(v string) {
 	x.xxx_hidden_Content = v
 }
 
-func (x *ArticleItem) SetStatus(v int32) {
+func (x *ArticleItem) SetStatus(v string) {
 	x.xxx_hidden_Status = v
 }
 
@@ -683,7 +683,7 @@ type ArticleItem_builder struct {
 	Title     string
 	Url       string
 	Content   string
-	Status    int32
+	Status    string
 	CreatedAt string
 	UpdatedAt string
 	User      *types.UserSummary
@@ -1125,7 +1125,7 @@ const file_api_v1_article_proto_rawDesc = "" +
 	"\x05title\x18\x05 \x01(\tR\x05title\x12\x10\n" +
 	"\x03url\x18\x06 \x01(\tR\x03url\x12\x18\n" +
 	"\acontent\x18\a \x01(\tR\acontent\x12\x16\n" +
-	"\x06status\x18\b \x01(\x05R\x06status\x12\x1d\n" +
+	"\x06status\x18\b \x01(\tR\x06status\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\t \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
