@@ -63,7 +63,7 @@ func (u *User) Login(ctx context.Context, in *apiv1.LoginRequest) (*apiv1.LoginR
 			return nil, apperrors.Unauthorized("TOTP_INVALID", "2FA验证码错误")
 		}
 	}
-	tokenString, expiresAt, err := signAccessToken(u.conf.Common.TokenSecret, user.Id)
+	tokenString, expiresAt, err := signAccessToken(u.conf.Common.TokenSecret, user.Id, tokenExpiryForClient(middleware.ClientTypeFromContext(ctx)))
 	if err != nil {
 		return nil, apperrors.InternalServer("TOKEN_SIGN_ERROR", "Access Token 加密失败").WithCause(err)
 	}

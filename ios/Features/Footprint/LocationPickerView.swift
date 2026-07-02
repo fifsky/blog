@@ -1,8 +1,53 @@
 import SwiftUI
 import MapKit
 
+/// 位置搜索补全视图模型
+/// 使用 MKLocalSearchCompleter 实现地址关键字搜索
+@Observable
+private class LocationSearchCompleter: NSObject, MKLocalSearchCompleterDelegate {
+
+    /// 搜索结果
+    var results: [MKLocalSearchCompletion] = []
+
+    /// 是否正在搜索
+    var isLoading = false
+
+    private let completer = MKLocalSearchCompleter()
+
+    override init() {
+        super.init()
+        completer.delegate = self
+        // 仅搜索地点，过滤掉商业类别等噪音
+        completer.resultTypes = .address
+    }
+
+    /// 更新搜索关键字
+    /// - Parameter query: 搜索词
+    func search(_ query: String) {
+        if query.isEmpty {
+            results = []
+            isLoading = false
+            return
+        }
+        isLoading = true
+        completer.queryFragment = query
+    }
+
+    // MARK: - MKLocalSearchCompleterDelegate
+
+    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        results = completer.results
+        isLoading = false
+    }
+
+    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
+        isLoading = false
+    }
+}
+
 /// 位置选择器视图
-/// 全屏地图，用户通过点击地图选择位置，点击确认后返回坐标
+/// 顶部返回按钮 + 全屏地图 + 底部玻璃质感搜索栏（定位按钮 + 确认按钮）
+/// 支持点击地图选择位置和关键字搜索地点，确认后返回坐标
 struct LocationPickerView: View {
 
     // MARK: - 绑定属性
@@ -24,8 +69,17 @@ struct LocationPickerView: View {
     /// 当前地图位置（用于 Map initialPosition）
     @State private var cameraPosition: MapCameraPosition
 
-    /// 提示文本
-    @State private var hintText = "点击地图选择位置"
+    /// 搜索框文本
+    @State private var searchText = ""
+
+    /// 是否展开搜索结果面板
+    @State private var isSearching = false
+
+    /// 搜索补全视图模型
+    @State private var searchCompleter = LocationSearchCompleter()
+
+    /// 是否正在执行地点解析（从搜索结果跳转）
+    @State private var isResolving = false
 
     /// 环境变量：dismiss
     @Environment(\.dismiss) private var dismiss
@@ -57,25 +111,29 @@ struct LocationPickerView: View {
             _selectedCoordinate = State(
                 initialValue: CLLocationCoordinate2D(latitude: lat, longitude: lon)
             )
-            _hintText = State(initialValue: "已选择位置，点击地图可更改")
         }
     }
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottom) {
             // 地图视图
             mapContent
 
-            // 顶部信息栏
-            VStack {
-                topInfoBar
-                Spacer()
-                bottomButtons
+            // 底部搜索栏 + 搜索结果面板
+            VStack(spacing: 8) {
+                // 搜索结果下拉面板（在搜索栏上方）
+                if isSearching && !searchText.isEmpty {
+                    searchResultsPanel
+                }
+
+                // 底部玻璃搜索栏
+                bottomSearchBar
             }
         }
         .navigationTitle("选择位置")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            // 原生返回按钮，与其他页面风格一致
             ToolbarItem(placement: .topBarLeading) {
                 Button("取消") {
                     dismiss()
@@ -115,14 +173,18 @@ struct LocationPickerView: View {
                 MapPitchToggle()
             }
             .gesture(
-                // 使用空间点击手势获取屏幕坐标，再转换为地图地理坐标
+                // 点击地图时收起搜索面板
                 SpatialTapGesture()
                     .onEnded { value in
+                        if isSearching {
+                            isSearching = false
+                        }
                         guard let coordinate = proxy.convert(value.location, from: .local) else { return }
                         selectCoordinate(coordinate)
                     }
             )
         }
+        .ignoresSafeArea(edges: .bottom)
     }
 
     /// 设置选中的坐标并更新地图区域
@@ -134,85 +196,124 @@ struct LocationPickerView: View {
                 span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
             )
         )
-        hintText = "\(coordinate.latitude), \(coordinate.longitude)"
     }
 
-    // MARK: - 顶部信息栏
+    // MARK: - 底部搜索栏
 
-    /// 顶部坐标信息显示
-    private var topInfoBar: some View {
-        VStack(spacing: 4) {
-            Text(hintText)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
-        }
-        .padding(.top, 8)
-    }
+    /// 底部玻璃质感搜索栏：搜索输入 + 确认按钮
+    private var bottomSearchBar: some View {
+        HStack(spacing: 8) {
+            // 搜索输入框
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
 
-    // MARK: - 底部按钮
+                TextField("搜索地点", text: $searchText)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .onChange(of: searchText) { _, newValue in
+                        searchCompleter.search(newValue)
+                    }
 
-    /// 底部确认按钮区域
-    private var bottomButtons: some View {
-        VStack(spacing: 12) {
-            // 确认位置按钮
+                if !searchText.isEmpty {
+                    Button {
+                        searchText = ""
+                        searchCompleter.search("")
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .padding(.horizontal, 14)
+            .frame(height: 44)
+            .background(.ultraThinMaterial, in: Capsule())
+
+            // 确认按钮（未选位为灰色、已选为蓝色）
             Button {
                 confirmLocation()
             } label: {
-                HStack {
-                    Image(systemName: "checkmark.circle.fill")
-                    Text("确认位置")
-                        .fontWeight(.medium)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(
-                    selectedCoordinate == nil
-                        ? Color(.systemGray4)
-                        : .blue
-                    , in: RoundedRectangle(cornerRadius: 12))
-                .foregroundStyle(.white)
+                Image(systemName: "checkmark")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 44, height: 44)
+                    .background(
+                        selectedCoordinate == nil
+                            ? Color(.systemGray4)
+                            : Color.blue
+                        , in: Circle()
+                    )
             }
             .disabled(selectedCoordinate == nil)
-            .padding(.horizontal, 20)
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 16)
+    }
 
-            // 重置到当前位置按钮
-            Button {
-                resetToCurrentLocation()
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "location.circle")
-                    Text("使用当前位置")
+    /// 搜索结果下拉面板
+    private var searchResultsPanel: some View {
+        ScrollView {
+            LazyVStack(spacing: 0) {
+                if searchCompleter.isLoading {
+                    ProgressView()
+                        .padding()
+                } else if searchCompleter.results.isEmpty {
+                    Text("无匹配地点")
                         .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .padding()
+                } else {
+                    ForEach(searchCompleter.results, id: \.self) { completion in
+                        Button {
+                            resolveCompletion(completion)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(completion.title)
+                                    .font(.body)
+                                    .foregroundStyle(.primary)
+                                if !completion.subtitle.isEmpty {
+                                    Text(completion.subtitle)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(1)
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                        }
+                        Divider()
+                    }
                 }
-                .foregroundStyle(.blue)
             }
-            .padding(.bottom, 16)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        }
+        .frame(maxHeight: 280)
+        .padding(.horizontal, 16)
+    }
+
+    /// 解析搜索补全项为坐标并定位
+    /// - Parameter completion: 搜索补全结果
+    private func resolveCompletion(_ completion: MKLocalSearchCompletion) {
+        isResolving = true
+        let request = MKLocalSearch.Request(completion: completion)
+        let search = MKLocalSearch(request: request)
+        search.start { response, _ in
+            isResolving = false
+            guard let coordinate = response?.mapItems.first?.placemark.coordinate else { return }
+            searchText = ""
+            isSearching = false
+            selectCoordinate(coordinate)
         }
     }
 
     // MARK: - 操作方法
 
-    /// 确认选择的位置，回传坐标并关闭
+    /// 确认选择的位置，回传坐标（保留 6 位小数）并关闭
     private func confirmLocation() {
         guard let coordinate = selectedCoordinate else { return }
-        latitude = "\(coordinate.latitude)"
-        longitude = "\(coordinate.longitude)"
+        latitude = String(format: "%.6f", coordinate.latitude)
+        longitude = String(format: "%.6f", coordinate.longitude)
         dismiss()
-    }
-
-    /// 重置位置到用户当前所在位置
-    private func resetToCurrentLocation() {
-        let manager = CLLocationManager()
-        manager.requestWhenInUseAuthorization()
-
-        if manager.authorizationStatus == .authorizedWhenInUse
-            || manager.authorizationStatus == .authorizedAlways {
-            if let location = manager.location {
-                selectCoordinate(location.coordinate)
-            }
-        }
     }
 }

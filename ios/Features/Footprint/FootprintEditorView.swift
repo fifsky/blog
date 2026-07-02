@@ -8,6 +8,9 @@ struct FootprintEditorView: View {
 
     @State private var viewModel: FootprintEditorViewModel
 
+    /// 名称输入框焦点（新建模式自动聚焦）
+    @FocusState private var nameFocused: Bool
+
     /// 保存成功的回调
     var onSave: () -> Void
 
@@ -29,19 +32,26 @@ struct FootprintEditorView: View {
         Form {
             // MARK: - 基本信息
             Section {
-                // 名称（必填）
-                TextField("名称", text: $viewModel.name)
+                // 地点名称（必填）
+                TextField("地点名称", text: $viewModel.name)
                     .font(.body)
+                    .focused($nameFocused)
 
-                // 描述
-                VStack(alignment: .leading, spacing: 8) {
-                    TextEditor(text: $viewModel.descriptionText)
-                        .frame(minHeight: 80, maxHeight: 150)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(.separator), lineWidth: 0.5)
-                        )
-                }
+                // 描述（可选）
+                TextEditor(text: $viewModel.descriptionText)
+                    .font(.body)
+                    .frame(minHeight: 80, maxHeight: 150)
+                    .scrollContentBackground(.hidden)
+                    .overlay(alignment: .topLeading) {
+                        // 占位提示文字
+                        if viewModel.descriptionText.isEmpty {
+                            Text("描述（可选）")
+                                .font(.body)
+                                .foregroundStyle(Color(.placeholderText))
+                                .allowsHitTesting(false)
+                                .padding(.top, 8)
+                        }
+                    }
             } header: {
                 Text("基本信息")
             }
@@ -169,15 +179,23 @@ struct FootprintEditorView: View {
             Text(viewModel.errorMessage ?? "未知错误")
         }
         .sheet(isPresented: $viewModel.showLocationPicker) {
-            LocationPickerView(
-                latitude: $viewModel.latitude,
-                longitude: $viewModel.longitude
-            )
+            NavigationStack {
+                LocationPickerView(
+                    latitude: $viewModel.latitude,
+                    longitude: $viewModel.longitude
+                )
+            }
         }
         .overlay {
             // 保存/上传中的遮罩
             if viewModel.isSaving || viewModel.isUploading {
                 savingOverlay
+            }
+        }
+        .onAppear {
+            // 新建模式自动聚焦名称输入框
+            if !viewModel.isEditing {
+                nameFocused = true
             }
         }
     }

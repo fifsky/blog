@@ -9,6 +9,9 @@ struct RemindEditorView: View {
     @State private var viewModel: RemindEditorViewModel
     @Environment(\.dismiss) private var dismiss
 
+    /// 提醒内容输入框焦点（新建模式自动聚焦）
+    @FocusState private var contentFocused: Bool
+
     init(remind: Remind? = nil) {
         self.existingRemind = remind
         _viewModel = State(initialValue: RemindEditorViewModel(remind: remind))
@@ -38,6 +41,7 @@ struct RemindEditorView: View {
             Section {
                 TextField("提醒内容", text: $viewModel.content, axis: .vertical)
                     .lineLimit(3...6)
+                    .focused($contentFocused)
             } header: {
                 Text("内容")
             } footer: {
@@ -169,6 +173,12 @@ struct RemindEditorView: View {
         .onChange(of: viewModel.didSave) {
             if viewModel.didSave {
                 dismiss()
+            }
+        }
+        .onAppear {
+            // 新建模式自动聚焦内容输入框
+            if existingRemind == nil {
+                contentFocused = true
             }
         }
     }

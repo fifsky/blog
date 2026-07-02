@@ -37,14 +37,7 @@ struct ContentView: View {
 
             // 足迹
             NavigationStack {
-                FootprintMapView(
-                    onShowListView: {
-                        // TODO: 后续接入足迹列表页切换
-                    },
-                    onAddFootprint: {
-                        // 由 FootprintMapView 内部 sheet 处理
-                    }
-                )
+                FootprintMapView()
             }
             .tabItem {
                 Label("足迹", systemImage: "map")

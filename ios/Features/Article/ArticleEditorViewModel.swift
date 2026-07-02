@@ -54,8 +54,8 @@ class ArticleEditorViewModel {
     private let categoryService = CategoryService.shared
     private let uploadService = UploadService.shared
 
-    /// 分类列表
-    var categories: [CateMenuItem] = []
+    /// 分类列表（管理端，含数字 ID）
+    var categories: [CateItem] = []
 
     // MARK: - 初始化
 
@@ -75,13 +75,13 @@ class ArticleEditorViewModel {
 
     // MARK: - 数据加载
 
-    /// 加载分类列表
+    /// 加载分类列表（使用管理端接口，确保拿到数字 ID）
     func loadCategories() async {
         guard !isLoadingCategories else { return }
         isLoadingCategories = true
 
         do {
-            let response = try await categoryService.all()
+            let response = try await categoryService.list()
             categories = response.list
         } catch {
             errorMessage = "加载分类失败：\(error.localizedDescription)"

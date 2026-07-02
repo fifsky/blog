@@ -9,6 +9,9 @@ struct MoodEditorView: View {
     @State private var viewModel: MoodEditorViewModel
     @Environment(\.dismiss) private var dismiss
 
+    /// 内容输入框焦点（新建模式自动聚焦）
+    @FocusState private var contentFocused: Bool
+
     init(mood: Mood? = nil) {
         self.existingMood = mood
         _viewModel = State(initialValue: MoodEditorViewModel(mood: mood))
@@ -22,6 +25,7 @@ struct MoodEditorView: View {
                 .textInputAutocapitalization(.sentences)
                 .autocorrectionDisabled()
                 .scrollContentBackground(.hidden)
+                .focused($contentFocused)
                 .padding(.horizontal, 16)
                 .padding(.top, 12)
                 .overlay(alignment: .topLeading) {
@@ -84,6 +88,12 @@ struct MoodEditorView: View {
         .onChange(of: viewModel.didSave) {
             if viewModel.didSave {
                 dismiss()
+            }
+        }
+        .onAppear {
+            // 新建模式自动聚焦内容输入框
+            if existingMood == nil {
+                contentFocused = true
             }
         }
     }

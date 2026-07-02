@@ -44,3 +44,13 @@ func ClientIPFromContext(ctx context.Context) string {
 	parts := strings.Split(forwarded, ",")
 	return strings.TrimSpace(parts[0])
 }
+
+// ClientTypeFromContext 从上下文中读取客户端类型（ios / web / miniapp 等）
+// 用于区分登录请求来源，例如 iOS 端发放更长有效期的 token
+func ClientTypeFromContext(ctx context.Context) string {
+	headers, ok := RequestHeaders(ctx)
+	if !ok {
+		return ""
+	}
+	return strings.ToLower(strings.TrimSpace(headers.Get("X-Client-Type")))
+}

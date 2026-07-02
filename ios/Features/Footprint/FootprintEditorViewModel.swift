@@ -127,18 +127,18 @@ class FootprintEditorViewModel {
 
     // MARK: - 位置处理
 
-    /// 设置选定的位置坐标
+    /// 设置选定的位置坐标（保留 6 位小数）
     func setLocation(latitude lat: Double, longitude lon: Double) {
-        latitude = "\(lat)"
-        longitude = "\(lon)"
+        latitude = String(format: "%.6f", lat)
+        longitude = String(format: "%.6f", lon)
     }
 
-    /// 位置信息描述
+    /// 位置信息描述（只展示坐标，逗号分隔，避免文字过长换行）
     var locationDescription: String {
         if latitude.isEmpty || longitude.isEmpty {
             return "未选择位置"
         }
-        return "纬度: \(latitude)  经度: \(longitude)"
+        return "\(latitude), \(longitude)"
     }
 
     // MARK: - 表单验证

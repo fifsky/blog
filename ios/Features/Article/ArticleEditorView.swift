@@ -16,6 +16,9 @@ struct ArticleEditorView: View {
     /// 图片选择器
     @State private var selectedItem: PhotosPickerItem?
 
+    /// 标题输入框焦点（新建模式自动聚焦）
+    @FocusState private var titleFocused: Bool
+
     /// 导航返回标记
     @Environment(\.dismiss) private var dismiss
 
@@ -27,6 +30,7 @@ struct ArticleEditorView: View {
                     get: { viewModel?.title ?? "" },
                     set: { viewModel?.title = $0 }
                 ))
+                .focused($titleFocused)
             }
 
             // MARK: - 分类
@@ -124,8 +128,8 @@ struct ArticleEditorView: View {
                     categories: categories,
                     selectedId: viewModel?.cateId ?? 0,
                     onSelect: { cate in
-                        viewModel?.cateId = extractCateId(from: cate.url)
-                        viewModel?.cateName = cate.content
+                        viewModel?.cateId = cate.id
+                        viewModel?.cateName = cate.name
                     }
                 )
                 .presentationDetents([.medium, .large])
@@ -145,6 +149,10 @@ struct ArticleEditorView: View {
             }
             Task {
                 await viewModel?.loadCategories()
+            }
+            // 新建模式自动聚焦标题输入框
+            if article == nil {
+                titleFocused = true
             }
         }
     }
@@ -212,24 +220,7 @@ struct ArticleEditorView: View {
         }
     }
 
-    // MARK: - 辅助方法
-
-    /// 从分类 URL 中提取分类 ID
-    /// URL 格式通常为 /cate/{id} 或包含分类 ID 的路径
-    private func extractCateId(from url: String) -> Int {
-        // 从 URL 路径中提取最后一段作为 ID
-        let components = url.split(separator: "/")
-        if let lastComponent = components.last, let id = Int(lastComponent) {
-            return id
-        }
-        // 尝试从查询参数中提取
-        if let urlComponents = URLComponents(string: url),
-           let idStr = urlComponents.queryItems?.first(where: { $0.name == "id" })?.value,
-           let id = Int(idStr) {
-            return id
-        }
-        return 0
-    }
+    // MARK: - 子视图（无需 URL 解析，分类项自带数字 ID）
 }
 
 // MARK: - 分类选择器
@@ -238,35 +229,25 @@ struct ArticleEditorView: View {
 /// 采用标准 iOS 选择列表样式，选中项带勾选标记
 struct CategoryPickerView: View {
 
-    let categories: [CateMenuItem]
+    let categories: [CateItem]
     let selectedId: Int
-    let onSelect: (CateMenuItem) -> Void
+    let onSelect: (CateItem) -> Void
 
     @Environment(\.dismiss) private var dismiss
-
-    /// 从分类 URL 中提取分类 ID
-    private func cateId(from url: String) -> Int {
-        let components = url.split(separator: "/")
-        if let lastComponent = components.last, let id = Int(lastComponent) {
-            return id
-        }
-        return 0
-    }
 
     var body: some View {
         NavigationStack {
             List {
-                ForEach(Array(categories.enumerated()), id: \.offset) { _, cate in
-                    let id = cateId(from: cate.url)
+                ForEach(categories) { cate in
                     Button {
                         onSelect(cate)
                         dismiss()
                     } label: {
                         HStack {
-                            Text(cate.content)
+                            Text(cate.name)
                                 .foregroundStyle(.primary)
                             Spacer()
-                            if id == selectedId {
+                            if cate.id == selectedId {
                                 Image(systemName: "checkmark")
                                     .foregroundStyle(Color.accentColor)
                             }

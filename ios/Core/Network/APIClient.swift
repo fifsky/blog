@@ -29,11 +29,13 @@ actor APIClient {
     ///   - path: API 路径（如 "/blog/login"）
     ///   - body: 请求体（Codable 对象，可为 nil）
     ///   - auth: 是否携带 Authorization 头
+    ///   - headers: 附加的自定义请求头（如 X-Client-Type）
     /// - Returns: 解码后的响应对象
     func request<T: Decodable>(
         path: String,
         body: Encodable? = nil,
-        auth: Bool = false
+        auth: Bool = false,
+        headers: [String: String]? = nil
     ) async throws -> T {
         guard let url = URL(string: Config.baseURL + path) else {
             throw APIError.invalidResponse
@@ -42,6 +44,13 @@ actor APIClient {
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        // 设置附加的自定义请求头
+        if let headers {
+            for (key, value) in headers {
+                urlRequest.setValue(value, forHTTPHeaderField: key)
+            }
+        }
 
         // 携带认证 Token
         if auth {

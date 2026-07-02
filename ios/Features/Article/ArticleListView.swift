@@ -11,6 +11,9 @@ struct ArticleListView: View {
     /// 导航到文章编辑器
     @State private var showEditor = false
 
+    /// 退出登录确认弹窗
+    @State private var showLogoutConfirmation = false
+
     var body: some View {
         NavigationStack {
             Group {
@@ -23,7 +26,7 @@ struct ArticleListView: View {
                     ContentUnavailableView {
                         Label("暂无文章", systemImage: "doc.text")
                     } description: {
-                        Text("点击右上角 + 创建第一篇文章")
+                        Text("点击右上角 ⋯ 创建第一篇文章")
                     }
                 } else {
                     // 文章列表
@@ -33,10 +36,24 @@ struct ArticleListView: View {
             .navigationTitle("博文")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showEditor = true
+                    // 三点菜单按钮，点击弹出新增博文 / 退出登录选项
+                    Menu {
+                        Button {
+                            showEditor = true
+                        } label: {
+                            Label("新增博文", systemImage: "square.and.pencil")
+                        }
+
+                        Divider()
+
+                        Button(role: .destructive) {
+                            showLogoutConfirmation = true
+                        } label: {
+                            Label("退出登录", systemImage: "rectangle.portrait.and.arrow.right")
+                        }
                     } label: {
-                        Image(systemName: "plus")
+                        Image(systemName: "ellipsis")
+                            .font(.system(size: 16, weight: .medium))
                     }
                 }
             }
@@ -53,6 +70,14 @@ struct ArticleListView: View {
                 Button("确定", role: .cancel) {}
             } message: {
                 Text(viewModel.errorMessage ?? "未知错误")
+            }
+            .alert("退出登录", isPresented: $showLogoutConfirmation) {
+                Button("退出登录", role: .destructive) {
+                    AuthManager.shared.logout()
+                }
+                Button("取消", role: .cancel) {}
+            } message: {
+                Text("确定要退出当前账号吗？")
             }
             .task {
                 await viewModel.load()

@@ -9,6 +9,11 @@ class AuthService {
     // 登录接口
     func login(userName: String, password: String, totpCode: String? = nil) async throws -> LoginResponse {
         let request = LoginRequest(user_name: userName, password: password, totp_code: totpCode)
-        return try await APIClient.shared.request(path: "/blog/login", body: request)
+        // 标识 iOS 客户端，后端据此发放 30 天有效期的 token
+        return try await APIClient.shared.request(
+            path: "/blog/login",
+            body: request,
+            headers: ["X-Client-Type": "ios"]
+        )
     }
 }

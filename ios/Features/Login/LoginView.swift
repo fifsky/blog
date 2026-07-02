@@ -9,6 +9,17 @@ struct LoginView: View {
     /// 登录成功回调
     var onLoginSuccess: (LoginViewModel) -> Void
 
+    // MARK: - 焦点状态
+
+    /// 用户名输入框焦点
+    @FocusState private var userNameFocused: Bool
+
+    /// 密码输入框焦点
+    @FocusState private var passwordFocused: Bool
+
+    /// OTP bridge 输入框焦点
+    @FocusState private var otpFocused: Bool
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -39,12 +50,21 @@ struct LoginView: View {
                     onLoginSuccess(viewModel)
                 }
             }
+            .onChange(of: viewModel.step) { _, newStep in
+                // 切换到对应步骤时自动聚焦
+                switch newStep {
+                case .credentials:
+                    userNameFocused = true
+                case .totp:
+                    otpFocused = true
+                }
+            }
         }
     }
 
     // MARK: - 第一步：用户名密码
 
-    /// 第一步登录页面
+    /// 第一步登录页面（一体化分组输入框）
     private var credentialsStep: some View {
         VStack(spacing: 24) {
             Spacer()
@@ -59,51 +79,88 @@ struct LoginView: View {
                     .foregroundStyle(.secondary)
             }
 
-            // 登录表单
-            VStack(spacing: 16) {
+            // 一体化分组输入框：用户名 + 密码，中间用分割线分隔
+            VStack(spacing: 0) {
                 // 用户名
-                TextField("用户名", text: $viewModel.userName)
-                    .textFieldStyle(.roundedBorder)
-                    .textContentType(.username)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .submitLabel(.next)
-                    .onSubmit { submitCredentials() }
+                HStack(spacing: 12) {
+                    Image(systemName: "person")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .frame(width: 20)
+
+                    TextField("用户名", text: $viewModel.userName)
+                        .textContentType(.username)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .submitLabel(.next)
+                        .focused($userNameFocused)
+                        .onSubmit {
+                            passwordFocused = true
+                        }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+
+                // 中间分割线
+                Divider()
 
                 // 密码
-                SecureField("密码", text: $viewModel.password)
-                    .textFieldStyle(.roundedBorder)
-                    .textContentType(.password)
-                    .submitLabel(.go)
-                    .onSubmit { submitCredentials() }
+                HStack(spacing: 12) {
+                    Image(systemName: "lock")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .frame(width: 20)
 
-                // 登录按钮
-                Button {
-                    submitCredentials()
-                } label: {
-                    HStack {
-                        if viewModel.isLoading {
-                            ProgressView()
-                                .tint(.white)
+                    SecureField("密码", text: $viewModel.password)
+                        .textContentType(.password)
+                        .submitLabel(.go)
+                        .focused($passwordFocused)
+                        .onSubmit {
+                            submitCredentials()
                         }
-                        Text("登录")
-                    }
-                    .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(viewModel.isCredentialsButtonDisabled || viewModel.isLoading)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
             }
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(Color.secondary.opacity(0.3), lineWidth: 1)
+            )
+            .padding(.horizontal, 24)
+
+            // 登录按钮
+            Button {
+                userNameFocused = false
+                passwordFocused = false
+                submitCredentials()
+            } label: {
+                HStack(spacing: 8) {
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .tint(.white)
+                    }
+                    Text("登录")
+                        .font(.headline)
+                }
+                .frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(viewModel.isCredentialsButtonDisabled || viewModel.isLoading)
             .padding(.horizontal, 24)
 
             Spacer()
             Spacer()
         }
         .navigationTitle("登录")
+        .onAppear {
+            // 首次进入自动聚焦用户名
+            userNameFocused = true
+        }
     }
 
     // MARK: - 第二步：TOTP 验证码
 
-    /// 第二步验证码页面
+    /// 第二步验证码页面（6 个独立展示框 + 隐藏 bridge TextField）
     private var totpStep: some View {
         VStack(spacing: 24) {
             Spacer()
@@ -125,20 +182,15 @@ struct LoginView: View {
                 }
             }
 
-            // 6 位验证码输入
-            VStack(spacing: 20) {
-                // 大号居中的验证码输入框，限制 6 位数字
+            // 6 位验证码展示框（覆盖在隐藏的 bridge TextField 上）
+            ZStack {
+                // 隐藏的 bridge TextField：负责接收输入、键盘和自动填充
                 TextField("", text: $viewModel.totpCode)
                     .keyboardType(.numberPad)
                     .textContentType(.oneTimeCode)
-                    .multilineTextAlignment(.center)
-                    .font(.system(size: 34, weight: .semibold, design: .monospaced))
-                    .frame(maxWidth: 220)
-                    .padding(.vertical, 14)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .strokeBorder(totpFieldColor, lineWidth: 1.5)
-                    )
+                    .focused($otpFocused)
+                    .opacity(0.001)
+                    .frame(width: 1, height: 1)
                     .onChange(of: viewModel.totpCode) { _, newValue in
                         // 仅保留数字，最多 6 位
                         let filtered = newValue.filter { $0.isNumber }
@@ -149,24 +201,40 @@ struct LoginView: View {
                         }
                     }
 
-                // 提示输入位数
-                Text("\(viewModel.totpCode.count) / 6")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                // 6 个展示框
+                HStack(spacing: 10) {
+                    ForEach(0..<6, id: \.self) { index in
+                        otpDigitBox(at: index)
+                    }
+                }
+                .allowsHitTesting(false)
             }
+            .padding(.horizontal, 24)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                // 点击展示框区域激活键盘
+                otpFocused = true
+            }
+
+            // 提示输入位数
+            Text("\(viewModel.totpCode.count) / 6")
+                .font(.caption)
+                .foregroundStyle(.secondary)
 
             // 验证按钮
             Button {
+                otpFocused = false
                 submitTotp()
             } label: {
-                HStack {
+                HStack(spacing: 8) {
                     if viewModel.isLoading {
                         ProgressView()
                             .tint(.white)
                     }
                     Text("验证")
+                        .font(.headline)
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, minHeight: 44)
             }
             .buttonStyle(.borderedProminent)
             .disabled(viewModel.isTotpButtonDisabled || viewModel.isLoading)
@@ -185,13 +253,38 @@ struct LoginView: View {
             Spacer()
         }
         .navigationTitle("两步验证")
+        .onAppear {
+            otpFocused = true
+        }
     }
 
-    // MARK: - 计算属性
+    // MARK: - 子视图
 
-    /// 验证码输入框边框颜色：未满 6 位为次要色，满 6 位为蓝色
-    private var totpFieldColor: Color {
-        viewModel.totpCode.count == 6 ? .blue : .secondary.opacity(0.4)
+    /// 单个 OTP 数字展示框
+    /// - Parameter index: 第几位（0...5）
+    private func otpDigitBox(at index: Int) -> some View {
+        let digits = Array(viewModel.totpCode)
+        // 当前位是否已填入
+        let isFilled = index < digits.count
+        // 当前位数字
+        let digit = isFilled ? String(digits[index]) : ""
+        // 是否为下一个待输入位（高亮）
+        let isCurrent = index == digits.count
+
+        return Text(digit)
+            .font(.system(size: 28, weight: .semibold, design: .monospaced))
+            .frame(width: 40, height: 52)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color(.systemGray6))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .strokeBorder(
+                        isCurrent ? Color.accentColor : Color.secondary.opacity(0.3),
+                        lineWidth: isCurrent ? 2 : 1
+                    )
+            )
     }
 
     // MARK: - 辅助方法

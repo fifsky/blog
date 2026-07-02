@@ -11,12 +11,6 @@ struct FootprintMapView: View {
     /// 新建足迹编辑器弹窗
     @State private var showEditor = false
 
-    /// 切换到列表视图的回调
-    var onShowListView: () -> Void
-
-    /// 新建足迹的回调
-    var onAddFootprint: () -> Void
-
     var body: some View {
         ZStack {
             // 地图主视图
@@ -34,7 +28,6 @@ struct FootprintMapView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    onAddFootprint()
                     showEditor = true
                 } label: {
                     Image(systemName: "plus")
@@ -91,40 +84,9 @@ struct FootprintMapView: View {
         .mapControls {
             MapUserLocationButton()
         }
-        .overlay(alignment: .bottomTrailing) {
-            // 切换视图按钮
-            toggleViewButton
-        }
     }
 
-    // MARK: - 视图切换按钮
-
-    /// 底部右侧的视图切换按钮
-    private var toggleViewButton: some View {
-        VStack(spacing: 8) {
-            // 切换到列表视图
-            Button {
-                onShowListView()
-            } label: {
-                Image(systemName: "list.bullet")
-                    .font(.title3)
-                    .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
-            }
-            .padding(.trailing, 16)
-
-            // 刷新按钮
-            Button {
-                Task { await viewModel.refresh() }
-            } label: {
-                Image(systemName: "arrow.clockwise")
-                    .font(.title3)
-                    .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
-            }
-        }
-        .padding(.bottom, 16)
-    }
+    // MARK: - 视图切换按钮（已移除：原切换列表为 TODO 空实现，刷新无可见反馈，均无实际作用）
 
     // MARK: - 足迹详情 Sheet
 

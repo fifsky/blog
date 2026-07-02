@@ -1,5 +1,12 @@
 import Foundation
 
+// MARK: - 通知名
+
+/// 用户退出登录通知，根视图监听后切回登录页
+extension Notification.Name {
+    static let didLogout = Notification.Name("AuthManagerDidLogout")
+}
+
 // MARK: - 模型定义
 
 /// 登录请求
@@ -133,10 +140,11 @@ class AuthManager {
 
     // MARK: - 登出
 
-    /// 清除登录状态
+    /// 清除登录状态，并广播退出登录通知
     func logout() {
         accessToken = nil
         expiresAt = nil
         currentUser = nil
+        NotificationCenter.default.post(name: .didLogout, object: nil)
     }
 }

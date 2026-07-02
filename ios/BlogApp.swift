@@ -23,6 +23,10 @@ struct BlogApp: App {
                     isAuthenticated = true
                 }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .didLogout)) { _ in
+                // 收到退出登录通知后切回登录页
+                isAuthenticated = false
+            }
         }
     }
 }
