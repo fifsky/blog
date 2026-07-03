@@ -73,7 +73,8 @@ struct FootprintMapView: View {
         .navigationDestination(isPresented: $showPhotoBrowser) {
             PhotoBrowserView(
                 photoURLs: photoBrowserURLs,
-                initialIndex: photoBrowserIndex
+                initialIndex: photoBrowserIndex,
+                placeName: viewModel.selectedFootprint?.name ?? "照片"
             )
         }
         // 点击照片后先关闭 sheet，sheet 收起后再 push 浏览器

@@ -11,6 +11,9 @@ struct PhotoBrowserView: View {
     /// 初始显示的照片索引
     let initialIndex: Int
 
+    /// 地点名称（用作页面标题）
+    let placeName: String
+
     /// 底部页码指示器是否可见
     @State private var indexVisible = true
 
@@ -20,16 +23,17 @@ struct PhotoBrowserView: View {
     /// 当前显示的照片索引
     @State private var currentIndex: Int
 
-    init(photoURLs: [String], initialIndex: Int) {
+    init(photoURLs: [String], initialIndex: Int, placeName: String) {
         self.photoURLs = photoURLs
         self.initialIndex = initialIndex
+        self.placeName = placeName
         self._currentIndex = State(initialValue: initialIndex)
     }
 
     var body: some View {
         ZStack {
-            // 纯黑背景，沉浸式浏览
-            Color.black.ignoresSafeArea()
+            // 浅灰背景
+            Color(.systemGroupedBackground).ignoresSafeArea()
 
             // 照片翻页容器
             TabView(selection: $currentIndex) {
@@ -39,7 +43,6 @@ struct PhotoBrowserView: View {
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: photoURLs.count > 1 ? .automatic : .never))
-            .ignoresSafeArea()
 
             // 底部页码指示器
             VStack {
@@ -49,10 +52,12 @@ struct PhotoBrowserView: View {
                 }
             }
         }
-        .navigationTitle("")
+        .navigationTitle(placeName)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.regularMaterial, for: .navigationBar)
+        // 导航栏背景与内容区统一灰底，从顶到底一致
         .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarBackground(Color(.systemGroupedBackground), for: .navigationBar)
+        .toolbar(.hidden, for: .tabBar)
         .statusBarHidden()
         .onAppear {
             scheduleHideIndex()
@@ -70,10 +75,10 @@ struct PhotoBrowserView: View {
         if indexVisible {
             Text("\(currentIndex + 1) / \(photoURLs.count)")
                 .font(.subheadline)
-                .foregroundStyle(.white)
+                .foregroundStyle(.secondary)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(.black.opacity(0.4), in: Capsule())
+                .background(.regularMaterial, in: Capsule())
                 .padding(.bottom, 24)
                 .transition(.opacity)
         }
@@ -132,7 +137,6 @@ private struct ZoomableImage: View {
                         .foregroundStyle(.gray)
                     default:
                         ProgressView()
-                            .tint(.white)
                     }
                 }
             }
