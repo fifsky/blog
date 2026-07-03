@@ -288,11 +288,14 @@ private struct Triangle: Shape {
 
 extension Footprint {
 
-    /// 将字符串经纬度转换为 CLLocationCoordinate2D
+    /// 将字符串经纬度转换为 CLLocationCoordinate2D（GCJ-02 转 WGS-84，适配 MapKit）
     var coordinate: CLLocationCoordinate2D? {
         guard let latStr = latitude, let lonStr = longitude,
               let lat = Double(latStr), let lon = Double(lonStr) else { return nil }
-        return CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        // 库存的是高德 GCJ-02 坐标，MapKit 用 WGS-84，需转换
+        return CoordinateTransform.gcj02ToWgs84(
+            CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        )
     }
 }
 

@@ -98,8 +98,13 @@ struct LocationPickerView: View {
         let lat = Double(latitude.wrappedValue) ?? 35.86
         let lon = Double(longitude.wrappedValue) ?? 104.19
 
+        // 库存为 GCJ-02，MapKit 需 WGS-84，转回用于初始定位与预选
+        let wgs = CoordinateTransform.gcj02ToWgs84(
+            CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        )
+
         let region = MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: lat, longitude: lon),
+            center: wgs,
             span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
         )
 
@@ -108,9 +113,7 @@ struct LocationPickerView: View {
 
         // 如果已有坐标，预选
         if Double(latitude.wrappedValue) != nil && Double(longitude.wrappedValue) != nil {
-            _selectedCoordinate = State(
-                initialValue: CLLocationCoordinate2D(latitude: lat, longitude: lon)
-            )
+            _selectedCoordinate = State(initialValue: wgs)
         }
     }
 
@@ -312,8 +315,10 @@ struct LocationPickerView: View {
     /// 确认选择的位置，回传坐标（保留 6 位小数）并关闭
     private func confirmLocation() {
         guard let coordinate = selectedCoordinate else { return }
-        latitude = String(format: "%.6f", coordinate.latitude)
-        longitude = String(format: "%.6f", coordinate.longitude)
+        // MapKit 采集的是 WGS-84，库存需为 GCJ-02（与网页高德地图对齐），转回再存
+        let gcj = CoordinateTransform.wgs84ToGcj02(coordinate)
+        latitude = String(format: "%.6f", gcj.latitude)
+        longitude = String(format: "%.6f", gcj.longitude)
         dismiss()
     }
 }

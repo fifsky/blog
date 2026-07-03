@@ -85,15 +85,12 @@ class FootprintMapViewModel {
             return
         }
 
-        // 计算所有足迹的坐标范围
-        let lats = validItems.compactMap { item -> Double? in
-            guard let s = item.latitude else { return nil }
-            return Double(s)
+        // 计算所有足迹的坐标范围（GCJ-02 转 WGS-84，适配 MapKit）
+        let wgsCoords = validItems.compactMap { item -> CLLocationCoordinate2D? in
+            item.coordinate
         }
-        let lons = validItems.compactMap { item -> Double? in
-            guard let s = item.longitude else { return nil }
-            return Double(s)
-        }
+        let lats = wgsCoords.map { $0.latitude }
+        let lons = wgsCoords.map { $0.longitude }
 
         let minLat = lats.min() ?? 0
         let maxLat = lats.max() ?? 0
