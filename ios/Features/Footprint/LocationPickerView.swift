@@ -144,6 +144,8 @@ struct LocationPickerView: View {
             }
             .ignoresSafeArea(.keyboard, edges: .bottom)
         }
+        // 点击空白区域收起键盘
+        .hideKeyboardOnTap()
         .navigationTitle("选择位置")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

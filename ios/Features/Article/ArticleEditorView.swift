@@ -81,6 +81,9 @@ struct ArticleEditorView: View {
                 Text("支持 Markdown 格式")
             }
         }
+        // 点击空白收起 + 拖拽下滑交互式收起键盘
+        .hideKeyboardOnTap()
+        .scrollDismissesKeyboard(.interactively)
         .navigationTitle(viewModel?.isEditing == true ? "编辑文章" : "新建文章")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

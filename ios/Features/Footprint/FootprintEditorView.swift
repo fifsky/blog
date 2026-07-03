@@ -146,6 +146,9 @@ struct FootprintEditorView: View {
                 Text("新建足迹时，照片将在保存时上传。")
             }
         }
+        // 点击空白收起 + 拖拽下滑交互式收起键盘
+        .hideKeyboardOnTap()
+        .scrollDismissesKeyboard(.interactively)
         .navigationTitle(viewModel.isEditing ? "编辑足迹" : "新建足迹")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

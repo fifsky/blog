@@ -123,6 +123,9 @@ struct ArticleDetailView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
+        // 点击空白收起 + 拖拽下滑交互式收起键盘（覆盖评论输入框）
+        .hideKeyboardOnTap()
+        .scrollDismissesKeyboard(.interactively)
         .navigationTitle("文章详情")
         .navigationBarTitleDisplayMode(.inline)
         .alert("错误", isPresented: Binding(

@@ -3,7 +3,13 @@ import SwiftUI
 @main
 struct BlogApp: App {
 
-    @State private var isAuthenticated = false
+    @State private var isAuthenticated: Bool
+
+    init() {
+        // 启动时同步检查登录态：Keychain 读取是同步且快速的，
+        // 让首帧即以正确状态渲染，避免冷启动闪过登录页（其 onAppear 会拉起键盘）
+        _isAuthenticated = State(initialValue: AuthManager.shared.isLoggedIn)
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -15,12 +21,6 @@ struct BlogApp: App {
                         // 登录成功后切换到主界面
                         isAuthenticated = true
                     }
-                }
-            }
-            .task {
-                // 启动时检查登录状态：Token 存于 Keychain（持久化），未过期则直接进入主页
-                if AuthManager.shared.isLoggedIn {
-                    isAuthenticated = true
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: .didLogout)) { _ in

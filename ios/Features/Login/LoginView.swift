@@ -44,6 +44,8 @@ struct LoginView: View {
                 }
             }
             .animation(.easeInOut(duration: 0.25), value: viewModel.step)
+            // 点击空白区域收起键盘
+            .hideKeyboardOnTap()
             // 隐藏系统导航栏，自定义标题承载
             .navigationBarHidden(true)
             .alert("登录失败", isPresented: $viewModel.showError) {

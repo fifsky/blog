@@ -40,6 +40,8 @@ struct MoodEditorView: View {
                     }
                 }
         }
+        // 点击空白区域收起键盘
+        .hideKeyboardOnTap()
         .navigationTitle(viewModel.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

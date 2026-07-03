@@ -28,3 +28,6 @@ test.sh
 /ios/build/
 /ios/*.ipa
 /ios/xcuserdata/
+# Xcode 用户状态文件（嵌套在 .xcodeproj 内部）
+/ios/**/*.xcuserstate
+/ios/**/xcuserdata/

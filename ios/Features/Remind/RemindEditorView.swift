@@ -140,6 +140,9 @@ struct RemindEditorView: View {
                 }
             }
         }
+        // 点击空白收起 + 拖拽下滑交互式收起键盘
+        .hideKeyboardOnTap()
+        .scrollDismissesKeyboard(.interactively)
         .navigationTitle(viewModel.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
