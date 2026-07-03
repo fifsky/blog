@@ -14,9 +14,6 @@ struct MoodListView: View {
     /// 当前编辑的心情（nil 表示新建）
     @State private var editingMood: Mood?
 
-    /// 长按操作的目标心情
-    @State private var actionMood: Mood?
-
     var body: some View {
         NavigationStack {
             // 主滚动内容：Header + 卡片，作为一个连续页面滚动
@@ -58,30 +55,6 @@ struct MoodListView: View {
             }) {
                 NavigationStack {
                     MoodEditorView(mood: editingMood)
-                }
-            }
-            // 长按弹出的操作菜单
-            .confirmationDialog("心情操作",
-                                isPresented: Binding(
-                                    get: { actionMood != nil },
-                                    set: { if !$0 { actionMood = nil } }
-                                ),
-                                titleVisibility: .visible) {
-                Button("编辑") {
-                    if let mood = actionMood {
-                        editingMood = mood
-                        actionMood = nil
-                        showEditor = true
-                    }
-                }
-                Button("删除", role: .destructive) {
-                    if let mood = actionMood {
-                        viewModel.confirmDelete(mood: mood)
-                        actionMood = nil
-                    }
-                }
-                Button("取消", role: .cancel) {
-                    actionMood = nil
                 }
             }
             .alert("删除心情", isPresented: $viewModel.showDeleteConfirmation) {
@@ -150,6 +123,7 @@ struct MoodListView: View {
             // 心情内容
             Text(mood.content)
                 .font(.body)
+                .foregroundStyle(Color.themePrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
 
@@ -167,9 +141,19 @@ struct MoodListView: View {
         .background(Color(.systemBackground).opacity(0.9))
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .contentShape(RoundedRectangle(cornerRadius: 14))
-        // 长按弹出操作菜单
-        .onLongPressGesture {
-            actionMood = mood
+        // 长按弹出系统 Context Menu（原生毛玻璃/Haptic/动画，跟随卡片）
+        .contextMenu {
+            Button {
+                editingMood = mood
+                showEditor = true
+            } label: {
+                Label("编辑", systemImage: "square.and.pencil")
+            }
+            Button(role: .destructive) {
+                viewModel.confirmDelete(mood: mood)
+            } label: {
+                Label("删除", systemImage: "trash")
+            }
         }
     }
 

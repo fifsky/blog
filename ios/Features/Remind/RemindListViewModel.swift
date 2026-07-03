@@ -150,13 +150,13 @@ class RemindListViewModel {
 
     // MARK: - 标记完成
 
-    /// 请求标记提醒为已完成
+    /// 请求标记提醒为已完成（已废弃，保留兼容）
     func requestComplete(remind: Remind) {
         remindToComplete = remind
         showCompleteAction = true
     }
 
-    /// 执行标记完成
+    /// 执行标记完成（已废弃，保留兼容）
     func markAsDone() async {
         guard let remind = remindToComplete else { return }
 
@@ -175,5 +175,23 @@ class RemindListViewModel {
         }
 
         remindToComplete = nil
+    }
+
+    /// 直接标记提醒为已完成（不弹窗，直接调用接口）
+    /// - Parameter remind: 要标记完成的提醒
+    func markAsDoneDirect(remind: Remind) async {
+        do {
+            _ = try await remindService.update(
+                id: remind.id,
+                cron: nil,
+                content: nil,
+                status: RemindStatus.done.rawValue
+            )
+            // 直接重新加载列表以确保数据一致
+            await refresh()
+        } catch {
+            errorMessage = error.localizedDescription
+            showError = true
+        }
     }
 }

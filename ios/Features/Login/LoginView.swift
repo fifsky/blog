@@ -2,6 +2,7 @@ import SwiftUI
 
 /// 登录视图
 /// 分两步登录：第一步输入用户名密码，第二步（账号开启 TOTP 时）输入 6 位验证码
+/// 采用与整个 App 一致的设计语言：水彩背景 + 毛玻璃卡片 + 大标题（Apple Journal 风格）
 struct LoginView: View {
 
     @State private var viewModel = LoginViewModel()
@@ -23,6 +24,9 @@ struct LoginView: View {
     var body: some View {
         NavigationStack {
             ZStack {
+                // 水彩背景图（与 App 其他页面一致）
+                PageBackground(imageName: "login_bg")
+
                 // 用 switch + transition 实现两步页面切换
                 switch viewModel.step {
                 case .credentials:
@@ -40,6 +44,8 @@ struct LoginView: View {
                 }
             }
             .animation(.easeInOut(duration: 0.25), value: viewModel.step)
+            // 隐藏系统导航栏，自定义标题承载
+            .navigationBarHidden(true)
             .alert("登录失败", isPresented: $viewModel.showError) {
                 Button("确定", role: .cancel) {}
             } message: {
@@ -64,29 +70,37 @@ struct LoginView: View {
 
     // MARK: - 第一步：用户名密码
 
-    /// 第一步登录页面（一体化分组输入框）
+    /// 第一步登录页面（毛玻璃卡片 + 大标题）
     private var credentialsStep: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 0) {
             Spacer()
 
-            // 标题
-            VStack(spacing: 8) {
-                Text("博客")
-                    .font(.largeTitle)
-                    .bold()
-                Text("登录以管理你的内容")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+            // Logo + 标题区
+            VStack(spacing: 16) {
+                Image(systemName: "paperplane.fill")
+                    .font(.system(size: 56, weight: .medium))
+                    .foregroundStyle(.white)
+                    .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 6)
+
+                VStack(spacing: 8) {
+                    Text("無處告別")
+                        .font(.system(size: 34, weight: .bold))
+                    Text("登录以管理你的内容")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
             }
 
-            // 一体化分组输入框：用户名 + 密码，中间用分割线分隔
+            Spacer()
+
+            // 毛玻璃登录卡片：用户名 + 密码
             VStack(spacing: 0) {
                 // 用户名
                 HStack(spacing: 12) {
                     Image(systemName: "person")
                         .font(.body)
                         .foregroundStyle(.secondary)
-                        .frame(width: 20)
+                        .frame(width: 22)
 
                     TextField("用户名", text: $viewModel.userName)
                         .textContentType(.username)
@@ -98,18 +112,19 @@ struct LoginView: View {
                             passwordFocused = true
                         }
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
+                .frame(height: 54)
+                .padding(.horizontal, 18)
 
                 // 中间分割线
                 Divider()
+                    .opacity(0.3)
 
                 // 密码
                 HStack(spacing: 12) {
                     Image(systemName: "lock")
                         .font(.body)
                         .foregroundStyle(.secondary)
-                        .frame(width: 20)
+                        .frame(width: 22)
 
                     SecureField("密码", text: $viewModel.password)
                         .textContentType(.password)
@@ -119,13 +134,11 @@ struct LoginView: View {
                             submitCredentials()
                         }
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
+                .frame(height: 54)
+                .padding(.horizontal, 18)
             }
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(Color.secondary.opacity(0.3), lineWidth: 1)
-            )
+            // 毛玻璃背景 + 大圆角
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
             .padding(.horizontal, 24)
 
             // 登录按钮
@@ -142,16 +155,22 @@ struct LoginView: View {
                     Text("登录")
                         .font(.headline)
                 }
-                .frame(maxWidth: .infinity, minHeight: 44)
+                .frame(maxWidth: .infinity, minHeight: 50)
             }
             .buttonStyle(.borderedProminent)
+            .tint(Color(red: 0x00/255.0, green: 0x7d/255.0, blue: 0xfe/255.0))
             .disabled(viewModel.isCredentialsButtonDisabled || viewModel.isLoading)
             .padding(.horizontal, 24)
+            .padding(.top, 20)
 
             Spacer()
-            Spacer()
+
+            // 版本号
+            Text("Version 1.0")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .padding(.bottom, 16)
         }
-        .navigationTitle("登录")
         .onAppear {
             // 首次进入自动聚焦用户名
             userNameFocused = true
@@ -162,25 +181,26 @@ struct LoginView: View {
 
     /// 第二步验证码页面（6 个独立展示框 + 隐藏 bridge TextField）
     private var totpStep: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 0) {
             Spacer()
 
             // 图标 + 标题
-            VStack(spacing: 12) {
-                Image(systemName: "lock.shield")
-                    .font(.system(size: 56))
-                    .foregroundStyle(.blue)
+            VStack(spacing: 16) {
+                Image(systemName: "lock.shield.fill")
+                    .font(.system(size: 56, weight: .medium))
+                    .foregroundStyle(Color(red: 0x00/255.0, green: 0x7d/255.0, blue: 0xfe/255.0))
 
                 VStack(spacing: 8) {
                     Text("两步验证")
-                        .font(.title2)
-                        .bold()
+                        .font(.system(size: 28, weight: .bold))
                     Text("请输入身份验证器中的 6 位验证码")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                 }
             }
+
+            Spacer()
 
             // 6 位验证码展示框（覆盖在隐藏的 bridge TextField 上）
             ZStack {
@@ -220,6 +240,9 @@ struct LoginView: View {
             Text("\(viewModel.totpCode.count) / 6")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .padding(.top, 12)
+
+            Spacer()
 
             // 验证按钮
             Button {
@@ -234,9 +257,10 @@ struct LoginView: View {
                     Text("验证")
                         .font(.headline)
                 }
-                .frame(maxWidth: .infinity, minHeight: 44)
+                .frame(maxWidth: .infinity, minHeight: 50)
             }
             .buttonStyle(.borderedProminent)
+            .tint(Color(red: 0x00/255.0, green: 0x7d/255.0, blue: 0xfe/255.0))
             .disabled(viewModel.isTotpButtonDisabled || viewModel.isLoading)
             .padding(.horizontal, 24)
 
@@ -248,11 +272,10 @@ struct LoginView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
+            .padding(.top, 16)
 
             Spacer()
-            Spacer()
         }
-        .navigationTitle("两步验证")
         .onAppear {
             otpFocused = true
         }
@@ -273,16 +296,14 @@ struct LoginView: View {
 
         return Text(digit)
             .font(.system(size: 28, weight: .semibold, design: .monospaced))
-            .frame(width: 40, height: 52)
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(.systemGray6))
-            )
+            .frame(width: 44, height: 56)
+            // 白色半透明背景，确保数字清晰可见
+            .background(Color.white.opacity(0.8), in: RoundedRectangle(cornerRadius: 12))
             .overlay(
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: 12)
                     .strokeBorder(
-                        isCurrent ? Color.accentColor : Color.secondary.opacity(0.3),
-                        lineWidth: isCurrent ? 2 : 1
+                        isCurrent ? Color(red: 0x00/255.0, green: 0x7d/255.0, blue: 0xfe/255.0) : .clear,
+                        lineWidth: isCurrent ? 2 : 0
                     )
             )
     }

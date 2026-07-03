@@ -2,8 +2,7 @@ import SwiftUI
 
 /// 提醒列表视图
 ///
-/// 布局结构：透明导航栏 + ScrollView(Header + List insetGrouped 分组)
-/// Header 是 ScrollView 第一项，随页面一起滚动；列表保持原生 insetGrouped 分组样式。
+/// 布局结构：透明导航栏 + List insetGrouped 分组 + safeAreaInset Header
 struct RemindListView: View {
 
     @State private var viewModel = RemindListViewModel()
@@ -27,18 +26,40 @@ struct RemindListView: View {
                 } else {
                     // 分组列表（保持原生 insetGrouped 风格）
                     List {
+                        // Header 作为 List 第一行，随列表滚动（与博文/心情一致）
+                        ListPageHeader(title: "提醒", bottomPadding: 0)
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 0, trailing: 16))
+
                         // 分组提醒
                         ForEach(viewModel.groupedReminds, id: \.status) { group in
                             Section {
                                 ForEach(group.items) { remind in
                                     remindRow(remind)
-                                        .listRowBackground(Color(.systemBackground).opacity(0.92))
-                                }
-                                .onDelete { indexSet in
-                                    if let index = indexSet.first {
-                                        let remind = group.items[index]
-                                        viewModel.confirmDelete(remind: remind)
-                                    }
+                                        // 左滑操作：待确认事项显示「标记完成」，其他显示「删除」
+                                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                            if remind.status == RemindStatus.pending.rawValue {
+                                                Button {
+                                                    Task { await viewModel.markAsDoneDirect(remind: remind) }
+                                                } label: {
+                                                    Label("完成", systemImage: "checkmark.circle")
+                                                }
+                                                .tint(.green)
+
+                                                Button(role: .destructive) {
+                                                    viewModel.confirmDelete(remind: remind)
+                                                } label: {
+                                                    Label("删除", systemImage: "trash")
+                                                }
+                                            } else {
+                                                Button(role: .destructive) {
+                                                    viewModel.confirmDelete(remind: remind)
+                                                } label: {
+                                                    Label("删除", systemImage: "trash")
+                                                }
+                                            }
+                                        }
                                 }
                             } header: {
                                 HStack {
@@ -81,11 +102,6 @@ struct RemindListView: View {
                     .scrollContentBackground(.hidden)
                     // 消除 List 顶部默认 contentInset，与其他 ScrollView 页面顶部对齐
                     .contentMargins(.top, 0, for: .scrollContent)
-                    // Header 放在 List 安全区域顶部，脱离 List row inset 影响，边距与其他页面一致
-                    .safeAreaInset(edge: .top) {
-                        ListPageHeader(title: "提醒", bottomPadding: 0)
-                            .padding(.horizontal, 16)
-                    }
                     .refreshable {
                         await viewModel.refresh()
                     }
@@ -125,18 +141,6 @@ struct RemindListView: View {
             } message: {
                 Text("确定要删除这条提醒吗？此操作不可撤销。")
             }
-            .confirmationDialog("标记完成", isPresented: $viewModel.showCompleteAction, titleVisibility: .visible) {
-                Button("标记为已完成") {
-                    Task { await viewModel.markAsDone() }
-                }
-                Button("取消", role: .cancel) {
-                    viewModel.remindToComplete = nil
-                }
-            } message: {
-                if let remind = viewModel.remindToComplete {
-                    Text("确定将「\(remind.content)」标记为已完成吗？")
-                }
-            }
             .alert("错误", isPresented: $viewModel.showError) {
                 Button("确定", role: .cancel) {}
             } message: {
@@ -157,6 +161,7 @@ struct RemindListView: View {
                 // 提醒内容
                 Text(remind.content)
                     .font(.body)
+                    .foregroundStyle(Color.themePrimary)
                     .lineLimit(2)
 
                 // 下次提醒时间（可读格式）
@@ -178,10 +183,9 @@ struct RemindListView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            let status = remind.status
-            // 仅 ACTIVE 和 PENDING 状态可以标记完成
-            if status == RemindStatus.active.rawValue || status == RemindStatus.pending.rawValue {
-                viewModel.requestComplete(remind: remind)
+            // 仅待确认（PENDING）状态点击可标记完成，直接执行无需弹窗
+            if remind.status == RemindStatus.pending.rawValue {
+                Task { await viewModel.markAsDoneDirect(remind: remind) }
             }
         }
     }

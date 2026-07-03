@@ -6,6 +6,20 @@ struct ContentView: View {
 
     @State private var selectedTab = 0
 
+    init() {
+        // 配置 TabBar：未选中图标/文字颜色为深灰黑
+        let appearance = UITabBarAppearance()
+        appearance.configureWithDefaultBackground()
+        let unselectedItem = UITabBarItemAppearance()
+        unselectedItem.normal.iconColor = UIColor(Color.themePrimary)
+        unselectedItem.normal.titleTextAttributes = [.foregroundColor: UIColor(Color.themePrimary)]
+        unselectedItem.selected.iconColor = UIColor(Color(red: 0x00/255.0, green: 0x7d/255.0, blue: 0xfe/255.0))
+        unselectedItem.selected.titleTextAttributes = [.foregroundColor: UIColor(Color(red: 0x00/255.0, green: 0x7d/255.0, blue: 0xfe/255.0))]
+        appearance.stackedLayoutAppearance = unselectedItem
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+    }
+
     var body: some View {
         TabView(selection: $selectedTab) {
             // 博文
@@ -44,5 +58,7 @@ struct ContentView: View {
             }
             .tag(3)
         }
+        // 选中 tab 的图标/文字颜色
+        .tint(Color(red: 0x00/255.0, green: 0x7d/255.0, blue: 0xfe/255.0))
     }
 }

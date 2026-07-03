@@ -2,8 +2,8 @@ import SwiftUI
 
 /// 文章列表视图
 ///
-/// 布局结构：`ZStack(背景图 + ScrollView(Header + Cards) + 浮动三点菜单)`
-/// Header 是 ScrollView 的第一个元素，随页面一起滚动（同 Apple Notes/Journal）。
+/// 布局结构：透明导航栏 + ScrollView(Header + 单个毛玻璃容器)
+/// 容器内用 Divider 分隔每篇文章，背景图透过整个容器若隐若现。
 struct ArticleListView: View {
 
     @State private var viewModel = ArticleListViewModel()
@@ -19,7 +19,7 @@ struct ArticleListView: View {
 
     var body: some View {
         NavigationStack {
-            // 主滚动内容：Header + 卡片，作为一个连续页面滚动
+            // 主滚动内容：Header + 毛玻璃容器，作为一个连续页面滚动
             ScrollView {
                 VStack(spacing: 16) {
                     // Header 是 ScrollView 第一项，会随页面一起滚动
@@ -101,42 +101,59 @@ struct ArticleListView: View {
                 Text("点击右上角 ⋯ 创建第一篇文章")
             }
         } else {
-            LazyVStack(spacing: 12) {
-                ForEach(viewModel.articles) { article in
-                    Button {
-                        selectedArticle = article
-                    } label: {
-                        ArticleRowView(
-                            article: article,
-                            relativeTime: viewModel.relativeTime(for: article.created_at),
-                            categoryName: article.cate?.name
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    .onAppear {
-                        if article == viewModel.articles.last {
-                            Task { await viewModel.loadMore() }
-                        }
+            // 单个毛玻璃大容器，内部用 Divider 分隔每篇文章
+            articleContainer
+        }
+    }
+
+    /// 文章毛玻璃容器：一个圆角容器，内部文章用轻量 Divider 分隔
+    private var articleContainer: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(viewModel.articles.enumerated()), id: \.element.id) { index, article in
+                Button {
+                    selectedArticle = article
+                } label: {
+                    ArticleRowView(
+                        article: article,
+                        relativeTime: viewModel.relativeTime(for: article.created_at),
+                        categoryName: article.cate?.name
+                    )
+                }
+                .buttonStyle(.plain)
+                .onAppear {
+                    if article == viewModel.articles.last {
+                        Task { await viewModel.loadMore() }
                     }
                 }
 
-                // 加载更多指示器
-                if viewModel.isLoadingMore {
-                    HStack(spacing: 6) {
-                        ProgressView()
-                        Text("加载更多...")
-                    }
-                    .foregroundStyle(.secondary)
-                    .padding(.vertical, 8)
+                // 文章之间用轻量 Divider 分隔（最后一条不显示）
+                if index < viewModel.articles.count - 1 {
+                    Divider()
+                        .opacity(0.3)
+                        .padding(.horizontal, 20)
                 }
             }
+
+            // 加载更多指示器
+            if viewModel.isLoadingMore {
+                HStack(spacing: 6) {
+                    ProgressView()
+                    Text("加载更多...")
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.vertical, 14)
+            }
         }
+        // 半透明背景：让背景图透过整个容器
+        .background(Color(.systemBackground).opacity(0.92))
+        .clipShape(RoundedRectangle(cornerRadius: 22))
     }
 }
 
 // MARK: - 文章行视图
 
-/// 单个文章行（半透明卡片）
+/// 单个文章行（容器内的一条，无独立卡片背景）
 private struct ArticleRowView: View {
 
     let article: Article
@@ -148,24 +165,26 @@ private struct ArticleRowView: View {
             // 标题和分类
             HStack(alignment: .top) {
                 Text(article.title)
-                    .font(.headline)
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(Color.themePrimary)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
 
                 Spacer()
 
-                // 分类标签
+                // 分类 Badge：小尺寸，蓝色透明
                 if let categoryName, !categoryName.isEmpty {
                     Text(categoryName)
-                        .font(.caption2)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
+                        .font(.system(size: 11))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .frame(minHeight: 22)
                         .background(Color.accentColor.opacity(0.12), in: Capsule())
                         .foregroundStyle(Color.accentColor)
                 }
             }
 
-            // 时间和浏览量（紧凑布局，缩小图标与文字间距）
+            // 时间和浏览量（紧凑布局）
             HStack(spacing: 12) {
                 HStack(spacing: 3) {
                     Image(systemName: "clock")
@@ -198,12 +217,10 @@ private struct ArticleRowView: View {
                 }
             }
         }
-        .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        // 半透明卡片背景，让底层装饰背景图透出
-        .background(Color(.systemBackground).opacity(0.92))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .contentShape(RoundedRectangle(cornerRadius: 14))
+        .padding(.horizontal, 20)
+        .padding(.vertical, 20)
+        .contentShape(Rectangle())
     }
 }
 

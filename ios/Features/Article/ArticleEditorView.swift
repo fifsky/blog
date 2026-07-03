@@ -216,6 +216,7 @@ struct ArticleEditorView: View {
                 }
                 .buttonStyle(.bordered)
             }
+            .foregroundStyle(.primary)
             .padding(.vertical, 4)
         }
     }

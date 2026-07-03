@@ -27,6 +27,7 @@ struct ListPageHeader: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.system(size: 34, weight: .bold))
+                .foregroundStyle(Color.themePrimary)
                 .accessibilityAddTraits(.isHeader)
 
             if let subtitle, !subtitle.isEmpty {
