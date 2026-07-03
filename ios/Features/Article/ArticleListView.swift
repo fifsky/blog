@@ -1,6 +1,9 @@
 import SwiftUI
 
 /// 文章列表视图
+///
+/// 布局结构：`ZStack(背景图 + ScrollView(Header + Cards) + 浮动三点菜单)`
+/// Header 是 ScrollView 的第一个元素，随页面一起滚动（同 Apple Notes/Journal）。
 struct ArticleListView: View {
 
     @State private var viewModel = ArticleListViewModel()
@@ -16,27 +19,28 @@ struct ArticleListView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if viewModel.isLoading && viewModel.articles.isEmpty {
-                    // 首次加载中
-                    ProgressView("加载中...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if viewModel.articles.isEmpty {
-                    // 空状态
-                    ContentUnavailableView {
-                        Label("暂无文章", systemImage: "doc.text")
-                    } description: {
-                        Text("点击右上角 ⋯ 创建第一篇文章")
-                    }
-                } else {
-                    // 文章列表
-                    articleList
+            // 主滚动内容：Header + 卡片，作为一个连续页面滚动
+            ScrollView {
+                VStack(spacing: 16) {
+                    // Header 是 ScrollView 第一项，会随页面一起滚动
+                    ListPageHeader(title: "博文")
+
+                    contentList
                 }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
             }
-            .navigationTitle("博文")
+            .refreshable {
+                await viewModel.refresh()
+            }
+            // 背景图放在 .background 中，铺满屏幕
+            .background(PageBackground(imageName: "article_bg").ignoresSafeArea())
+            // 导航栏透明：让背景图自然透出，但保留系统 Toolbar 按钮的原生玻璃质感
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
+                // 右上角三点菜单：使用原生 ToolbarItem，获得系统玻璃质感/高亮/动画
                 ToolbarItem(placement: .topBarTrailing) {
-                    // 三点菜单按钮，点击弹出新增博文 / 退出登录选项
                     Menu {
                         Button {
                             showEditor = true
@@ -53,13 +57,11 @@ struct ArticleListView: View {
                         }
                     } label: {
                         Image(systemName: "ellipsis")
-                            .font(.system(size: 16, weight: .medium))
                     }
                 }
             }
-            .refreshable {
-                await viewModel.refresh()
-            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(item: $selectedArticle) { article in
                 ArticleDetailView(articleId: article.id)
             }
@@ -87,46 +89,54 @@ struct ArticleListView: View {
 
     // MARK: - 子视图
 
-    /// 文章列表主体
-    private var articleList: some View {
-        List {
-            ForEach(viewModel.articles) { article in
-                ArticleRowView(
-                    article: article,
-                    relativeTime: viewModel.relativeTime(for: article.created_at),
-                    categoryName: article.cate?.name
-                )
-                .onTapGesture {
-                    selectedArticle = article
-                }
-                .onAppear {
-                    // 滚动到最后几条时加载更多
-                    if article == viewModel.articles.last {
-                        Task {
-                            await viewModel.loadMore()
+    /// 列表主体（区分加载/空/有数据三种状态）
+    @ViewBuilder
+    private var contentList: some View {
+        if viewModel.isLoading && viewModel.articles.isEmpty {
+            Text(" ")
+        } else if viewModel.articles.isEmpty {
+            ContentUnavailableView {
+                Label("暂无文章", systemImage: "doc.text")
+            } description: {
+                Text("点击右上角 ⋯ 创建第一篇文章")
+            }
+        } else {
+            LazyVStack(spacing: 12) {
+                ForEach(viewModel.articles) { article in
+                    Button {
+                        selectedArticle = article
+                    } label: {
+                        ArticleRowView(
+                            article: article,
+                            relativeTime: viewModel.relativeTime(for: article.created_at),
+                            categoryName: article.cate?.name
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .onAppear {
+                        if article == viewModel.articles.last {
+                            Task { await viewModel.loadMore() }
                         }
                     }
                 }
-            }
 
-            // 加载更多指示器
-            if viewModel.isLoadingMore {
-                HStack {
-                    Spacer()
-                    ProgressView()
-                    Text("加载更多...")
-                    Spacer()
+                // 加载更多指示器
+                if viewModel.isLoadingMore {
+                    HStack(spacing: 6) {
+                        ProgressView()
+                        Text("加载更多...")
+                    }
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 8)
                 }
-                .listRowSeparator(.hidden)
             }
         }
-        .listStyle(.plain)
     }
 }
 
 // MARK: - 文章行视图
 
-/// 单个文章行
+/// 单个文章行（半透明卡片）
 private struct ArticleRowView: View {
 
     let article: Article
@@ -188,8 +198,12 @@ private struct ArticleRowView: View {
                 }
             }
         }
-        .padding(.vertical, 4)
-        .contentShape(Rectangle())
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        // 半透明卡片背景，让底层装饰背景图透出
+        .background(Color(.systemBackground).opacity(0.92))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .contentShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 

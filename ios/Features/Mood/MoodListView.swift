@@ -1,6 +1,9 @@
 import SwiftUI
 
 /// 心情列表视图
+///
+/// 布局结构：`ZStack(背景图 + ScrollView(Header + Cards) + 浮动 + 按钮)`
+/// Header 是 ScrollView 的第一个元素，随页面一起滚动（同 Apple Notes/Journal）。
 struct MoodListView: View {
 
     @State private var viewModel = MoodListViewModel()
@@ -16,53 +19,28 @@ struct MoodListView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if viewModel.isLoading && viewModel.moods.isEmpty {
-                    // 首次加载中
-                    ProgressView("加载中...")
-                } else if viewModel.moods.isEmpty && !viewModel.isLoading {
-                    // 空状态
-                    ContentUnavailableView {
-                        Label("还没有心情", systemImage: "heart.text.square")
-                    } description: {
-                        Text("点击右上角 + 记录你的第一条心情")
-                    }
-                } else {
-                    // 心情卡片列表
-                    ScrollView {
-                        LazyVStack(spacing: 12) {
-                            ForEach(viewModel.moods) { mood in
-                                moodCard(mood)
-                            }
+            // 主滚动内容：Header + 卡片，作为一个连续页面滚动
+            ScrollView {
+                VStack(spacing: 16) {
+                    // Header 是 ScrollView 第一项，会随页面一起滚动
+                    ListPageHeader(title: "心情")
 
-                            // 加载更多指示器
-                            if viewModel.isLoadingMore {
-                                HStack {
-                                    Spacer()
-                                    ProgressView()
-                                        .padding()
-                                    Spacer()
-                                }
-                            } else if viewModel.hasMore {
-                                // 触底加载更多
-                                Color.clear
-                                    .frame(height: 1)
-                                    .onAppear {
-                                        Task { await viewModel.loadMore() }
-                                    }
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.top, 12)
-                    }
-                    .refreshable {
-                        await viewModel.refresh()
-                    }
+                    contentList
                 }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
             }
-            .navigationTitle("心情")
+            .refreshable {
+                await viewModel.refresh()
+            }
+            // 背景图放在 .background 中，铺满屏幕
+            .background(PageBackground(imageName: "moon_bg").ignoresSafeArea())
+            // 导航栏透明：让背景图自然透出，但保留系统 Toolbar 按钮的原生玻璃质感
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
+                // 右上角 + 按钮：使用原生 ToolbarItem，获得系统玻璃质感/高亮/动画
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         editingMood = nil
                         showEditor = true
@@ -71,10 +49,11 @@ struct MoodListView: View {
                     }
                 }
             }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             // 新建/编辑共用 sheet
             .sheet(isPresented: $showEditor, onDismiss: {
                 editingMood = nil
-                // 编辑器关闭后刷新列表（涵盖新建、编辑场景）
                 Task { await viewModel.refresh() }
             }) {
                 NavigationStack {
@@ -128,6 +107,43 @@ struct MoodListView: View {
 
     // MARK: - 子视图
 
+    /// 列表主体（区分加载/空/有数据三种状态）
+    @ViewBuilder
+    private var contentList: some View {
+        if viewModel.isLoading && viewModel.moods.isEmpty {
+            Text(" ")
+        } else if viewModel.moods.isEmpty && !viewModel.isLoading {
+            ContentUnavailableView {
+                Label("还没有心情", systemImage: "heart.text.square")
+            } description: {
+                Text("点击右上角 + 记录你的第一条心情")
+            }
+        } else {
+            LazyVStack(spacing: 12) {
+                ForEach(viewModel.moods) { mood in
+                    moodCard(mood)
+                }
+
+                // 加载更多指示器
+                if viewModel.isLoadingMore {
+                    HStack {
+                        Spacer()
+                        ProgressView()
+                            .padding()
+                        Spacer()
+                    }
+                } else if viewModel.hasMore {
+                    // 触底加载更多
+                    Color.clear
+                        .frame(height: 1)
+                        .onAppear {
+                            Task { await viewModel.loadMore() }
+                        }
+                }
+            }
+        }
+    }
+
     /// 单条心情卡片
     private func moodCard(_ mood: Mood) -> some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -148,7 +164,7 @@ struct MoodListView: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemBackground))
+        .background(Color(.systemBackground).opacity(0.9))
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .contentShape(RoundedRectangle(cornerRadius: 14))
         // 长按弹出操作菜单

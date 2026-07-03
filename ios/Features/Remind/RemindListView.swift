@@ -1,6 +1,9 @@
 import SwiftUI
 
 /// 提醒列表视图
+///
+/// 布局结构：透明导航栏 + ScrollView(Header + List insetGrouped 分组)
+/// Header 是 ScrollView 第一项，随页面一起滚动；列表保持原生 insetGrouped 分组样式。
 struct RemindListView: View {
 
     @State private var viewModel = RemindListViewModel()
@@ -22,12 +25,14 @@ struct RemindListView: View {
                         Text("点击右上角 + 创建你的第一条提醒")
                     }
                 } else {
-                    // 分组列表
+                    // 分组列表（保持原生 insetGrouped 风格）
                     List {
+                        // 分组提醒
                         ForEach(viewModel.groupedReminds, id: \.status) { group in
                             Section {
                                 ForEach(group.items) { remind in
                                     remindRow(remind)
+                                        .listRowBackground(Color(.systemBackground).opacity(0.92))
                                 }
                                 .onDelete { indexSet in
                                     if let index = indexSet.first {
@@ -60,6 +65,7 @@ struct RemindListView: View {
                                 Spacer()
                             }
                             .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
                         } else if viewModel.hasMore {
                             Color.clear
                                 .frame(height: 1)
@@ -67,17 +73,32 @@ struct RemindListView: View {
                                     Task { await viewModel.loadMore() }
                                 }
                                 .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
                         }
                     }
                     .listStyle(.insetGrouped)
+                    // 隐藏 List 默认背景，露出底层装饰背景图
+                    .scrollContentBackground(.hidden)
+                    // 消除 List 顶部默认 contentInset，与其他 ScrollView 页面顶部对齐
+                    .contentMargins(.top, 0, for: .scrollContent)
+                    // Header 放在 List 安全区域顶部，脱离 List row inset 影响，边距与其他页面一致
+                    .safeAreaInset(edge: .top) {
+                        ListPageHeader(title: "提醒", bottomPadding: 0)
+                            .padding(.horizontal, 16)
+                    }
                     .refreshable {
                         await viewModel.refresh()
                     }
                 }
             }
-            .navigationTitle("提醒")
+            // 背景图放在 .background 中，铺满屏幕
+            .background(PageBackground(imageName: "remind_bg").ignoresSafeArea())
+            // 导航栏透明：让背景图自然透出，但保留系统 Toolbar 按钮的原生玻璃质感
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
+                // 右上角 + 按钮：使用原生 ToolbarItem，获得系统玻璃质感/高亮/动画
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showEditor = true
                     } label: {
@@ -85,8 +106,9 @@ struct RemindListView: View {
                     }
                 }
             }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showEditor, onDismiss: {
-                // 编辑器关闭后刷新列表（涵盖新建、编辑、删除场景）
                 Task { await viewModel.refresh() }
             }) {
                 NavigationStack {
@@ -128,7 +150,7 @@ struct RemindListView: View {
 
     // MARK: - 子视图
 
-    /// 单条提醒行
+    /// 单条提醒行（保持原来的 List 行样式）
     private func remindRow(_ remind: Remind) -> some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
