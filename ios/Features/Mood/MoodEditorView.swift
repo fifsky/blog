@@ -45,6 +45,8 @@ struct MoodEditorView: View {
         .toolbar {
             // 表情按钮
             ToolbarItem(placement: .keyboard) {
+                // 键盘 accessory bar 紧贴输入法边框，加底部留白避免顶死。
+                // padding 加在 Button 上，由系统 accessory bar 容器承担为整体下移效果。
                 Button {
                     viewModel.showEmojiPicker = true
                 } label: {

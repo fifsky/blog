@@ -7,6 +7,8 @@ struct EmojiPicker: View {
     /// 选中表情的回调
     var onSelect: (String) -> Void
 
+    @Environment(\.dismiss) private var dismiss
+
     /// 搜索关键词
     @State private var searchText = ""
 
@@ -67,9 +69,10 @@ struct EmojiPicker: View {
             .navigationTitle("选择表情")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                // 完成按钮放右侧：点击关闭表情面板
+                ToolbarItem(placement: .topBarTrailing) {
                     Button("完成") {
-                        // 由父视图通过 isPresented 控制
+                        dismiss()
                     }
                 }
             }
