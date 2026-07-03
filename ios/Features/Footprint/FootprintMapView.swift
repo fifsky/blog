@@ -11,6 +11,14 @@ struct FootprintMapView: View {
     /// 新建足迹编辑器弹窗
     @State private var showEditor = false
 
+    /// 全屏照片浏览器相关状态
+    @State private var showPhotoBrowser = false
+    @State private var photoBrowserURLs: [String] = []
+    @State private var photoBrowserIndex = 0
+
+    /// 标记用户点击了照片，等待 sheet 收起后再 push 浏览器
+    @State private var pendingPhotoBrowse = false
+
     var body: some View {
         ZStack {
             // 地图主视图
@@ -59,6 +67,30 @@ struct FootprintMapView: View {
             Button("确定", role: .cancel) {}
         } message: {
             Text(viewModel.errorMessage ?? "未知错误")
+        }
+        // 照片浏览器挂在根 NavigationStack 上，
+        // push 时占满全屏（不受详情 sheet 的 medium detent 限制）
+        .navigationDestination(isPresented: $showPhotoBrowser) {
+            PhotoBrowserView(
+                photoURLs: photoBrowserURLs,
+                initialIndex: photoBrowserIndex
+            )
+        }
+        // 点击照片后先关闭 sheet，sheet 收起后再 push 浏览器
+        .onChange(of: viewModel.showDetail) { _, isShown in
+            if !isShown && pendingPhotoBrowse {
+                pendingPhotoBrowse = false
+                // 等待 sheet 收起动画完成后再 push，避免动画重叠
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    showPhotoBrowser = true
+                }
+            }
+        }
+        // 从照片浏览器返回后，重新拉起详情 sheet
+        .onChange(of: showPhotoBrowser) { _, isShown in
+            if !isShown && viewModel.selectedFootprint != nil {
+                viewModel.showDetail = true
+            }
         }
     }
 
@@ -167,9 +199,10 @@ struct FootprintMapView: View {
 
     /// 照片网格视图
     private func photoGrid(_ photos: [FootprintPhoto]) -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
+        let urls = photos.compactMap { $0.src }
+        return ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                ForEach(photos, id: \.src) { photo in
+                ForEach(Array(photos.enumerated()), id: \.element.src) { index, photo in
                     let thumb = photo.thumbnail ?? ""
                     let src = photo.src ?? ""
                     AsyncImage(url: URL(string: thumb.isEmpty ? src : thumb)) { phase in
@@ -187,6 +220,13 @@ struct FootprintMapView: View {
                     }
                     .frame(width: 120, height: 120)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .onTapGesture {
+                        // 记录要浏览的照片，先收起 sheet，收起后再 push 全屏浏览器
+                        photoBrowserURLs = urls
+                        photoBrowserIndex = index
+                        pendingPhotoBrowse = true
+                        viewModel.showDetail = false
+                    }
                 }
             }
         }
