@@ -27,10 +27,7 @@ class RemindListViewModel {
     /// 是否显示错误弹窗
     var showError = false
 
-    /// 删除确认弹窗
-    var showDeleteConfirmation = false
-
-    /// 待删除的提醒
+    /// 待删除的提醒（非 nil 时驱动 .alert(item:) 弹出删除确认弹窗）
     var remindToDelete: Remind?
 
     /// 待标记完成的提醒
@@ -127,10 +124,9 @@ class RemindListViewModel {
 
     // MARK: - 删除
 
-    /// 确认删除提醒
+    /// 确认删除提醒（仅设置待删除项，由 .alert(item:) 自动驱动弹窗显隐）
     func confirmDelete(remind: Remind) {
         remindToDelete = remind
-        showDeleteConfirmation = true
     }
 
     /// 执行删除提醒

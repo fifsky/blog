@@ -41,17 +41,21 @@ struct RemindListView: View {
                                                 }
                                                 .tint(.green)
 
-                                                Button(role: .destructive) {
+                                                // 不使用 role: .destructive：系统会预判删除并触发 cell 收缩动画，
+                                                // 导致左滑删除确认时行闪烁。改用 .tint(.red) 保持红色外观但避开系统动画。
+                                                Button {
                                                     viewModel.confirmDelete(remind: remind)
                                                 } label: {
                                                     Label("删除", systemImage: "trash")
                                                 }
+                                                .tint(.red)
                                             } else {
-                                                Button(role: .destructive) {
+                                                Button {
                                                     viewModel.confirmDelete(remind: remind)
                                                 } label: {
                                                     Label("删除", systemImage: "trash")
                                                 }
+                                                .tint(.red)
                                             }
                                         }
                                 }
@@ -130,7 +134,12 @@ struct RemindListView: View {
                     RemindEditorView()
                 }
             }
-            .alert("删除提醒", isPresented: $viewModel.showDeleteConfirmation) {
+            // 使用 .alert(item:)：由 remindToDelete 是否为 nil 自动驱动弹窗显隐，
+            // 相比 .alert(isPresented:) 减少一次 View Diff，配合 L1（去 destructive role）缓解左滑闪烁
+            .alert("删除提醒", isPresented: Binding(
+                get: { viewModel.remindToDelete != nil },
+                set: { if !$0 { viewModel.remindToDelete = nil } }
+            )) {
                 Button("取消", role: .cancel) {
                     viewModel.remindToDelete = nil
                 }
