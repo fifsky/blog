@@ -19,12 +19,11 @@ struct MoodListView: View {
             // 主滚动内容：Header + 卡片，作为一个连续页面滚动
             ScrollView {
                 VStack(spacing: 16) {
-                    // Header 是 ScrollView 第一项，会随页面一起滚动
+                    // Header 自己负责横向/顶部 padding，这里不再叠加
                     ListPageHeader(title: "心情")
 
                     contentList
                 }
-                .padding(.horizontal, 16)
                 .padding(.bottom, 16)
             }
             .refreshable {
@@ -114,6 +113,8 @@ struct MoodListView: View {
                         }
                 }
             }
+            // 卡片横向 padding：与 Header（自管 16）逐像素对齐
+            .padding(.horizontal, 16)
         }
     }
 
@@ -139,8 +140,8 @@ struct MoodListView: View {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.systemBackground).opacity(0.9))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .contentShape(RoundedRectangle(cornerRadius: 14))
+        .clipShape(RoundedRectangle(cornerRadius: 22))
+        .contentShape(RoundedRectangle(cornerRadius: 22))
         // 长按弹出系统 Context Menu（原生毛玻璃/Haptic/动画，跟随卡片）
         .contextMenu {
             Button {

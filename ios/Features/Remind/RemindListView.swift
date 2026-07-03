@@ -2,7 +2,7 @@ import SwiftUI
 
 /// 提醒列表视图
 ///
-/// 布局结构：透明导航栏 + List insetGrouped 分组 + safeAreaInset Header
+/// 布局结构：透明导航栏 + List insetGrouped 分组 + safeAreaInset 固定 Header
 struct RemindListView: View {
 
     @State private var viewModel = RemindListViewModel()
@@ -26,12 +26,6 @@ struct RemindListView: View {
                 } else {
                     // 分组列表（保持原生 insetGrouped 风格）
                     List {
-                        // Header 作为 List 第一行，随列表滚动（与博文/心情一致）
-                        ListPageHeader(title: "提醒", bottomPadding: 0)
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
-                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 0, trailing: 16))
-
                         // 分组提醒
                         ForEach(viewModel.groupedReminds, id: \.status) { group in
                             Section {
@@ -102,6 +96,11 @@ struct RemindListView: View {
                     .scrollContentBackground(.hidden)
                     // 消除 List 顶部默认 contentInset，与其他 ScrollView 页面顶部对齐
                     .contentMargins(.top, 0, for: .scrollContent)
+                    // 这样 Header 内部的 padding(.horizontal, 16) 直接生效，与博文/心情页逐像素对齐，
+                    // 注意：Header 不随列表滚动，始终固定在顶部（提醒类页面体验更佳）。
+                    .safeAreaInset(edge: .top, spacing: 0) {
+                        ListPageHeader(title: "提醒", bottomPadding: 0)
+                    }
                     .refreshable {
                         await viewModel.refresh()
                     }

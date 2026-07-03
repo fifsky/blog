@@ -22,12 +22,11 @@ struct ArticleListView: View {
             // 主滚动内容：Header + 毛玻璃容器，作为一个连续页面滚动
             ScrollView {
                 VStack(spacing: 16) {
-                    // Header 是 ScrollView 第一项，会随页面一起滚动
+                    // Header 自己负责横向/顶部 padding，这里不再叠加
                     ListPageHeader(title: "博文")
 
                     contentList
                 }
-                .padding(.horizontal, 16)
                 .padding(.bottom, 16)
             }
             .refreshable {
@@ -148,6 +147,8 @@ struct ArticleListView: View {
         // 半透明背景：让背景图透过整个容器
         .background(Color(.systemBackground).opacity(0.92))
         .clipShape(RoundedRectangle(cornerRadius: 22))
+        // 内容横向 padding：与 Header（自管 16）逐像素对齐
+        .padding(.horizontal, 16)
     }
 }
 
