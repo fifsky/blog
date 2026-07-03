@@ -1,6 +1,6 @@
 ## Project Overview
 
-Full-stack blog application with Go backend and React frontend.
+Full-stack blog application with Go backend, React frontend, and native iOS (SwiftUI) app.
 
 ## Backend (Go)
 
@@ -180,6 +180,117 @@ import { articleListApi } from "@/service";
 - Utils: camelCase (e.g., `getApiUrl`)
 - Types/Interfaces: PascalCase (e.g., `ArticleItem`, `ArticleListRequest`)
 - Constants: UPPER_SNAKE_CASE
+
+## iOS (SwiftUI)
+
+### Tech Stack
+
+- **Swift 5.0** / **SwiftUI** - 原生 iOS App
+- **iOS Deployment Target** - 17.0
+- **Xcode 26.5** - 构建/归档工具
+- **无第三方依赖** - 纯原生 Foundation + SwiftUI
+- **架构** - MVVM（View + ViewModel + Service）
+- **网络** - 原生 `URLSession`，`actor APIClient` 单例封装
+- **鉴权** - Keychain 存储 token，`AuthManager` 管理
+- **数据编码** - protojson（snake_case），`Codable` 直接映射
+
+### Project Info
+
+- **工程** - `ios/BlogApp.xcodeproj`（scheme: `BlogApp`）
+- **Bundle ID** - `com.fifsky.blog`
+- **版本** - 1.0 (1)
+- **设备** - `TARGETED_DEVICE_FAMILY = "1,2"`（iPhone + iPad）
+- **签名** - `CODE_SIGN_STYLE = Automatic`，`DEVELOPMENT_TEAM = ""`（无签名，配合 SideStore 侧载部署）
+- **API 地址** - `https://api.fifsky.com`（见 `App/Config.swift`）
+
+### Directory Structure
+
+```
+ios/
+├── App/                  # 全局配置 Config.swift（所有 API 路径常量）
+├── BlogApp.swift         # @main 入口
+├── ContentView.swift     # 根视图（登录态切换）
+├── Core/
+│   ├── Auth/             # AuthManager（登录态）、KeychainService
+│   ├── Network/          # APIClient 单例、APIError、MultipartFormData
+│   └── Extensions/       # Date+Format、CoordinateTransform（GCJ-02/WGS-84 转换）
+├── Models/               # Codable 数据模型（对应后端 proto 消息）
+├── Services/             # 业务 API 封装（按模块拆分）
+├── Features/             # 功能模块（MVVM）
+│   ├── Article/          # 文章（列表/详情/编辑/评论）
+│   ├── Mood/             # 心情
+│   ├── Remind/           # 提醒
+│   ├── Footprint/        # 足迹（含地图）
+│   └── Login/            # 登录
+├── Components/           # 通用组件（Theme、PageBackground、PhotoBrowserView 等）
+├── Assets.xcassets/      # 背景图等资源
+└── AppIconAssets.xcassets/ # App 图标
+```
+
+### Commands
+
+```bash
+cd ios
+
+# 模拟器构建并运行（通过 MCP ios-simulator 工具）
+# - mcp__ios_simulator__ios_build_and_run
+# - mcp__ios_simulator__ios_screenshot（截图验证）
+
+# 真机 IPA 归档（无签名，适配 SideStore）
+xcrun xcodebuild archive \
+  -project BlogApp.xcodeproj \
+  -scheme BlogApp \
+  -configuration Release \
+  -destination "generic/platform=iOS" \
+  -archivePath build/BlogApp.xcarchive \
+  CODE_SIGN_IDENTITY="" \
+  CODE_SIGNING_REQUIRED=NO \
+  CODE_SIGNING_ALLOWED=NO \
+  DEVELOPMENT_TEAM="" \
+  AD_HOC_CODE_SIGNING_ALLOWED=NO
+
+# 从 xcarchive 打包为 IPA
+rm -rf build/Payload && mkdir -p build/Payload
+cp -R build/BlogApp.xcarchive/Products/Applications/BlogApp.app build/Payload/
+cd build && zip -qry BlogApp.ipa Payload
+# 产物：ios/build/BlogApp.ipa（arm64，未签名）
+```
+
+### Code Style - iOS
+
+**API 请求:**
+
+- 所有接口统一走 `APIClient.shared`，POST + JSON Body
+- 路径常量集中定义在 `App/Config.swift`（如 `Config.loginPath`）
+- 业务封装在 `Services/` 下各 Service 类，返回 `async throws` 模型
+- protojson 编码：模型属性直接用 `snake_case`，`int64` 字段为 `String` 类型
+
+**架构约定 (MVVM):**
+
+- `XxxView.swift` - SwiftUI 视图
+- `XxxViewModel.swift` - `@MainActor` ObservableObject，业务逻辑
+- `XxxService.swift` - API 调用封装
+- 模型放 `Models/`，实现 `Codable` / `Identifiable`
+
+**注释规范:**
+
+- 注释仅使用中文
+- 复杂逻辑必须注释，简单逻辑可省略
+- 结构体字段、函数均需文档注释（`///`）
+
+**命名约定:**
+
+- 类型/协议：PascalCase（`AuthManager`、`ArticleListViewModel`）
+- 属性/方法：camelCase（`baseURL`、`request()`）
+- 常量：camelCase（Config 内的 `static let`）
+- 私有成员：前置 `_` 或 camelCase
+
+### Important Notes
+
+- 修改 Swift 文件后需通过 Xcode/MCP 重新构建生效
+- `Models/` 的字段须与后端 proto 定义（snake_case）严格对应
+- 默认无签名，仅供 SideStore 侧载；如需 App Store/TestFlight，需配置 DEVELOPMENT_TEAM 和证书
+- 地图相关使用 GCJ-02 坐标，通过 `Core/Extensions/CoordinateTransform.swift` 与 WGS-84 转换
 
 ## Important Notes
 

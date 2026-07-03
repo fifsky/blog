@@ -27,3 +27,4 @@ test.sh
 /.uploads
 /ios/build/
 /ios/*.ipa
+/ios/xcuserdata/
