@@ -87,6 +87,15 @@ class FootprintEditorViewModel {
     private let footprintService = FootprintService.shared
     private let uploadService = UploadService.shared
 
+    /// 日期格式化器（yyyy-MM-dd），与接口约定的格式一致
+    /// 复用同一实例避免重复创建
+    static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.locale = Locale(identifier: "zh_CN")
+        return formatter
+    }()
+
     // MARK: - 初始化
 
     /// 初始化编辑器视图模型
@@ -102,6 +111,9 @@ class FootprintEditorViewModel {
             longitude = footprint.longitude ?? ""
             // 加载已有照片 URL
             uploadedPhotoURLs = (footprint.photos ?? []).compactMap { $0.src }
+        } else {
+            // 新建模式：默认选中今天，避免 DatePicker 不交互时 dateString 为空导致 date 未提交
+            dateString = Self.dateFormatter.string(from: Date())
         }
     }
 

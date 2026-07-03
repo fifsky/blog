@@ -62,20 +62,18 @@ struct FootprintEditorView: View {
                     "日期",
                     selection: Binding(
                         get: {
-                            // 从日期字符串解析为 Date
-                            let formatter = DateFormatter()
-                            formatter.dateFormat = "yyyy-MM-dd"
-                            return formatter.date(from: viewModel.dateString) ?? Date()
+                            // 从日期字符串解析为 Date，无效时回退到今天
+                            FootprintEditorViewModel.dateFormatter.date(from: viewModel.dateString) ?? Date()
                         },
                         set: { newDate in
-                            // 将 Date 转换为字符串
-                            let formatter = DateFormatter()
-                            formatter.dateFormat = "yyyy-MM-dd"
-                            viewModel.dateString = formatter.string(from: newDate)
+                            // 将 Date 转换为 yyyy-MM-dd 字符串
+                            viewModel.dateString = FootprintEditorViewModel.dateFormatter.string(from: newDate)
                         }
                     ),
                     displayedComponents: .date
                 )
+                // 统一显示为 yyyy-MM-dd，避免随系统区域格式变化
+                .environment(\.locale, Locale(identifier: "zh_CN"))
             } header: {
                 Text("日期")
             }

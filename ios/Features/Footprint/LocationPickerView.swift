@@ -47,7 +47,11 @@ private class LocationSearchCompleter: NSObject, MKLocalSearchCompleterDelegate 
 
 /// 位置选择器视图
 /// 顶部返回按钮 + 全屏地图 + 底部玻璃质感搜索栏（定位按钮 + 确认按钮）
-/// 支持点击地图选择位置和关键字搜索地点，确认后返回坐标
+/// 采用「中心固定图钉 + 地图拖动微调」交互（类似微信发送位置）：
+/// - 图钉始终位于地图屏幕中心
+/// - 拖动地图时图钉抬起（缩小），停止时落下（弹回）动画
+/// - 搜索后定位到结果坐标，再通过拖动微调
+/// - 点击右侧确认按钮以地图中心点作为最终选取坐标
 struct LocationPickerView: View {
 
     // MARK: - 绑定属性
@@ -60,26 +64,29 @@ struct LocationPickerView: View {
 
     // MARK: - 状态
 
-    /// 当前选中的位置坐标
+    /// 当前选中的位置坐标（始终等于地图中心）
     @State private var selectedCoordinate: CLLocationCoordinate2D?
 
     /// 地图显示区域
     @State private var mapRegion: MKCoordinateRegion
 
-    /// 当前地图位置（用于 Map initialPosition）
+    /// 当前地图位置（用于 Map position）
     @State private var cameraPosition: MapCameraPosition
 
     /// 搜索框文本
     @State private var searchText = ""
 
-    /// 是否展开搜索结果面板
-    @State private var isSearching = false
+    /// 是否正在拖动地图（用于图钉抬起动画）
+    @State private var isDraggingMap = false
 
     /// 搜索补全视图模型
     @State private var searchCompleter = LocationSearchCompleter()
 
     /// 是否正在执行地点解析（从搜索结果跳转）
     @State private var isResolving = false
+
+    /// 是否聚焦搜索框（用于显示/隐藏搜索结果面板）
+    @FocusState private var isSearchFieldFocused: Bool
 
     /// 环境变量：dismiss
     @Environment(\.dismiss) private var dismiss
@@ -122,16 +129,20 @@ struct LocationPickerView: View {
             // 地图视图
             mapContent
 
+            // 中心固定图钉覆盖层（始终位于地图屏幕中心）
+            centerPinOverlay
+
             // 底部搜索栏 + 搜索结果面板
             VStack(spacing: 8) {
                 // 搜索结果下拉面板（在搜索栏上方）
-                if isSearching && !searchText.isEmpty {
+                if isSearchFieldFocused && !searchText.isEmpty {
                     searchResultsPanel
                 }
 
                 // 底部玻璃搜索栏
                 bottomSearchBar
             }
+            .ignoresSafeArea(.keyboard, edges: .bottom)
         }
         .navigationTitle("选择位置")
         .navigationBarTitleDisplayMode(.inline)
@@ -147,51 +158,35 @@ struct LocationPickerView: View {
 
     // MARK: - 地图内容
 
-    /// 地图主内容，支持点击选择位置
-    /// 通过 MapReader 将屏幕坐标转换为地理坐标，兼容 iOS 17+
+    /// 地图主内容
+    /// 图钉固定在屏幕中心，拖动地图时记录中心点作为选中坐标
+    /// 通过 onMapCameraChange 监听地图拖动状态与中心点
     private var mapContent: some View {
-        MapReader { proxy in
-            Map(position: $cameraPosition) {
-                // 如果已选中位置，显示标注
-                if let coordinate = selectedCoordinate {
-                    Annotation("已选位置", coordinate: coordinate) {
-                        VStack(spacing: 0) {
-                            Image(systemName: "mappin.circle.fill")
-                                .font(.title)
-                                .foregroundStyle(.red)
-
-                            Image(systemName: "triangle.fill")
-                                .font(.caption)
-                                .foregroundStyle(.red)
-                                .rotationEffect(.degrees(180))
-                                .offset(y: -4)
-                        }
-                    }
-                    .annotationTitles(.hidden)
-                }
-            }
-            .mapStyle(.standard(elevation: .realistic))
-            .mapControls {
-                MapUserLocationButton()
-                MapPitchToggle()
-            }
-            .gesture(
-                // 点击地图时收起搜索面板
-                SpatialTapGesture()
-                    .onEnded { value in
-                        if isSearching {
-                            isSearching = false
-                        }
-                        guard let coordinate = proxy.convert(value.location, from: .local) else { return }
-                        selectCoordinate(coordinate)
-                    }
-            )
+        Map(position: $cameraPosition) {
+            // 中心固定图钉模型下，无需在地图上添加移动标注
+        }
+        .mapStyle(.standard(elevation: .realistic))
+        .mapControls {
+            MapUserLocationButton()
+            MapPitchToggle()
+        }
+        .onMapCameraChange { context in
+            // 实时跟踪地图中心点作为选中坐标
+            selectedCoordinate = context.region.center
+            // 连续变化时标记为拖动中（图钉抬起）
+            isDraggingMap = true
+        }
+        .onMapCameraChange(frequency: .onEnd) { _ in
+            // 拖动结束，图钉落下
+            isDraggingMap = false
         }
         .ignoresSafeArea(edges: .bottom)
+        .zIndex(0)
     }
 
-    /// 设置选中的坐标并更新地图区域
-    private func selectCoordinate(_ coordinate: CLLocationCoordinate2D) {
+    /// 设置地图中心并同步选中坐标
+    /// - Parameter coordinate: 目标坐标
+    private func centerMap(on coordinate: CLLocationCoordinate2D) {
         selectedCoordinate = coordinate
         cameraPosition = .region(
             MKCoordinateRegion(
@@ -199,6 +194,34 @@ struct LocationPickerView: View {
                 span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
             )
         )
+    }
+
+    // MARK: - 中心固定图钉
+
+    /// 地图屏幕中心固定图钉覆盖层
+    /// 拖动地图时图钉抬起（缩小并轻微上移），停止时落下（弹回原大小）
+    private var centerPinOverlay: some View {
+        VStack(spacing: 0) {
+            Image(systemName: "mappin.circle.fill")
+                .font(.system(size: 34, weight: .semibold))
+                .foregroundStyle(.red)
+                .shadow(color: .black.opacity(0.25), radius: 3, x: 0, y: 1)
+                // 拖动时抬起：缩小并上移，模拟「被吸起」效果
+                .scaleEffect(isDraggingMap ? 0.85 : 1.0)
+                .offset(y: isDraggingMap ? -6 : 0)
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isDraggingMap)
+
+            Image(systemName: "triangle.fill")
+                .font(.system(size: 11))
+                .foregroundStyle(.red)
+                .rotationEffect(.degrees(180))
+                .offset(y: -4)
+        }
+        // 图针尖端对齐地图中心：整体向上偏移图针高度的一半
+        .offset(y: -20)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .allowsHitTesting(false)
+        .zIndex(1)
     }
 
     // MARK: - 底部搜索栏
@@ -214,8 +237,14 @@ struct LocationPickerView: View {
                 TextField("搜索地点", text: $searchText)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
+                    .submitLabel(.search)
+                    .focused($isSearchFieldFocused)
                     .onChange(of: searchText) { _, newValue in
                         searchCompleter.search(newValue)
+                    }
+                    .onSubmit {
+                        // 点击键盘「搜索」按钮：解析首个匹配结果并定位
+                        resolveFirstResult()
                     }
 
                 if !searchText.isEmpty {
@@ -232,7 +261,7 @@ struct LocationPickerView: View {
             .frame(height: 44)
             .background(.ultraThinMaterial, in: Capsule())
 
-            // 确认按钮（未选位为灰色、已选为蓝色）
+            // 确认按钮（始终可点击，以当前地图中心作为选取坐标）
             Button {
                 confirmLocation()
             } label: {
@@ -240,12 +269,7 @@ struct LocationPickerView: View {
                     .font(.system(size: 18, weight: .bold))
                     .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
-                    .background(
-                        selectedCoordinate == nil
-                            ? Color(.systemGray4)
-                            : Color.blue
-                        , in: Circle()
-                    )
+                    .background(Color.blue, in: Circle())
             }
             .disabled(selectedCoordinate == nil)
         }
@@ -305,8 +329,30 @@ struct LocationPickerView: View {
             isResolving = false
             guard let coordinate = response?.mapItems.first?.placemark.coordinate else { return }
             searchText = ""
-            isSearching = false
-            selectCoordinate(coordinate)
+            isSearchFieldFocused = false
+            centerMap(on: coordinate)
+        }
+    }
+
+    /// 解析当前搜索词的首个结果并定位（键盘「搜索」按钮触发）
+    private func resolveFirstResult() {
+        // 优先使用已补全的首个结果，避免重复请求
+        if let first = searchCompleter.results.first {
+            resolveCompletion(first)
+            return
+        }
+        // 补全列表为空时按关键字发起一次完整搜索
+        guard !searchText.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        isResolving = true
+        let request = MKLocalSearch.Request()
+        request.naturalLanguageQuery = searchText
+        let search = MKLocalSearch(request: request)
+        search.start { response, _ in
+            isResolving = false
+            guard let coordinate = response?.mapItems.first?.placemark.coordinate else { return }
+            searchText = ""
+            isSearchFieldFocused = false
+            centerMap(on: coordinate)
         }
     }
 
