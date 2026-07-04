@@ -183,27 +183,30 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3F14FB2BB0EF4FE267F34863 /* BlogApp */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = C938EA1BB77268AAFD860D4F /* Build configuration list for PBXNativeTarget "BlogApp" */;
-			buildPhases = (
-				D2A19A6998AC85451BD7E591 /* Sources */,
-				8C66EDF95F97FB95C15CE0AD /* Frameworks */,
-				70D0BBEA441044821BF1C55C /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				1EF1F572B0D3CE68657F863C /* Features */,
-				2E0FE79CAE4FCF754DD989DF /* Core */,
-			);
-			name = BlogApp;
-			productName = BlogApp;
-			productReference = 06C13C8BE2466821B6F0C6A4 /* BlogApp.app */;
-			productType = "com.apple.product-type.application";
-		};
+	3F14FB2BB0EF4FE267F34863 /* BlogApp */ = {
+		isa = PBXNativeTarget;
+		buildConfigurationList = C938EA1BB77268AAFD860D4F /* Build configuration list for PBXNativeTarget "BlogApp" */;
+		buildPhases = (
+			D2A19A6998AC85451BD7E591 /* Sources */,
+			8C66EDF95F97FB95C15CE0AD /* Frameworks */,
+			70D0BBEA441044821BF1C55C /* Resources */,
+		);
+		buildRules = (
+		);
+		dependencies = (
+		);
+		fileSystemSynchronizedGroups = (
+			1EF1F572B0D3CE68657F863C /* Features */,
+			2E0FE79CAE4FCF754DD989DF /* Core */,
+		);
+		name = BlogApp;
+		packageProductDependencies = (
+			D4E5F60718293A4B5C6D7E8F /* Textual */,
+		);
+		productName = BlogApp;
+		productReference = 06C13C8BE2466821B6F0C6A4 /* BlogApp.app */;
+		productType = "com.apple.product-type.application";
+	};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -220,6 +223,9 @@
 			knownRegions = (
 				en,
 				Base,
+			);
+			packageReferences = (
+				A1B2C3D4E5F60718293A4B5C /* XCRemoteSwiftPackageReference "textual" */,
 			);
 			mainGroup = 1F439AA0A3CFF6E3DD447F3F /* . */;
 			productRefGroup = F642F8D6A17BC611B5A9EDDC /* Products */;
@@ -417,7 +423,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -455,7 +461,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -493,6 +499,26 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A1B2C3D4E5F60718293A4B5C /* XCRemoteSwiftPackageReference "textual" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/textual";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.0;
+				maximumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D4E5F60718293A4B5C6D7E8F /* Textual */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1B2C3D4E5F60718293A4B5C /* XCRemoteSwiftPackageReference "textual" */;
+			productName = Textual;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = ED7E207E802343E2FD8232FF /* Project object */;
 }

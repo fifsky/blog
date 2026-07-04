@@ -186,9 +186,9 @@ import { articleListApi } from "@/service";
 ### Tech Stack
 
 - **Swift 5.0** / **SwiftUI** - 原生 iOS App
-- **iOS Deployment Target** - 17.0
+- **iOS Deployment Target** - 18.0
 - **Xcode 26.5** - 构建/归档工具
-- **无第三方依赖** - 纯原生 Foundation + SwiftUI
+- **Textual** - Markdown 渲染（[gonzalezreal/textual](https://github.com/gonzalezreal/textual)，通过 SPM 集成）
 - **架构** - MVVM（View + ViewModel + Service）
 - **网络** - 原生 `URLSession`，`actor APIClient` 单例封装
 - **鉴权** - Keychain 存储 token，`AuthManager` 管理
@@ -290,6 +290,7 @@ cd build && zip -qry BlogApp.ipa Payload
 - 修改 Swift 文件后需通过 Xcode/MCP 重新构建生效
 - `Models/` 的字段须与后端 proto 定义（snake_case）严格对应
 - 默认无签名，仅供 SideStore 侧载；如需 App Store/TestFlight，需配置 DEVELOPMENT_TEAM 和证书
+- 文章详情正文通过 [Textual](https://github.com/gonzalezreal/textual) 的 `StructuredText(markdown:)` 渲染（GitHub Flavored Markdown，支持标题/列表/代码块/引用/表格），样式深浅色自动适配
 - 地图相关使用 GCJ-02 坐标，通过 `Core/Extensions/CoordinateTransform.swift` 与 WGS-84 转换
 
 ## Important Notes

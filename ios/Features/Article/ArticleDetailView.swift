@@ -1,4 +1,5 @@
 import SwiftUI
+import Textual
 
 /// 文章详情视图
 struct ArticleDetailView: View {
@@ -57,29 +58,24 @@ struct ArticleDetailView: View {
 
                         // 标签
                         if !article.tags.isEmpty {
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 8) {
-                                    ForEach(article.tags, id: \.self) { tag in
-                                        Text(tag)
-                                            .font(.caption)
-                                            .padding(.horizontal, 10)
-                                            .padding(.vertical, 4)
-                                            .background(Color(.tertiarySystemBackground), in: Capsule())
-                                            .foregroundStyle(.secondary)
-                                    }
+                            FlowLayout(spacing: 6) {
+                                ForEach(article.tags, id: \.self) { tag in
+                                    Text(tag)
+                                        .font(.caption2)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 3)
+                                        .background(Color(.secondarySystemBackground), in: Capsule())
+                                        .foregroundStyle(.secondary)
                                 }
                             }
                         }
 
                         Divider()
 
-                        // 正文内容
-                        // TODO: 集成 swift-markdown-ui 后替换为 Markdown(content)
-                        Text(article.content)
-                            .font(.body)
-                            .lineSpacing(6)
+                        // 正文内容（Markdown 渲染）
+                        StructuredText(markdown: article.content)
                             .multilineTextAlignment(.leading)
-                            .textSelection(.enabled)
+                            .textual.textSelection(.enabled)
 
                         Divider()
 
@@ -132,6 +128,7 @@ struct ArticleDetailView: View {
         .scrollDismissesKeyboard(.interactively)
         .navigationTitle("文章详情")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
         .alert("错误", isPresented: Binding(
             get: { viewModel?.showError ?? false },
             set: { if !$0 { viewModel?.showError = false } }
