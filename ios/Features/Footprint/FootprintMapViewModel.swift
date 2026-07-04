@@ -59,10 +59,8 @@ class FootprintMapViewModel {
             // 根据足迹数据调整地图区域
             adjustMapRegion()
         } catch {
-            if !error.isCancellation {
-                errorMessage = error.localizedDescription
-                showError = true
-            }
+            errorMessage = error.localizedDescription
+            showError = true
         }
 
         isLoading = false

@@ -47,10 +47,8 @@ class ArticleListViewModel {
             currentPage = 1
             hasMore = articles.count < response.total
         } catch {
-            if !error.isCancellation {
-                errorMessage = error.localizedDescription
-                showError = true
-            }
+            errorMessage = error.localizedDescription
+            showError = true
         }
 
         isLoading = false
@@ -69,10 +67,8 @@ class ArticleListViewModel {
             currentPage = 1
             hasMore = articles.count < response.total
         } catch {
-            if !error.isCancellation {
-                errorMessage = error.localizedDescription
-                showError = true
-            }
+            errorMessage = error.localizedDescription
+            showError = true
         }
 
         isRefreshing = false
@@ -93,10 +89,8 @@ class ArticleListViewModel {
             currentPage = nextPage
             hasMore = !response.list.isEmpty && articles.count < response.total
         } catch {
-            if !error.isCancellation {
-                errorMessage = error.localizedDescription
-                showError = true
-            }
+            errorMessage = error.localizedDescription
+            showError = true
         }
 
         isLoadingMore = false

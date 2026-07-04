@@ -78,10 +78,6 @@ actor APIClient {
         do {
             (data, response) = try await session.data(for: urlRequest)
         } catch {
-            // 用户主动取消（离开页面、切 tab、刷新中断）不当作错误，转 CancellationError 让上层跳过
-            if error.isCancellation {
-                throw CancellationError()
-            }
             throw APIError.networkError(error)
         }
 

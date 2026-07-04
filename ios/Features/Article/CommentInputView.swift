@@ -109,10 +109,8 @@ struct CommentInputView: View {
                 commentText = ""
                 onSuccess?()
             } catch {
-                if !error.isCancellation {
-                    errorMessage = error.localizedDescription
-                    showError = true
-                }
+                errorMessage = error.localizedDescription
+                showError = true
             }
 
             isSending = false

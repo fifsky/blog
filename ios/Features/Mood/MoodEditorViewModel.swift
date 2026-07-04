@@ -79,10 +79,8 @@ class MoodEditorViewModel {
             }
             didSave = true
         } catch {
-            if !error.isCancellation {
-                errorMessage = error.localizedDescription
-                showError = true
-            }
+            errorMessage = error.localizedDescription
+            showError = true
         }
 
         isSaving = false
