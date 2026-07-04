@@ -47,8 +47,10 @@ class FootprintListViewModel {
             let response = try await service.all()
             footprints = response.footprints
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         isLoading = false
@@ -63,8 +65,10 @@ class FootprintListViewModel {
             let response = try await service.all()
             footprints = response.footprints
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         isRefreshing = false
@@ -86,8 +90,10 @@ class FootprintListViewModel {
                 footprints.append(contentsOf: newList)
             }
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         isLoading = false

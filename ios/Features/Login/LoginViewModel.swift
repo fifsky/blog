@@ -81,8 +81,10 @@ class LoginViewModel {
             // 未开启 TOTP，直接登录成功
             isLoginSuccess = true
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         isLoading = false
@@ -108,8 +110,10 @@ class LoginViewModel {
                 isLoginSuccess = true
             }
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         isLoading = false

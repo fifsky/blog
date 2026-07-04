@@ -71,8 +71,10 @@ class RemindListViewModel {
             currentPage = 1
             hasMore = reminds.count < response.total
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         isLoading = false
@@ -91,8 +93,10 @@ class RemindListViewModel {
             currentPage = 1
             hasMore = reminds.count < response.total
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         isRefreshing = false
@@ -115,8 +119,10 @@ class RemindListViewModel {
             // 当前页返回为空或不足一页时，判定无更多
             hasMore = !response.list.isEmpty && reminds.count < response.total
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         isLoadingMore = false
@@ -137,8 +143,10 @@ class RemindListViewModel {
             try await remindService.delete(id: remind.id)
             reminds.removeAll { $0.id == remind.id }
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         remindToDelete = nil
@@ -166,8 +174,10 @@ class RemindListViewModel {
             // 直接重新加载列表以确保数据一致
             await refresh()
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         remindToComplete = nil
@@ -186,8 +196,10 @@ class RemindListViewModel {
             // 直接重新加载列表以确保数据一致
             await refresh()
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
     }
 }

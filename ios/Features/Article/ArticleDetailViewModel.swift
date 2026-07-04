@@ -39,8 +39,10 @@ class ArticleDetailViewModel {
         do {
             article = try await articleService.detail(id: articleId)
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         isLoading = false

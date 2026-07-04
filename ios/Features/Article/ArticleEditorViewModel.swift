@@ -84,8 +84,10 @@ class ArticleEditorViewModel {
             let response = try await categoryService.list()
             categories = response.list
         } catch {
-            errorMessage = "加载分类失败：\(error.localizedDescription)"
-            showError = true
+            if !error.isCancellation {
+                errorMessage = "加载分类失败：\(error.localizedDescription)"
+                showError = true
+            }
         }
 
         isLoadingCategories = false
@@ -144,8 +146,10 @@ class ArticleEditorViewModel {
             }
             isSaved = true
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         isSaving = false
@@ -171,8 +175,10 @@ class ArticleEditorViewModel {
             let imageMarkdown = "\n![image](\(imageUrl))\n"
             content += imageMarkdown
         } catch {
-            errorMessage = "图片上传失败：\(error.localizedDescription)"
-            showError = true
+            if !error.isCancellation {
+                errorMessage = "图片上传失败：\(error.localizedDescription)"
+                showError = true
+            }
         }
 
         isUploadingImage = false

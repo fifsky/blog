@@ -40,8 +40,10 @@ class CommentListViewModel {
             let response = try await commentService.list(postId: postId)
             comments = response.list
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         isLoading = false

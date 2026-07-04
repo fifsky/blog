@@ -53,8 +53,10 @@ class MoodListViewModel {
             currentPage = 1
             hasMore = moods.count < response.total
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         isLoading = false
@@ -73,8 +75,10 @@ class MoodListViewModel {
             currentPage = 1
             hasMore = moods.count < response.total
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         isRefreshing = false
@@ -93,8 +97,10 @@ class MoodListViewModel {
             currentPage = nextPage
             hasMore = moods.count < response.total
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         isLoadingMore = false
@@ -116,8 +122,10 @@ class MoodListViewModel {
             try await moodService.delete(ids: [mood.id])
             moods.removeAll { $0.id == mood.id }
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            if !error.isCancellation {
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
 
         moodToDelete = nil
