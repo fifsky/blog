@@ -51,6 +51,9 @@ struct ArticleEditorView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+                // Form 内 Button 必须显式指定 buttonStyle，
+                // 否则复杂 label 会导致整行命中区域被 List/Form 吞掉，表现为点击无反应
+                .buttonStyle(.borderless)
             }
 
             // MARK: - 标签

@@ -107,6 +107,8 @@ struct FootprintEditorView: View {
                         systemImage: "map"
                     )
                 }
+                // Form 内 Button 必须显式指定 buttonStyle，否则点击无反应
+                .buttonStyle(.borderless)
             } header: {
                 Text("位置")
             }
@@ -132,6 +134,8 @@ struct FootprintEditorView: View {
                         }
                     }
                 }
+                // PhotosPicker 在 Form 内本质是 Button，复杂 label 需显式 buttonStyle 否则点击无反应
+                .buttonStyle(.borderless)
 
                 // 已选照片预览
                 if !viewModel.selectedPhotoItems.isEmpty {
@@ -148,7 +152,12 @@ struct FootprintEditorView: View {
                 Text("新建足迹时，照片将在保存时上传。")
             }
         }
-        // 点击空白收起 + 拖拽下滑交互式收起键盘
+        // 收起键盘交互：
+        // 1. 向下滑动表单跟随收起（.interactively）
+        // 2. 键盘工具栏「完成」按钮主动收起
+        // 足迹表单含 LazyVGrid / 嵌套 ScrollView，hideKeyboardOnTap 的
+        // simultaneousGesture(TapGesture) 会与这些控件手势仲裁冲突导致点击失效，
+        // 故改用原生 scrollDismissesKeyboard + 键盘工具栏方案，零手势冲突。
         .hideKeyboardOnTap()
         .scrollDismissesKeyboard(.interactively)
         .navigationTitle(viewModel.isEditing ? "编辑足迹" : "新建足迹")
@@ -246,7 +255,9 @@ struct FootprintEditorView: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .buttonStyle(.plain)
+        // Form 内 Button 必须用 .borderless，.plain 会与 hideKeyboardOnTap 的
+        // TapGesture 手势仲裁冲突，导致整个 Form 触摸事件被吞掉
+        .buttonStyle(.borderless)
     }
 
     // MARK: - 照片预览
