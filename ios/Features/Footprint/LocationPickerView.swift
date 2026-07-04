@@ -95,8 +95,8 @@ struct LocationPickerView: View {
 
     /// 初始化位置选择器
     /// - Parameters:
-    ///   - latitude: 纬度 Binding
-    ///   - longitude: 经度 Binding
+    ///   - latitude: WGS-84 纬度 Binding（由调用方缓存，全程不做坐标转换）
+    ///   - longitude: WGS-84 经度 Binding
     init(latitude: Binding<String>, longitude: Binding<String>) {
         _latitude = latitude
         _longitude = longitude
@@ -105,13 +105,10 @@ struct LocationPickerView: View {
         let lat = Double(latitude.wrappedValue) ?? 35.86
         let lon = Double(longitude.wrappedValue) ?? 104.19
 
-        // 库存为 GCJ-02，MapKit 需 WGS-84，转回用于初始定位与预选
-        let wgs = CoordinateTransform.gcj02ToWgs84(
-            CLLocationCoordinate2D(latitude: lat, longitude: lon)
-        )
-
+        // 全程 WGS-84，无需坐标转换（调用方 FootprintEditorViewModel 已缓存 WGS-84）
+        let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
         let region = MKCoordinateRegion(
-            center: wgs,
+            center: coordinate,
             span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
         )
 
@@ -120,7 +117,7 @@ struct LocationPickerView: View {
 
         // 如果已有坐标，预选
         if Double(latitude.wrappedValue) != nil && Double(longitude.wrappedValue) != nil {
-            _selectedCoordinate = State(initialValue: wgs)
+            _selectedCoordinate = State(initialValue: coordinate)
         }
     }
 
@@ -139,9 +136,11 @@ struct LocationPickerView: View {
                     searchResultsPanel
                 }
 
-                // 底部玻璃搜索栏
+                // 底部搜索栏
                 bottomSearchBar
             }
+            // 浮于图钉之上：搜索结果列表展开时不应被中心图钉遮挡
+            .zIndex(2)
             .ignoresSafeArea(.keyboard, edges: .bottom)
         }
         // 点击空白区域收起键盘
@@ -201,29 +200,21 @@ struct LocationPickerView: View {
     // MARK: - 中心固定图钉
 
     /// 地图屏幕中心固定图钉覆盖层
+    /// 使用 📍 emoji，其自带朝下尖角，尖端天然对准地图中心坐标
     /// 拖动地图时图钉抬起（缩小并轻微上移），停止时落下（弹回原大小）
     private var centerPinOverlay: some View {
-        VStack(spacing: 0) {
-            Image(systemName: "mappin.circle.fill")
-                .font(.system(size: 34, weight: .semibold))
-                .foregroundStyle(.red)
-                .shadow(color: .black.opacity(0.25), radius: 3, x: 0, y: 1)
-                // 拖动时抬起：缩小并上移，模拟「被吸起」效果
-                .scaleEffect(isDraggingMap ? 0.85 : 1.0)
-                .offset(y: isDraggingMap ? -6 : 0)
-                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isDraggingMap)
-
-            Image(systemName: "triangle.fill")
-                .font(.system(size: 11))
-                .foregroundStyle(.red)
-                .rotationEffect(.degrees(180))
-                .offset(y: -4)
-        }
-        // 图针尖端对齐地图中心：整体向上偏移图针高度的一半
-        .offset(y: -20)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .allowsHitTesting(false)
-        .zIndex(1)
+        Text("📍")
+            .font(.system(size: 40))
+            // 拖动时抬起：缩小并上移，模拟「被吸起」效果
+            .scaleEffect(isDraggingMap ? 0.85 : 1.0)
+            .offset(y: isDraggingMap ? -6 : 0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isDraggingMap)
+            // 📍 字形尖端在底部，对准地图屏幕中心需上移约半个字形高度
+            .offset(y: -20)
+            .shadow(color: .black.opacity(0.2), radius: 3, x: 0, y: 1)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .allowsHitTesting(false)
+            .zIndex(1)
     }
 
     // MARK: - 底部搜索栏
@@ -261,7 +252,7 @@ struct LocationPickerView: View {
             }
             .padding(.horizontal, 14)
             .frame(height: 44)
-            .background(.ultraThinMaterial, in: Capsule())
+            .background(Color.white.opacity(0.9), in: Capsule())
 
             // 确认按钮（始终可点击，以当前地图中心作为选取坐标）
             Button {
@@ -315,7 +306,7 @@ struct LocationPickerView: View {
                     }
                 }
             }
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+            .background(Color.white.opacity(0.8), in: RoundedRectangle(cornerRadius: 16))
         }
         .frame(maxHeight: 280)
         .padding(.horizontal, 16)
@@ -360,13 +351,12 @@ struct LocationPickerView: View {
 
     // MARK: - 操作方法
 
-    /// 确认选择的位置，回传坐标（保留 6 位小数）并关闭
+    /// 确认选择的位置，回传 WGS-84 坐标（保留 6 位小数）并关闭
+    /// 全程 WGS-84 无坐标转换，由调用方 FootprintEditorViewModel 正向算 GCJ-02 供后端
     private func confirmLocation() {
         guard let coordinate = selectedCoordinate else { return }
-        // MapKit 采集的是 WGS-84，库存需为 GCJ-02（与网页高德地图对齐），转回再存
-        let gcj = CoordinateTransform.wgs84ToGcj02(coordinate)
-        latitude = String(format: "%.6f", gcj.latitude)
-        longitude = String(format: "%.6f", gcj.longitude)
+        latitude = String(format: "%.6f", coordinate.latitude)
+        longitude = String(format: "%.6f", coordinate.longitude)
         dismiss()
     }
 }

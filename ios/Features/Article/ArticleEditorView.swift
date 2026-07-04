@@ -54,6 +54,9 @@ struct ArticleEditorView: View {
                 // Form 内 Button 必须显式指定 buttonStyle，
                 // 否则复杂 label 会导致整行命中区域被 List/Form 吞掉，表现为点击无反应
                 .buttonStyle(.borderless)
+                // .borderless 会用 accentColor 渲染 label，覆盖 .primary；
+                // 显式设主题黑，与表单其它文字一致
+                .tint(Color.themePrimary)
             }
 
             // MARK: - 标签
@@ -258,10 +261,14 @@ struct CategoryPickerView: View {
                             Spacer()
                             if cate.id == selectedId {
                                 Image(systemName: "checkmark")
-                                    .foregroundStyle(Color.accentColor)
+                                    .foregroundStyle(Color.themePrimary)
                             }
                         }
                     }
+                    // List 内 Button 需显式 buttonStyle，否则点击无反应；
+                    // .borderless + .tint(themePrimary) 避免文字被 accentColor 染蓝
+                    .buttonStyle(.borderless)
+                    .tint(Color.themePrimary)
                 }
             }
             .navigationTitle("选择分类")
@@ -273,6 +280,8 @@ struct CategoryPickerView: View {
                     }
                 }
             }
+            // sheet 弹出，不继承主 NavigationStack 的 tint，需显式设主题黑
+            .tint(Color.themePrimary)
         }
     }
 }

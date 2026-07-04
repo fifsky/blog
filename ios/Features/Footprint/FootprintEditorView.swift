@@ -87,25 +87,20 @@ struct FootprintEditorView: View {
 
             // MARK: - 位置
             Section {
-                // 位置显示
-                HStack {
-                    Image(systemName: "location")
-                        .foregroundStyle(.secondary)
-                    Text(viewModel.locationDescription)
-                        .foregroundStyle(
-                            viewModel.latitude.isEmpty ? .tertiary : .primary
-                        )
-                    Spacer()
-                }
-
-                // 选择位置按钮
+                // 整行可点击打开地图选择，蓝色定位图标 + 坐标文字（颜色随选中状态变化）
                 Button {
                     viewModel.showLocationPicker = true
                 } label: {
-                    Label(
-                        viewModel.latitude.isEmpty ? "选择位置" : "更改位置",
-                        systemImage: "map"
-                    )
+                    HStack {
+                        Image(systemName: "location")
+                            // 图标保持蓝色，与地图 icon 一致
+                            .foregroundStyle(.blue)
+                        Text(viewModel.locationDescription)
+                            .foregroundStyle(
+                                viewModel.latitude.isEmpty ? .tertiary : .primary
+                            )
+                        Spacer()
+                    }
                 }
                 // Form 内 Button 必须显式指定 buttonStyle，否则点击无反应
                 .buttonStyle(.borderless)
@@ -136,6 +131,8 @@ struct FootprintEditorView: View {
                 }
                 // PhotosPicker 在 Form 内本质是 Button，复杂 label 需显式 buttonStyle 否则点击无反应
                 .buttonStyle(.borderless)
+                // 位置/照片按钮保留蓝色，与地图/相册 icon 一致
+                .tint(.blue)
 
                 // 已选照片预览
                 if !viewModel.selectedPhotoItems.isEmpty {
@@ -193,9 +190,15 @@ struct FootprintEditorView: View {
         .sheet(isPresented: $viewModel.showLocationPicker) {
             NavigationStack {
                 LocationPickerView(
-                    latitude: $viewModel.latitude,
-                    longitude: $viewModel.longitude
+                    latitude: $viewModel.wgsLatitude,
+                    longitude: $viewModel.wgsLongitude
                 )
+            }
+        }
+        // LocationPicker 关闭后（用户确认了新位置），将缓存的 WGS-84 正向转换为 GCJ-02 供后端
+        .onChange(of: viewModel.showLocationPicker) { _, isPresented in
+            if !isPresented && !viewModel.wgsLatitude.isEmpty {
+                viewModel.syncGcjCoordinates()
             }
         }
         .overlay {

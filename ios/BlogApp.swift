@@ -27,6 +27,8 @@ struct BlogApp: App {
                 // 收到退出登录通知后切回登录页
                 isAuthenticated = false
             }
+            // 不在根视图设 .tint：TabBar 选中色需走 Asset Catalog AccentColor（品牌蓝），
+            // 子页面 accentColor 由各 NavigationStack 内部 .tint(themePrimary) 控制
         }
     }
 }

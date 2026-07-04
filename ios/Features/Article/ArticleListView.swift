@@ -180,8 +180,8 @@ private struct ArticleRowView: View {
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .frame(minHeight: 22)
-                        .background(Color.accentColor.opacity(0.12), in: Capsule())
-                        .foregroundStyle(Color.accentColor)
+                        .background(Color.themePrimary.opacity(0.12), in: Capsule())
+                        .foregroundStyle(Color.themePrimary)
                 }
             }
 

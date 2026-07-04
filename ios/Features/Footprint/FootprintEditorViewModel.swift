@@ -1,5 +1,6 @@
 import SwiftUI
 import PhotosUI
+import CoreLocation
 
 /// 足迹编辑器视图模型
 /// 负责创建和编辑足迹的逻辑，包括照片上传
@@ -21,11 +22,17 @@ class FootprintEditorViewModel: APIErrorPresentable {
     /// 标记颜色（十六进制）
     var markerColor = "#FF3B30"
 
-    /// 纬度字符串
+    /// 纬度字符串（GCJ-02 火星坐标，提交后端用）
     var latitude = ""
 
-    /// 经度字符串
+    /// 经度字符串（GCJ-02 火星坐标，提交后端用）
     var longitude = ""
+
+    /// WGS-84 纬度缓存（MapKit 原生坐标，LocationPicker 直接读写，避免往返转换漂移）
+    var wgsLatitude = ""
+
+    /// WGS-84 经度缓存
+    var wgsLongitude = ""
 
     /// 选中的照片（PhotosPicker 的结果）
     var selectedPhotoItems: [PhotosPickerItem] = []
@@ -110,6 +117,16 @@ class FootprintEditorViewModel: APIErrorPresentable {
             markerColor = footprint.marker_color ?? "#FF3B30"
             latitude = footprint.latitude ?? ""
             longitude = footprint.longitude ?? ""
+            // 编辑模式：库存为 GCJ-02，转一次 WGS-84 缓存供 LocationPicker 使用
+            // LocationPicker 全程用 WGS-84，避免 GCJ-02↔WGS-84 往返转换累积漂移
+            if let lat = Double(latitude), let lon = Double(longitude),
+               !lat.isZero && !lon.isZero {
+                let wgs = CoordinateTransform.gcj02ToWgs84(
+                    CLLocationCoordinate2D(latitude: lat, longitude: lon)
+                )
+                wgsLatitude = String(format: "%.6f", wgs.latitude)
+                wgsLongitude = String(format: "%.6f", wgs.longitude)
+            }
             // 加载已有照片 URL
             uploadedPhotoURLs = (footprint.photos ?? []).compactMap { $0.src }
         } else {
@@ -147,10 +164,16 @@ class FootprintEditorViewModel: APIErrorPresentable {
 
     // MARK: - 位置处理
 
-    /// 设置选定的位置坐标（保留 6 位小数）
-    func setLocation(latitude lat: Double, longitude lon: Double) {
-        latitude = String(format: "%.6f", lat)
-        longitude = String(format: "%.6f", lon)
+    /// 将缓存的 WGS-84 坐标正向转换为 GCJ-02 供后端存储
+    /// LocationPicker 关闭后由视图层 onChange 触发
+    func syncGcjCoordinates() {
+        guard let lat = Double(wgsLatitude), let lon = Double(wgsLongitude),
+              !lat.isZero && !lon.isZero else { return }
+        let gcj = CoordinateTransform.wgs84ToGcj02(
+            CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        )
+        latitude = String(format: "%.6f", gcj.latitude)
+        longitude = String(format: "%.6f", gcj.longitude)
     }
 
     /// 位置信息描述（只展示坐标，逗号分隔，避免文字过长换行）
