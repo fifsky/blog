@@ -107,7 +107,7 @@ struct ArticleListView: View {
 
     /// 文章毛玻璃容器：一个圆角容器，内部文章用轻量 Divider 分隔
     private var articleContainer: some View {
-        VStack(spacing: 0) {
+        LazyVStack(spacing: 0) {
             ForEach(Array(viewModel.articles.enumerated()), id: \.element.id) { index, article in
                 Button {
                     selectedArticle = article
@@ -119,11 +119,6 @@ struct ArticleListView: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .onAppear {
-                    if article == viewModel.articles.last {
-                        Task { await viewModel.loadMore() }
-                    }
-                }
 
                 // 文章之间用轻量 Divider 分隔（最后一条不显示）
                 if index < viewModel.articles.count - 1 {
@@ -142,6 +137,13 @@ struct ArticleListView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.vertical, 14)
+            } else if viewModel.hasMore {
+                // 触底哨兵：进入可视区域时再请求下一页
+                Color.clear
+                    .frame(height: 1)
+                    .onAppear {
+                        Task { await viewModel.loadMore() }
+                    }
             }
         }
         // 半透明背景：让背景图透过整个容器

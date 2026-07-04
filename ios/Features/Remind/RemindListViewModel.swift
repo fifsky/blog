@@ -127,9 +127,8 @@ class RemindListViewModel: APIErrorPresentable {
     }
 
     /// 执行删除提醒
-    func deleteRemind() async {
-        guard let remind = remindToDelete else { return }
-
+    /// - Parameter remind: 要删除的提醒
+    func deleteRemind(remind: Remind) async {
         do {
             try await remindService.delete(id: remind.id)
             reminds.removeAll { $0.id == remind.id }
@@ -137,7 +136,9 @@ class RemindListViewModel: APIErrorPresentable {
             handleAPIError(error)
         }
 
-        remindToDelete = nil
+        if remindToDelete?.id == remind.id {
+            remindToDelete = nil
+        }
     }
 
     // MARK: - 标记完成

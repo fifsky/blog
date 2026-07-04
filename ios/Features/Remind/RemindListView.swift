@@ -144,7 +144,8 @@ struct RemindListView: View {
                     viewModel.remindToDelete = nil
                 }
                 Button("删除", role: .destructive) {
-                    Task { await viewModel.deleteRemind() }
+                    guard let remind = viewModel.remindToDelete else { return }
+                    Task { await viewModel.deleteRemind(remind: remind) }
                 }
             } message: {
                 Text("确定要删除这条提醒吗？此操作不可撤销。")
