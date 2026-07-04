@@ -9,6 +9,7 @@ enum LoginStep {
 }
 
 /// 登录视图模型
+@MainActor
 @Observable
 class LoginViewModel: APIErrorPresentable {
 

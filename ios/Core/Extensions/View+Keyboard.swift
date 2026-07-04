@@ -6,11 +6,11 @@ extension View {
     /// 点击视图空白区域收起键盘
     ///
     /// 使用 simultaneousGesture 同时识别手势，不影响子视图（Button、Form、列表项等）的原有交互。
-    /// 采用 minimumDistance 为 0 的 DragGesture，可同时响应轻点与轻划，对 ScrollView/Form 更稳健。
+    /// 拖拽收起键盘由调用方的 scrollDismissesKeyboard 处理，避免 DragGesture 抢占表单控件点击。
     func hideKeyboardOnTap() -> some View {
         simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .onEnded { _ in
+            TapGesture()
+                .onEnded {
                     UIApplication.shared.sendAction(
                         #selector(UIResponder.resignFirstResponder),
                         to: nil,

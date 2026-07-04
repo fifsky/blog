@@ -1,6 +1,7 @@
 import SwiftUI
 
 /// 文章列表视图模型
+@MainActor
 @Observable
 class ArticleListViewModel: APIErrorPresentable {
 

@@ -9,7 +9,7 @@ class CommentService {
     // 获取某篇文章的全部评论（公开接口）
     func list(postId: Int) async throws -> CommentListResponse {
         let request = CommentListRequest(post_id: postId)
-        return try await APIClient.shared.request(path: "/blog/comment/list", body: request)
+        return try await APIClient.shared.request(path: Config.commentListPath, body: request)
     }
 
     // 创建评论（公开接口）
@@ -23,19 +23,19 @@ class CommentService {
             reply_name: replyName,
             content: content
         )
-        return try await APIClient.shared.request(path: "/blog/comment/create", body: request)
+        return try await APIClient.shared.request(path: Config.commentCreatePath, body: request)
     }
 
     // 获取评论列表（管理端）
     func adminList(page: Int, keyword: String? = nil) async throws -> AdminCommentListResponse {
         let request = AdminCommentListRequest(page: page, keyword: keyword)
-        return try await APIClient.shared.request(path: "/blog/admin/comment/list", body: request, auth: true)
+        return try await APIClient.shared.request(path: Config.adminCommentListPath, body: request, auth: true)
     }
 
     // 删除评论（支持批量）
     func delete(ids: [Int]) async throws {
         let request = CommentDeleteRequest(ids: ids)
         // 返回 google.protobuf.Empty，只需要检查不抛错即可
-        let _: EmptyResponse = try await APIClient.shared.request(path: "/blog/admin/comment/delete", body: request, auth: true)
+        let _: EmptyResponse = try await APIClient.shared.request(path: Config.adminCommentDeletePath, body: request, auth: true)
     }
 }

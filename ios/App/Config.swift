@@ -23,56 +23,87 @@ enum Config {
 
     // MARK: - 文章接口
 
-    /// 获取文章列表
-    static let articleListPath = "/blog/article/list"
+    /// 管理端文章列表
+    static let adminArticleListPath = "/blog/admin/article/list"
 
-    /// 获取文章详情
-    static let articleGetPath = "/blog/article/get"
+    /// 管理端文章详情
+    static let adminArticleDetailPath = "/blog/admin/article/detail"
 
-    /// 创建文章
-    static let articleCreatePath = "/blog/article/create"
+    /// 管理端创建文章
+    static let adminArticleCreatePath = "/blog/admin/article/create"
 
-    /// 更新文章
-    static let articleUpdatePath = "/blog/article/update"
+    /// 管理端更新文章
+    static let adminArticleUpdatePath = "/blog/admin/article/update"
 
-    /// 删除文章
-    static let articleDeletePath = "/blog/article/delete"
+    /// 管理端删除文章
+    static let adminArticleDeletePath = "/blog/admin/article/delete"
+
+    // MARK: - 分类接口
+
+    /// 公开分类列表
+    static let cateAllPath = "/blog/cate/all"
+
+    /// 管理端分类列表
+    static let adminCateListPath = "/blog/admin/cate/list"
+
+    // MARK: - 评论接口
+
+    /// 公开评论列表
+    static let commentListPath = "/blog/comment/list"
+
+    /// 公开创建评论
+    static let commentCreatePath = "/blog/comment/create"
+
+    /// 管理端评论列表
+    static let adminCommentListPath = "/blog/admin/comment/list"
+
+    /// 管理端删除评论
+    static let adminCommentDeletePath = "/blog/admin/comment/delete"
 
     // MARK: - 心情接口
 
-    /// 获取心情列表
+    /// 公开心情列表
     static let moodListPath = "/blog/mood/list"
 
-    /// 创建心情
-    static let moodCreatePath = "/blog/mood/create"
+    /// 管理端创建心情
+    static let adminMoodCreatePath = "/blog/admin/mood/create"
 
-    /// 删除心情
-    static let moodDeletePath = "/blog/mood/delete"
+    /// 管理端更新心情
+    static let adminMoodUpdatePath = "/blog/admin/mood/update"
+
+    /// 管理端删除心情
+    static let adminMoodDeletePath = "/blog/admin/mood/delete"
 
     // MARK: - 提醒接口
 
-    /// 获取提醒列表
-    static let reminderListPath = "/blog/reminder/list"
+    /// 管理端提醒列表
+    static let adminRemindListPath = "/blog/admin/remind/list"
 
-    /// 创建提醒
-    static let reminderCreatePath = "/blog/reminder/create"
+    /// 管理端创建提醒
+    static let adminRemindCreatePath = "/blog/admin/remind/create"
 
-    /// 更新提醒
-    static let reminderUpdatePath = "/blog/reminder/update"
+    /// 管理端更新提醒
+    static let adminRemindUpdatePath = "/blog/admin/remind/update"
 
-    /// 删除提醒
-    static let reminderDeletePath = "/blog/reminder/delete"
+    /// 管理端删除提醒
+    static let adminRemindDeletePath = "/blog/admin/remind/delete"
 
     // MARK: - 足迹接口
 
-    /// 获取足迹列表
-    static let footprintListPath = "/blog/footprint/list"
+    /// 管理端足迹列表
+    static let adminFootprintListPath = "/blog/admin/footprint/list"
 
-    /// 创建足迹
-    static let footprintCreatePath = "/blog/footprint/create"
+    /// 公开全部足迹
+    static let footprintAllPath = "/blog/travel/footprints"
 
-    /// 删除足迹
-    static let footprintDeletePath = "/blog/footprint/delete"
+    /// 管理端创建足迹
+    static let adminFootprintCreatePath = "/blog/admin/footprint/create"
+
+    /// 管理端更新足迹
+    static let adminFootprintUpdatePath = "/blog/admin/footprint/update"
+
+    /// 管理端删除足迹
+    static let adminFootprintDeletePath = "/blog/admin/footprint/delete"
 
     // MARK: - 文件上传
 

@@ -164,7 +164,9 @@ struct ArticleEditorView: View {
 
     /// Markdown 编辑工具栏
     private var markdownToolbar: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
+        let isUploadingImage = viewModel?.isUploadingImage == true
+
+        return ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
                 // 粗体
                 Button {
@@ -208,7 +210,7 @@ struct ArticleEditorView: View {
 
                 // 图片上传
                 PhotosPicker(selection: $selectedItem, matching: .images) {
-                    if viewModel?.isUploadingImage == true {
+                    if isUploadingImage {
                         ProgressView()
                             .frame(width: 32, height: 32)
                     } else {

@@ -2,6 +2,7 @@ import SwiftUI
 import PhotosUI
 
 /// 文章编辑器视图模型
+@MainActor
 @Observable
 class ArticleEditorViewModel: APIErrorPresentable {
 

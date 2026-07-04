@@ -11,7 +11,7 @@ class AuthService {
         let request = LoginRequest(user_name: userName, password: password, totp_code: totpCode)
         // 标识 iOS 客户端，后端据此发放 30 天有效期的 token
         return try await APIClient.shared.request(
-            path: "/blog/login",
+            path: Config.loginPath,
             body: request,
             headers: ["X-Client-Type": "ios"]
         )

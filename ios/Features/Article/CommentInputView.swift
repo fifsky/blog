@@ -16,6 +16,9 @@ struct CommentInputView: View {
     /// 发送成功回调
     var onSuccess: (() -> Void)?
 
+    /// 取消回复回调
+    var onCancelReply: (() -> Void)?
+
     @State private var commentText = ""
     @State private var isSending = false
     @State private var errorMessage: String?
@@ -35,7 +38,7 @@ struct CommentInputView: View {
                         .foregroundStyle(.secondary)
                     Spacer()
                     Button {
-                        // 由父视图清除回复状态
+                        onCancelReply?()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.caption)

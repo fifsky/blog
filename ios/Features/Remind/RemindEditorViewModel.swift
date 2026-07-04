@@ -9,6 +9,7 @@ enum RemindCreateMode: Hashable {
 }
 
 /// 提醒编辑视图模型
+@MainActor
 @Observable
 class RemindEditorViewModel: APIErrorPresentable {
 

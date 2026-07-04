@@ -8,11 +8,11 @@ class CategoryService {
 
     // 获取所有分类（公开接口，仅含 domain URL，无数字 ID）
     func all() async throws -> CateMenuResponse {
-        return try await APIClient.shared.request(path: "/blog/cate/all", body: EmptyRequest())
+        return try await APIClient.shared.request(path: Config.cateAllPath, body: EmptyRequest())
     }
 
     // 获取分类列表（管理端接口，包含数字 ID，用于文章编辑器选择分类）
     func list() async throws -> CateListResponse {
-        return try await APIClient.shared.request(path: "/blog/admin/cate/list", body: EmptyRequest(), auth: true)
+        return try await APIClient.shared.request(path: Config.adminCateListPath, body: EmptyRequest(), auth: true)
     }
 }

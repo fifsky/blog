@@ -18,71 +18,69 @@ struct ArticleListView: View {
     @State private var showLogoutConfirmation = false
 
     var body: some View {
-        NavigationStack {
-            // 主滚动内容：Header + 毛玻璃容器，作为一个连续页面滚动
-            ScrollView {
-                VStack(spacing: 16) {
-                    // Header 自己负责横向/顶部 padding，这里不再叠加
-                    ListPageHeader(title: "博文")
+        // 主滚动内容：Header + 毛玻璃容器，作为一个连续页面滚动
+        ScrollView {
+            VStack(spacing: 16) {
+                // Header 自己负责横向/顶部 padding，这里不再叠加
+                ListPageHeader(title: "博文")
 
-                    contentList
-                }
-                .padding(.bottom, 16)
+                contentList
             }
-            .refreshable {
-                await viewModel.refresh()
-            }
-            // 背景图放在 .background 中，铺满屏幕
-            .background(PageBackground(imageName: "article_bg").ignoresSafeArea())
-            // 导航栏透明：让背景图自然透出，但保留系统 Toolbar 按钮的原生玻璃质感
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbar {
-                // 右上角三点菜单：使用原生 ToolbarItem，获得系统玻璃质感/高亮/动画
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Button {
-                            showEditor = true
-                        } label: {
-                            Label("新增博文", systemImage: "square.and.pencil")
-                        }
-
-                        Divider()
-
-                        Button(role: .destructive) {
-                            showLogoutConfirmation = true
-                        } label: {
-                            Label("退出登录", systemImage: "rectangle.portrait.and.arrow.right")
-                        }
+            .padding(.bottom, 16)
+        }
+        .refreshable {
+            await viewModel.refresh()
+        }
+        // 背景图放在 .background 中，铺满屏幕
+        .background(PageBackground(imageName: "article_bg").ignoresSafeArea())
+        // 导航栏透明：让背景图自然透出，但保留系统 Toolbar 按钮的原生玻璃质感
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbar {
+            // 右上角三点菜单：使用原生 ToolbarItem，获得系统玻璃质感/高亮/动画
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button {
+                        showEditor = true
                     } label: {
-                        Image(systemName: "ellipsis")
+                        Label("新增博文", systemImage: "square.and.pencil")
                     }
+
+                    Divider()
+
+                    Button(role: .destructive) {
+                        showLogoutConfirmation = true
+                    } label: {
+                        Label("退出登录", systemImage: "rectangle.portrait.and.arrow.right")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis")
                 }
             }
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(item: $selectedArticle) { article in
-                ArticleDetailView(articleId: article.id)
+        }
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(item: $selectedArticle) { article in
+            ArticleDetailView(articleId: article.id)
+        }
+        .navigationDestination(isPresented: $showEditor) {
+            ArticleEditorView()
+        }
+        .alert("错误", isPresented: $viewModel.showError) {
+            Button("确定", role: .cancel) {}
+        } message: {
+            Text(viewModel.errorMessage ?? "未知错误")
+        }
+        .alert("退出登录", isPresented: $showLogoutConfirmation) {
+            Button("退出登录", role: .destructive) {
+                AuthManager.shared.logout()
             }
-            .navigationDestination(isPresented: $showEditor) {
-                ArticleEditorView()
-            }
-            .alert("错误", isPresented: $viewModel.showError) {
-                Button("确定", role: .cancel) {}
-            } message: {
-                Text(viewModel.errorMessage ?? "未知错误")
-            }
-            .alert("退出登录", isPresented: $showLogoutConfirmation) {
-                Button("退出登录", role: .destructive) {
-                    AuthManager.shared.logout()
-                }
-                Button("取消", role: .cancel) {}
-            } message: {
-                Text("确定要退出当前账号吗？")
-            }
-            .task {
-                await viewModel.load()
-            }
+            Button("取消", role: .cancel) {}
+        } message: {
+            Text("确定要退出当前账号吗？")
+        }
+        .task {
+            await viewModel.load()
         }
     }
 

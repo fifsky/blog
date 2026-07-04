@@ -54,8 +54,7 @@ actor APIClient {
 
         // 携带认证 Token
         if auth {
-            // AuthManager 是 @Observable class（非 actor），accessToken 为同步属性，无需 await
-            let token = AuthManager.shared.accessToken
+            let token = await AuthManager.shared.accessToken
             if let token {
                 urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
             }

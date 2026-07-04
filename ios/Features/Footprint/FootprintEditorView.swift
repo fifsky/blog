@@ -113,6 +113,8 @@ struct FootprintEditorView: View {
 
             // MARK: - 照片
             Section {
+                let selectedPhotoCount = viewModel.selectedPhotoItems.count
+
                 // 照片选择器
                 PhotosPicker(
                     selection: $viewModel.selectedPhotoItems,
@@ -124,8 +126,8 @@ struct FootprintEditorView: View {
                         Image(systemName: "photo.on.rectangle.angled")
                         Text("选择照片（最多9张）")
                         Spacer()
-                        if viewModel.selectedPhotoItems.count > 0 {
-                            Text("\(viewModel.selectedPhotoItems.count)")
+                        if selectedPhotoCount > 0 {
+                            Text("\(selectedPhotoCount)")
                                 .foregroundStyle(.secondary)
                         }
                     }

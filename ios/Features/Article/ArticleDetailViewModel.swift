@@ -1,6 +1,7 @@
 import Foundation
 
 /// 文章详情视图模型
+@MainActor
 @Observable
 class ArticleDetailViewModel: APIErrorPresentable {
 

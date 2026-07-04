@@ -42,6 +42,7 @@ struct User: Decodable, Identifiable {
 
 /// 认证管理器
 /// 负责登录状态管理、Token 存储
+@MainActor
 @Observable
 class AuthManager {
 
@@ -85,6 +86,9 @@ class AuthManager {
     /// 当前登录用户
     var currentUser: User?
 
+    /// 认证接口服务
+    private let authService = AuthService.shared
+
     /// 是否已登录（Token 存在且未过期）
     var isLoggedIn: Bool {
         guard let token = accessToken, !token.isEmpty else { return false }
@@ -109,15 +113,10 @@ class AuthManager {
     ///   - totpCode: TOTP 验证码（可选）
     /// - Returns: 登录响应
     func login(userName: String, password: String, totpCode: String? = nil) async throws -> LoginResponse {
-        let request = LoginRequest(
-            user_name: userName,
+        let response = try await authService.login(
+            userName: userName,
             password: password,
-            totp_code: totpCode
-        )
-
-        let response: LoginResponse = try await APIClient.shared.request(
-            path: Config.loginPath,
-            body: request
+            totpCode: totpCode
         )
 
         // 需要二次验证时（无 token），不存储登录信息

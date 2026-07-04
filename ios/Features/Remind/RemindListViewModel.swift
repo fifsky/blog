@@ -1,6 +1,7 @@
 import Foundation
 
 /// 提醒列表视图模型
+@MainActor
 @Observable
 class RemindListViewModel: APIErrorPresentable {
 

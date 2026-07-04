@@ -1,6 +1,7 @@
 import Foundation
 
 /// 评论列表视图模型
+@MainActor
 @Observable
 class CommentListViewModel: APIErrorPresentable {
 

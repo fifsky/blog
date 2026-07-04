@@ -103,8 +103,12 @@ struct FootprintMapView: View {
             // 遍历所有足迹，在地图上添加标注
             ForEach(viewModel.footprints) { footprint in
                 if let coordinate = footprint.coordinate {
-                    Annotation(footprint.name ?? "未命名", coordinate: coordinate) {
-                        FootprintMarkerView(color: footprint.marker_color ?? "#FF3B30")
+                    Annotation(
+                        footprint.name ?? "未命名",
+                        coordinate: coordinate,
+                        anchor: UnitPoint(x: 0.5, y: 0.91)
+                    ) {
+                        FootprintPhotoMarkerView(footprint: footprint)
                             .onTapGesture {
                                 viewModel.selectFootprint(footprint)
                             }
@@ -236,57 +240,95 @@ struct FootprintMapView: View {
 
 // MARK: - 足迹标注视图
 
-/// 自定义地图标注视图：带颜色的圆形标记
-struct FootprintMarkerView: View {
+/// 自定义地图标注视图：照片气泡 + 精确坐标点
+struct FootprintPhotoMarkerView: View {
 
-    /// 标记颜色（十六进制字符串）
-    let color: String
+    /// 足迹数据
+    let footprint: Footprint
 
     var body: some View {
-        ZStack {
-            Circle()
-                .fill(markerColor)
-                .frame(width: 28, height: 28)
-                .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
-
-            // 内部白色圆点
-            Circle()
-                .fill(.white)
-                .frame(width: 8, height: 8)
+        VStack(spacing: 4) {
+            photoBubble
+            coordinateDot
         }
-        .overlay(
-            // 底部三角箭头
-            Triangle()
-                .fill(markerColor)
-                .frame(width: 12, height: 8)
-                .offset(y: 16),
-            alignment: .bottom
-        )
+        .frame(width: 58, height: 76)
+        .accessibilityLabel(footprint.name ?? "足迹")
     }
 
-    /// 将十六进制颜色字符串转换为 SwiftUI Color
+    /// 照片气泡
+    private var photoBubble: some View {
+        Group {
+            if let url = footprint.markerPhotoURL {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    case .failure:
+                        fallbackBubble
+                    default:
+                        ProgressView()
+                            .controlSize(.small)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(Color(.secondarySystemBackground))
+                    }
+                }
+            } else {
+                fallbackBubble
+            }
+        }
+        .frame(width: 58, height: 58)
+        .clipShape(Circle())
+        .overlay {
+            Circle()
+                .stroke(.white, lineWidth: 3)
+        }
+        .shadow(color: .black.opacity(0.22), radius: 5, x: 0, y: 2)
+    }
+
+    /// 无照片或加载失败时的兜底气泡
+    private var fallbackBubble: some View {
+        ZStack {
+            markerColor
+            Text(footprint.name?.first.map(String.init) ?? "足")
+                .font(.title3)
+                .fontWeight(.semibold)
+                .foregroundStyle(.white)
+        }
+    }
+
+    /// 坐标点：Annotation 的 anchor 对齐到这个圆点中心
+    private var coordinateDot: some View {
+        Circle()
+            .fill(Color.blue)
+            .frame(width: 14, height: 14)
+            .overlay {
+                Circle()
+                    .stroke(.white, lineWidth: 3)
+            }
+            .shadow(color: .black.opacity(0.24), radius: 3, x: 0, y: 1)
+    }
+
+    /// 标记颜色
     private var markerColor: Color {
-        Color(hex: color) ?? .systemBlue
-    }
-}
-
-// MARK: - 三角形形状
-
-/// 向下的三角形形状（用于标注底部箭头）
-private struct Triangle: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.midX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
-        path.closeSubpath()
-        return path
+        Color(hex: footprint.marker_color ?? "#0A84FF") ?? .blue
     }
 }
 
 // MARK: - Footprint 扩展
 
 extension Footprint {
+
+    /// 地图标注使用的第一张照片 URL
+    var markerPhotoURL: URL? {
+        guard let firstPhoto = photos?.first else { return nil }
+        let thumb = firstPhoto.thumbnail?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let src = firstPhoto.src?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let urlString = thumb.isEmpty ? src : thumb
+        guard !urlString.isEmpty else { return nil }
+        return URL(string: urlString)
+    }
 
     /// 将字符串经纬度转换为 CLLocationCoordinate2D（GCJ-02 转 WGS-84，适配 MapKit）
     var coordinate: CLLocationCoordinate2D? {

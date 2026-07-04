@@ -15,65 +15,64 @@ struct MoodListView: View {
     @State private var editingMood: Mood?
 
     var body: some View {
-        NavigationStack {
-            // 主滚动内容：Header + 卡片，作为一个连续页面滚动
-            ScrollView {
-                VStack(spacing: 16) {
-                    // Header 自己负责横向/顶部 padding，这里不再叠加
-                    ListPageHeader(title: "心情")
+        // 主滚动内容：Header + 卡片，作为一个连续页面滚动
+        ScrollView {
+            VStack(spacing: 16) {
+                // Header 自己负责横向/顶部 padding，这里不再叠加
+                ListPageHeader(title: "心情")
 
-                    contentList
-                }
-                .padding(.bottom, 16)
+                contentList
             }
-            .refreshable {
-                await viewModel.refresh()
-            }
-            // 背景图放在 .background 中，铺满屏幕
-            .background(PageBackground(imageName: "moon_bg").ignoresSafeArea())
-            // 导航栏透明：让背景图自然透出，但保留系统 Toolbar 按钮的原生玻璃质感
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbar {
-                // 右上角 + 按钮：使用原生 ToolbarItem，获得系统玻璃质感/高亮/动画
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        editingMood = nil
-                        showEditor = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                }
-            }
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            // 新建/编辑共用 sheet
-            .sheet(isPresented: $showEditor, onDismiss: {
-                editingMood = nil
-                Task { await viewModel.refresh() }
-            }) {
-                NavigationStack {
-                    MoodEditorView(mood: editingMood)
+            .padding(.bottom, 16)
+        }
+        .refreshable {
+            await viewModel.refresh()
+        }
+        // 背景图放在 .background 中，铺满屏幕
+        .background(PageBackground(imageName: "moon_bg").ignoresSafeArea())
+        // 导航栏透明：让背景图自然透出，但保留系统 Toolbar 按钮的原生玻璃质感
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbar {
+            // 右上角 + 按钮：使用原生 ToolbarItem，获得系统玻璃质感/高亮/动画
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    editingMood = nil
+                    showEditor = true
+                } label: {
+                    Image(systemName: "plus")
                 }
             }
-            .alert("删除心情", isPresented: $viewModel.showDeleteConfirmation) {
-                Button("取消", role: .cancel) {
-                    viewModel.moodToDelete = nil
-                }
-                Button("删除", role: .destructive) {
-                    Task { await viewModel.deleteMood() }
-                }
-            } message: {
-                Text("确定要删除这条心情吗？此操作不可撤销。")
+        }
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        // 新建/编辑共用 sheet
+        .sheet(isPresented: $showEditor, onDismiss: {
+            editingMood = nil
+            Task { await viewModel.refresh() }
+        }) {
+            NavigationStack {
+                MoodEditorView(mood: editingMood)
             }
-            .alert("错误", isPresented: $viewModel.showError) {
-                Button("确定", role: .cancel) {}
-            } message: {
-                Text(viewModel.errorMessage ?? "未知错误")
+        }
+        .alert("删除心情", isPresented: $viewModel.showDeleteConfirmation) {
+            Button("取消", role: .cancel) {
+                viewModel.moodToDelete = nil
             }
-            .task {
-                await viewModel.load()
+            Button("删除", role: .destructive) {
+                guard let mood = viewModel.moodToDelete else { return }
+                Task { await viewModel.deleteMood(mood: mood) }
             }
+        } message: {
+            Text("确定要删除这条心情吗？此操作不可撤销。")
+        }
+        .alert("错误", isPresented: $viewModel.showError) {
+            Button("确定", role: .cancel) {}
+        } message: {
+            Text(viewModel.errorMessage ?? "未知错误")
+        }
+        .task {
+            await viewModel.load()
         }
     }
 

@@ -1,6 +1,7 @@
 import Foundation
 
 /// 心情列表视图模型
+@MainActor
 @Observable
 class MoodListViewModel: APIErrorPresentable {
 
@@ -106,9 +107,8 @@ class MoodListViewModel: APIErrorPresentable {
     }
 
     /// 执行删除心情
-    func deleteMood() async {
-        guard let mood = moodToDelete else { return }
-
+    /// - Parameter mood: 要删除的心情
+    func deleteMood(mood: Mood) async {
         do {
             try await moodService.delete(ids: [mood.id])
             moods.removeAll { $0.id == mood.id }
@@ -116,6 +116,8 @@ class MoodListViewModel: APIErrorPresentable {
             handleAPIError(error)
         }
 
-        moodToDelete = nil
+        if moodToDelete?.id == mood.id {
+            moodToDelete = nil
+        }
     }
 }

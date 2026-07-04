@@ -1,6 +1,7 @@
 import Foundation
 
 /// 心情编辑视图模型
+@MainActor
 @Observable
 class MoodEditorViewModel: APIErrorPresentable {
 

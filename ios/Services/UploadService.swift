@@ -10,13 +10,13 @@ class UploadService {
     // 返回上传后的图片 URL
     func uploadImage(imageData: Data, filename: String, mimeType: String = "image/jpeg") async throws -> String {
         let boundary = UUID().uuidString
-        let url = try await APIClient.shared.buildURL(path: "/blog/admin/upload")
+        let url = try await APIClient.shared.buildURL(path: Config.uploadPath)
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         // 添加认证 Token
-        if let token = AuthManager.shared.accessToken {
+        if let token = await AuthManager.shared.accessToken {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
 
@@ -60,7 +60,7 @@ class UploadService {
         // 第一步：获取预签名 URL，传入 content_type 让后端匹配签名
         let presignRequest = PresignRequest(filename: filename, content_type: contentType)
         let presignResponse: PresignResponse = try await APIClient.shared.request(
-            path: "/blog/admin/oss/presign",
+            path: Config.ossPresignPath,
             body: presignRequest,
             auth: true
         )

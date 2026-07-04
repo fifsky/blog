@@ -1,6 +1,7 @@
 import Foundation
 
 /// 足迹列表视图模型
+@MainActor
 @Observable
 class FootprintListViewModel: APIErrorPresentable {
 
@@ -15,6 +16,9 @@ class FootprintListViewModel: APIErrorPresentable {
     /// 是否正在刷新
     var isRefreshing = false
 
+    /// 是否正在加载更多
+    var isLoadingMore = false
+
     /// 错误信息
     var errorMessage: String?
 
@@ -22,7 +26,7 @@ class FootprintListViewModel: APIErrorPresentable {
     var showError = false
 
     /// 当前页码
-    private var currentPage = 1
+    private var currentPage = 0
 
     /// 是否还有更多数据
     var hasMore = true
@@ -31,21 +35,22 @@ class FootprintListViewModel: APIErrorPresentable {
 
     private let service = FootprintService.shared
 
-    /// 每页数量
-    private let pageSize = 20
-
     // MARK: - 数据加载
 
-    /// 加载所有足迹数据（使用公开接口获取全部数据）
+    /// 加载足迹列表（第一页）
     func loadFootprints() async {
         guard !isLoading else { return }
         isLoading = true
+        currentPage = 0
+        hasMore = true
         errorMessage = nil
         showError = false
 
         do {
-            let response = try await service.all()
-            footprints = response.footprints
+            let response = try await service.list(page: 1)
+            footprints = response.list
+            currentPage = 1
+            hasMore = footprints.count < response.total
         } catch {
             handleAPIError(error)
         }
@@ -57,10 +62,14 @@ class FootprintListViewModel: APIErrorPresentable {
     func refresh() async {
         guard !isRefreshing else { return }
         isRefreshing = true
+        currentPage = 0
+        hasMore = true
 
         do {
-            let response = try await service.all()
-            footprints = response.footprints
+            let response = try await service.list(page: 1)
+            footprints = response.list
+            currentPage = 1
+            hasMore = footprints.count < response.total
         } catch {
             handleAPIError(error)
         }
@@ -70,23 +79,21 @@ class FootprintListViewModel: APIErrorPresentable {
 
     /// 加载更多数据（分页）
     func loadMore() async {
-        guard !isLoading, hasMore else { return }
-        isLoading = true
+        guard !isLoading, !isLoadingMore, hasMore else { return }
+        isLoadingMore = true
+        let nextPage = currentPage + 1
 
         do {
-            let response = try await service.list(page: currentPage + 1)
-            let newList = response.list
-
-            if newList.isEmpty {
-                hasMore = false
-            } else {
-                currentPage += 1
-                footprints.append(contentsOf: newList)
-            }
+            let response = try await service.list(page: nextPage)
+            let existingIds = Set(footprints.map { $0.id })
+            let newItems = response.list.filter { !existingIds.contains($0.id) }
+            footprints.append(contentsOf: newItems)
+            currentPage = nextPage
+            hasMore = !response.list.isEmpty && footprints.count < response.total
         } catch {
             handleAPIError(error)
         }
 
-        isLoading = false
+        isLoadingMore = false
     }
 }

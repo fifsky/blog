@@ -2,6 +2,7 @@ import Foundation
 import MapKit
 
 /// 足迹地图视图模型
+@MainActor
 @Observable
 class FootprintMapViewModel: APIErrorPresentable {
 

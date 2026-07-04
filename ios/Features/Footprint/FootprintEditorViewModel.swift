@@ -3,6 +3,7 @@ import PhotosUI
 
 /// 足迹编辑器视图模型
 /// 负责创建和编辑足迹的逻辑，包括照片上传
+@MainActor
 @Observable
 class FootprintEditorViewModel: APIErrorPresentable {
 
@@ -121,13 +122,20 @@ class FootprintEditorViewModel: APIErrorPresentable {
 
     /// 处理从照片选择器选中的照片，加载缩略图用于预览
     func loadSelectedPhotos() async {
-        photoPreviews.removeAll()
+        var previews: [Data] = []
 
         for item in selectedPhotoItems {
-            if let data = try? await item.loadTransferable(type: Data.self) {
-                photoPreviews.append(data)
+            guard let data = try? await item.loadTransferable(type: Data.self) else {
+                selectedPhotoItems.removeAll()
+                photoPreviews.removeAll()
+                errorMessage = "无法读取选中的照片，请重新选择"
+                showError = true
+                return
             }
+            previews.append(data)
         }
+
+        photoPreviews = previews
     }
 
     /// 移除已选照片（按索引）
@@ -234,7 +242,11 @@ class FootprintEditorViewModel: APIErrorPresentable {
 
             // 加载照片数据
             guard let data = try? await item.loadTransferable(type: Data.self) else {
-                continue
+                throw APIError.clientError(
+                    code: "PHOTO_READ_FAILED",
+                    message: "无法读取第 \(index + 1) 张照片，请重新选择后再保存",
+                    underlying: nil
+                )
             }
 
             // 生成文件名

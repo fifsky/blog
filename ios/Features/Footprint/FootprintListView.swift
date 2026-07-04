@@ -122,16 +122,19 @@ struct FootprintListView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
 
-            // 加载更多指示器
-            if viewModel.hasMore {
+            if viewModel.isLoadingMore {
                 HStack {
                     Spacer()
                     ProgressView()
+                        .padding()
                     Spacer()
                 }
-                .onAppear {
-                    Task { await viewModel.loadMore() }
-                }
+            } else if viewModel.hasMore {
+                Color.clear
+                    .frame(height: 1)
+                    .onAppear {
+                        Task { await viewModel.loadMore() }
+                    }
             }
         }
         .refreshable {

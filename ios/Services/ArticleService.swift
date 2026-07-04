@@ -14,13 +14,13 @@ class ArticleService {
             status: status,
             keyword: keyword
         )
-        return try await APIClient.shared.request(path: "/blog/admin/article/list", body: request, auth: true)
+        return try await APIClient.shared.request(path: Config.adminArticleListPath, body: request, auth: true)
     }
 
     // 获取文章详情（管理端）
     func detail(id: Int) async throws -> Article {
         let request = ArticleDetailRequest(id: id)
-        return try await APIClient.shared.request(path: "/blog/admin/article/detail", body: request, auth: true)
+        return try await APIClient.shared.request(path: Config.adminArticleDetailPath, body: request, auth: true)
     }
 
     // 创建文章
@@ -34,7 +34,7 @@ class ArticleService {
             status: nil,
             tags: tags
         )
-        return try await APIClient.shared.request(path: "/blog/admin/article/create", body: request, auth: true)
+        return try await APIClient.shared.request(path: Config.adminArticleCreatePath, body: request, auth: true)
     }
 
     // 更新文章
@@ -49,13 +49,13 @@ class ArticleService {
             status: nil,
             tags: tags
         )
-        return try await APIClient.shared.request(path: "/blog/admin/article/update", body: request, auth: true)
+        return try await APIClient.shared.request(path: Config.adminArticleUpdatePath, body: request, auth: true)
     }
 
     // 删除文章（支持批量）
     func delete(ids: [Int]) async throws {
         let request = ArticleDeleteRequest(ids: ids)
         // 返回 google.protobuf.Empty，只需要检查不抛错即可
-        let _: EmptyResponse = try await APIClient.shared.request(path: "/blog/admin/article/delete", body: request, auth: true)
+        let _: EmptyResponse = try await APIClient.shared.request(path: Config.adminArticleDeletePath, body: request, auth: true)
     }
 }

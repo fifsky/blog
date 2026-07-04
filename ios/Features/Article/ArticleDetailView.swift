@@ -114,6 +114,10 @@ struct ArticleDetailView: View {
                             replyName = nil
                             replyPid = 0
                             refreshCommentTrigger.toggle()
+                        },
+                        onCancelReply: {
+                            replyName = nil
+                            replyPid = 0
                         }
                     )
                 }
