@@ -15,7 +15,7 @@ struct RemindListView: View {
             Group {
                 if viewModel.isLoading && viewModel.reminds.isEmpty {
                     // 首次加载中
-                    ProgressView("加载中...")
+                    LoadingView()
                 } else if viewModel.reminds.isEmpty && !viewModel.isLoading {
                     // 空状态
                     ContentUnavailableView {

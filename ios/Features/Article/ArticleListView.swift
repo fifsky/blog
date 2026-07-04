@@ -92,8 +92,8 @@ struct ArticleListView: View {
     @ViewBuilder
     private var contentList: some View {
         if viewModel.isLoading && viewModel.articles.isEmpty {
-            Text(" ")
-        } else if viewModel.articles.isEmpty {
+            LoadingView()
+        } else if viewModel.articles.isEmpty && !viewModel.isLoading {
             ContentUnavailableView {
                 Label("暂无文章", systemImage: "doc.text")
             } description: {

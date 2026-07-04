@@ -83,7 +83,7 @@ struct MoodListView: View {
     @ViewBuilder
     private var contentList: some View {
         if viewModel.isLoading && viewModel.moods.isEmpty {
-            Text(" ")
+            LoadingView()
         } else if viewModel.moods.isEmpty && !viewModel.isLoading {
             ContentUnavailableView {
                 Label("还没有心情", systemImage: "heart.text.square")
