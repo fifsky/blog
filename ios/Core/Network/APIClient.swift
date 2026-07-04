@@ -63,7 +63,15 @@ actor APIClient {
 
         // 编码请求体
         if let body {
-            urlRequest.httpBody = try encoder.encode(body)
+            do {
+                urlRequest.httpBody = try encoder.encode(body)
+            } catch {
+                throw APIError.clientError(
+                    code: "ENCODING_ERROR",
+                    message: "请求数据编码失败：\(error.localizedDescription)",
+                    underlying: error
+                )
+            }
         }
 
         // 调试日志：打印实际发送的请求（NSLog 确保进入 unified log）
@@ -74,15 +82,11 @@ actor APIClient {
 
         // 发起请求
         let data: Data
-        let response: URLResponse
+        let httpResponse: HTTPURLResponse
         do {
-            (data, response) = try await session.data(for: urlRequest)
+            (data, httpResponse) = try await send(urlRequest)
         } catch {
-            throw APIError.networkError(error)
-        }
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw APIError.invalidResponse
+            throw APIError.normalized(error)
         }
 
         // 调试日志：打印响应状态码和内容
@@ -91,16 +95,9 @@ actor APIClient {
         NSLog("[API] RESP %d %@ body: %@", httpResponse.statusCode, urlRequest.url?.lastPathComponent ?? "?", respString)
         #endif
 
-        // 处理非 200 状态码
-        guard httpResponse.statusCode == 200 else {
-            // 尝试解析错误响应 {"code": "...", "message": "..."}
-            if let errorInfo = try? decoder.decode(ServerErrorResponse.self, from: data) {
-                throw APIError.serverError(code: errorInfo.code, message: errorInfo.message)
-            }
-            throw APIError.serverError(
-                code: "\(httpResponse.statusCode)",
-                message: "请求失败（HTTP \(httpResponse.statusCode)）"
-            )
+        // 处理非 2xx 状态码
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            throw responseError(from: data, statusCode: httpResponse.statusCode)
         }
 
         // 解码成功响应
@@ -109,6 +106,41 @@ actor APIClient {
         } catch {
             throw APIError.decodingError(error)
         }
+    }
+
+    /// 执行 URLRequest，并统一归一化网络层错误
+    func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
+        do {
+            let (data, response) = try await session.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw APIError.invalidResponse
+            }
+            return (data, httpResponse)
+        } catch {
+            throw APIError.normalized(error)
+        }
+    }
+
+    /// 解析非 2xx HTTP 响应
+    func responseError(from data: Data, statusCode: Int) -> APIError {
+        if statusCode == 401 {
+            return .unauthorized
+        }
+
+        // 尝试解析错误响应 {"code": "...", "message": "..."}
+        if let errorInfo = try? decoder.decode(ServerErrorResponse.self, from: data) {
+            return .serverError(
+                code: errorInfo.code,
+                message: errorInfo.message,
+                statusCode: statusCode
+            )
+        }
+
+        return .serverError(
+            code: "\(statusCode)",
+            message: "请求失败（HTTP \(statusCode)）",
+            statusCode: statusCode
+        )
     }
 
     /// 构建 API URL（用于非 JSON 请求，如 multipart/form-data 上传）

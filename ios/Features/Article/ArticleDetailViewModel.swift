@@ -2,7 +2,7 @@ import Foundation
 
 /// 文章详情视图模型
 @Observable
-class ArticleDetailViewModel {
+class ArticleDetailViewModel: APIErrorPresentable {
 
     // MARK: - 状态
 
@@ -39,8 +39,7 @@ class ArticleDetailViewModel {
         do {
             article = try await articleService.detail(id: articleId)
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isLoading = false

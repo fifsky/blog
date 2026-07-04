@@ -3,7 +3,7 @@ import MapKit
 
 /// 足迹地图视图模型
 @Observable
-class FootprintMapViewModel {
+class FootprintMapViewModel: APIErrorPresentable {
 
     // MARK: - 状态
 
@@ -59,8 +59,7 @@ class FootprintMapViewModel {
             // 根据足迹数据调整地图区域
             adjustMapRegion()
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isLoading = false

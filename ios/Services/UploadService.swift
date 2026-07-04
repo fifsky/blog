@@ -32,18 +32,23 @@ class UploadService {
 
         request.httpBody = body
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, httpResponse) = try await APIClient.shared.send(request)
 
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw APIError.invalidResponse
-        }
-
-        guard httpResponse.statusCode == 200 else {
-            throw APIError.httpError(statusCode: httpResponse.statusCode)
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            let apiError = await APIClient.shared.responseError(
+                from: data,
+                statusCode: httpResponse.statusCode
+            )
+            throw apiError
         }
 
         // 解析响应中的 url 字段（snake_case 直接匹配 protojson 输出）
-        let result = try JSONDecoder().decode(UploadResponse.self, from: data)
+        let result: UploadResponse
+        do {
+            result = try JSONDecoder().decode(UploadResponse.self, from: data)
+        } catch {
+            throw APIError.decodingError(error)
+        }
         return result.url
     }
 
@@ -69,9 +74,9 @@ class UploadService {
         putRequest.setValue(contentType, forHTTPHeaderField: "Content-Type")
         putRequest.httpBody = imageData
 
-        let (_, putResponse) = try await URLSession.shared.data(for: putRequest)
+        let (_, httpResponse) = try await APIClient.shared.send(putRequest)
 
-        guard let httpResponse = putResponse as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+        guard (200..<300).contains(httpResponse.statusCode) else {
             throw APIError.uploadFailed
         }
 

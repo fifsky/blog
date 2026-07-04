@@ -3,7 +3,7 @@ import PhotosUI
 
 /// 文章编辑器视图模型
 @Observable
-class ArticleEditorViewModel {
+class ArticleEditorViewModel: APIErrorPresentable {
 
     // MARK: - 状态
 
@@ -84,8 +84,7 @@ class ArticleEditorViewModel {
             let response = try await categoryService.list()
             categories = response.list
         } catch {
-            errorMessage = "加载分类失败：\(error.localizedDescription)"
-            showError = true
+            handleAPIError(error, prefix: "加载分类失败")
         }
 
         isLoadingCategories = false
@@ -144,8 +143,7 @@ class ArticleEditorViewModel {
             }
             isSaved = true
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isSaving = false
@@ -171,8 +169,7 @@ class ArticleEditorViewModel {
             let imageMarkdown = "\n![image](\(imageUrl))\n"
             content += imageMarkdown
         } catch {
-            errorMessage = "图片上传失败：\(error.localizedDescription)"
-            showError = true
+            handleAPIError(error, prefix: "图片上传失败")
         }
 
         isUploadingImage = false

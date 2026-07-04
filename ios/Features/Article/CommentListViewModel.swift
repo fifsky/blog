@@ -2,7 +2,7 @@ import Foundation
 
 /// 评论列表视图模型
 @Observable
-class CommentListViewModel {
+class CommentListViewModel: APIErrorPresentable {
 
     // MARK: - 状态
 
@@ -40,8 +40,7 @@ class CommentListViewModel {
             let response = try await commentService.list(postId: postId)
             comments = response.list
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isLoading = false

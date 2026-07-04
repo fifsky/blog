@@ -10,7 +10,7 @@ enum LoginStep {
 
 /// 登录视图模型
 @Observable
-class LoginViewModel {
+class LoginViewModel: APIErrorPresentable {
 
     // MARK: - 状态
 
@@ -81,8 +81,7 @@ class LoginViewModel {
             // 未开启 TOTP，直接登录成功
             isLoginSuccess = true
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isLoading = false
@@ -108,8 +107,7 @@ class LoginViewModel {
                 isLoginSuccess = true
             }
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isLoading = false

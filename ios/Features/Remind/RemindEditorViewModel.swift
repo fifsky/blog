@@ -10,7 +10,7 @@ enum RemindCreateMode: Hashable {
 
 /// 提醒编辑视图模型
 @Observable
-class RemindEditorViewModel {
+class RemindEditorViewModel: APIErrorPresentable {
 
     // MARK: - 状态
 
@@ -129,11 +129,9 @@ class RemindEditorViewModel {
             }
             didSave = true
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isSaving = false
     }
 }
-

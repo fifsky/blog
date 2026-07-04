@@ -2,7 +2,7 @@ import SwiftUI
 
 /// 文章列表视图模型
 @Observable
-class ArticleListViewModel {
+class ArticleListViewModel: APIErrorPresentable {
 
     // MARK: - 状态
 
@@ -47,8 +47,7 @@ class ArticleListViewModel {
             currentPage = 1
             hasMore = articles.count < response.total
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isLoading = false
@@ -67,8 +66,7 @@ class ArticleListViewModel {
             currentPage = 1
             hasMore = articles.count < response.total
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isRefreshing = false
@@ -89,8 +87,7 @@ class ArticleListViewModel {
             currentPage = nextPage
             hasMore = !response.list.isEmpty && articles.count < response.total
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isLoadingMore = false

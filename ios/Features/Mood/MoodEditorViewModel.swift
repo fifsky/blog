@@ -2,7 +2,7 @@ import Foundation
 
 /// 心情编辑视图模型
 @Observable
-class MoodEditorViewModel {
+class MoodEditorViewModel: APIErrorPresentable {
 
     // MARK: - 状态
 
@@ -79,8 +79,7 @@ class MoodEditorViewModel {
             }
             didSave = true
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isSaving = false

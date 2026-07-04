@@ -109,8 +109,11 @@ struct CommentInputView: View {
                 commentText = ""
                 onSuccess?()
             } catch {
-                errorMessage = error.localizedDescription
-                showError = true
+                let apiError = APIError.normalized(error)
+                if !apiError.isCancelled {
+                    errorMessage = apiError.displayMessage()
+                    showError = true
+                }
             }
 
             isSending = false

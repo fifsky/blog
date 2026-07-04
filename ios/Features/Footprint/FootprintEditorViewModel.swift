@@ -4,7 +4,7 @@ import PhotosUI
 /// 足迹编辑器视图模型
 /// 负责创建和编辑足迹的逻辑，包括照片上传
 @Observable
-class FootprintEditorViewModel {
+class FootprintEditorViewModel: APIErrorPresentable {
 
     // MARK: - 表单数据
 
@@ -214,8 +214,7 @@ class FootprintEditorViewModel {
 
             isSaveSuccess = true
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isSaving = false

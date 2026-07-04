@@ -2,7 +2,7 @@ import Foundation
 
 /// 足迹列表视图模型
 @Observable
-class FootprintListViewModel {
+class FootprintListViewModel: APIErrorPresentable {
 
     // MARK: - 状态
 
@@ -47,8 +47,7 @@ class FootprintListViewModel {
             let response = try await service.all()
             footprints = response.footprints
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isLoading = false
@@ -63,8 +62,7 @@ class FootprintListViewModel {
             let response = try await service.all()
             footprints = response.footprints
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isRefreshing = false
@@ -86,8 +84,7 @@ class FootprintListViewModel {
                 footprints.append(contentsOf: newList)
             }
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isLoading = false

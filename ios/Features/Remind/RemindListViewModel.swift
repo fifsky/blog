@@ -2,7 +2,7 @@ import Foundation
 
 /// 提醒列表视图模型
 @Observable
-class RemindListViewModel {
+class RemindListViewModel: APIErrorPresentable {
 
     // MARK: - 状态
 
@@ -71,8 +71,7 @@ class RemindListViewModel {
             currentPage = 1
             hasMore = reminds.count < response.total
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isLoading = false
@@ -91,8 +90,7 @@ class RemindListViewModel {
             currentPage = 1
             hasMore = reminds.count < response.total
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isRefreshing = false
@@ -115,8 +113,7 @@ class RemindListViewModel {
             // 当前页返回为空或不足一页时，判定无更多
             hasMore = !response.list.isEmpty && reminds.count < response.total
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isLoadingMore = false
@@ -137,8 +134,7 @@ class RemindListViewModel {
             try await remindService.delete(id: remind.id)
             reminds.removeAll { $0.id == remind.id }
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         remindToDelete = nil
@@ -166,8 +162,7 @@ class RemindListViewModel {
             // 直接重新加载列表以确保数据一致
             await refresh()
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         remindToComplete = nil
@@ -186,8 +181,7 @@ class RemindListViewModel {
             // 直接重新加载列表以确保数据一致
             await refresh()
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
     }
 }

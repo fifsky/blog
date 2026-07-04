@@ -2,7 +2,7 @@ import Foundation
 
 /// 心情列表视图模型
 @Observable
-class MoodListViewModel {
+class MoodListViewModel: APIErrorPresentable {
 
     // MARK: - 状态
 
@@ -53,8 +53,7 @@ class MoodListViewModel {
             currentPage = 1
             hasMore = moods.count < response.total
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isLoading = false
@@ -73,8 +72,7 @@ class MoodListViewModel {
             currentPage = 1
             hasMore = moods.count < response.total
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isRefreshing = false
@@ -93,8 +91,7 @@ class MoodListViewModel {
             currentPage = nextPage
             hasMore = moods.count < response.total
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         isLoadingMore = false
@@ -116,8 +113,7 @@ class MoodListViewModel {
             try await moodService.delete(ids: [mood.id])
             moods.removeAll { $0.id == mood.id }
         } catch {
-            errorMessage = error.localizedDescription
-            showError = true
+            handleAPIError(error)
         }
 
         moodToDelete = nil
