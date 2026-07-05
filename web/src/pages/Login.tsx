@@ -59,7 +59,7 @@ export default function Login() {
         return;
       }
       navigate("/admin/index");
-    } catch (e) {
+    } catch  {
       // 错误处理由 request 拦截器完成
     } finally {
       setLoading(false);
