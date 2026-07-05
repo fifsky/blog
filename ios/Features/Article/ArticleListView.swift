@@ -228,7 +228,7 @@ private struct ArticleRowView: View {
 // MARK: - 流式布局（用于标签自动换行）
 
 /// 简单的流式布局，用于标签 chip 自动换行显示
-private struct FlowLayout: Layout {
+struct FlowLayout: Layout {
 
     var spacing: CGFloat = 8
 

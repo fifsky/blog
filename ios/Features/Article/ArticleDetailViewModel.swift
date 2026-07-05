@@ -50,15 +50,16 @@ class ArticleDetailViewModel: APIErrorPresentable {
 
     /// 解析文章创建时间字符串为相对时间
     func relativeTime(for dateString: String) -> String {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let date = formatter.date(from: dateString) {
-            return date.relativeString()
-        }
-        formatter.formatOptions = [.withInternetDateTime]
-        if let date = formatter.date(from: dateString) {
+        if let date = Date.parseAPIString(dateString) {
             return date.relativeString()
         }
         return dateString
+    }
+
+    /// 格式化文章更新时间
+    /// - Parameter dateString: 后端时间字符串
+    /// - Returns: yyyy-MM-dd HH:mm 格式的更新时间
+    func updateTime(for dateString: String) -> String {
+        Date.formattedAPIString(dateString, format: "yyyy-MM-dd HH:mm")
     }
 }

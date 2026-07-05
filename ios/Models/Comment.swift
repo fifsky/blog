@@ -22,6 +22,23 @@ struct CommentListRequest: Encodable {
 /// 评论列表响应
 struct CommentListResponse: Decodable {
     let list: [Comment]
+
+    enum CodingKeys: String, CodingKey {
+        case list
+    }
+
+    /// 创建评论列表响应
+    /// - Parameter list: 评论列表
+    init(list: [Comment] = []) {
+        self.list = list
+    }
+
+    /// 从后端响应解码评论列表，缺失或 null 时按空列表处理
+    /// - Parameter decoder: 解码器
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.list = try container.decodeIfPresent([Comment].self, forKey: .list) ?? []
+    }
 }
 
 /// 创建评论请求

@@ -8,124 +8,65 @@ struct ArticleDetailView: View {
 
     @State private var viewModel: ArticleDetailViewModel?
 
-    /// 评论回复信息
-    @State private var replyName: String?
-    @State private var replyPid: Int = 0
+    /// 当前评论草稿目标
+    @State private var draftTarget: CommentDraftTarget = .new
+
+    /// 是否展示评论输入弹层
+    @State private var showCommentInput = false
 
     /// 需要刷新评论列表
     @State private var refreshCommentTrigger = false
 
+    private let commentsAnchor = "article-comments-section"
+
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottom) {
+            Color(.systemGroupedBackground)
+                .ignoresSafeArea()
+
             if let viewModel, let article = viewModel.article {
-                // 文章内容
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        // 标题
-                        Text(article.title)
-                            .font(.largeTitle)
-                            .bold()
-                            .multilineTextAlignment(.leading)
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            articleSection(article: article, viewModel: viewModel)
 
-                        // 日期和浏览量
-                        HStack(spacing: 16) {
-                            Label(
-                                viewModel.relativeTime(for: article.created_at),
-                                systemImage: "clock"
-                            )
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            Color(.systemGroupedBackground)
+                                .frame(height: 12)
 
-                            Label(
-                                "\(article.view_num) 次浏览",
-                                systemImage: "eye"
-                            )
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            commentsSection(article: article)
+                                .id(commentsAnchor)
+
+                            Spacer(minLength: 96)
                         }
-
-                        // 分类
-                        if let cate = article.cate {
-                            HStack(spacing: 6) {
-                                Image(systemName: "folder")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Text(cate.name)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-
-                        // 标签
-                        if !article.tags.isEmpty {
-                            FlowLayout(spacing: 6) {
-                                ForEach(article.tags, id: \.self) { tag in
-                                    Text(tag)
-                                        .font(.caption2)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 3)
-                                        .background(Color(.secondarySystemBackground), in: Capsule())
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                        }
-
-                        Divider()
-
-                        // 正文内容（Markdown 渲染）
-                        StructuredText(markdown: article.content)
-                            .multilineTextAlignment(.leading)
-                            .textual.textSelection(.enabled)
-
-                        Divider()
-
-                        // 评论区
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("评论")
-                                .font(.headline)
-
-                            CommentListView(
-                                postId: article.id,
-                                refreshTrigger: refreshCommentTrigger,
-                                onReply: { name, pid in
-                                    replyName = name
-                                    replyPid = pid
-                                }
-                            )
-                        }
-
-                        // 底部留白，避免被输入框遮挡
-                        Spacer(minLength: 80)
                     }
-                    .padding(.horizontal, 16)
-                }
-                .overlay(alignment: .bottom) {
-                    // 评论输入框
-                    CommentInputView(
-                        postId: article.id,
-                        replyName: replyName,
-                        pid: replyPid,
-                        onSuccess: {
-                            // 清除回复状态，触发评论列表刷新
-                            replyName = nil
-                            replyPid = 0
-                            refreshCommentTrigger.toggle()
-                        },
-                        onCancelReply: {
-                            replyName = nil
-                            replyPid = 0
-                        }
-                    )
+                    .scrollDismissesKeyboard(.interactively)
+                    .safeAreaInset(edge: .bottom) {
+                        CommentBottomBar(
+                            onCompose: {
+                                openCommentInput(.new)
+                            },
+                            onScrollToComments: {
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    proxy.scrollTo(commentsAnchor, anchor: .top)
+                                }
+                            }
+                        )
+                    }
                 }
             } else if let viewModel, viewModel.isLoading {
-                // 加载中
+                ProgressView("加载中...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
                 ProgressView("加载中...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+
+            if let viewModel, let article = viewModel.article, showCommentInput {
+                commentInputOverlay(article: article)
+                    .zIndex(2)
+            }
         }
-        // 点击空白收起 + 拖拽下滑交互式收起键盘（覆盖评论输入框）
-        .hideKeyboardOnTap()
-        .scrollDismissesKeyboard(.interactively)
+        .animation(.easeInOut(duration: 0.2), value: showCommentInput)
         .navigationTitle("文章详情")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .tabBar)
@@ -145,5 +86,186 @@ struct ArticleDetailView: View {
                 await viewModel?.load()
             }
         }
+    }
+
+    /// 文章内容区块
+    /// - Parameters:
+    ///   - article: 文章详情
+    ///   - viewModel: 文章详情视图模型
+    /// - Returns: 文章内容视图
+    private func articleSection(article: Article, viewModel: ArticleDetailViewModel) -> some View {
+        VStack(alignment: .leading, spacing: 18) {
+            Text(article.title)
+                .font(.system(size: 30, weight: .semibold))
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+
+            articleMetaRow(article: article, viewModel: viewModel)
+
+            StructuredText(markdown: article.content)
+                .multilineTextAlignment(.leading)
+                .textual.textSelection(.enabled)
+                .padding(.top, 4)
+
+            if !article.tags.isEmpty {
+                tagSection(tags: article.tags)
+                    .padding(.top, 8)
+            }
+
+            updateTimeSection(text: viewModel.updateTime(for: article.updated_at))
+                .padding(.top, 28)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 16)
+        .padding(.top, 18)
+        .padding(.bottom, 26)
+        .background(Color(.systemBackground))
+    }
+
+    /// 文章分类、发布时间和阅读量元信息
+    /// - Parameters:
+    ///   - article: 文章详情
+    ///   - viewModel: 文章详情视图模型
+    /// - Returns: 元信息视图
+    private func articleMetaRow(article: Article, viewModel: ArticleDetailViewModel) -> some View {
+        HStack(spacing: 10) {
+            if let cate = article.cate {
+                metaItem(systemImage: "folder", text: cate.name)
+                    .lineLimit(1)
+            }
+
+            metaItem(systemImage: "clock", text: viewModel.relativeTime(for: article.created_at))
+                .layoutPriority(1)
+
+            metaItem(systemImage: "eye", text: "\(article.view_num) 次浏览")
+                .layoutPriority(1)
+        }
+        .font(.system(size: 13))
+        .foregroundStyle(.secondary)
+        .lineLimit(1)
+        .minimumScaleFactor(0.85)
+    }
+
+    /// 单个文章元信息项
+    /// - Parameters:
+    ///   - systemImage: 系统图标名称
+    ///   - text: 展示文本
+    /// - Returns: 元信息项视图
+    private func metaItem(systemImage: String, text: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: systemImage)
+                .font(.system(size: 12, weight: .regular))
+            Text(text)
+        }
+    }
+
+    /// 标签区块
+    /// - Parameter tags: 标签列表
+    /// - Returns: 标签视图
+    private func tagSection(tags: [String]) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: "tag.fill")
+                .font(.system(size: 16, weight: .regular))
+                .foregroundStyle(Color(.systemGray3))
+                .frame(width: 22, height: 22)
+                .padding(.top, 2)
+
+            FlowLayout(spacing: 8) {
+                ForEach(tags, id: \.self) { tag in
+                    Text(tag)
+                        .font(.system(size: 13))
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color(.secondarySystemBackground), in: Capsule())
+                }
+            }
+        }
+    }
+
+    /// 更新时间区块
+    /// - Parameter text: 更新时间文本
+    /// - Returns: 更新时间视图
+    private func updateTimeSection(text: String) -> some View {
+        HStack(spacing: 10) {
+            Rectangle()
+                .fill(Color(.systemGray4))
+                .frame(maxWidth: 74)
+                .frame(height: 1)
+
+            Text("更新于 \(text)")
+                .font(.system(size: 13))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .layoutPriority(1)
+
+            Rectangle()
+                .fill(Color(.systemGray4))
+                .frame(maxWidth: 74)
+                .frame(height: 1)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 12)
+    }
+
+    /// 评论区块
+    /// - Parameter article: 文章详情
+    /// - Returns: 评论视图
+    private func commentsSection(article: Article) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            CommentListView(
+                postId: article.id,
+                refreshTrigger: refreshCommentTrigger,
+                onReply: { target in
+                    openCommentInput(target)
+                }
+            )
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 16)
+        .padding(.top, 22)
+        .padding(.bottom, 28)
+        .background(Color(.systemBackground))
+    }
+
+    /// 评论输入遮罩
+    /// - Parameter article: 文章详情
+    /// - Returns: 输入弹层视图
+    private func commentInputOverlay(article: Article) -> some View {
+        ZStack(alignment: .bottom) {
+            Color.black.opacity(0.38)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    closeCommentInput()
+                }
+
+            CommentInputView(
+                postId: article.id,
+                target: draftTarget,
+                onSuccess: {
+                    closeCommentInput()
+                    refreshCommentTrigger.toggle()
+                },
+                onCancel: {
+                    closeCommentInput()
+                }
+            )
+            .transition(.move(edge: .bottom).combined(with: .opacity))
+        }
+        .ignoresSafeArea(.container, edges: .bottom)
+    }
+
+    /// 打开评论输入弹层
+    /// - Parameter target: 评论目标
+    private func openCommentInput(_ target: CommentDraftTarget) {
+        draftTarget = target
+        showCommentInput = true
+    }
+
+    /// 关闭评论输入弹层
+    private func closeCommentInput() {
+        showCommentInput = false
+        draftTarget = .new
     }
 }

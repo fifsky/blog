@@ -77,4 +77,49 @@ extension Date {
         }
         return Date(timeIntervalSince1970: TimeInterval(timestamp))
     }
+
+    // MARK: - API 时间解析
+
+    /// 解析后端 API 返回的时间字符串
+    /// - Parameter dateString: 后端时间字符串
+    /// - Returns: 对应的 Date，无效值返回 nil
+    static func parseAPIString(_ dateString: String) -> Date? {
+        let trimmed = dateString.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = isoFormatter.date(from: trimmed) {
+            return date
+        }
+
+        isoFormatter.formatOptions = [.withInternetDateTime]
+        if let date = isoFormatter.date(from: trimmed) {
+            return date
+        }
+
+        for format in ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm"] {
+            let formatter = DateFormatter()
+            formatter.dateFormat = format
+            formatter.locale = Locale(identifier: "zh_CN")
+            formatter.timeZone = .current
+            if let date = formatter.date(from: trimmed) {
+                return date
+            }
+        }
+
+        return nil
+    }
+
+    /// 将 API 时间格式化为展示文案
+    /// - Parameters:
+    ///   - dateString: 后端时间字符串
+    ///   - format: 输出日期格式
+    /// - Returns: 格式化后的日期，无效值返回原始字符串
+    static func formattedAPIString(_ dateString: String, format: String = "yyyy-MM-dd HH:mm") -> String {
+        guard let date = parseAPIString(dateString) else {
+            return dateString
+        }
+        return date.toString(format: format)
+    }
 }
