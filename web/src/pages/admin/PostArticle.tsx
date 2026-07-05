@@ -94,7 +94,7 @@ const uploadImages = async (
     const response = await fetch(getApiUrl("/blog/admin/upload"), {
       method: "POST",
       headers: {
-        "Access-Token": getAccessToken(),
+        Authorization: `Bearer ${getAccessToken()}`,
       },
       body: formData,
     });

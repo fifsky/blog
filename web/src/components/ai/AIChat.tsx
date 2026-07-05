@@ -325,7 +325,7 @@ export function AIChat() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Access-Token": localStorage.getItem("access_token") || "",
+          Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
         },
         body: JSON.stringify({ messages: apiMessages }),
         signal: controller.signal,
