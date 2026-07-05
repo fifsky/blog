@@ -10,7 +10,6 @@ import (
 	"app/config"
 	"app/pkg/aiagent"
 	"app/service/feishu"
-	"app/service/motto"
 	"app/service/remind"
 	"app/store"
 
@@ -68,9 +67,10 @@ func main() {
 		go feishuBot.Start(context.Background())
 	}
 
-	ai := motto.NewOpenAIProvider(agent)
-	m := motto.New(s, ai)
-	go m.Start("0 7 * * *")
+	// TODO 临时停用自动生成心情
+	// ai := motto.NewOpenAIProvider(agent)
+	// m := motto.New(s, ai)
+	// go m.Start("0 7 * * *")
 
 	app := &cli.Command{
 		Name:  "blog",
