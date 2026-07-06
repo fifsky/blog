@@ -61,7 +61,7 @@ func (s *Store) GetOptions(ctx context.Context) (map[string]string, error) {
 
 func (s *Store) UpdateOptions(ctx context.Context, m map[string]string) (map[string]string, error) {
 	for k, v := range m {
-		_, err := s.db.ExecContext(ctx, "insert into options (option_key, option_value) values (?, ?) on duplicate key update option_value = values(option_value)", k, v)
+		_, err := s.db.ExecContext(ctx, "insert into options (option_key, option_value) values (?, ?) on conflict(option_key) do update set option_value = excluded.option_value", k, v)
 		if err != nil {
 			return nil, err
 		}

@@ -87,7 +87,7 @@ func TestStore_ListGuestbook_Order(t *testing.T) {
 		s := New(db)
 
 		// 清空可能存在的默认数据
-		_, err := db.Exec("TRUNCATE TABLE guestbook")
+		_, err := db.Exec("DELETE FROM guestbook")
 		require.NoError(t, err)
 
 		// 插入测试数据，包含置顶和非置顶数据

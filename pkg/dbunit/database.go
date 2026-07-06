@@ -4,70 +4,65 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sync/atomic"
 	"time"
+
+	_ "modernc.org/sqlite"
 )
 
 var (
-	defaultTestDSN         = "root:123456@tcp(127.0.0.1:3306)/"
 	createTableRegex       = regexp.MustCompile(`(?isU)CREATE TABLE\s+.*;`)
 	id               int32 = 0
+	testDir                = filepath.Join(os.TempDir(), "blog_dbunit")
 )
 
 func init() {
-	if os.Getenv("DRONE") == "true" {
-		SetDatabase("root:123456@tcp(database:3306)/")
-	}
-
-	if os.Getenv("CI") == "true" {
-		SetDatabase("root:root@tcp(127.0.0.1:3306)/")
-	}
+	// 确保测试目录存在
+	_ = os.MkdirAll(testDir, 0755)
 }
 
-// SetDatabase 配置单元测试的数据库DSN
+// SetDatabase 设置测试数据库 DSN（SQLite 兼容，仅为兼容旧 API 保留）
 func SetDatabase(dsn string) {
-	defaultTestDSN = dsn
+	// no-op: SQLite 使用文件路径，不需要 MySQL 的 server DSN
 }
 
 type database struct {
-	Name   string
-	source string
+	Name   string // 数据库文件名（含 test_ 前缀）
+	source string // 完整文件路径
 	db     *sql.DB
 }
 
 func newDatabase(schema string) *database {
 	atomic.AddInt32(&id, 1)
-	name := "test_" + fmt.Sprintf("%d_%d", time.Now().UnixNano(), id)
+	name := fmt.Sprintf("test_%d_%d.db", time.Now().UnixNano(), id)
 	return newDatabaseWithName(name, schema)
 }
 
 func newDatabaseWithName(name string, schema string) *database {
-	db := &database{Name: name, source: defaultTestDSN}
-	err := db.connection()
+	dbPath := filepath.Join(testDir, name)
+	d := &database{Name: name, source: dbPath}
 
+	err := d.connection()
 	if err != nil {
-		panic("test mysql connection fail," + err.Error())
+		panic("test sqlite connection fail," + err.Error())
 	}
 
-	err = db.create()
-	if err != nil {
-		panic("test mysql create database fail," + err.Error())
-	}
-
-	err = db.Import(schema)
+	err = d.Import(schema)
 	if err != nil {
 		panic(err)
 	}
-	return db
+	return d
 }
 
+// DSN 返回 SQLite 连接字符串（含 test_ 前缀，满足 EnsureTestDatabase 检查）
 func (d *database) DSN() string {
-	return defaultTestDSN + d.Name + "?charset=utf8mb4&parseTime=True&loc=Asia%2FShanghai"
+	return fmt.Sprintf("file:%s?_pragma=foreign_keys(ON)&_pragma=journal_mode(WAL)", d.source)
 }
 
 func (d *database) connection() error {
-	db, err := sql.Open("mysql", d.source)
+	db, err := sql.Open("sqlite", d.DSN())
 	if err != nil {
 		return err
 	}
@@ -75,26 +70,20 @@ func (d *database) connection() error {
 	return nil
 }
 
+// Drop 删除 SQLite 数据库文件
 func (d *database) Drop() error {
-	query := fmt.Sprintf("DROP DATABASE IF EXISTS %s", d.Name)
-	defaultLog.Print(query)
-	_, err := d.db.Exec(query)
-	if err != nil {
-		return err
+	if d.db != nil {
+		_ = d.db.Close()
 	}
-	d.db.Close()
+	// 删除主数据库文件及 WAL/SHM 文件
+	for _, suffix := range []string{"", "-wal", "-shm"} {
+		_ = os.Remove(d.source + suffix)
+	}
 	return nil
 }
 
-func (d *database) create() error {
-	query := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", d.Name)
-	defaultLog.Print(query)
-	_, err := d.db.Exec(query)
-	return err
-}
-
+// Import 导入 schema 文件，执行所有 CREATE TABLE 语句
 func (d *database) Import(schema string) error {
-
 	if !isExists(schema) {
 		return fmt.Errorf("sql file not found:%s", schema)
 	}
@@ -104,26 +93,27 @@ func (d *database) Import(schema string) error {
 		return err
 	}
 
-	querys := createTableRegex.FindAllString(string(content), -1)
+	// 提取所有 CREATE TABLE 语句
+	queries := createTableRegex.FindAllString(string(content), -1)
 
-	var results []sql.Result
+	// 同时提取 CREATE INDEX、CREATE UNIQUE INDEX、CREATE TRIGGER 语句
+	indexRe := regexp.MustCompile(`(?isU)CREATE\s+(?:UNIQUE\s+)?INDEX\s+.*;`)
+	triggerRe := regexp.MustCompile(`(?isU)CREATE\s+TRIGGER\s+(?:IF\s+NOT\s+EXISTS\s+)?[\s\S]*?END;`)
+	queries = append(queries, indexRe.FindAllString(string(content), -1)...)
+	queries = append(queries, triggerRe.FindAllString(string(content), -1)...)
 
-	db, err := sql.Open("mysql", d.DSN())
+	db, err := sql.Open("sqlite", d.DSN())
 	if err != nil {
 		return err
 	}
+	defer db.Close()
 
-	defaultLog.Print(fmt.Sprintf("Import schema:%s", schema))
-	for _, query := range querys {
-		defaultLog.Debug(query)
+	for _, query := range queries {
 		if len(query) > 0 {
-			result, err := db.Exec(query)
-			if err != nil {
+			if _, err := db.Exec(query); err != nil {
 				return err
 			}
-			results = append(results, result)
 		}
 	}
-	_ = results
 	return nil
 }

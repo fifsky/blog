@@ -12,7 +12,7 @@ import (
 func (s *Store) GetFootprint(ctx context.Context, id int) (*model.Footprint, error) {
 	query := "SELECT id, name, description, longitude, latitude, date, marker_color, categories, url, url_label, photos, created_at, updated_at FROM footprints WHERE id = ?"
 	var m model.Footprint
-	var catRaw, photoRaw json.RawMessage
+	var catRaw, photoRaw []byte
 	err := s.db.QueryRowContext(ctx, query, id).Scan(&m.Id, &m.Name, &m.Description, &m.Longitude, &m.Latitude, &m.Date, &m.MarkerColor, &catRaw, &m.Url, &m.UrlLabel, &photoRaw, &m.CreatedAt, &m.UpdatedAt)
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (s *Store) ListFootprint(ctx context.Context, start int, num int) ([]*model
 	ret := make([]*model.Footprint, 0)
 	for rows.Next() {
 		var item model.Footprint
-		var catRaw, photoRaw json.RawMessage
+		var catRaw, photoRaw []byte
 		if err := rows.Scan(&item.Id, &item.Name, &item.Description, &item.Longitude, &item.Latitude, &item.Date, &item.MarkerColor, &catRaw, &item.Url, &item.UrlLabel, &photoRaw, &item.CreatedAt, &item.UpdatedAt); err != nil {
 			return nil, err
 		}
@@ -128,7 +128,7 @@ func (s *Store) ListAllFootprints(ctx context.Context) ([]*model.Footprint, erro
 	ret := make([]*model.Footprint, 0)
 	for rows.Next() {
 		var item model.Footprint
-		var catRaw, photoRaw json.RawMessage
+		var catRaw, photoRaw []byte
 		if err := rows.Scan(&item.Id, &item.Name, &item.Description, &item.Longitude, &item.Latitude, &item.Date, &item.MarkerColor, &catRaw, &item.Url, &item.UrlLabel, &photoRaw, &item.CreatedAt, &item.UpdatedAt); err != nil {
 			return nil, err
 		}

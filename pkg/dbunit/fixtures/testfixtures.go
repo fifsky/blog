@@ -14,10 +14,10 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
-// Loader is the responsible to loading fixtures.
+// Loader 负责加载测试 fixture 数据
 type Loader struct {
 	db            *sql.DB
-	helper        *mySQL
+	helper        *sqliteHelper
 	fixturesFiles []*fixtureFile
 
 	skipTestDatabaseCheck bool
@@ -41,7 +41,7 @@ var (
 func New(options ...func(*Loader) error) (*Loader, error) {
 	l := &Loader{
 		template: NewTemplate(),
-		helper:   &mySQL{},
+		helper:   &sqliteHelper{},
 	}
 
 	for _, option := range options {
@@ -129,8 +129,6 @@ func (l *Loader) Load() error {
 			return err
 		}
 	}
-
-	_, _ = l.db.Exec("set @@sql_mode=''")
 
 	err := l.helper.disableReferentialIntegrity(l.db, func(tx *sql.Tx) error {
 		for _, file := range l.fixturesFiles {

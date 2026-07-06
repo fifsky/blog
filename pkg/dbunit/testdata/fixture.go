@@ -7,17 +7,17 @@ import (
 
 	"app/pkg/dbunit"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "modernc.org/sqlite"
 )
 
 func main() {
-	dbname := "example"
+	// 使用 SQLite 数据库进行 fixture 导出
+	dbPath := os.Getenv("SQLITE_PATH")
+	if dbPath == "" {
+		dbPath = "storage/blog.db"
+	}
 
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=%s",
-		os.Getenv("DEV_DATABASE_USERNAME"),
-		os.Getenv("DEV_DATABASE_PASSWORD"),
-		os.Getenv("DEV_DATABASE_HOST"), dbname, "Asia%2FShanghai"),
-	)
+	db, err := sql.Open("sqlite", fmt.Sprintf("file:%s?_pragma=foreign_keys(ON)", dbPath))
 	if err != nil {
 		panic(err)
 	}

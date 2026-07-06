@@ -3,12 +3,15 @@ package config
 import (
 	"database/sql"
 	"log"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
-	"github.com/go-sql-driver/mysql"
+	_ "modernc.org/sqlite"
 )
 
-// Config is database connection configuration
+// Database 数据库连接配置
 type Database struct {
 	Driver       string `yaml:"driver"`
 	Dsn          string `yaml:"dsn"`
@@ -17,22 +20,26 @@ type Database struct {
 	MaxLifetime  int    `yaml:"max_lifetime"`
 }
 
+// Connect 建立 SQLite 数据库连接，自动创建数据目录并启用 WAL 模式
 func (d *Database) Connect() *sql.DB {
-	dsn, err := mysql.ParseDSN(d.Dsn)
-	if err != nil {
-		log.Fatalf("[db] failed parse dsn: %s\n", err)
+	// 从 DSN 中提取文件路径，自动创建目录
+	dbPath := d.ExtractDBPath()
+	if dbPath != "" && dbPath != ":memory:" {
+		dir := filepath.Dir(dbPath)
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			log.Fatalf("[db] failed to create database directory: %s\n", err)
+		}
 	}
 
-	log.Printf("[db] connect: %s %s\n", dsn.DBName, dsn.Addr)
-	var sess *sql.DB
-	sess, err = sql.Open(d.Driver, d.Dsn)
+	log.Printf("[db] connect sqlite: %s\n", dbPath)
+	sess, err := sql.Open(d.Driver, d.Dsn)
 	if err != nil {
-		log.Fatalf("[db] failed to connect: %s %s\n", dsn.DBName, err)
+		log.Fatalf("[db] failed to open: %s\n", err)
 	}
 
 	if err = sess.Ping(); err != nil {
 		_ = sess.Close()
-		log.Fatalf("[db] failed to connect: %s %s\n", dsn.DBName, err)
+		log.Fatalf("[db] failed to connect: %s\n", err)
 	}
 
 	sess.SetMaxOpenConns(d.MaxOpenConns)
@@ -41,4 +48,18 @@ func (d *Database) Connect() *sql.DB {
 		sess.SetConnMaxLifetime(time.Duration(d.MaxLifetime) * time.Second)
 	}
 	return sess
+}
+
+// ExtractDBPath 从 SQLite DSN 中提取数据库文件路径
+// DSN 格式: file:storage/blog.db?_pragma=journal_mode(WAL)&...
+func (d *Database) ExtractDBPath() string {
+	dsn := d.Dsn
+	if after, ok := strings.CutPrefix(dsn, "file:"); ok {
+		dsn = after
+	}
+	// 去掉查询参数
+	if idx := strings.Index(dsn, "?"); idx != -1 {
+		dsn = dsn[:idx]
+	}
+	return dsn
 }

@@ -4,7 +4,8 @@ import (
 	"database/sql"
 	"testing"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "modernc.org/sqlite"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,7 +15,7 @@ func TestNewDatabase(t *testing.T) {
 		_ = tdb.Drop()
 	})
 
-	db, err := sql.Open("mysql", tdb.DSN())
+	db, err := sql.Open("sqlite", tdb.DSN())
 	assert.NoError(t, err)
 	defer db.Close()
 }

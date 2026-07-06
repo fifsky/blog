@@ -9,6 +9,7 @@ import (
 	"app/cmd"
 	"app/config"
 	"app/pkg/aiagent"
+	"app/pkg/litestream"
 	"app/service/feishu"
 	"app/service/remind"
 	"app/store"
@@ -22,11 +23,24 @@ import (
 
 func main() {
 	conf := config.New()
+
+	// 1. 先启动 Litestream（作为 Go library 嵌入），从 OSS 自动恢复 + 实时备份 SQLite
+	dbPath := conf.DB.ExtractDBPath()
+	ls := litestream.New(conf, dbPath)
+	if err := ls.Start(context.Background()); err != nil {
+		log.Fatalf("[litestream] start failed: %s", err)
+	}
+
+	// 2. 再打开应用层数据库连接（确保 litestream 已初始化）
 	db := conf.DB.Connect()
+
 	defer func() {
+		// 先关闭应用层数据库连接
 		if err := db.Close(); err != nil {
 			log.Printf("[db] database close error: %s", err)
 		}
+		// 再关闭 litestream store（确保所有应用连接已释放）
+		_ = ls.Stop()
 	}()
 
 	// logger
@@ -78,6 +92,7 @@ func main() {
 		Commands: []*cli.Command{
 			cmd.NewHttp(s, conf, agent),
 			cmd.NewTmp(db, conf),
+			cmd.NewMigrate(),
 		},
 	}
 

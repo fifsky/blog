@@ -36,7 +36,7 @@ func (s *Store) IncrementPostViewNum(ctx context.Context, id int) error {
 }
 
 func (s *Store) GetPostDaysInMonth(ctx context.Context, year, month int) ([]int32, error) {
-	query := "select distinct DAY(created_at) from posts where status = 'ACTIVE' and YEAR(created_at) = ? and MONTH(created_at) = ?"
+	query := "select distinct cast(strftime('%d', substr(created_at, 1, 19)) as integer) from posts where status = 'ACTIVE' and cast(strftime('%Y', substr(created_at, 1, 19)) as integer) = ? and cast(strftime('%m', substr(created_at, 1, 19)) as integer) = ?"
 	rows, err := s.db.QueryContext(ctx, query, year, month)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (s *Store) NextPost(ctx context.Context, id int) (*model.Post, error) {
 
 func (s *Store) PostArchive(ctx context.Context) ([]model.PostArchive, error) {
 	res := make([]model.PostArchive, 0)
-	rows, err := s.db.QueryContext(ctx, "select ym,count(ym) total from (select DATE_FORMAT(created_at,'%Y/%m') as ym from posts where status = 'ACTIVE') s group by ym order by ym desc")
+	rows, err := s.db.QueryContext(ctx, "select ym,count(ym) total from (select strftime('%Y/%m', substr(created_at, 1, 19)) as ym from posts where status = 'ACTIVE') s group by ym order by ym desc")
 	if err != nil {
 		return nil, err
 	}
@@ -109,9 +109,9 @@ func (s *Store) ListPost(ctx context.Context, p *model.Post, start int, num int,
 	}
 	if artdate != "" {
 		if len(artdate) == 7 {
-			where += " and DATE_FORMAT(created_at,'%Y-%m') = ?"
+			where += " and strftime('%Y-%m', substr(created_at, 1, 19)) = ?"
 		} else {
-			where += " and DATE_FORMAT(created_at,'%Y-%m-%d') = ?"
+			where += " and strftime('%Y-%m-%d', substr(created_at, 1, 19)) = ?"
 		}
 		args = append(args, artdate)
 	}
@@ -120,7 +120,7 @@ func (s *Store) ListPost(ctx context.Context, p *model.Post, start int, num int,
 		args = append(args, fmt.Sprintf("%%%s%%", keyword))
 	}
 	if tag != "" {
-		where += " and JSON_CONTAINS(tags, JSON_QUOTE(?))"
+		where += " and exists (select 1 from json_each(tags) where value = ?)"
 		args = append(args, tag)
 	}
 	args = append(args, num, offset)
@@ -155,9 +155,9 @@ func (s *Store) CountPosts(ctx context.Context, p *model.Post, artdate, keyword,
 	}
 	if artdate != "" {
 		if len(artdate) == 7 {
-			where += " and DATE_FORMAT(created_at,'%Y-%m') = ?"
+			where += " and strftime('%Y-%m', substr(created_at, 1, 19)) = ?"
 		} else {
-			where += " and DATE_FORMAT(created_at,'%Y-%m-%d') = ?"
+			where += " and strftime('%Y-%m-%d', substr(created_at, 1, 19)) = ?"
 		}
 		args = append(args, artdate)
 	}
@@ -166,7 +166,7 @@ func (s *Store) CountPosts(ctx context.Context, p *model.Post, artdate, keyword,
 		args = append(args, fmt.Sprintf("%%%s%%", keyword))
 	}
 	if tag != "" {
-		where += " and JSON_CONTAINS(tags, JSON_QUOTE(?))"
+		where += " and exists (select 1 from json_each(tags) where value = ?)"
 		args = append(args, tag)
 	}
 	q := "select count(*) from posts where " + where

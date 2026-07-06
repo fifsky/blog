@@ -1,59 +1,94 @@
 package dbunit
 
 import (
+	"database/sql"
+	"fmt"
 	"os"
-	"reflect"
+	"strings"
 
 	"app/pkg/dbunit/fixtures"
 
-	"go.yaml.in/yaml/v3"
+	_ "modernc.org/sqlite"
 )
 
-func PluckWithFixture(filePath string, key string) []any {
-	var data = make([]map[string]any, 0)
-	if !isExists(filePath) {
-		panic("file not exists:" + filePath)
+type Testing struct {
+	tdb    *database
+	db     *sql.DB
+	schema string
+}
+
+func NewTest(schema string) *Testing {
+	tdb := newDatabase(schema)
+
+	// 打开 SQLite 测试数据库连接
+	db, err := sql.Open("sqlite", tdb.DSN())
+	if err != nil {
+		panic("test sqlite open fail " + err.Error())
 	}
-	d, _ := os.ReadFile(filePath)
-	tpl := fixtures.NewTemplate()
-	d, err := tpl.Parse(d)
+
+	return &Testing{
+		tdb,
+		db,
+		schema,
+	}
+}
+
+func (d *Testing) DB() *sql.DB {
+	return d.db
+}
+
+func (d *Testing) Schema() string {
+	return d.schema
+}
+
+// Drop 删除测试数据库文件
+func (d *Testing) Drop() {
+	// 先关闭数据库连接
+	if d.db != nil {
+		_ = d.db.Close()
+	}
+	err := d.tdb.Drop()
+	if err != nil {
+		panic("drop database error " + err.Error())
+	}
+}
+
+// Load 加载 YAML fixture 文件到测试数据库
+func (d *Testing) Load(files ...string) {
+	options := make([]func(*fixtures.Loader) error, 0)
+	options = append(options, fixtures.Database(d.db))
+
+	fs := make([]string, 0)
+	for _, file := range files {
+		if isDir(file) {
+			options = append(options, fixtures.Directory(file))
+		} else {
+			fs = append(fs, file)
+		}
+	}
+
+	if len(fs) > 0 {
+		options = append(options, fixtures.Files(fs...))
+	}
+
+	f, err := fixtures.New(options...)
 	if err != nil {
 		panic(err)
 	}
-	err = yaml.Unmarshal(d, &data)
-	if err != nil {
+
+	fmt.Printf("db Load fixtures:%s\n", strings.Join(files, ","))
+
+	if err := f.Load(); err != nil {
 		panic(err)
 	}
-
-	return Pluck(data, key)
 }
 
-func Pluck(data []map[string]any, key string) []any {
-	s := make([]any, len(data))
-	for k, v := range data {
-		s[k] = v[key]
+// isDir 判断路径是否为目录
+func isDir(path string) bool {
+	fio, err := os.Lstat(path)
+	if nil != err {
+		return false
 	}
-	return unique(s)
-}
 
-func unique(s []any) []any {
-	ns := make([]any, 0)
-	for _, v := range s {
-		isDuplicate := false
-		for _, nv := range ns {
-			if reflect.DeepEqual(nv, v) {
-				isDuplicate = true
-				break
-			}
-		}
-		if !isDuplicate {
-			ns = append(ns, v)
-		}
-	}
-	return ns
-}
-
-func isExists(path string) bool {
-	_, err := os.Stat(path)
-	return !os.IsNotExist(err)
+	return fio.IsDir()
 }

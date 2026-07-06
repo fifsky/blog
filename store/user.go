@@ -21,8 +21,8 @@ func (s *Store) GetUser(ctx context.Context, uid int) (*model.User, error) {
 }
 
 func (s *Store) ListUser(ctx context.Context, start int, num int) ([]model.User, error) {
-	query := "select id,name,password,nick_name,email,status,`type`,totp_secret,created_at,updated_at from users order by id desc limit ?,?"
-	rows, err := s.db.QueryContext(ctx, query, max((start-1)*num, 0), num)
+	query := "select id,name,password,nick_name,email,status,`type`,totp_secret,created_at,updated_at from users order by id desc limit ? offset ?"
+	rows, err := s.db.QueryContext(ctx, query, num, max((start-1)*num, 0))
 	if err != nil {
 		return nil, err
 	}

@@ -40,16 +40,25 @@ type FeishuConf struct {
 	UserID    string `yaml:"user_id"`
 }
 
+// LitestreamConf Litestream 备份配置
+type LitestreamConf struct {
+	Bucket   string `yaml:"bucket"`   // 备份 OSS bucket（fifsky-backup）
+	Path     string `yaml:"path"`     // 备份路径（blog/sqlite）
+	Endpoint string `yaml:"endpoint"` // OSS endpoint
+	Region   string `yaml:"region"`   // OSS region
+}
+
 type Config struct {
-	Env      string
-	LogLevel string             `yaml:"log_level"`
-	AppName  string             `yaml:"app_name"`
-	Common   common             `yaml:"common"`
-	DB       Database           `yaml:"database"`
-	OSS      ossConf            `yaml:"oss"`
-	MCP      map[string]MCPConf `yaml:"mcp"`
-	MiniAPP  MiniAPPConf        `yaml:"miniapp"`
-	Feishu   FeishuConf         `yaml:"feishu"`
+	Env        string
+	LogLevel   string             `yaml:"log_level"`
+	AppName    string             `yaml:"app_name"`
+	Common     common             `yaml:"common"`
+	DB         Database           `yaml:"database"`
+	OSS        ossConf            `yaml:"oss"`
+	Litestream LitestreamConf     `yaml:"litestream"`
+	MCP        map[string]MCPConf `yaml:"mcp"`
+	MiniAPP    MiniAPPConf        `yaml:"miniapp"`
+	Feishu     FeishuConf         `yaml:"feishu"`
 }
 
 func (c *Config) GetLogLevel() slog.Level {

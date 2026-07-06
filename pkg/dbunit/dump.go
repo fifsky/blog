@@ -51,16 +51,10 @@ func getPrimaryKey(db *sql.DB, query string) (string, error) {
 		return "", errors.New("sql parse table name is empty")
 	}
 
-	row := db.QueryRow("select database();")
-	var dbname string
-	err := row.Scan(&dbname)
-	if err != nil {
-		return "", fmt.Errorf("get database name error %w", err)
-	}
-
-	row = db.QueryRow("select column_name from information_schema.key_column_usage where constraint_name = 'PRIMARY' and table_schema = ? and table_name = ?", dbname, tableName)
+	// SQLite 使用 pragma_table_info 获取主键列名
+	row := db.QueryRow("SELECT name FROM pragma_table_info(?) WHERE pk > 0 ORDER BY pk LIMIT 1", tableName)
 	var pk string
-	err = row.Scan(&pk)
+	err := row.Scan(&pk)
 	if err != nil {
 		return "", err
 	}

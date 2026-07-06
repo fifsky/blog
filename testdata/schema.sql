@@ -1,144 +1,186 @@
-CREATE TABLE `cates` (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
-  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '分类名称',
-  `desc` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '分类描述',
-  `domain` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '分类域名path',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `un_domain` (`domain`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '文章分类表';
+-- SQLite 建表语句（从 MySQL 迁移）
+-- 注意：SQLite 不支持 ON UPDATE CURRENT_TIMESTAMP，使用触发器替代
+-- 日期列使用 DATETIME 类型，modernc.org/sqlite 驱动会自动解析为 time.Time
 
-CREATE TABLE `links` (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
-  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '链接名称',
-  `url` varchar(200) COLLATE utf8mb4_general_ci NOT NULL COMMENT '链接地址',
-  `desc` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '链接描述',
-  `status` varchar(64) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'PENDING' COMMENT '状态:PENDING审核中,APPROVED审核通过',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '友情链接表';
+CREATE TABLE IF NOT EXISTS `cates` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `name` TEXT NOT NULL,
+  `desc` TEXT NOT NULL,
+  `domain` TEXT NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime')),
+  `updated_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
+CREATE UNIQUE INDEX IF NOT EXISTS `un_domain` ON `cates`(`domain`);
 
-CREATE TABLE `moods` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `content` varchar(2048) NOT NULL DEFAULT '',
-  `user_id` int(10) unsigned NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '心情表';
+CREATE TABLE IF NOT EXISTS `links` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `name` TEXT NOT NULL,
+  `url` TEXT NOT NULL,
+  `desc` TEXT NOT NULL,
+  `status` TEXT NOT NULL DEFAULT 'PENDING',
+  `created_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime')),
+  `updated_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
 
-CREATE TABLE `options` (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
-  `option_key` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置项唯一key',
-  `option_value` varchar(2048) COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置内容',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `option_name` (`option_key`) USING BTREE
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '配置表';
+CREATE TABLE IF NOT EXISTS `moods` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `content` TEXT NOT NULL DEFAULT '',
+  `user_id` INTEGER NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime')),
+  `updated_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
 
-CREATE TABLE `posts` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'PK',
-  `cate_id` int unsigned NOT NULL DEFAULT '1' COMMENT '文章分类ID',
-  `type` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '1:文章,2:页面',
-  `user_id` int unsigned NOT NULL COMMENT '文章作者ID',
-  `title` varchar(200) NOT NULL DEFAULT '' COMMENT '文章标题',
-  `url` varchar(100) NOT NULL DEFAULT '' COMMENT '页面缩略名',
-  `content` longtext NOT NULL COMMENT '文章内容',
-  `view_num` int NOT NULL DEFAULT '1' COMMENT '浏览次数',
-  `tags` json DEFAULT NULL COMMENT '文章标签',
-  `status` varchar(64) NOT NULL DEFAULT 'ACTIVE' COMMENT '状态:ACTIVE正常,DELETED删除,DRAFT草稿',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  KEY `idx_user` (`user_id`),
-  KEY `idx_url` (`url`),
-  KEY `idx_created_at` (`created_at`),
-  KEY `idx_updated_at` (`updated_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '文章表';
+CREATE TABLE IF NOT EXISTS `options` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `option_key` TEXT NOT NULL,
+  `option_value` TEXT NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS `option_name` ON `options`(`option_key`);
 
-CREATE TABLE `comments` (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
-  `post_id` int NOT NULL COMMENT '文章PID',
-  `pid` int NOT NULL COMMENT '回复评论ID',
-  `name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '名称',
-  `reply_name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL COMMENT '回复用户名',
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '邮箱',
-  `website` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '网址',
-  `content` tinytext COLLATE utf8mb4_general_ci NOT NULL COMMENT '内容',
-  `ip` varchar(100) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'IP',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '评论时间',
-  PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 16 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '文章评论表';
+CREATE TABLE IF NOT EXISTS `posts` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `cate_id` INTEGER NOT NULL DEFAULT 1,
+  `type` INTEGER NOT NULL DEFAULT 1,
+  `user_id` INTEGER NOT NULL,
+  `title` TEXT NOT NULL DEFAULT '',
+  `url` TEXT NOT NULL DEFAULT '',
+  `content` TEXT NOT NULL,
+  `view_num` INTEGER NOT NULL DEFAULT 1,
+  `tags` TEXT,
+  `status` TEXT NOT NULL DEFAULT 'ACTIVE',
+  `created_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime')),
+  `updated_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
+CREATE INDEX IF NOT EXISTS `idx_user` ON `posts`(`user_id`);
+CREATE INDEX IF NOT EXISTS `idx_url` ON `posts`(`url`);
+CREATE INDEX IF NOT EXISTS `idx_created_at` ON `posts`(`created_at`);
+CREATE INDEX IF NOT EXISTS `idx_updated_at` ON `posts`(`updated_at`);
 
+CREATE TABLE IF NOT EXISTS `comments` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `post_id` INTEGER NOT NULL,
+  `pid` INTEGER NOT NULL,
+  `name` TEXT NOT NULL DEFAULT '',
+  `reply_name` TEXT NOT NULL,
+  `email` TEXT NOT NULL,
+  `website` TEXT NOT NULL,
+  `content` TEXT NOT NULL,
+  `ip` TEXT NOT NULL DEFAULT '',
+  `created_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
 
-CREATE TABLE `users` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL DEFAULT '用户名',
-  `password` varchar(100) NOT NULL DEFAULT '密码',
-  `nick_name` varchar(100) NOT NULL DEFAULT '昵称',
-  `email` varchar(100) NOT NULL DEFAULT '邮箱',
-  `status` varchar(64) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'ACTIVE' COMMENT '状态:ACTIVE正常,DELETED删除',
-  `type` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '1:管理员,2:编辑',
-  `totp_secret` varchar(64) NOT NULL DEFAULT '',
-  `openid` varchar(256) COLLATE utf8mb4_general_ci NOT NULL COMMENT '小程序openid',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `un_user_name` (`name`),
-  UNIQUE KEY `un_users_email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = '用户表';
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `name` TEXT NOT NULL DEFAULT '',
+  `password` TEXT NOT NULL DEFAULT '',
+  `nick_name` TEXT NOT NULL DEFAULT '',
+  `email` TEXT NOT NULL DEFAULT '',
+  `status` TEXT NOT NULL DEFAULT 'ACTIVE',
+  `type` INTEGER NOT NULL DEFAULT 1,
+  `totp_secret` TEXT NOT NULL DEFAULT '',
+  `openid` TEXT NOT NULL DEFAULT '',
+  `created_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime')),
+  `updated_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
+CREATE UNIQUE INDEX IF NOT EXISTS `un_user_name` ON `users`(`name`);
+CREATE UNIQUE INDEX IF NOT EXISTS `un_users_email` ON `users`(`email`);
 
+CREATE TABLE IF NOT EXISTS `reminds` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `cron` TEXT NOT NULL DEFAULT '',
+  `content` TEXT NOT NULL,
+  `status` TEXT NOT NULL DEFAULT 'ACTIVE',
+  `next_time` DATETIME NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime')),
+  `updated_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
 
-CREATE TABLE `reminds` (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PK',
-  `cron` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'cron表达式或固定时间',
-  `content` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '提醒内容',
-  `status` varchar(64) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'ACTIVE' COMMENT '状态:ACTIVE正常,PENDING等待确认,DONE已完成',
-  `next_time` datetime NOT NULL COMMENT '下次提醒时间',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 2 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '提醒表';
+CREATE TABLE IF NOT EXISTS `regions` (
+  `region_id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `parent_id` INTEGER NOT NULL,
+  `level` INTEGER NOT NULL,
+  `region_name` TEXT NOT NULL DEFAULT '',
+  `longitude` TEXT NOT NULL DEFAULT '',
+  `latitude` TEXT NOT NULL DEFAULT '',
+  `pinyin` TEXT NOT NULL,
+  `az_no` TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS `idx_parent_id` ON `regions`(`parent_id`);
+CREATE INDEX IF NOT EXISTS `idx_region_name` ON `regions`(`region_name`);
 
+CREATE TABLE IF NOT EXISTS `guestbook` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `name` TEXT NOT NULL DEFAULT '',
+  `content` TEXT NOT NULL,
+  `ip` TEXT NOT NULL DEFAULT '',
+  `top` INTEGER NOT NULL DEFAULT 0,
+  `created_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
 
-CREATE TABLE `regions` (
-  `region_id` int unsigned NOT NULL AUTO_INCREMENT COMMENT '区域ID',
-  `parent_id` int unsigned NOT NULL COMMENT '上级ID',
-  `level` int NOT NULL COMMENT '层级',
-  `region_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '区域名称',
-  `longitude` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '经度',
-  `latitude` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '纬度',
-  `pinyin` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '拼音',
-  `az_no` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '首字母',
-  PRIMARY KEY (`region_id`),
-  KEY `idx_parent_id` (`parent_id`),
-  KEY `idx_region_name` (`region_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='中国身份区域关系';
+CREATE TABLE IF NOT EXISTS `footprints` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `name` TEXT NOT NULL,
+  `description` TEXT NOT NULL DEFAULT '',
+  `longitude` TEXT NOT NULL,
+  `latitude` TEXT NOT NULL,
+  `date` TEXT NOT NULL DEFAULT '',
+  `marker_color` TEXT NOT NULL DEFAULT '',
+  `categories` TEXT,
+  `url` TEXT NOT NULL DEFAULT '',
+  `url_label` TEXT NOT NULL DEFAULT '',
+  `photos` TEXT,
+  `created_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime')),
+  `updated_at` DATETIME NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
 
-CREATE TABLE `guestbook` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '昵称',
-  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '内容',
-  `ip` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'IP',
-  `top` int NOT NULL DEFAULT '0' COMMENT '1置顶',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '留言时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT = 'windiness 留言本';
+-- updated_at 自动更新触发器（替代 MySQL ON UPDATE CURRENT_TIMESTAMP）
+-- PRAGMA recursive_triggers 默认 OFF，触发器内的 UPDATE 不会递归触发自身
 
-CREATE TABLE `footprints` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'PK',
-  `name` varchar(256) NOT NULL COMMENT '地点名称',
-  `description` varchar(1024) NOT NULL DEFAULT '' COMMENT '描述',
-  `longitude` varchar(20) NOT NULL COMMENT '经度',
-  `latitude` varchar(20) NOT NULL COMMENT '纬度',
-  `date` varchar(128) NOT NULL DEFAULT '' COMMENT '到访日期',
-  `marker_color` varchar(32) NOT NULL DEFAULT '' COMMENT '标记颜色',
-  `categories` json DEFAULT NULL COMMENT '分类标签数组',
-  `url` varchar(1024) NOT NULL DEFAULT '' COMMENT '关联链接',
-  `url_label` varchar(128) NOT NULL DEFAULT '' COMMENT '链接按钮文案',
-  `photos` json DEFAULT NULL COMMENT '照片URL数组',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='旅行足迹';
+CREATE TRIGGER IF NOT EXISTS `tr_cates_updated_at`
+AFTER UPDATE ON `cates` FOR EACH ROW
+WHEN NEW.`updated_at` IS OLD.`updated_at`
+BEGIN
+    UPDATE `cates` SET `updated_at` = datetime('now', 'localtime') WHERE `id` = NEW.`id`;
+END;
+
+CREATE TRIGGER IF NOT EXISTS `tr_links_updated_at`
+AFTER UPDATE ON `links` FOR EACH ROW
+WHEN NEW.`updated_at` IS OLD.`updated_at`
+BEGIN
+    UPDATE `links` SET `updated_at` = datetime('now', 'localtime') WHERE `id` = NEW.`id`;
+END;
+
+CREATE TRIGGER IF NOT EXISTS `tr_moods_updated_at`
+AFTER UPDATE ON `moods` FOR EACH ROW
+WHEN NEW.`updated_at` IS OLD.`updated_at`
+BEGIN
+    UPDATE `moods` SET `updated_at` = datetime('now', 'localtime') WHERE `id` = NEW.`id`;
+END;
+
+CREATE TRIGGER IF NOT EXISTS `tr_posts_updated_at`
+AFTER UPDATE ON `posts` FOR EACH ROW
+WHEN NEW.`updated_at` IS OLD.`updated_at`
+BEGIN
+    UPDATE `posts` SET `updated_at` = datetime('now', 'localtime') WHERE `id` = NEW.`id`;
+END;
+
+CREATE TRIGGER IF NOT EXISTS `tr_users_updated_at`
+AFTER UPDATE ON `users` FOR EACH ROW
+WHEN NEW.`updated_at` IS OLD.`updated_at`
+BEGIN
+    UPDATE `users` SET `updated_at` = datetime('now', 'localtime') WHERE `id` = NEW.`id`;
+END;
+
+CREATE TRIGGER IF NOT EXISTS `tr_reminds_updated_at`
+AFTER UPDATE ON `reminds` FOR EACH ROW
+WHEN NEW.`updated_at` IS OLD.`updated_at`
+BEGIN
+    UPDATE `reminds` SET `updated_at` = datetime('now', 'localtime') WHERE `id` = NEW.`id`;
+END;
+
+CREATE TRIGGER IF NOT EXISTS `tr_footprints_updated_at`
+AFTER UPDATE ON `footprints` FOR EACH ROW
+WHEN NEW.`updated_at` IS OLD.`updated_at`
+BEGIN
+    UPDATE `footprints` SET `updated_at` = datetime('now', 'localtime') WHERE `id` = NEW.`id`;
+END;

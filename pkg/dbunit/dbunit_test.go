@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"testing"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "modernc.org/sqlite"
 )
 
 func TestRun(t *testing.T) {
@@ -51,7 +51,6 @@ func TestRun(t *testing.T) {
 func TestNew(t *testing.T) {
 	New(t, func(d *DBUnit) {
 		db := d.NewDatabase("testdata/schema.sql", "testdata/fixtures/users.yml")
-		// more database
 		_ = d.NewDatabase("testdata/schema.sql")
 		row := db.QueryRow("select email from users where id = 1")
 		var email string
@@ -66,7 +65,6 @@ func TestNew(t *testing.T) {
 }
 
 func TestLoad(t *testing.T) {
-	// SetDatabase("root:123456@tcp(127.0.0.1:33306)/")
 	test := NewTest("testdata/schema.sql")
 	t.Cleanup(func() {
 		test.Drop()

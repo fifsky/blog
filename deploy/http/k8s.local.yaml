@@ -13,6 +13,18 @@ spec:
   selector:
     app: fifsky-blog-http
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fifsky-blog-http-data
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -35,12 +47,17 @@ spec:
             - containerPort: 80
               name: http
           volumeMounts:
+            - mountPath: /app/storage
+              name: data
             - mountPath: /app/storage/logs
               name: log
             - mountPath: /app/config.yml
               name: config
               subPath: config.yml
       volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: fifsky-blog-http-data
         - emptyDir: {}
           name: log
         - name: config

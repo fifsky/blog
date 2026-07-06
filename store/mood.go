@@ -27,7 +27,7 @@ func (s *Store) ListMood(ctx context.Context, start int, num int) ([]model.Mood,
 
 func (s *Store) RandomMood(ctx context.Context) (*model.Mood, error) {
 	var md model.Mood
-	err := s.db.QueryRowContext(ctx, "select id,content,user_id,created_at,updated_at from moods order by rand() limit 1").
+	err := s.db.QueryRowContext(ctx, "select id,content,user_id,created_at,updated_at from moods order by random() limit 1").
 		Scan(&md.Id, &md.Content, &md.UserId, &md.CreatedAt, &md.UpdatedAt)
 	if err != nil {
 		return nil, err
