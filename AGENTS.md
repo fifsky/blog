@@ -9,9 +9,10 @@ Full-stack blog application with Go backend, React frontend, and native iOS (Swi
 - **Go 1.26.0** - No framework, uses native `net/http`
 - **Protobuf** - API definitions with buf (googleapis)
 - **Validation** - buf protovalidate
-- **Database** - MySQL with native `database/sql` (no ORM)
+- **Database** - SQLite (`modernc.org/sqlite`，纯 Go 无 CGO) with native `database/sql` (no ORM)
+- **Backup** - Litestream（Go library 模式嵌入，实时流式备份到阿里云 OSS）
 - **Logging** - slog
-- **Testing** - standard Go testing + dbunit
+- **Testing** - standard Go testing + dbunit（SQLite 适配版）
 
 ### Commands
 
@@ -86,7 +87,16 @@ import (
 - Always `defer rows.Close()` after creating rows
 - Use context throughout: `ctx context.Context` as first param
 - Return errors directly, don't panic
-- **When you need to adjust or query the database**, you can use the `mysql` command by connecting with the database DSN found in `config.yml`. **However, any SQL execution MUST be approved by the user first.**
+- **SQLite DSN**: `file:storage/blog.db?_pragma=journal_mode(WAL)&_pragma=foreign_keys(ON)&_pragma=busy_timeout(5000)` — PRAGMA 必须通过 DSN 参数设置，不能用 `ExecContext`（连接池下只影响随机连接）
+- **SQLite SQL 语法注意事项**:
+  - UPSERT: `INSERT INTO ... ON CONFLICT(col) DO UPDATE SET col = excluded.col`
+  - 日期格式化: `strftime('%Y/%m', substr(col, 1, 19))`（含时区的 DATETIME 需用 `substr` 截取前 19 字符）
+  - JSON 数组查询: `EXISTS (SELECT 1 FROM json_each(col) WHERE value = ?)`
+  - 随机排序: `ORDER BY RANDOM()`
+  - 分页: `LIMIT ? OFFSET ?`
+  - JSON 列扫描: 用 `[]byte` 接收（SQLite 驱动返回 string，不能直接 scan 到 `json.RawMessage`）
+- **Litestream 备份**: 作为 Go library 嵌入（`pkg/litestream/manager.go`），启动时自动从 OSS 恢复（若本地无 DB），关闭时优雅停止。备份路径按环境区分：开发 `blog/sqlite/local`，线上 `blog/sqlite/prod`
+- **`updated_at` 自动更新**: 通过 `testdata/schema.sql` 中的 SQLite 触发器实现，`PRAGMA recursive_triggers` 默认 OFF 不会递归
 
 **Protobuf:**
 
@@ -298,6 +308,9 @@ cd build && zip -qry BlogApp.ipa Payload
 ### Backend
 
 - No ORM - use raw SQL with `database/sql`
+- Database: SQLite (`modernc.org/sqlite`)，DSN 见 `config.yml`，Schema 定义在 `testdata/schema.sql`
+- Litestream 实时备份到阿里云 OSS（`fifsky-backup` bucket），Go library 模式嵌入，无需独立进程
+- K8s 部署使用 PVC 持久化 `/app/storage` 目录（SQLite 文件存储）
 - Always pass context through the call chain
 - Use `make fmt` before committing
 - Generated protobuf code is in `proto/gen/` (excluded from lint),use `make proto` to generate
@@ -317,7 +330,7 @@ cd build && zip -qry BlogApp.ipa Payload
 - Single test: `go test -v -run TestName ./path/to/package`
 - **Environment Variables**: Environment variables required for unit tests are defined in `.envrc`. When running unit tests from the command line, you must load these variables first:
   - `export $(cat .envrc | xargs) && go test ./...`
-- Use dbunit fixtures in `testdata/` directory
+- Use dbunit fixtures in `testdata/` directory（SQLite 临时文件模式，每个测试用例独立数据库）
 - Linter configuration: `.golangci.yml`
 
 #### Table-Driven Tests
