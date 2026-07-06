@@ -12,9 +12,8 @@ import (
 )
 
 type Testing struct {
-	tdb    *database
-	db     *sql.DB
-	schema string
+	tdb *database
+	db  *sql.DB
 }
 
 func NewTest(schema string) *Testing {
@@ -27,9 +26,8 @@ func NewTest(schema string) *Testing {
 	}
 
 	return &Testing{
-		tdb,
-		db,
-		schema,
+		tdb: tdb,
+		db:  db,
 	}
 }
 
@@ -37,11 +35,7 @@ func (d *Testing) DB() *sql.DB {
 	return d.db
 }
 
-func (d *Testing) Schema() string {
-	return d.schema
-}
-
-// Drop 删除测试数据库文件
+// Drop 关闭测试数据库连接，内存数据库自动释放
 func (d *Testing) Drop() {
 	// 先关闭数据库连接
 	if d.db != nil {
@@ -57,6 +51,7 @@ func (d *Testing) Drop() {
 func (d *Testing) Load(files ...string) {
 	options := make([]func(*fixtures.Loader) error, 0)
 	options = append(options, fixtures.Database(d.db))
+	options = append(options, fixtures.SkipTestDatabaseCheck()) // 内存数据库跳过测试库检查
 
 	fs := make([]string, 0)
 	for _, file := range files {

@@ -105,6 +105,15 @@ func Location(location *time.Location) func(*Loader) error {
 	}
 }
 
+// SkipTestDatabaseCheck 跳过 EnsureTestDatabase 检查，适用于内存数据库
+// （内存数据库的 PRAGMA database_list 返回空文件路径，无法匹配 "test" 前缀）
+func SkipTestDatabaseCheck() func(*Loader) error {
+	return func(l *Loader) error {
+		l.skipTestDatabaseCheck = true
+		return nil
+	}
+}
+
 // EnsureTestDatabase returns an error if the database name does not contains
 // "test".
 func (l *Loader) EnsureTestDatabase() error {

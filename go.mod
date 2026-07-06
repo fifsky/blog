@@ -7,7 +7,6 @@ require (
 	buf.build/go/protovalidate v1.2.0
 	github.com/aliyun/alibabacloud-oss-go-sdk-v2 v1.5.1
 	github.com/benbjohnson/litestream v0.5.13
-	github.com/go-sql-driver/mysql v1.10.0
 	github.com/goapt/logger v1.8.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/uuid v1.6.0
@@ -34,7 +33,6 @@ require (
 
 require (
 	cel.dev/expr v0.25.1 // indirect
-	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.41.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.4 // indirect

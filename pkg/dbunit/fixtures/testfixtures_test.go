@@ -44,31 +44,25 @@ CREATE UNIQUE INDEX IF NOT EXISTS un_email ON users(email);
 CREATE UNIQUE INDEX IF NOT EXISTS un_user_name ON users(user_name);`
 
 func TestLoader_Load(t *testing.T) {
-	// 使用内存 SQLite 数据库进行测试
-	db, err := sql.Open("sqlite", "file::memory:?cache=shared")
+	// 使用命名内存 SQLite 数据库进行测试
+	db, err := sql.Open("sqlite", "file:test_loader?mode=memory&cache=shared")
 	require.NoError(t, err)
 	defer db.Close()
 
 	_, err = db.Exec(sqliteSchema)
 	require.NoError(t, err)
 
-	// skipTestDatabaseCheck: 内存数据库不包含 "test" 前缀
 	options := []func(*Loader) error{
 		Database(db),
 		Files("../testdata/fixtures/users.yml"),
+		SkipTestDatabaseCheck(), // 内存数据库跳过测试库检查
 	}
 
 	f, err := New(options...)
-	if err != nil {
-		t.Skip("fixture load skipped:", err)
-	}
+	require.NoError(t, err)
 
-	// 手动加载 fixture（跳过 EnsureTestDatabase 检查）
-	_, _ = db.Exec("PRAGMA foreign_keys = OFF")
-	for _, ff := range f.fixturesFiles {
-		_, _ = db.Exec(ff.insertSQL.sql, ff.insertSQL.params...)
-	}
-	_, _ = db.Exec("PRAGMA foreign_keys = ON")
+	err = f.Load()
+	require.NoError(t, err)
 
 	row := db.QueryRow("select email from users where id = 1")
 	var content string

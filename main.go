@@ -92,7 +92,6 @@ func main() {
 		Commands: []*cli.Command{
 			cmd.NewHttp(s, conf, agent),
 			cmd.NewTmp(db, conf),
-			cmd.NewMigrate(),
 		},
 	}
 
