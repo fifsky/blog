@@ -60,8 +60,14 @@ class AuthManager {
         didSet {
             if let token = accessToken {
                 KeychainService.set(key: Self.tokenKey, value: token)
+                #if DEBUG
+                DebugAuthCache.set(key: Self.tokenKey, value: token)
+                #endif
             } else {
                 KeychainService.delete(key: Self.tokenKey)
+                #if DEBUG
+                DebugAuthCache.delete(key: Self.tokenKey)
+                #endif
             }
         }
     }
@@ -76,9 +82,16 @@ class AuthManager {
         }
         set {
             if let date = newValue {
-                KeychainService.set(key: Self.expiresAtKey, value: "\(date.timeIntervalSince1970)")
+                let value = "\(date.timeIntervalSince1970)"
+                KeychainService.set(key: Self.expiresAtKey, value: value)
+                #if DEBUG
+                DebugAuthCache.set(key: Self.expiresAtKey, value: value)
+                #endif
             } else {
                 KeychainService.delete(key: Self.expiresAtKey)
+                #if DEBUG
+                DebugAuthCache.delete(key: Self.expiresAtKey)
+                #endif
             }
         }
     }
@@ -101,7 +114,19 @@ class AuthManager {
 
     private init() {
         // 初始化时从 Keychain 恢复 Token
+        #if DEBUG
+        let token = KeychainService.get(key: Self.tokenKey) ?? DebugAuthCache.get(key: Self.tokenKey)
+        self.accessToken = token
+        if KeychainService.get(key: Self.tokenKey) == nil, let token {
+            KeychainService.set(key: Self.tokenKey, value: token)
+        }
+        if KeychainService.get(key: Self.expiresAtKey) == nil,
+           let expiresAt = DebugAuthCache.get(key: Self.expiresAtKey) {
+            KeychainService.set(key: Self.expiresAtKey, value: expiresAt)
+        }
+        #else
         self.accessToken = KeychainService.get(key: Self.tokenKey)
+        #endif
     }
 
     // MARK: - 登录
@@ -147,3 +172,33 @@ class AuthManager {
         NotificationCenter.default.post(name: .didLogout, object: nil)
     }
 }
+
+#if DEBUG
+/// 调试登录缓存
+///
+/// 仅用于模拟器/Debug 构建兜底：当重新编译安装导致 Keychain 读不到旧 token 时，
+/// 用应用容器里的镜像恢复一次，避免每次调试都重新登录。
+private enum DebugAuthCache {
+
+    private static let namespace = "debug_auth_cache"
+
+    /// 读取调试缓存
+    static func get(key: String) -> String? {
+        UserDefaults.standard.string(forKey: cacheKey(key))
+    }
+
+    /// 写入调试缓存
+    static func set(key: String, value: String) {
+        UserDefaults.standard.set(value, forKey: cacheKey(key))
+    }
+
+    /// 删除调试缓存
+    static func delete(key: String) {
+        UserDefaults.standard.removeObject(forKey: cacheKey(key))
+    }
+
+    private static func cacheKey(_ key: String) -> String {
+        "\(namespace).\(key)"
+    }
+}
+#endif
