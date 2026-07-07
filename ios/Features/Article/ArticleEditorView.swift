@@ -22,6 +22,9 @@ struct ArticleEditorView: View {
     /// 导航返回标记
     @Environment(\.dismiss) private var dismiss
 
+    /// UIKit 导航壳入口
+    @Environment(\.appNavigator) private var navigator
+
     var body: some View {
         Form {
             // MARK: - 标题
@@ -100,7 +103,7 @@ struct ArticleEditorView: View {
                         await viewModel?.save()
                         // 保存成功后返回上一页
                         if viewModel?.isSaved == true {
-                            dismiss()
+                            closePage()
                         }
                     }
                 } label: {
@@ -118,7 +121,7 @@ struct ArticleEditorView: View {
             if viewModel?.isEditing == true {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("取消") {
-                        dismiss()
+                        closePage()
                     }
                 }
             }
@@ -163,6 +166,13 @@ struct ArticleEditorView: View {
             if article == nil {
                 titleFocused = true
             }
+        }
+    }
+
+    /// 关闭当前页面
+    private func closePage() {
+        if !navigator.pop() {
+            dismiss()
         }
     }
 

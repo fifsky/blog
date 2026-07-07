@@ -8,17 +8,14 @@ struct ArticleListView: View {
 
     @State private var viewModel = ArticleListViewModel()
 
-    /// 导航到文章详情
-    @State private var selectedArticle: Article?
-
-    /// 导航到文章编辑器
-    @State private var showEditor = false
-
     /// 退出登录确认弹窗
     @State private var showLogoutConfirmation = false
 
     /// 原生搜索框文本（提交时才请求后端）
     @State private var searchText = ""
+
+    /// UIKit 导航壳入口
+    @Environment(\.appNavigator) private var navigator
 
     var body: some View {
         // 主滚动内容：毛玻璃容器，随原生大标题一起滚动
@@ -53,7 +50,9 @@ struct ArticleListView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
                     Button {
-                        showEditor = true
+                        navigator.push(ArticleEditorView()) {
+                            Task { await viewModel.refresh() }
+                        }
                     } label: {
                         Label("新增博文", systemImage: "square.and.pencil")
                     }
@@ -72,12 +71,6 @@ struct ArticleListView: View {
         }
         .navigationTitle("博文")
         .navigationBarTitleDisplayMode(.large)
-        .navigationDestination(item: $selectedArticle) { article in
-            ArticleDetailView(articleId: article.id)
-        }
-        .navigationDestination(isPresented: $showEditor) {
-            ArticleEditorView()
-        }
         .alert("错误", isPresented: $viewModel.showError) {
             Button("确定", role: .cancel) {}
         } message: {
@@ -155,7 +148,7 @@ struct ArticleListView: View {
         LazyVStack(spacing: 0) {
             ForEach(Array(viewModel.articles.enumerated()), id: \.element.id) { index, article in
                 Button {
-                    selectedArticle = article
+                    navigator.push(ArticleDetailView(articleId: article.id))
                 } label: {
                     ArticleRowView(
                         article: article,

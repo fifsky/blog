@@ -54,16 +54,10 @@ struct ArticleDetailView: View {
     /// 需要刷新评论列表
     @State private var refreshCommentTrigger = false
 
-    /// 图片浏览器：是否展示
-    @State private var showPhotoBrowser = false
-
-    /// 图片浏览器：文章中所有图片 URL
-    @State private var photoBrowserURLs: [String] = []
-
-    /// 图片浏览器：当前点击的图片索引
-    @State private var photoBrowserIndex = 0
-
     private let commentsAnchor = "article-comments-section"
+
+    /// UIKit 导航壳入口
+    @Environment(\.appNavigator) private var navigator
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -119,14 +113,6 @@ struct ArticleDetailView: View {
         .animation(.easeInOut(duration: 0.2), value: showCommentInput)
         .navigationTitle("文章详情")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(isPresented: $showPhotoBrowser) {
-            PhotoBrowserView(
-                photoURLs: photoBrowserURLs,
-                initialIndex: photoBrowserIndex,
-                placeName: "图片预览"
-            )
-        }
-        .toolbar(.hidden, for: .tabBar)
         .alert("错误", isPresented: Binding(
             get: { viewModel?.showError ?? false },
             set: { if !$0 { viewModel?.showError = false } }
@@ -171,9 +157,13 @@ struct ArticleDetailView: View {
                     let urls = extractImageURLs(from: article.content)
                     let urlString = url.absoluteString
                     if urls.contains(urlString) {
-                        photoBrowserURLs = urls
-                        photoBrowserIndex = urls.firstIndex(of: urlString) ?? 0
-                        showPhotoBrowser = true
+                        navigator.push(
+                            PhotoBrowserView(
+                                photoURLs: urls,
+                                initialIndex: urls.firstIndex(of: urlString) ?? 0,
+                                placeName: "图片预览"
+                            )
+                        )
                         return .handled
                     }
                     return .systemAction

@@ -2,7 +2,7 @@ import SwiftUI
 
 /// 原生照片浏览器页面
 /// 支持左右滑动翻页、双击/捏合缩放、放大后拖动查看细节
-/// 通过 NavigationStack push 呈现，带返回按钮，符合系统原生交互
+/// 通过 UIKit 导航栈 push 呈现，带返回按钮，符合系统原生交互
 struct PhotoBrowserView: View {
 
     /// 待浏览的照片 URL 字符串列表
@@ -57,7 +57,6 @@ struct PhotoBrowserView: View {
         // 导航栏背景与内容区统一灰底，从顶到底一致
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarBackground(Color(.systemGroupedBackground), for: .navigationBar)
-        .toolbar(.hidden, for: .tabBar)
         .statusBarHidden()
         .onAppear {
             scheduleHideIndex()

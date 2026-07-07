@@ -11,13 +11,15 @@ struct FootprintMapView: View {
     /// 新建足迹编辑器弹窗
     @State private var showEditor = false
 
-    /// 全屏照片浏览器相关状态
-    @State private var showPhotoBrowser = false
+    /// 照片浏览器相关状态
     @State private var photoBrowserURLs: [String] = []
     @State private var photoBrowserIndex = 0
 
     /// 标记用户点击了照片，等待 sheet 收起后再 push 浏览器
     @State private var pendingPhotoBrowse = false
+
+    /// UIKit 导航壳入口
+    @Environment(\.appNavigator) private var navigator
 
     var body: some View {
         ZStack {
@@ -68,29 +70,28 @@ struct FootprintMapView: View {
         } message: {
             Text(viewModel.errorMessage ?? "未知错误")
         }
-        // 照片浏览器挂在根 NavigationStack 上，
-        // push 时占满全屏（不受详情 sheet 的 medium detent 限制）
-        .navigationDestination(isPresented: $showPhotoBrowser) {
-            PhotoBrowserView(
-                photoURLs: photoBrowserURLs,
-                initialIndex: photoBrowserIndex,
-                placeName: viewModel.selectedFootprint?.name ?? "照片"
-            )
-        }
         // 点击照片后先关闭 sheet，sheet 收起后再 push 浏览器
         .onChange(of: viewModel.showDetail) { _, isShown in
             if !isShown && pendingPhotoBrowse {
                 pendingPhotoBrowse = false
+                let urls = photoBrowserURLs
+                let index = photoBrowserIndex
+                let placeName = viewModel.selectedFootprint?.name ?? "照片"
                 // 等待 sheet 收起动画完成后再 push，避免动画重叠
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    showPhotoBrowser = true
+                    navigator.push(
+                        PhotoBrowserView(
+                            photoURLs: urls,
+                            initialIndex: index,
+                            placeName: placeName
+                        ),
+                        onPop: {
+                            if viewModel.selectedFootprint != nil {
+                                viewModel.showDetail = true
+                            }
+                        }
+                    )
                 }
-            }
-        }
-        // 从照片浏览器返回后，重新拉起详情 sheet
-        .onChange(of: showPhotoBrowser) { _, isShown in
-            if !isShown && viewModel.selectedFootprint != nil {
-                viewModel.showDetail = true
             }
         }
     }

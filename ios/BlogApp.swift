@@ -16,6 +16,7 @@ struct BlogApp: App {
             Group {
                 if isAuthenticated {
                     ContentView()
+                        .ignoresSafeArea()
                 } else {
                     LoginView { viewModel in
                         // 登录成功后切换到主界面
