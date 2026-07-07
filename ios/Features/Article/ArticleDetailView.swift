@@ -18,6 +18,26 @@ private struct TableImageFixCellStyle: StructuredText.TableCellStyle {
     }
 }
 
+/// 为图片 run 添加 link 属性的 Markdown 解析器
+///
+/// Textual 的 `TextLinkInteraction` 通过 `run.url` 检测点击，仅对携带 `.link` 属性的 run 生效。
+/// 标准 Markdown 图片 `![alt](url)` 只设置 `.imageURL`，不设置 `.link`，因此点击无响应。
+/// 此解析器在 Foundation 解析后遍历 AttributedString，为每个图片 run 补充 `.link = imageURL`，
+/// 使 `TextLinkInteraction` 能拦截图片点击并触发 `openURL`，同时不影响图片正常渲染。
+private struct ImageLinkMarkdownParser: MarkupParser {
+    private let base = AttributedStringMarkdownParser(baseURL: nil)
+
+    func attributedString(for input: String) throws -> AttributedString {
+        var result = try base.attributedString(for: input)
+        for run in result.runs {
+            if let imageURL = run.imageURL, run.link == nil {
+                result[run.range].link = imageURL
+            }
+        }
+        return result
+    }
+}
+
 /// 文章详情视图
 struct ArticleDetailView: View {
 
@@ -33,6 +53,15 @@ struct ArticleDetailView: View {
 
     /// 需要刷新评论列表
     @State private var refreshCommentTrigger = false
+
+    /// 图片浏览器：是否展示
+    @State private var showPhotoBrowser = false
+
+    /// 图片浏览器：文章中所有图片 URL
+    @State private var photoBrowserURLs: [String] = []
+
+    /// 图片浏览器：当前点击的图片索引
+    @State private var photoBrowserIndex = 0
 
     private let commentsAnchor = "article-comments-section"
 
@@ -90,6 +119,13 @@ struct ArticleDetailView: View {
         .animation(.easeInOut(duration: 0.2), value: showCommentInput)
         .navigationTitle("文章详情")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $showPhotoBrowser) {
+            PhotoBrowserView(
+                photoURLs: photoBrowserURLs,
+                initialIndex: photoBrowserIndex,
+                placeName: "图片预览"
+            )
+        }
         .toolbar(.hidden, for: .tabBar)
         .alert("错误", isPresented: Binding(
             get: { viewModel?.showError ?? false },
@@ -123,7 +159,7 @@ struct ArticleDetailView: View {
 
             articleMetaRow(article: article, viewModel: viewModel)
 
-            StructuredText(markdown: article.content)
+            StructuredText(article.content, parser: ImageLinkMarkdownParser())
                 .multilineTextAlignment(.leading)
                 .textual.textSelection(.enabled)
                 .textual.overflowMode(.scroll)
@@ -131,6 +167,17 @@ struct ArticleDetailView: View {
                 .textual.tableCellStyle(TableImageFixCellStyle())
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, 4)
+                .environment(\.openURL, OpenURLAction { url in
+                    let urls = extractImageURLs(from: article.content)
+                    let urlString = url.absoluteString
+                    if urls.contains(urlString) {
+                        photoBrowserURLs = urls
+                        photoBrowserIndex = urls.firstIndex(of: urlString) ?? 0
+                        showPhotoBrowser = true
+                        return .handled
+                    }
+                    return .systemAction
+                })
 
             if !article.tags.isEmpty {
                 tagSection(tags: article.tags)
@@ -292,5 +339,22 @@ struct ArticleDetailView: View {
     private func closeCommentInput() {
         showCommentInput = false
         draftTarget = .new
+    }
+
+    // MARK: - 图片点击放大
+
+    /// 从 Markdown 中提取所有图片 URL
+    /// - Parameter markdown: Markdown 原文
+    /// - Returns: 图片 URL 字符串数组
+    private func extractImageURLs(from markdown: String) -> [String] {
+        let pattern = #"!\[[^\]]*\]\(([^)]+)\)"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
+        let range = NSRange(markdown.startIndex..., in: markdown)
+        return regex.matches(in: markdown, range: range).compactMap { match in
+            guard let urlRange = Range(match.range(at: 1), in: markdown) else { return nil }
+            let raw = String(markdown[urlRange])
+            // 处理带标题的图片语法 ![alt](url "title")，取空格前的 URL 部分
+            return raw.split(separator: " ").first.map(String.init) ?? raw
+        }
     }
 }

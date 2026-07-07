@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// 原生照片浏览器页面
-/// 支持左右滑动翻页、双击/捏合缩放
+/// 支持左右滑动翻页、双击/捏合缩放、放大后拖动查看细节
 /// 通过 NavigationStack push 呈现，带返回按钮，符合系统原生交互
 struct PhotoBrowserView: View {
 
@@ -38,7 +38,7 @@ struct PhotoBrowserView: View {
             // 照片翻页容器
             TabView(selection: $currentIndex) {
                 ForEach(Array(photoURLs.enumerated()), id: \.offset) { index, url in
-                    ZoomableImage(urlString: url)
+                    ZoomableImageView(urlString: url)
                         .tag(index)
                 }
             }
@@ -100,99 +100,146 @@ struct PhotoBrowserView: View {
     }
 }
 
-// MARK: - 可缩放单张图片
+// MARK: - 可缩放图片视图
 
-/// 支持双击缩放、捏合缩放的单张图片
-private struct ZoomableImage: View {
+/// 基于 UIScrollView 的可缩放图片视图
+///
+/// 使用 UIScrollView 实现原生相册般的缩放与拖动体验：
+/// - 双击放大/还原（点击位置为中心放大）
+/// - 捏合缩放（1x ~ 4x）
+/// - 放大后可自由拖动查看图片任意细节
+/// - 缩放至 1x 时 TabView 恢复翻页手势
+private struct ZoomableImageView: UIViewRepresentable {
 
     /// 图片 URL
     let urlString: String
 
-    /// 当前缩放比例
-    @State private var scale: CGFloat = 1.0
+    func makeUIView(context: Context) -> UIScrollView {
+        let scrollView = UIScrollView()
+        scrollView.delegate = context.coordinator
+        scrollView.maximumZoomScale = 4.0
+        scrollView.minimumZoomScale = 1.0
+        scrollView.bouncesZoom = true
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.backgroundColor = .clear
+        scrollView.contentInsetAdjustmentBehavior = .never
 
-    /// 双击缩放后的目标比例
-    @State private var targetScale: CGFloat = 1.0
+        // 图片容器视图（缩放对象）
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.backgroundColor = .clear
+        imageView.clipsToBounds = true
+        scrollView.addSubview(imageView)
+        context.coordinator.imageView = imageView
 
-    var body: some View {
-        GeometryReader { geo in
-            ZStack {
-                AsyncImage(url: URL(string: urlString)) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .modifier(ZoomableModifier(
-                                scale: $scale,
-                                targetScale: $targetScale
-                            ))
-                            .frame(width: geo.size.width, height: geo.size.height)
-                    case .failure:
-                        VStack(spacing: 8) {
-                            Image(systemName: "photo")
-                                .font(.system(size: 40))
-                            Text("加载失败")
-                        }
-                        .foregroundStyle(.gray)
-                    default:
-                        ProgressView()
-                    }
-                }
-            }
-            .frame(width: geo.size.width, height: geo.size.height)
-        }
-        // 重置缩放状态，避免翻页时残留上一张的缩放
-        .id(urlString)
+        // 双击缩放手势
+        let doubleTap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleDoubleTap(_:)))
+        doubleTap.numberOfTapsRequired = 2
+        scrollView.addGestureRecognizer(doubleTap)
+
+        // 加载图片
+        context.coordinator.loadImage(urlString: urlString, scrollView: scrollView)
+
+        return scrollView
     }
-}
 
-// MARK: - 缩放手势修饰器
+    func updateUIView(_ scrollView: UIScrollView, context: Context) {
+        guard let imageView = context.coordinator.imageView else { return }
+        // URL 变化时重新加载
+        if context.coordinator.currentURLString != urlString {
+            context.coordinator.currentURLString = urlString
+            scrollView.zoomScale = 1.0
+            context.coordinator.loadImage(urlString: urlString, scrollView: scrollView)
+        }
+        // 确保 imageView 尶寸与 scrollView 一致
+        let bounds = scrollView.bounds
+        if bounds.width > 0 && bounds.height > 0 {
+            imageView.frame = bounds
+        }
+    }
 
-/// 封装双击与捏合缩放手势的 ViewModifier
-private struct ZoomableModifier: ViewModifier {
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
 
-    /// 当前缩放比例
-    @Binding var scale: CGFloat
+    // MARK: - Coordinator
 
-    /// 双击目标缩放比例
-    @Binding var targetScale: CGFloat
+    final class Coordinator: NSObject, UIScrollViewDelegate {
+        weak var imageView: UIImageView?
+        var currentURLString: String?
+        private var loadTask: Task<Void, Never>?
 
-    /// 双击放大后的目标比例
-    private let maxScale: CGFloat = 3.0
-
-    func body(content: Content) -> some View {
-        content
-            .scaleEffect(scale)
-            // 双击切换原始尺寸与放大尺寸
-            .onTapGesture(count: 2) {
-                withAnimation(.spring()) {
-                    if scale > 1 {
-                        scale = 1
-                        targetScale = 1
-                    } else {
-                        scale = maxScale
-                        targetScale = maxScale
-                    }
-                }
-            }
-            // 捏合缩放
-            .gesture(
-                MagnifyGesture()
-                    .onChanged { value in
-                        let delta = value.magnification / targetScale
-                        scale = min(max(scale * delta, 1), maxScale)
-                    }
-                    .onEnded { _ in
-                        targetScale = scale
-                        // 缩小到接近 1 时复位
-                        if scale < 1.1 {
-                            withAnimation(.spring()) {
-                                scale = 1
-                                targetScale = 1
-                            }
+        /// 异步加载图片
+        func loadImage(urlString: String, scrollView: UIScrollView) {
+            currentURLString = urlString
+            loadTask?.cancel()
+            imageView?.image = nil
+            loadTask = Task {
+                guard let url = URL(string: urlString) else { return }
+                do {
+                    let (data, _) = try await URLSession.shared.data(from: url)
+                    guard !Task.isCancelled, let image = UIImage(data: data) else { return }
+                    await MainActor.run {
+                        guard !Task.isCancelled, let imageView = self.imageView else { return }
+                        imageView.image = image
+                        // 设置 scrollView 的 contentSize 与缩放
+                        let boundsSize = scrollView.bounds.size
+                        if boundsSize.width > 0 {
+                            imageView.frame = CGRect(origin: .zero, size: boundsSize)
+                            scrollView.contentSize = boundsSize
                         }
                     }
+                } catch {
+                    // 加载失败，忽略
+                }
+            }
+        }
+
+        // MARK: - UIScrollViewDelegate
+
+        /// 返回缩放视图
+        func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+            imageView
+        }
+
+        /// 缩放时居中内容
+        func scrollViewDidZoom(_ scrollView: UIScrollView) {
+            guard let imageView = imageView, imageView.image != nil else { return }
+            let boundsSize = scrollView.bounds.size
+            let contentSize = imageView.frame.size
+
+            let horizontalInset = max(0, (boundsSize.width - contentSize.width) / 2)
+            let verticalInset = max(0, (boundsSize.height - contentSize.height) / 2)
+
+            scrollView.contentInset = UIEdgeInsets(
+                top: verticalInset,
+                left: horizontalInset,
+                bottom: verticalInset,
+                right: horizontalInset
             )
+        }
+
+        // MARK: - 双击缩放
+
+        /// 双击切换 1x 与 2.5x 缩放（以点击位置为中心）
+        @objc func handleDoubleTap(_ recognizer: UITapGestureRecognizer) {
+            guard let scrollView = recognizer.view as? UIScrollView else { return }
+            if scrollView.zoomScale > 1.0 {
+                scrollView.setZoomScale(1.0, animated: true)
+            } else {
+                let location = recognizer.location(in: scrollView)
+                let targetScale: CGFloat = 2.5
+                let zoomWidth = scrollView.bounds.width / targetScale
+                let zoomHeight = scrollView.bounds.height / targetScale
+                let zoomRect = CGRect(
+                    x: location.x - zoomWidth / 2,
+                    y: location.y - zoomHeight / 2,
+                    width: zoomWidth,
+                    height: zoomHeight
+                )
+                scrollView.zoom(to: zoomRect, animated: true)
+            }
+        }
     }
 }
