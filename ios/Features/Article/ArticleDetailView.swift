@@ -30,15 +30,19 @@ struct ArticleDetailView: View {
                         VStack(spacing: 0) {
                             articleSection(article: article, viewModel: viewModel)
 
+                            // 文章区与评论区之间的灰色间隔条（透出底层 systemGroupedBackground）
                             Color(.systemGroupedBackground)
                                 .frame(height: 12)
 
                             commentsSection(article: article)
                                 .id(commentsAnchor)
 
-                            Spacer(minLength: 96)
+                            Spacer(minLength: 56)
                         }
                     }
+                    // 整个 ScrollView 底色用白色：顶部安全区与文章区块均为纯白，
+                    // 两区块之间靠上面的 12pt systemGroupedBackground 间隔条区分
+                    .background(Color(.systemBackground))
                     .scrollDismissesKeyboard(.interactively)
                     .safeAreaInset(edge: .bottom) {
                         CommentBottomBar(
