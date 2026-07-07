@@ -2,7 +2,7 @@ import SwiftUI
 
 /// 提醒列表视图
 ///
-/// 布局结构：透明导航栏 + List insetGrouped 分组 + safeAreaInset 固定 Header
+/// 布局结构：原生大标题导航栏 + List insetGrouped 分组 + 背景图
 struct RemindListView: View {
 
     @State private var viewModel = RemindListViewModel()
@@ -11,108 +11,105 @@ struct RemindListView: View {
     @State private var showEditor = false
 
     var body: some View {
-        Group {
-            if viewModel.isLoading && viewModel.reminds.isEmpty {
-                // 首次加载中
-                LoadingView()
-            } else if viewModel.reminds.isEmpty && !viewModel.isLoading {
-                // 空状态
-                ContentUnavailableView {
-                    Label("还没有提醒", systemImage: "bell.badge")
-                } description: {
-                    Text("点击右上角 + 创建你的第一条提醒")
-                }
-            } else {
-                // 分组列表（保持原生 insetGrouped 风格）
-                List {
-                    // 分组提醒
-                    ForEach(viewModel.groupedReminds, id: \.status) { group in
-                        Section {
-                            ForEach(group.items) { remind in
-                                remindRow(remind)
-                                    // 左滑操作：待确认事项显示「标记完成」，其他显示「删除」
-                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                        if remind.status == RemindStatus.pending.rawValue {
-                                            Button {
-                                                Task { await viewModel.markAsDoneDirect(remind: remind) }
-                                            } label: {
-                                                Label("完成", systemImage: "checkmark.circle")
-                                            }
-                                            .tint(.green)
+        // 用 ZStack 让背景图独立于三态内容铺满全屏，避免 Group 因首帧 LoadingView 高度不足
+        // 导致 .background(PageBackground) 拿不到全屏尺寸、背景图被压缩到中间区域
+        ZStack {
+            // 背景图铺满全屏（位于最底层，不受三态内容高度影响）
+            PageBackground(imageName: "remind_bg").ignoresSafeArea()
 
-                                            // 不使用 role: .destructive：系统会预判删除并触发 cell 收缩动画，
-                                            // 导致左滑删除确认时行闪烁。改用 .tint(.red) 保持红色外观但避开系统动画。
-                                            Button {
-                                                viewModel.confirmDelete(remind: remind)
-                                            } label: {
-                                                Label("删除", systemImage: "trash")
-                                            }
-                                            .tint(.red)
-                                        } else {
-                                            Button {
-                                                viewModel.confirmDelete(remind: remind)
-                                            } label: {
-                                                Label("删除", systemImage: "trash")
-                                            }
-                                            .tint(.red)
-                                        }
-                                    }
-                            }
-                        } header: {
-                            HStack {
-                                Text(group.title)
-                                Spacer()
-                                // 状态计数标签
-                                Text("\(group.items.count)")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 2)
-                                    .background(Color(.systemGray5))
-                                    .clipShape(Capsule())
-                            }
-                        }
+            Group {
+                if viewModel.isLoading && viewModel.reminds.isEmpty {
+                    // 首次加载中
+                    LoadingView()
+                } else if viewModel.reminds.isEmpty && !viewModel.isLoading {
+                    // 空状态
+                    ContentUnavailableView {
+                        Label("还没有提醒", systemImage: "bell.badge")
+                    } description: {
+                        Text("点击右上角 + 创建你的第一条提醒")
                     }
+                } else {
+                    // 分组列表（保持原生 insetGrouped 风格）
+                    List {
+                        // 分组提醒
+                        ForEach(viewModel.groupedReminds, id: \.status) { group in
+                            Section {
+                                ForEach(group.items) { remind in
+                                    remindRow(remind)
+                                        // 左滑操作：待确认事项显示「标记完成」，其他显示「删除」
+                                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                            if remind.status == RemindStatus.pending.rawValue {
+                                                Button {
+                                                    Task { await viewModel.markAsDoneDirect(remind: remind) }
+                                                } label: {
+                                                    Label("完成", systemImage: "checkmark.circle")
+                                                }
+                                                .tint(.green)
 
-                    // 加载更多
-                    if viewModel.isLoadingMore {
-                        HStack {
-                            Spacer()
-                            ProgressView()
-                                .padding()
-                            Spacer()
+                                                // 不使用 role: .destructive：系统会预判删除并触发 cell 收缩动画，
+                                                // 导致左滑删除确认时行闪烁。改用 .tint(.red) 保持红色外观但避开系统动画。
+                                                Button {
+                                                    viewModel.confirmDelete(remind: remind)
+                                                } label: {
+                                                    Label("删除", systemImage: "trash")
+                                                }
+                                                .tint(.red)
+                                            } else {
+                                                Button {
+                                                    viewModel.confirmDelete(remind: remind)
+                                                } label: {
+                                                    Label("删除", systemImage: "trash")
+                                                }
+                                                .tint(.red)
+                                            }
+                                        }
+                                }
+                            } header: {
+                                HStack {
+                                    Text(group.title)
+                                    Spacer()
+                                    // 状态计数标签
+                                    Text("\(group.items.count)")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 2)
+                                        .background(Color(.systemGray5))
+                                        .clipShape(Capsule())
+                                }
+                            }
                         }
-                        .listRowSeparator(.hidden)
-                        .listRowBackground(Color.clear)
-                    } else if viewModel.hasMore {
-                        Color.clear
-                            .frame(height: 1)
-                            .onAppear {
-                                Task { await viewModel.loadMore() }
+
+                        // 加载更多
+                        if viewModel.isLoadingMore {
+                            HStack {
+                                Spacer()
+                                ProgressView()
+                                    .padding()
+                                Spacer()
                             }
                             .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
+                        } else if viewModel.hasMore {
+                            Color.clear
+                                .frame(height: 1)
+                                .onAppear {
+                                    Task { await viewModel.loadMore() }
+                                }
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
+                        }
                     }
-                }
-                .listStyle(.insetGrouped)
-                // 隐藏 List 默认背景，露出底层装饰背景图
-                .scrollContentBackground(.hidden)
-                // 消除 List 顶部默认 contentInset，与其他 ScrollView 页面顶部对齐
-                .contentMargins(.top, 0, for: .scrollContent)
-                // 这样 Header 内部的 padding(.horizontal, 16) 直接生效，与博文/心情页逐像素对齐，
-                // 注意：Header 不随列表滚动，始终固定在顶部（提醒类页面体验更佳）。
-                .safeAreaInset(edge: .top, spacing: 0) {
-                    ListPageHeader(title: "提醒", bottomPadding: 0)
-                }
-                .refreshable {
-                    await viewModel.refresh()
+                    .listStyle(.insetGrouped)
+                    // 隐藏 List 默认背景，露出底层装饰背景图
+                    .scrollContentBackground(.hidden)
+                    .refreshable {
+                        await viewModel.refresh()
+                    }
                 }
             }
         }
-        // 背景图放在 .background 中，铺满屏幕
-        .background(PageBackground(imageName: "remind_bg").ignoresSafeArea())
-        // 导航栏透明：让背景图自然透出，但保留系统 Toolbar 按钮的原生玻璃质感
-        .toolbarBackground(.hidden, for: .navigationBar)
+        // 导航栏毛玻璃立即生效，避免冷启动切到该 Tab 时首帧白屏闪烁
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             // 右上角 + 按钮：使用原生 ToolbarItem，获得系统玻璃质感/高亮/动画
@@ -124,8 +121,8 @@ struct RemindListView: View {
                 }
             }
         }
-        .navigationTitle("")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("提醒")
+        .navigationBarTitleDisplayMode(.large)
         .sheet(isPresented: $showEditor, onDismiss: {
             Task { await viewModel.refresh() }
         }) {

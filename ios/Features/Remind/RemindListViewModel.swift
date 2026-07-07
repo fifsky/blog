@@ -10,8 +10,8 @@ class RemindListViewModel: APIErrorPresentable {
     /// 提醒列表数据
     var reminds: [Remind] = []
 
-    /// 是否正在加载
-    var isLoading = false
+    /// 是否正在加载（首帧默认 true，避免冷启动时先闪一帧空态）
+    var isLoading = true
 
     /// 是否正在刷新
     var isRefreshing = false
@@ -40,6 +40,8 @@ class RemindListViewModel: APIErrorPresentable {
     // MARK: - 私有属性
 
     private var currentPage = 0
+    /// 是否已执行过首次加载（配合 isLoading 初始 true，避免 guard !isLoading 提前返回）
+    private var hasLoaded = false
     private let remindService = RemindService.shared
 
     // MARK: - 数据分组
@@ -61,7 +63,9 @@ class RemindListViewModel: APIErrorPresentable {
 
     /// 加载提醒列表（首次加载）
     func load() async {
-        guard !isLoading else { return }
+        // 用 hasLoaded 守卫，避免与 isLoading 初始值 true 冲突（guard !isLoading 会提前返回）
+        guard !hasLoaded else { return }
+        hasLoaded = true
         isLoading = true
         currentPage = 0
         hasMore = true

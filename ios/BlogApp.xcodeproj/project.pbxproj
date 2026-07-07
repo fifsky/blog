@@ -27,7 +27,6 @@
 		6E8144BE952F425C438D25C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 664DE96CBFEA253650D63A02 /* Assets.xcassets */; };
 		6F32061B96259A3EC6367D42 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33A7A8A10569B8CA7700FAFE /* User.swift */; };
 		77FAE7583FC25ED09FDBC80D /* Cate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6639756DD7504A02EB90CE1B /* Cate.swift */; };
-		78D2298CC4E86AFB5EF9803D /* ListPageHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC4D48F2CD9868CC95171E5D /* ListPageHeader.swift */; };
 		B1A2C3D4E5F6A7B8C9D0E1F2 /* PhotoBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F2 /* PhotoBrowserView.swift */; };
 		C383FBB0974DE1A9C8B3B007 /* BlogApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1573E70B86C112453A2D744C /* BlogApp.swift */; };
 		C7341FF2BCEC78758EED88A1 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A3379BD04C421B3AEC99B14 /* Theme.swift */; };
@@ -60,7 +59,6 @@
 		E2F3A4B5C6D7E8F9A0B1C2D3 /* LoadingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A7B8C9D0E1F2 /* PhotoBrowserView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PhotoBrowserView.swift; sourceTree = "<group>"; };
 		A4ACD3825D2FEC5EE43B86EA /* Footprint.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Footprint.swift; sourceTree = "<group>"; };
-		AC4D48F2CD9868CC95171E5D /* ListPageHeader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ListPageHeader.swift; sourceTree = "<group>"; };
 		ACA50961351DB1D1A5DB6523 /* Common.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		CB489832FDAEF88D25C2D23E /* PageBackground.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PageBackground.swift; sourceTree = "<group>"; };
 		D8B7926C777CFCF5CDEBBD5A /* AppIconAssets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = AppIconAssets.xcassets; sourceTree = "<group>"; };
@@ -90,7 +88,6 @@
 			isa = PBXGroup;
 			children = (
 				CB489832FDAEF88D25C2D23E /* PageBackground.swift */,
-				AC4D48F2CD9868CC95171E5D /* ListPageHeader.swift */,
 				A1B2C3D4E5F6A7B8C9D0E1F2 /* PhotoBrowserView.swift */,
 				9A3379BD04C421B3AEC99B14 /* Theme.swift */,
 				E2F3A4B5C6D7E8F9A0B1C2D3 /* LoadingView.swift */,
@@ -275,7 +272,6 @@
 				12AE9C3AF203B976FFD1F671 /* UploadService.swift in Sources */,
 				34803FC191B63F5F815AF41C /* AppIconAssets.xcassets in Sources */,
 				4D97B62145F31D2F826EF36F /* PageBackground.swift in Sources */,
-				78D2298CC4E86AFB5EF9803D /* ListPageHeader.swift in Sources */,
 				B1A2C3D4E5F6A7B8C9D0E1F2 /* PhotoBrowserView.swift in Sources */,
 				C7341FF2BCEC78758EED88A1 /* Theme.swift in Sources */,
 				D1E2F3A4B5C6D7E8F9A0B1C2 /* LoadingView.swift in Sources */,

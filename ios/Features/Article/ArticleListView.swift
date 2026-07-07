@@ -2,7 +2,7 @@ import SwiftUI
 
 /// 文章列表视图
 ///
-/// 布局结构：透明导航栏 + ScrollView(Header + 单个毛玻璃容器)
+/// 布局结构：原生大标题导航栏 + 搜索框 drawer + ScrollView(毛玻璃容器)
 /// 容器内用 Divider 分隔每篇文章，背景图透过整个容器若隐若现。
 struct ArticleListView: View {
 
@@ -17,13 +17,13 @@ struct ArticleListView: View {
     /// 退出登录确认弹窗
     @State private var showLogoutConfirmation = false
 
+    /// 原生搜索框文本（提交时才请求后端）
+    @State private var searchText = ""
+
     var body: some View {
-        // 主滚动内容：Header + 毛玻璃容器，作为一个连续页面滚动
+        // 主滚动内容：毛玻璃容器，随原生大标题一起滚动
         ScrollView {
             VStack(spacing: 16) {
-                // Header 自己负责横向/顶部 padding，这里不再叠加
-                ListPageHeader(title: "博文")
-
                 contentList
             }
             .padding(.bottom, 16)
@@ -31,11 +31,23 @@ struct ArticleListView: View {
         .refreshable {
             await viewModel.refresh()
         }
+        // 原生搜索框：挂在导航栏下方的 drawer，随大标题一起滚动收起
+        .searchable(
+            text: $searchText,
+            placement: .navigationBarDrawer(displayMode: .automatic),
+            prompt: "搜索文章"
+        )
+        .onSubmit(of: .search) {
+            viewModel.applySearch(searchText)
+        }
+        // 监听搜索框文本：点搜索框内部 ✕ 清空时，恢复全量列表
+        .onChange(of: searchText) { _, newValue in
+            if newValue.isEmpty {
+                viewModel.clearSearch()
+            }
+        }
         // 背景图放在 .background 中，铺满屏幕
         .background(PageBackground(imageName: "article_bg").ignoresSafeArea())
-        // 导航栏透明：让背景图自然透出，但保留系统 Toolbar 按钮的原生玻璃质感
-        .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             // 右上角三点菜单：使用原生 ToolbarItem，获得系统玻璃质感/高亮/动画
             ToolbarItem(placement: .topBarTrailing) {
@@ -58,8 +70,8 @@ struct ArticleListView: View {
                 }
             }
         }
-        .navigationTitle("")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("博文")
+        .navigationBarTitleDisplayMode(.large)
         .navigationDestination(item: $selectedArticle) { article in
             ArticleDetailView(articleId: article.id)
         }
@@ -92,15 +104,38 @@ struct ArticleListView: View {
         if viewModel.isLoading && viewModel.articles.isEmpty {
             LoadingView()
         } else if viewModel.articles.isEmpty && !viewModel.isLoading {
-            ContentUnavailableView {
-                Label("暂无文章", systemImage: "doc.text")
-            } description: {
-                Text("点击右上角 ⋯ 创建第一篇文章")
+            // 搜索态：自定义空态（文字更小、灰色，图标更贴切）
+            // 非搜索态：系统 ContentUnavailableView
+            if viewModel.isSearching {
+                searchEmptyState
+            } else {
+                ContentUnavailableView {
+                    Label("暂无文章", systemImage: "doc.text")
+                } description: {
+                    Text("点击右上角 ⋯ 创建第一篇文章")
+                }
             }
         } else {
             // 单个毛玻璃大容器，内部用 Divider 分隔每篇文章
             articleContainer
         }
+    }
+
+    /// 搜索无结果空态：缩小灰色文字 + 贴切图标
+    private var searchEmptyState: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "text.page.slash")
+                .font(.system(size: 40, weight: .light))
+                .foregroundStyle(.secondary)
+            Text("未找到相关文章")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Text("换个关键词试试")
+                .font(.caption)
+                .foregroundStyle(Color(.tertiaryLabel))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 200)
     }
 
     /// 文章毛玻璃容器：一个圆角容器，内部文章用轻量 Divider 分隔

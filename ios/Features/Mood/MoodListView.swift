@@ -2,8 +2,7 @@ import SwiftUI
 
 /// 心情列表视图
 ///
-/// 布局结构：`ZStack(背景图 + ScrollView(Header + Cards) + 浮动 + 按钮)`
-/// Header 是 ScrollView 的第一个元素，随页面一起滚动（同 Apple Notes/Journal）。
+/// 布局结构：原生大标题导航栏 + ScrollView(卡片) + 背景图
 struct MoodListView: View {
 
     @State private var viewModel = MoodListViewModel()
@@ -15,12 +14,9 @@ struct MoodListView: View {
     @State private var editingMood: Mood?
 
     var body: some View {
-        // 主滚动内容：Header + 卡片，作为一个连续页面滚动
+        // 主滚动内容：卡片，随原生大标题一起滚动
         ScrollView {
             VStack(spacing: 16) {
-                // Header 自己负责横向/顶部 padding，这里不再叠加
-                ListPageHeader(title: "心情")
-
                 contentList
             }
             .padding(.bottom, 16)
@@ -30,9 +26,6 @@ struct MoodListView: View {
         }
         // 背景图放在 .background 中，铺满屏幕
         .background(PageBackground(imageName: "moon_bg").ignoresSafeArea())
-        // 导航栏透明：让背景图自然透出，但保留系统 Toolbar 按钮的原生玻璃质感
-        .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             // 右上角 + 按钮：使用原生 ToolbarItem，获得系统玻璃质感/高亮/动画
             ToolbarItem(placement: .topBarTrailing) {
@@ -44,8 +37,8 @@ struct MoodListView: View {
                 }
             }
         }
-        .navigationTitle("")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("心情")
+        .navigationBarTitleDisplayMode(.large)
         // 新建/编辑共用 sheet
         .sheet(isPresented: $showEditor, onDismiss: {
             editingMood = nil
