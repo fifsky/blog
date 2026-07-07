@@ -24,6 +24,7 @@ config.yml
 .buf-deps
 test.sh
 /.codebuddy
+/.workbuddy
 /.uploads
 /ios/build/
 /ios/*.ipa

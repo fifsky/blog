@@ -1,6 +1,23 @@
 import SwiftUI
 import Textual
 
+/// 修复表格内图片显示不全的单元格样式
+///
+/// Textual 在 `StructuredText` 顶层定义 `.textContainer` 坐标空间，
+/// 图片附件按整个文本容器的宽度缩放（`ImageAttachment.sizeThatFits` 使用 `min(proposedWidth, imageWidth)`）。
+/// 表格单元格比文本容器窄（多列表格），图片按容器宽度渲染后溢出单元格被裁剪。
+/// 此样式在单元格级别重新定义 `.textContainer` 坐标空间，使 `TextFragment` 读到的容器宽度为单元格宽度，
+/// 图片按单元格宽度缩放，不再溢出裁剪。
+private struct TableImageFixCellStyle: StructuredText.TableCellStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .fontWeight(configuration.row == 0 ? .semibold : .regular)
+            .textual.lineSpacing(.fontScaled(0.471))
+            .coordinateSpace(.named("textContainer"))
+            .textual.padding(.fontScaled(0.588))
+    }
+}
+
 /// 文章详情视图
 struct ArticleDetailView: View {
 
@@ -109,6 +126,10 @@ struct ArticleDetailView: View {
             StructuredText(markdown: article.content)
                 .multilineTextAlignment(.leading)
                 .textual.textSelection(.enabled)
+                .textual.overflowMode(.scroll)
+                .textual.tableStyle(.overflow)
+                .textual.tableCellStyle(TableImageFixCellStyle())
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, 4)
 
             if !article.tags.isEmpty {
