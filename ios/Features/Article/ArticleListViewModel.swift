@@ -113,31 +113,35 @@ class ArticleListViewModel: APIErrorPresentable {
     func applySearch(_ keyword: String) {
         let trimmed = keyword.trimmingCharacters(in: .whitespaces)
         currentKeyword = trimmed
-        Task { await reload() }
+        reload()
     }
 
     /// 清除搜索态，恢复全部列表
     func clearSearch() {
         currentKeyword = ""
-        Task { await reload() }
+        reload()
     }
 
     /// 重新加载第 1 页（搜索/清除搜索复用，不受首次加载守卫限制）
-    private func reload() async {
+    /// 同步置 isLoading=true，避免重置关键词后、Task 调度前闪一帧空态
+    private func reload() {
+        // 先同步置加载态，确保后续任何渲染帧都命中 LoadingView 而非空态
         isLoading = true
         currentPage = 0
         hasMore = true
 
-        do {
-            let response = try await articleService.list(page: 1, keyword: requestKeyword)
-            articles = response.list
-            currentPage = 1
-            hasMore = articles.count < response.total
-        } catch {
-            handleAPIError(error)
-        }
+        Task {
+            do {
+                let response = try await articleService.list(page: 1, keyword: requestKeyword)
+                articles = response.list
+                currentPage = 1
+                hasMore = articles.count < response.total
+            } catch {
+                handleAPIError(error)
+            }
 
-        isLoading = false
+            isLoading = false
+        }
     }
 
     /// 转换为 Service 层接受的 keyword 参数（空串转 nil）

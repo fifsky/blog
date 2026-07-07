@@ -104,16 +104,11 @@ struct ArticleListView: View {
         if viewModel.isLoading && viewModel.articles.isEmpty {
             LoadingView()
         } else if viewModel.articles.isEmpty && !viewModel.isLoading {
-            // 搜索态：自定义空态（文字更小、灰色，图标更贴切）
-            // 非搜索态：系统 ContentUnavailableView
+            // 搜索态与非搜索态均用自定义灰色空态
             if viewModel.isSearching {
                 searchEmptyState
             } else {
-                ContentUnavailableView {
-                    Label("暂无文章", systemImage: "doc.text")
-                } description: {
-                    Text("点击右上角 ⋯ 创建第一篇文章")
-                }
+                emptyState
             }
         } else {
             // 单个毛玻璃大容器，内部用 Divider 分隔每篇文章
@@ -131,6 +126,23 @@ struct ArticleListView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             Text("换个关键词试试")
+                .font(.caption)
+                .foregroundStyle(Color(.tertiaryLabel))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 200)
+    }
+
+    /// 无文章空态：缩小灰色文字 + 文档图标
+    private var emptyState: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "doc.text")
+                .font(.system(size: 40, weight: .light))
+                .foregroundStyle(.secondary)
+            Text("暂无文章")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            Text("点击右上角 ⋯ 创建第一篇文章")
                 .font(.caption)
                 .foregroundStyle(Color(.tertiaryLabel))
         }
