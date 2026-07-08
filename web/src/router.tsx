@@ -10,6 +10,7 @@ const ArticleList = lazy(() => import("@/pages/ArticleList"));
 const ArticleDetail = lazy(() => import("@/pages/ArticleDetail"));
 const TravelMap = lazy(() => import("@/pages/TravelMap"));
 const Archive = lazy(() => import("@/pages/Archive"));
+const About = lazy(() => import("@/pages/About"));
 const Links = lazy(() => import("@/pages/Links"));
 const Login = lazy(() => import("@/pages/Login"));
 const AdminIndex = lazy(() => import("@/pages/admin/AdminIndex"));
@@ -104,6 +105,14 @@ const routesConfig: RouteObject[] = [
             element: (
               <Suspense fallback={<SkeletonArticleList />}>
                 <Links />
+              </Suspense>
+            ),
+          },
+          {
+            path: "about",
+            element: (
+              <Suspense fallback={<SkeletonArticle />}>
+                <About />
               </Suspense>
             ),
           },
