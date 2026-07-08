@@ -23,6 +23,8 @@ type AIServiceHTTPServer interface {
 	GenerateTags(context.Context, *GenerateTagsRequest) (*GenerateTagsResponse, error)
 	// RemindSmartCreate 智能创建提醒
 	RemindSmartCreate(context.Context, *RemindSmartCreateRequest) (*types.IDResponse, error)
+	// RemindSpeechTranscribe 将提醒录音转成文字
+	RemindSpeechTranscribe(context.Context, *RemindSpeechTranscribeRequest) (*RemindSpeechTranscribeResponse, error)
 }
 
 type AIService struct {
@@ -34,6 +36,7 @@ type AIService struct {
 func (s *AIService) RegisterService() {
 	s.mux.HandleFunc("POST /blog/admin/ai/tags", s.GenerateTags)
 	s.mux.HandleFunc("POST /blog/admin/ai/remind/create", s.RemindSmartCreate)
+	s.mux.HandleFunc("POST /blog/admin/ai/remind/transcribe", s.RemindSpeechTranscribe)
 	s.mux.HandleFunc("POST /blog/admin/ai/mood", s.GenerateMood)
 }
 
@@ -80,6 +83,27 @@ func (s *AIService) RemindSmartCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	out, err := s.server.RemindSmartCreate(r.Context(), &in)
+	if err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+	s.codec.Encode(w, r, out)
+	return
+}
+
+func (s *AIService) RemindSpeechTranscribe(w http.ResponseWriter, r *http.Request) {
+	var in RemindSpeechTranscribeRequest
+	if err := s.codec.Decode(r, &in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	if err := s.codec.Validate(&in); err != nil {
+		s.codec.Encode(w, r, err)
+		return
+	}
+
+	out, err := s.server.RemindSpeechTranscribe(r.Context(), &in)
 	if err != nil {
 		s.codec.Encode(w, r, err)
 		return

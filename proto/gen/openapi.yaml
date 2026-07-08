@@ -42,6 +42,25 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/IDResponse'
+    /blog/admin/ai/remind/transcribe:
+        post:
+            tags:
+                - AIService
+            description: RemindSpeechTranscribe 将提醒录音转成文字
+            operationId: AIService_RemindSpeechTranscribe
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RemindSpeechTranscribeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RemindSpeechTranscribeResponse'
     /blog/admin/ai/tags:
         post:
             tags:
@@ -2373,6 +2392,20 @@ components:
                 content:
                     type: string
             description: RemindSmartCreateRequest 智能创建提醒请求
+        RemindSpeechTranscribeRequest:
+            required:
+                - audio_base64
+            type: object
+            properties:
+                audio_base64:
+                    type: string
+            description: RemindSpeechTranscribeRequest 提醒语音识别请求
+        RemindSpeechTranscribeResponse:
+            type: object
+            properties:
+                text:
+                    type: string
+            description: RemindSpeechTranscribeResponse 提醒语音识别响应
         RemindUpdateRequest:
             required:
                 - id

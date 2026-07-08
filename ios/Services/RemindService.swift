@@ -24,6 +24,12 @@ class RemindService {
         return try await APIClient.shared.request(path: Config.aiRemindCreatePath, body: request, auth: true)
     }
 
+    // 提醒语音转文字
+    func transcribeSpeech(audioBase64: String) async throws -> RemindSpeechTranscribeResponse {
+        let request = RemindSpeechTranscribeRequest(audio_base64: audioBase64)
+        return try await APIClient.shared.request(path: Config.aiRemindTranscribePath, body: request, auth: true)
+    }
+
     // 更新提醒
     func update(id: Int, cron: String?, content: String?, status: String?) async throws -> IDResponse {
         // 将字符串状态映射为枚举，便于以 proto 枚举值编码

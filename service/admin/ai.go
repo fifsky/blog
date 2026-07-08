@@ -2,14 +2,18 @@ package admin
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 	"time"
 
+	"app/config"
 	"app/pkg/aiagent"
+	"app/pkg/doubaoasr"
 	"app/pkg/errors"
 	adminv1 "app/proto/gen/admin/v1"
 	"app/proto/gen/types"
@@ -24,15 +28,27 @@ import (
 
 var _ adminv1.AIServiceHTTPServer = (*AI)(nil)
 
-type AI struct {
-	agent *aiagent.Agent
-	store *store.Store
+const maxRemindSpeechAudioBytes = 20 * 1024 * 1024
+
+type remindSpeechTranscriber interface {
+	Transcribe(ctx context.Context, audioBase64 string) (string, error)
 }
 
-func NewAI(agent *aiagent.Agent, s *store.Store) *AI {
+type AI struct {
+	agent             *aiagent.Agent
+	store             *store.Store
+	conf              *config.Config
+	speechTranscriber remindSpeechTranscriber
+}
+
+func NewAI(agent *aiagent.Agent, s *store.Store, conf *config.Config) *AI {
+	if conf == nil {
+		conf = &config.Config{}
+	}
 	return &AI{
 		agent: agent,
 		store: s,
+		conf:  conf,
 	}
 }
 
@@ -263,6 +279,34 @@ func (a *AI) RemindSmartCreate(ctx context.Context, req *adminv1.RemindSmartCrea
 	return types.IDResponse_builder{Id: int32(lastID)}.Build(), nil
 }
 
+func (a *AI) RemindSpeechTranscribe(ctx context.Context, req *adminv1.RemindSpeechTranscribeRequest) (*adminv1.RemindSpeechTranscribeResponse, error) {
+	audioBase64 := strings.TrimSpace(req.GetAudioBase64())
+	if audioBase64 == "" {
+		return nil, errors.BadRequest("EMPTY_AUDIO", "录音不能为空")
+	}
+
+	audioData, err := base64.StdEncoding.DecodeString(audioBase64)
+	if err != nil {
+		return nil, errors.BadRequest("INVALID_AUDIO_BASE64", "录音数据格式错误").WithCause(err)
+	}
+	if len(audioData) == 0 {
+		return nil, errors.BadRequest("EMPTY_AUDIO", "录音不能为空")
+	}
+	if len(audioData) > maxRemindSpeechAudioBytes {
+		return nil, errors.BadRequest("AUDIO_TOO_LARGE", "录音文件过大，请缩短录音时间")
+	}
+
+	text, err := a.getSpeechTranscriber().Transcribe(ctx, audioBase64)
+	if err != nil {
+		return nil, errors.InternalServer("AI_REMIND_TRANSCRIBE_ERROR", "语音识别失败").WithCause(err)
+	}
+	text = strings.TrimSpace(text)
+	if text == "" {
+		return nil, errors.BadRequest("EMPTY_TRANSCRIPT", "没有识别到文字，请重新录音")
+	}
+	return adminv1.RemindSpeechTranscribeResponse_builder{Text: text}.Build(), nil
+}
+
 func (a *AI) GenerateMood(ctx context.Context, _ *emptypb.Empty) (*adminv1.GenerateMoodResponse, error) {
 	dateStr := time.Now().Format("2006-01-02")
 	provider := motto.NewOpenAIProvider(a.agent)
@@ -273,6 +317,31 @@ func (a *AI) GenerateMood(ctx context.Context, _ *emptypb.Empty) (*adminv1.Gener
 
 	return adminv1.GenerateMoodResponse_builder{Content: content}.Build(),
 		nil
+}
+
+func (a *AI) getSpeechTranscriber() remindSpeechTranscriber {
+	if a.speechTranscriber != nil {
+		return a.speechTranscriber
+	}
+
+	conf := config.DoubaoASRConf{}
+	if a.conf != nil {
+		conf = a.conf.DoubaoASR
+	}
+	return doubaoasr.Client{
+		APIKey:     firstNonEmpty(os.Getenv("DOUBAO_ASR_API_KEY"), conf.APIKey),
+		Endpoint:   firstNonEmpty(os.Getenv("DOUBAO_ASR_ENDPOINT"), conf.Endpoint),
+		ResourceID: firstNonEmpty(os.Getenv("DOUBAO_ASR_RESOURCE_ID"), conf.ResourceID),
+	}
+}
+
+func firstNonEmpty(values ...string) string {
+	for _, value := range values {
+		if trimmed := strings.TrimSpace(value); trimmed != "" {
+			return trimmed
+		}
+	}
+	return ""
 }
 
 func parseTagsFromAIResponse(text string) []string {

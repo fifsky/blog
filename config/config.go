@@ -40,6 +40,13 @@ type FeishuConf struct {
 	UserID    string `yaml:"user_id"`
 }
 
+// DoubaoASRConf 豆包语音识别配置
+type DoubaoASRConf struct {
+	APIKey     string `yaml:"api_key"`     // 新版控制台的 X-Api-Key
+	Endpoint   string `yaml:"endpoint"`    // 语音识别极速版接口地址
+	ResourceID string `yaml:"resource_id"` // 资源 ID，默认 volc.bigasr.auc_turbo
+}
+
 // LitestreamConf Litestream 备份配置
 type LitestreamConf struct {
 	Bucket   string `yaml:"bucket"`   // 备份 OSS bucket（fifsky-backup）
@@ -59,6 +66,7 @@ type Config struct {
 	MCP        map[string]MCPConf `yaml:"mcp"`
 	MiniAPP    MiniAPPConf        `yaml:"miniapp"`
 	Feishu     FeishuConf         `yaml:"feishu"`
+	DoubaoASR  DoubaoASRConf      `yaml:"doubao_asr"`
 }
 
 func (c *Config) GetLogLevel() slog.Level {

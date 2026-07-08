@@ -2,7 +2,7 @@ import Foundation
 
 /// 提醒创建模式
 enum RemindCreateMode: Hashable {
-    /// AI 智能模式：用户输入自然语言描述，AI 自动生成 cron 和内容
+    /// AI 智能模式：用户通过语音生成自然语言描述，AI 自动生成 cron 和内容
     case smart
     /// 手动模式：用户手动设置 cron 表达式或预设
     case manual
@@ -29,6 +29,9 @@ class RemindEditorViewModel: APIErrorPresentable {
 
     /// 是否正在保存
     var isSaving = false
+
+    /// 是否正在将录音转换为文字
+    var isTranscribing = false
 
     /// 是否保存成功（用于关闭视图）
     var didSave = false
@@ -59,7 +62,12 @@ class RemindEditorViewModel: APIErrorPresentable {
 
     /// 保存按钮是否可用
     var isSaveButtonDisabled: Bool {
-        content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving
+        content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving || isTranscribing
+    }
+
+    /// 是否显示 AI 语音录入区域
+    var showsSmartVoiceInput: Bool {
+        !isEditing && createMode == .smart
     }
 
     /// 是否显示 cron 设置区域（手动模式或编辑模式）
@@ -134,5 +142,38 @@ class RemindEditorViewModel: APIErrorPresentable {
         }
 
         isSaving = false
+    }
+
+    /// 将提醒录音转成文字并追加到当前描述
+    /// - Parameter audioBase64: base64 编码的录音文件
+    func transcribeSpeech(audioBase64: String) async {
+        guard !isTranscribing else { return }
+        isTranscribing = true
+
+        do {
+            let response = try await remindService.transcribeSpeech(audioBase64: audioBase64)
+            appendTranscript(response.text)
+        } catch {
+            handleAPIError(error)
+        }
+
+        isTranscribing = false
+    }
+
+    /// 清空智能提醒语音识别草稿
+    func resetSmartDraft() {
+        content = ""
+    }
+
+    private func appendTranscript(_ transcript: String) {
+        let text = transcript.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+
+        let current = content.trimmingCharacters(in: .whitespacesAndNewlines)
+        if current.isEmpty {
+            content = text
+        } else {
+            content = current + " " + text
+        }
     }
 }

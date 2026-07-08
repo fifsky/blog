@@ -32,7 +32,7 @@ func New(s *store.Store, conf *config.Config, agent *aiagent.Agent) *Service {
 		Mood:      NewMood(s),
 		Remind:    NewRemind(s),
 		Setting:   NewSetting(s),
-		AI:        NewAI(agent, s),
+		AI:        NewAI(agent, s, conf),
 		OSS:       NewOSS(conf),
 		ClawBot:   NewClawBot(s, conf, agent),
 		Guestbook: NewGuestbook(s),

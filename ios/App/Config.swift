@@ -21,6 +21,9 @@ enum Config {
     /// AI 智能创建提醒（自动生成 cron 和内容）
     static let aiRemindCreatePath = "/blog/admin/ai/remind/create"
 
+    /// AI 提醒语音转文字
+    static let aiRemindTranscribePath = "/blog/admin/ai/remind/transcribe"
+
     // MARK: - 文章接口
 
     /// 管理端文章列表

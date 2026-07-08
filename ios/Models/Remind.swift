@@ -54,3 +54,13 @@ struct RemindDeleteRequest: Encodable {
 struct RemindSmartCreateRequest: Encodable {
     let content: String
 }
+
+/// 提醒语音转文字请求
+struct RemindSpeechTranscribeRequest: Encodable {
+    let audio_base64: String
+}
+
+/// 提醒语音转文字响应
+struct RemindSpeechTranscribeResponse: Decodable {
+    let text: String
+}

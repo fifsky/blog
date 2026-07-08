@@ -7,6 +7,8 @@ struct RemindEditorView: View {
     var existingRemind: Remind?
 
     @State private var viewModel: RemindEditorViewModel
+    @State private var voiceRecorder = RemindVoiceRecorder()
+    @State private var isVoicePressActive = false
     @Environment(\.dismiss) private var dismiss
 
     /// 提醒内容输入框焦点（新建模式自动聚焦）
@@ -30,23 +32,21 @@ struct RemindEditorView: View {
                     }
                     .pickerStyle(.segmented)
                     .labelsHidden()
-                } footer: {
-                    Text(viewModel.createMode == .smart
-                        ? "输入提醒描述，AI 自动识别时间并生成重复规则"
-                        : "手动设置 Cron 表达式或选择预设频率")
                 }
             }
 
             // MARK: - 提醒内容
-            Section {
-                TextField("提醒内容", text: $viewModel.content, axis: .vertical)
-                    .lineLimit(3...6)
-                    .focused($contentFocused)
-            } header: {
-                Text("内容")
-            } footer: {
-                if !viewModel.isEditing && viewModel.createMode == .smart {
-                    Text("如：每天早上9点提醒我喝水、每周一例会前10分钟提醒")
+            if viewModel.showsSmartVoiceInput {
+                Section {
+                    smartVoiceInput
+                }
+            } else {
+                Section {
+                    TextField("提醒内容", text: $viewModel.content, axis: .vertical)
+                        .lineLimit(3...6)
+                        .focused($contentFocused)
+                } header: {
+                    Text("内容")
                 }
             }
 
@@ -154,11 +154,11 @@ struct RemindEditorView: View {
                     if viewModel.isSaving {
                         ProgressView()
                     } else {
-                        Text("保存")
+                        Text(viewModel.showsSmartVoiceInput ? "提交" : "保存")
                             .fontWeight(.medium)
                     }
                 }
-                .disabled(viewModel.isSaveButtonDisabled)
+                .disabled(viewModel.isSaveButtonDisabled || voiceRecorder.isRecording)
             }
 
             // 取消按钮
@@ -178,11 +178,200 @@ struct RemindEditorView: View {
                 dismiss()
             }
         }
-        .onAppear {
-            // 新建模式自动聚焦内容输入框
-            if existingRemind == nil {
+        .onChange(of: viewModel.createMode) { _, newValue in
+            if newValue == .smart {
+                contentFocused = false
+            } else {
+                voiceRecorder.reset()
                 contentFocused = true
             }
         }
+        .onAppear {
+            // 仅文本输入场景自动聚焦，语音模式避免直接拉起键盘
+            if existingRemind == nil && !viewModel.showsSmartVoiceInput {
+                contentFocused = true
+            }
+        }
+        .onDisappear {
+            voiceRecorder.reset()
+        }
+    }
+
+    /// AI 智能模式下的语音录入面板
+    private var smartVoiceInput: some View {
+        VStack(spacing: 18) {
+            if !viewModel.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                recognizedTextCard
+            } else {
+                voiceEmptyState
+            }
+
+            voiceRecordingStage
+
+            if let errorMessage = voiceRecorder.errorMessage, !errorMessage.isEmpty {
+                Label(errorMessage, systemImage: "exclamationmark.triangle")
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding(.vertical, 12)
+    }
+
+    /// 固定高度的录音舞台，避免波形出现时挤动按钮位置
+    private var voiceRecordingStage: some View {
+        ZStack {
+            VoiceWaveView(level: voiceRecorder.audioLevel)
+                .frame(height: 38)
+                .opacity(voiceRecorder.isRecording ? 1 : 0)
+                .scaleEffect(voiceRecorder.isRecording ? 1 : 0.92)
+                .offset(y: -78)
+
+            voiceRecordButton
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 162)
+        .animation(.spring(response: 0.28, dampingFraction: 0.86), value: voiceRecorder.isRecording)
+    }
+
+    /// 未识别文字时的空状态
+    private var voiceEmptyState: some View {
+        VStack(spacing: 8) {
+            Text(voiceRecorder.isRecording ? "正在聆听..." : "按住说出提醒")
+                .font(.headline)
+            Text(voiceRecorder.isRecording ? "松开后自动转成文字" : "例如：明天上午九点提醒我喝水")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 4)
+    }
+
+    /// 语音识别后的文字确认卡片
+    private var recognizedTextCard: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Text(viewModel.content)
+                .font(.body)
+                .foregroundStyle(.primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .textSelection(.enabled)
+
+            Button {
+                voiceRecorder.reset()
+                viewModel.resetSmartDraft()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("清空并重来")
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    /// 按住录音按钮
+    private var voiceRecordButton: some View {
+        VStack(spacing: 10) {
+            ZStack {
+                Circle()
+                    .fill(voiceButtonBackground)
+                    .frame(width: 84, height: 84)
+                    .scaleEffect(voiceRecorder.isRecording ? 1.04 : 1)
+                    .animation(.spring(response: 0.25, dampingFraction: 0.72), value: voiceRecorder.isRecording)
+
+                if viewModel.isTranscribing {
+                    ProgressView()
+                        .controlSize(.large)
+                } else {
+                    Image(systemName: voiceRecorder.isRecording ? "waveform" : "mic.fill")
+                        .font(.system(size: 32, weight: .semibold))
+                        .foregroundStyle(voiceRecorder.isRecording ? .red : Color.accentColor)
+                }
+            }
+            .contentShape(Circle())
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { _ in beginVoicePress() }
+                    .onEnded { _ in endVoicePress() }
+            )
+            .opacity(viewModel.isTranscribing ? 0.72 : 1)
+            .allowsHitTesting(!viewModel.isTranscribing)
+
+            Text(voiceButtonText)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var voiceButtonBackground: Color {
+        if viewModel.isTranscribing {
+            return Color(.systemGray5)
+        }
+        return voiceRecorder.isRecording ? Color.red.opacity(0.12) : Color.accentColor.opacity(0.12)
+    }
+
+    private var voiceButtonText: String {
+        if viewModel.isTranscribing {
+            return "正在识别..."
+        }
+        return voiceRecorder.isRecording ? "松开识别" : "按住说话"
+    }
+
+    private func beginVoicePress() {
+        guard !isVoicePressActive && !viewModel.isTranscribing else { return }
+        isVoicePressActive = true
+
+        Task {
+            let started = await voiceRecorder.startRecording()
+            if started && !isVoicePressActive {
+                await finishVoiceRecording()
+            }
+        }
+    }
+
+    private func endVoicePress() {
+        guard isVoicePressActive else { return }
+        isVoicePressActive = false
+
+        Task {
+            await finishVoiceRecording()
+        }
+    }
+
+    private func finishVoiceRecording() async {
+        guard let audioBase64 = voiceRecorder.stopRecordingBase64() else { return }
+        await viewModel.transcribeSpeech(audioBase64: audioBase64)
+        voiceRecorder.deleteRecordingFile()
+    }
+}
+
+/// 录音时的声纹波形
+private struct VoiceWaveView: View {
+    let level: Double
+
+    private let barCount = 18
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 0.06)) { context in
+            let phase = context.date.timeIntervalSinceReferenceDate * 7
+            HStack(alignment: .center, spacing: 4) {
+                ForEach(0..<barCount, id: \.self) { index in
+                    Capsule()
+                        .fill(Color.accentColor.opacity(0.82))
+                        .frame(width: 4, height: barHeight(index: index, phase: phase))
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    private func barHeight(index: Int, phase: Double) -> CGFloat {
+        let wave = (sin(phase + Double(index) * 0.62) + 1) / 2
+        let base = 8 + wave * 28
+        return CGFloat(base * max(0.35, min(level + 0.2, 1.1)))
     }
 }

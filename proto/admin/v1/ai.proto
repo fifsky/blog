@@ -26,6 +26,13 @@ service AIService {
       body: "*"
     };
   }
+  // RemindSpeechTranscribe 将提醒录音转成文字
+  rpc RemindSpeechTranscribe(RemindSpeechTranscribeRequest) returns (RemindSpeechTranscribeResponse) {
+    option (google.api.http) = {
+      post: "/blog/admin/ai/remind/transcribe"
+      body: "*"
+    };
+  }
   // GenerateMood 自动生成心情
   rpc GenerateMood(google.protobuf.Empty) returns (GenerateMoodResponse) {
     option (google.api.http) = {
@@ -55,6 +62,19 @@ message RemindSmartCreateRequest {
     (buf.validate.field).required = true,
     (google.api.field_behavior) = REQUIRED
   ];
+}
+
+// RemindSpeechTranscribeRequest 提醒语音识别请求
+message RemindSpeechTranscribeRequest {
+  string audio_base64 = 1 [
+    (buf.validate.field).required = true,
+    (google.api.field_behavior) = REQUIRED
+  ];
+}
+
+// RemindSpeechTranscribeResponse 提醒语音识别响应
+message RemindSpeechTranscribeResponse {
+  string text = 1;
 }
 
 // GenerateMoodResponse 生成心情响应
