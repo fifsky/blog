@@ -1,14 +1,22 @@
 import { useMemo, useState } from "react";
+import { CalendarDays, CircleDot, Clock, Sparkles } from "lucide-react";
 import { Comment } from "@/components/Comment";
 import { PageTransition } from "@/components/PageTransition";
 import { SkeletonArticle } from "@/components/Skeleton";
 import { articleDetailApi, settingApi } from "@/service";
 import { ArticleItem, Setting } from "@/types/openapi";
 import { useAsyncEffect } from "@/hooks";
+import { cn } from "@/lib/utils";
 
 interface TimelineEntry {
   date: string;
   description: string;
+}
+
+interface TimelineDisplayEntry extends TimelineEntry {
+  year: string;
+  detail: string;
+  sequence: string;
 }
 
 /** 解析时间轴内容：按行分割，第一个空格前为日期，其后为描述 */
@@ -27,6 +35,28 @@ function parseTimeline(content: string): TimelineEntry[] {
       return { date, description } as TimelineEntry;
     })
     .filter((entry): entry is TimelineEntry => entry !== null);
+}
+
+/** 拆分日期用于时间轴的年份和短日期展示 */
+function splitTimelineDate(date: string): Pick<TimelineDisplayEntry, "year" | "detail"> {
+  const match = date.match(/^(\d{4})(.*)$/);
+  if (!match) {
+    return { year: date, detail: "纪事" };
+  }
+
+  const [, year, rest] = match;
+  const detail = rest
+    .trim()
+    .replace(/^[年./-]+/, "")
+    .replace(/[/-]/g, ".")
+    .replace(/年/g, ".")
+    .replace(/月/g, ".")
+    .replace(/日/g, "")
+    .replace(/\.+/g, ".")
+    .replace(/^\./, "")
+    .replace(/\.$/, "");
+
+  return { year, detail: detail || "纪事" };
 }
 
 /** 关于页面：通过固定 path "about" 获取文章数据，以时间轴样式展示 */
@@ -55,8 +85,15 @@ export default function About() {
   const siteName = settings?.site_name || "無處告別";
   const pageTitle = `${article?.title ? article.title + " - " : ""}${siteName}`;
 
-  const entries = useMemo(
-    () => (article ? parseTimeline(article.content) : []),
+  const entries = useMemo<TimelineDisplayEntry[]>(
+    () =>
+      article
+        ? parseTimeline(article.content).map((entry, index) => ({
+            ...entry,
+            ...splitTimelineDate(entry.date),
+            sequence: String(index + 1).padStart(2, "0"),
+          }))
+        : [],
     [article],
   );
 
@@ -70,62 +107,117 @@ export default function About() {
       <meta name="description" content={settings?.site_desc || ""} />
       <meta name="keywords" content={settings?.site_keyword || ""} />
       <PageTransition loading={loading}>
-        <div className="mb-[10px] mx-auto max-w-3xl">
+        <div className="mx-auto mb-[10px] max-w-[720px]">
           {/* 标题区域 */}
-          <header className="mb-10 text-center">
-            <h1 className="text-2xl font-bold text-foreground">{article.title}</h1>
-            <div className="mt-3 mx-auto h-px w-20 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-            <div className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-              <span>{article.user?.nick_name}</span>
-              <span>·</span>
-              <span>{article.created_at}</span>
+          <header className="relative mb-9 overflow-hidden border-b border-primary/15 pb-7">
+            <div className="pointer-events-none absolute right-0 top-0 hidden select-none text-[58px] font-black leading-none tracking-normal text-primary/5 sm:block">
+              ABOUT
+            </div>
+            <div className="relative">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div className="min-w-0">
+                  <h1 className="text-[28px] font-bold leading-tight tracking-normal text-foreground">
+                    {article.title}
+                  </h1>
+                </div>
+              </div>
             </div>
           </header>
 
           {/* 时间轴 */}
           <div className="relative">
-            {entries.map((entry, index) => {
-              const isFirst = index === 0;
-              const isLast = index === entries.length - 1;
+            <div
+              className="absolute bottom-14 left-[21px] top-1 w-px bg-gradient-to-b from-primary/10 via-primary/35 to-primary/10 sm:left-1/2 sm:-translate-x-1/2"
+              aria-hidden="true"
+            />
+            <ol aria-label="关于我的时间线">
+              {entries.map((entry, index) => {
+                const isLast = index === entries.length - 1;
+                const cardOnRight = index % 2 === 1;
 
-              return (
-                <div key={index} className="relative flex gap-5 group">
-                  {/* 时间轴标记列：圆点 + 连接线 */}
-                  <div className="relative flex flex-col items-center flex-shrink-0 w-4">
+                return (
+                  <li
+                    key={`${entry.date}-${index}`}
+                    className="group relative grid grid-cols-[44px_minmax(0,1fr)] gap-4 pb-6 sm:grid-cols-[minmax(0,1fr)_70px_minmax(0,1fr)] sm:gap-0"
+                  >
                     <div
-                      className={`relative z-10 rounded-full bg-primary ring-4 ring-white transition-all duration-300 group-hover:scale-125 ${
-                        isFirst
-                          ? "w-4 h-4 mt-1.5"
-                          : isLast
-                            ? "w-4 h-4 mt-1.5 animate-pulse"
-                            : "w-2.5 h-2.5 mt-2.5"
-                      }`}
-                    />
-                    {!isLast && (
-                      <div className="flex-1 w-[2px] bg-gradient-to-b from-primary/25 to-primary/10 mt-2" />
-                    )}
-                  </div>
-
-                  {/* 内容区域 */}
-                  <div className={`flex-1 ${isLast ? "pb-2" : "pb-7"}`}>
-                    <div className="inline-block text-sm font-semibold text-primary bg-primary/5 px-3 py-0.5 rounded-full mb-2 transition-colors duration-300 group-hover:bg-primary/10">
-                      {entry.date}
+                      className={cn(
+                        "hidden pt-2 sm:flex sm:flex-col",
+                        cardOnRight
+                          ? "sm:col-start-1 sm:items-end sm:pr-5 sm:text-right"
+                          : "sm:col-start-3 sm:items-start sm:pl-5",
+                      )}
+                      aria-hidden="true"
+                    >
+                      <span className="font-mono text-[28px] font-bold leading-none tracking-normal text-primary/35">
+                        {entry.year}
+                      </span>
+                      <span className="mt-1 text-xs font-semibold text-muted-foreground/70">
+                        {entry.detail}
+                      </span>
                     </div>
-                    <p className="text-foreground/80 leading-[1.8] transition-colors duration-300 group-hover:text-foreground">
-                      {entry.description}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+
+                    {/* 时间脊线节点 */}
+                    <div className="relative z-10 col-start-1 row-start-1 flex justify-center sm:col-start-2">
+                      <span
+                        className={cn(
+                          "flex items-center justify-center rounded-full bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110",
+                          isLast ? "size-7" : "size-6",
+                        )}
+                      >
+                        <CircleDot className="size-4" aria-hidden="true" />
+                      </span>
+                    </div>
+
+                    {/* 内容区域 */}
+                    <article
+                      className={cn(
+                        "col-start-2 row-start-1 min-w-0",
+                        cardOnRight
+                          ? "sm:col-start-3 sm:pl-5"
+                          : "sm:col-start-1 sm:pr-5 sm:text-right",
+                      )}
+                    >
+                      <div>
+                        <div
+                          className={cn(
+                            "flex flex-wrap items-center gap-2",
+                            !cardOnRight && "sm:justify-end",
+                          )}
+                        >
+                          <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                            <CalendarDays className="size-3.5" aria-hidden="true" />
+                            {entry.date}
+                          </span>
+                          <span className="inline-flex items-center rounded-full border border-border/70 px-2 py-0.5 font-mono text-[11px] text-muted-foreground">
+                            #{entry.sequence}
+                          </span>
+                          {isLast ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+                              <Sparkles className="size-3" aria-hidden="true" />
+                              现在
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="mt-3 text-[15px] leading-[1.9] text-foreground/85 transition-colors duration-300 group-hover:text-foreground">
+                          {entry.description}
+                        </p>
+                      </div>
+                    </article>
+                  </li>
+                );
+              })}
+            </ol>
 
             {/* 结尾标记 */}
-            <div className="relative flex gap-5">
-              <div className="relative flex flex-col items-center flex-shrink-0 w-4">
-                <div className="w-3 h-3 rounded-full border-2 border-primary/30 bg-white mt-2" />
+            <div className="relative grid grid-cols-[44px_minmax(0,1fr)] gap-4 sm:grid-cols-[minmax(0,1fr)_70px_minmax(0,1fr)] sm:gap-y-1">
+              <div className="relative z-10 col-start-1 flex justify-center sm:col-start-2">
+                <div className="flex size-10 items-center justify-center text-primary/60">
+                  <Clock className="size-5" aria-hidden="true" />
+                </div>
               </div>
-              <div className="flex-1 pt-1.5">
-                <p className="text-sm text-muted-foreground/60 italic">未完待续...</p>
+              <div className="col-span-2 text-center sm:col-span-3">
+                <p className="text-sm font-medium text-muted-foreground">生活还在继续...</p>
               </div>
             </div>
           </div>
