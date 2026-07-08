@@ -198,7 +198,7 @@
 		);
 		name = BlogApp;
 		packageProductDependencies = (
-			D4E5F60718293A4B5C6D7E8F /* Textual */,
+			D4E5F60718293A4B5C6D7E8F /* MarkdownView */,
 		);
 		productName = BlogApp;
 		productReference = 06C13C8BE2466821B6F0C6A4 /* BlogApp.app */;
@@ -222,7 +222,7 @@
 				Base,
 			);
 			packageReferences = (
-				A1B2C3D4E5F60718293A4B5C /* XCRemoteSwiftPackageReference "textual" */,
+				A1B2C3D4E5F60718293A4B5C /* XCRemoteSwiftPackageReference "MarkdownView" */,
 			);
 			mainGroup = 1F439AA0A3CFF6E3DD447F3F /* . */;
 			productRefGroup = F642F8D6A17BC611B5A9EDDC /* Products */;
@@ -497,22 +497,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		A1B2C3D4E5F60718293A4B5C /* XCRemoteSwiftPackageReference "textual" */ = {
+		A1B2C3D4E5F60718293A4B5C /* XCRemoteSwiftPackageReference "MarkdownView" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/gonzalezreal/textual";
+			repositoryURL = "https://github.com/LiYanan2004/MarkdownView.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.5.0;
-				maximumVersion = 1.0.0;
+				minimumVersion = 3.0.0;
+				maximumVersion = 4.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		D4E5F60718293A4B5C6D7E8F /* Textual */ = {
+		D4E5F60718293A4B5C6D7E8F /* MarkdownView */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A1B2C3D4E5F60718293A4B5C /* XCRemoteSwiftPackageReference "textual" */;
-			productName = Textual;
+			package = A1B2C3D4E5F60718293A4B5C /* XCRemoteSwiftPackageReference "MarkdownView" */;
+			productName = MarkdownView;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

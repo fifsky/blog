@@ -1,40 +1,125 @@
 import SwiftUI
-import Textual
+import UIKit
+import MarkdownView
 
-/// 修复表格内图片显示不全的单元格样式
-///
-/// Textual 在 `StructuredText` 顶层定义 `.textContainer` 坐标空间，
-/// 图片附件按整个文本容器的宽度缩放（`ImageAttachment.sizeThatFits` 使用 `min(proposedWidth, imageWidth)`）。
-/// 表格单元格比文本容器窄（多列表格），图片按容器宽度渲染后溢出单元格被裁剪。
-/// 此样式在单元格级别重新定义 `.textContainer` 坐标空间，使 `TextFragment` 读到的容器宽度为单元格宽度，
-/// 图片按单元格宽度缩放，不再溢出裁剪。
-private struct TableImageFixCellStyle: StructuredText.TableCellStyle {
+/// 文章 Markdown 图片渲染器
+private struct ArticleMarkdownImageRenderer: MarkdownImageRenderer {
+    /// 图片点击处理
+    let onTap: (URL) -> Void
+
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .fontWeight(configuration.row == 0 ? .semibold : .regular)
-            .textual.lineSpacing(.fontScaled(0.471))
-            .coordinateSpace(.named("textContainer"))
-            .textual.padding(.fontScaled(0.588))
+        ArticleMarkdownImage(configuration: configuration, onTap: onTap)
     }
 }
 
-/// 为图片 run 添加 link 属性的 Markdown 解析器
-///
-/// Textual 的 `TextLinkInteraction` 通过 `run.url` 检测点击，仅对携带 `.link` 属性的 run 生效。
-/// 标准 Markdown 图片 `![alt](url)` 只设置 `.imageURL`，不设置 `.link`，因此点击无响应。
-/// 此解析器在 Foundation 解析后遍历 AttributedString，为每个图片 run 补充 `.link = imageURL`，
-/// 使 `TextLinkInteraction` 能拦截图片点击并触发 `openURL`，同时不影响图片正常渲染。
-private struct ImageLinkMarkdownParser: MarkupParser {
-    private let base = AttributedStringMarkdownParser(baseURL: nil)
+/// 文章 Markdown 图片视图
+private struct ArticleMarkdownImage: View {
+    /// Markdown 图片最大预览宽度
+    private static let maxPreviewWidth: CGFloat = 320
 
-    func attributedString(for input: String) throws -> AttributedString {
-        var result = try base.attributedString(for: input)
-        for run in result.runs {
-            if let imageURL = run.imageURL, run.link == nil {
-                result[run.range].link = imageURL
+    /// Markdown 图片最大预览高度
+    private static let maxPreviewHeight: CGFloat = 220
+
+    /// Markdown 图片配置
+    let configuration: MarkdownImageRendererConfiguration
+
+    /// 图片点击处理
+    let onTap: (URL) -> Void
+
+    /// 图片加载状态
+    @State private var loadingState: ImageLoadingState = .loading
+
+    var body: some View {
+        Group {
+            switch loadingState {
+            case .loading:
+                ProgressView()
+                    .frame(width: 48, height: 48, alignment: .leading)
+            case .loaded(let image, let size):
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: size.width, height: size.height, alignment: .leading)
+            case .failed:
+                Label("图片加载失败", systemImage: "photo")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize()
             }
         }
-        return result
+        .accessibilityLabel(configuration.alternativeText ?? "图片")
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onTap(configuration.url)
+        }
+        .task(id: configuration.url) {
+            await loadImage()
+        }
+    }
+
+    /// 加载图片并计算稳定的缩略图尺寸
+    @MainActor
+    private func loadImage() async {
+        loadingState = .loading
+        do {
+            let (data, _) = try await URLSession.shared.data(from: configuration.url)
+            guard let image = UIImage(data: data) else {
+                loadingState = .failed
+                return
+            }
+            loadingState = .loaded(image, thumbnailSize(for: image.size))
+        } catch is CancellationError {
+        } catch {
+            loadingState = .failed
+        }
+    }
+
+    /// 根据原图尺寸计算缩略图实际占位尺寸
+    /// - Parameter originalSize: 原图尺寸
+    /// - Returns: 等比缩放后的缩略图尺寸
+    private func thumbnailSize(for originalSize: CGSize) -> CGSize {
+        guard originalSize.width > 0, originalSize.height > 0 else {
+            return CGSize(width: Self.maxPreviewWidth, height: Self.maxPreviewHeight)
+        }
+
+        let scale = min(
+            Self.maxPreviewWidth / originalSize.width,
+            Self.maxPreviewHeight / originalSize.height,
+            1
+        )
+        return CGSize(
+            width: floor(originalSize.width * scale),
+            height: floor(originalSize.height * scale)
+        )
+    }
+
+    /// 图片加载状态
+    private enum ImageLoadingState {
+        /// 加载中
+        case loading
+
+        /// 加载成功
+        case loaded(UIImage, CGSize)
+
+        /// 加载失败
+        case failed
+    }
+}
+
+/// 文章 Markdown 表格样式
+private struct ArticleMarkdownTableStyle: MarkdownTableStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        ScrollView(.horizontal) {
+            configuration.table
+                .markdownTableCellPadding(.vertical, 6)
+                .markdownTableCellPadding(.horizontal, 10)
+                .markdownTableCellOverlay {
+                    Rectangle()
+                        .strokeBorder(Color(.separator), lineWidth: 0.5)
+                }
+        }
+        .scrollIndicators(.automatic)
+        .padding(.vertical, 4)
     }
 }
 
@@ -145,27 +230,30 @@ struct ArticleDetailView: View {
 
             articleMetaRow(article: article, viewModel: viewModel)
 
-            StructuredText(article.content, parser: ImageLinkMarkdownParser())
+            MarkdownView(article.content)
                 .multilineTextAlignment(.leading)
-                .textual.textSelection(.enabled)
-                .textual.overflowMode(.scroll)
-                .textual.tableStyle(.overflow)
-                .textual.tableCellStyle(TableImageFixCellStyle())
+                .markdownTableStyle(ArticleMarkdownTableStyle())
+                .markdownBlockQuoteStyle(.github)
+                .markdownCodeBlockStyle(.default(lightTheme: "xcode", darkTheme: "dark"))
+                .markdownElementRenderer(
+                    .image(
+                        ArticleMarkdownImageRenderer { url in
+                            openImagePreview(url: url, article: article)
+                        },
+                        urlScheme: "http"
+                    )
+                )
+                .markdownElementRenderer(
+                    .image(
+                        ArticleMarkdownImageRenderer { url in
+                            openImagePreview(url: url, article: article)
+                        },
+                        urlScheme: "https"
+                    )
+                )
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, 4)
                 .environment(\.openURL, OpenURLAction { url in
-                    let urls = extractImageURLs(from: article.content)
-                    let urlString = url.absoluteString
-                    if urls.contains(urlString) {
-                        navigator.push(
-                            PhotoBrowserView(
-                                photoURLs: urls,
-                                initialIndex: urls.firstIndex(of: urlString) ?? 0,
-                                placeName: "图片预览"
-                            )
-                        )
-                        return .handled
-                    }
                     return .systemAction
                 })
 
@@ -332,6 +420,24 @@ struct ArticleDetailView: View {
     }
 
     // MARK: - 图片点击放大
+
+    /// 打开图片预览
+    /// - Parameters:
+    ///   - url: 图片 URL
+    ///   - article: 文章详情
+    private func openImagePreview(url: URL, article: Article) {
+        let urls = extractImageURLs(from: article.content)
+        let urlString = url.absoluteString
+        guard let initialIndex = urls.firstIndex(of: urlString) else { return }
+
+        navigator.push(
+            PhotoBrowserView(
+                photoURLs: urls,
+                initialIndex: initialIndex,
+                placeName: "图片预览"
+            )
+        )
+    }
 
     /// 从 Markdown 中提取所有图片 URL
     /// - Parameter markdown: Markdown 原文
