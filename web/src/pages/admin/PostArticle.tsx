@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 import { useAsyncEffect } from "@/hooks";
 import { Sparkles } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -81,42 +82,54 @@ const sanitize = (schema: any) => {
   return { ...schema, tagNames: tags, attributes };
 };
 
-// 图片上传函数
-const uploadImages = async (
-  files: File[],
-): Promise<{ url: string; alt: string; title: string }[]> => {
-  const results: { url: string; alt: string; title: string }[] = [];
-
-  for (const file of files) {
-    const formData = new FormData();
-    formData.append("uploadFile", file);
-
-    const response = await fetch(getApiUrl("/blog/admin/upload"), {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${getAccessToken()}`,
-      },
-      body: formData,
-    });
-
-    const data = await response.json();
-    if (data.url) {
-      results.push({
-        url: data.url,
-        alt: file.name,
-        title: file.name,
-      });
-    }
-  }
-
-  return results;
-};
-
 export default function PostArticle() {
   const [cates, setCates] = useState<CateListItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [useCustomPath, setUseCustomPath] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  // 图片上传函数（粘贴/拖拽图片时由 ByteMD 调用）
+  const uploadImages = async (
+    files: File[],
+  ): Promise<{ url: string; alt: string; title: string }[]> => {
+    const results: { url: string; alt: string; title: string }[] = [];
+
+    setUploading(true);
+    try {
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("uploadFile", file);
+
+        const response = await fetch(getApiUrl("/blog/admin/upload"), {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+          },
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`上传失败: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.url) {
+          results.push({
+            url: data.url,
+            alt: file.name,
+            title: file.name,
+          });
+        }
+      }
+    } catch (err) {
+      dialog.message(err instanceof Error ? err.message : "图片上传失败");
+    } finally {
+      setUploading(false);
+    }
+
+    return results;
+  };
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -401,7 +414,7 @@ export default function PostArticle() {
               render={({ field }) => (
                 <FormItem className="grid grid-cols-1">
                   <FormControl>
-                    <div className="bytemd-editor-wrapper">
+                    <div className="bytemd-editor-wrapper relative">
                       <Editor
                         value={contentValue || ""}
                         plugins={getPlugins()}
@@ -409,6 +422,14 @@ export default function PostArticle() {
                         onChange={(v) => field.onChange(v)}
                         uploadImages={uploadImages}
                       />
+                      {uploading && (
+                        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+                          <div className="flex flex-col items-center gap-2 text-sm text-gray-600">
+                            <Spinner className="size-6 animate-spin" />
+                            <span>正在上传图片...</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </FormControl>
                   <FormMessage />
