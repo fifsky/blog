@@ -5,7 +5,7 @@
 1、单数据库自动辅助测试函数
 
 ```go
-dbunit.Run(t, "testdata/schema.sql", func(t *testing.T, db *sql.DB) {
+dbunit.Run(t, schemaReader, func(t *testing.T, db *sql.DB) {
     row := db.QueryRow("select email from users where id = 1")
     var email string
     if err := row.Scan(&email); err != nil {
@@ -15,18 +15,19 @@ dbunit.Run(t, "testdata/schema.sql", func(t *testing.T, db *sql.DB) {
     if email != "test@test.cn" {
         t.Fatalf("user mismatch want %s,but get %s", "test@test.cn", email)
     }
-})
+}, fixtureMap)
 ```
 
-> dbunit.Run 会自动创建数据库，并且自动导入`testdata/fixtures`目录下面的测试数据
+> `schemaReader` 为 `io.Reader`（如 `bytes.NewReader(embeddedSchema)`），`fixtureMap` 为 `map[string][]byte`（文件名到内容的映射）。
+> 当 `fixtureMap` 为 `nil` 时，只创建表结构不加载测试数据。
 
 2、多数据库创建
 
 ```go
 dbunit.New(t, func(d *DBUnit) {
-    db := d.NewDatabase("testdata/schema.sql","testdata/fixtures/users.yml")
+    db := d.NewDatabase(schemaReader, fixtureMap)
     // more database
-    db2 = d.NewDatabase("testdata/schema2.sql")
+    db2 = d.NewDatabase(schemaReader2, nil)
     .....
 })
 ```
@@ -36,7 +37,7 @@ dbunit.New(t, func(d *DBUnit) {
 ### 使用脚本导出数据
 
 ```go
-db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:3306)/%s", os.Getenv("DEV_DATABASE_USERNAME"), os.Getenv("DEV_DATABASE_PASSWORD"), os.Getenv("DEV_DATABASE_HOST"), "example")+"?charset=utf8&parseTime=True&loc=Asia%2FShanghai")
+db, err := sql.Open("sqlite", fmt.Sprintf("file:%s?_pragma=foreign_keys(ON)", dbPath))
 if err != nil {
     t.Fatal("db open error:", err)
 }
@@ -76,7 +77,7 @@ if err != nil {
 
 ```go
 dbunit.New(t, func(d *DBUnit) {
-    db := d.NewDatabase("testdata/schema.sql","testdata/fixtures/users.yml")
+    db := d.NewDatabase(schemaReader, fixtureMap)
 
     gormDB, err := gorm.Open(mysql.New(mysql.Config{Conn: db}))
 })

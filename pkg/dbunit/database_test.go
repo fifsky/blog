@@ -10,7 +10,7 @@ import (
 )
 
 func TestNewDatabase(t *testing.T) {
-	tdb := newDatabase("./testdata/schema.sql")
+	tdb := newDatabase(testSchemaReader())
 	t.Cleanup(func() {
 		_ = tdb.Drop()
 	})

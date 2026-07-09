@@ -12,7 +12,7 @@ import (
 
 func TestMood_List(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("moods", "users")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("moods", "users"))
 		svc := NewMood(store.New(db))
 		resp, err := svc.List(context.Background(), apiv1.MoodListRequest_builder{Page: 1}.Build())
 		if err != nil || len(resp.GetList()) == 0 {

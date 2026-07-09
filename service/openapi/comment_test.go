@@ -16,7 +16,7 @@ import (
 
 func TestComment_List(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts"))
 		svc := NewComment(store.New(db), nil, nil, WithCommentModerator(&MockModerator{ShouldPass: true}))
 
 		resp, err := svc.List(context.Background(), apiv1.CommentListRequest_builder{PostId: 7}.Build())
@@ -110,7 +110,7 @@ func TestComment_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dbunit.New(t, func(d *dbunit.DBUnit) {
-				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts")...)
+				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts"))
 				ctx := context.Background()
 
 				svc := NewComment(store.New(db), nil, nil, WithCommentModerator(tt.moderator))
@@ -151,7 +151,7 @@ func TestComment_Create(t *testing.T) {
 func TestComment_Create_WebsiteNotIncludedInModeration(t *testing.T) {
 	// 验证网址不参与审核（避免被 AI 误判为广告），仅昵称和内容参与审核
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts"))
 		ctx := context.Background()
 
 		mock := &captureModerator{}
@@ -173,7 +173,7 @@ func TestComment_Create_WebsiteNotIncludedInModeration(t *testing.T) {
 
 func TestComment_New(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts"))
 		svc := NewComment(store.New(db), nil, nil, WithCommentModerator(&MockModerator{ShouldPass: true}))
 
 		resp, err := svc.New(context.Background(), nil)

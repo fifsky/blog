@@ -15,7 +15,7 @@ import (
 
 func TestAdminComment_List(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts"))
 		svc := NewComment(store.New(db))
 
 		resp, err := svc.List(context.Background(), adminv1.CommentListRequest_builder{Page: 1}.Build())
@@ -38,7 +38,7 @@ func TestAdminComment_List(t *testing.T) {
 
 func TestAdminComment_Delete(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts"))
 		svc := NewComment(store.New(db))
 
 		before, err := svc.List(context.Background(), adminv1.CommentListRequest_builder{Page: 1}.Build())
@@ -57,7 +57,7 @@ func TestAdminComment_Delete(t *testing.T) {
 func TestAdminComment_DeleteEmptyIds(t *testing.T) {
 	// 空 ID 数组调用不报错（store.DeleteComment 对空数组直接返回 nil）
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments"))
 		svc := NewComment(store.New(db))
 
 		_, err := svc.Delete(context.Background(), adminv1.CommentDeleteRequest_builder{Ids: []int32{}}.Build())

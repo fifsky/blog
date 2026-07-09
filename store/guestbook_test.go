@@ -61,7 +61,7 @@ func TestStore_ListGuestbook(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dbunit.New(t, func(d *dbunit.DBUnit) {
-				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook")...)
+				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook"))
 				s := New(db)
 
 				got, err := s.ListGuestbook(context.Background(), tt.keyword, tt.page, 10)
@@ -83,7 +83,7 @@ func parseTime(s string) time.Time {
 
 func TestStore_ListGuestbook_Order(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema())
+		db := d.NewDatabase(testutil.Schema(), nil)
 		s := New(db)
 
 		// 清空可能存在的默认数据
@@ -122,7 +122,7 @@ func TestStore_ListGuestbook_Order(t *testing.T) {
 
 func TestStore_CountGuestbookTotal(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook"))
 		s := New(db)
 
 		total, err := s.CountGuestbookTotal(context.Background(), "")
@@ -137,7 +137,7 @@ func TestStore_CountGuestbookTotal(t *testing.T) {
 
 func TestStore_CreateGuestbook(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema())
+		db := d.NewDatabase(testutil.Schema(), nil)
 		s := New(db)
 
 		// 获取创建前的总数

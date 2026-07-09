@@ -25,7 +25,7 @@ import (
 
 func TestClawBotLoginPersistsAccount(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options"))
 		s := store.New(db)
 		botToken := strings.Repeat("token-", 50)
 
@@ -89,7 +89,7 @@ func TestClawBotLoginPersistsAccount(t *testing.T) {
 
 func TestClawBotCheckLoginRefreshesQRCode(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options"))
 		s := store.New(db)
 		pollCount := 0
 
@@ -135,7 +135,7 @@ func TestClawBotCheckLoginRefreshesQRCode(t *testing.T) {
 
 func TestClawBotDisconnectClearsOptions(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options"))
 		s := store.New(db)
 		_, err := s.UpdateOptions(context.Background(), map[string]string{
 			"clawbot_account_id": "demo@im.bot",

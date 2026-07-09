@@ -12,7 +12,7 @@ import (
 
 func TestGeo_GetNearestRegion(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("regions")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("regions"))
 		svc := NewGeo(store.New(db))
 
 		// Test with valid coordinates (near Shanghai)

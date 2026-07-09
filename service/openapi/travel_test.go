@@ -12,7 +12,7 @@ import (
 
 func TestTravel_GetFootprints(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("footprints")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("footprints"))
 		svc := NewTravel(store.New(db))
 
 		resp, err := svc.GetFootprints(context.Background(), apiv1.GetFootprintsRequest_builder{}.Build())

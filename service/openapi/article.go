@@ -21,6 +21,11 @@ import (
 	"github.com/samber/lo"
 )
 
+const (
+	siteURL = "https://fifsky.com"
+	feedURL = "https://api.fifsky.com/blog/feed.xml"
+)
+
 var _ apiv1.ArticleServiceHTTPServer = (*Article)(nil)
 
 type Article struct {
@@ -193,31 +198,33 @@ func (a *Article) Detail(ctx context.Context, req *apiv1.ArticleDetailRequest) (
 
 // Feed 返回Atom XML
 func (a *Article) Feed(ctx context.Context, _ *emptypb.Empty) (*httpbody.HttpBody, error) {
-	now := time.Now()
 	options, err := a.store.GetOptions(ctx)
 	if err != nil {
 		return nil, err
 	}
-	feed := &feeds.Feed{
-		Title:       options["site_name"],
-		Link:        &feeds.Link{Href: "https://fifsky.com"},
-		Description: options["site_desc"],
-		Author:      &feeds.Author{Name: "fifsky", Email: "fifsky@gmail.com"},
-		Created:     now,
-	}
 	posts, err := a.store.ListPost(ctx, &model.Post{}, 1, 10, "", "", "")
 	if err != nil {
 		return nil, err
+	}
+	feedUpdated := latestPostCreatedAt(posts)
+	feed := &feeds.Feed{
+		Title:       options["site_name"],
+		Link:        &feeds.Link{Href: feedURL, Rel: "self"},
+		Description: options["site_desc"],
+		Author:      &feeds.Author{Name: "fifsky", Email: "fifsky@gmail.com"},
+		Updated:     feedUpdated,
 	}
 	uids := lo.Map(posts, func(item model.Post, index int) int {
 		return item.UserId
 	})
 	um, _ := a.store.GetUserByIds(ctx, lo.Uniq(uids))
 	for _, v := range posts {
+		articleURL := fmt.Sprintf("%s/article/%d", siteURL, v.Id)
 		feed.Items = append(feed.Items, &feeds.Item{
 			Title:       v.Title,
-			Link:        &feeds.Link{Href: fmt.Sprintf("https://fifsky.com/article/%d", v.Id)},
+			Link:        &feeds.Link{Href: articleURL},
 			Description: v.Content,
+			Id:          articleURL,
 			Author: &feeds.Author{
 				Name: func() string {
 					if u, ok := um[v.UserId]; ok {
@@ -227,7 +234,7 @@ func (a *Article) Feed(ctx context.Context, _ *emptypb.Empty) (*httpbody.HttpBod
 				}(),
 				Email: "fifsky@gmail.com",
 			},
-			Created: now,
+			Created: v.CreatedAt,
 		})
 	}
 	atom, err := feed.ToAtom()
@@ -235,7 +242,20 @@ func (a *Article) Feed(ctx context.Context, _ *emptypb.Empty) (*httpbody.HttpBod
 		return nil, err
 	}
 	return &httpbody.HttpBody{
-		ContentType: "application/xml; charset=utf-8",
+		ContentType: "application/atom+xml; charset=utf-8",
 		Data:        []byte(atom),
 	}, nil
+}
+
+func latestPostCreatedAt(posts []model.Post) time.Time {
+	var latest time.Time
+	for _, post := range posts {
+		if post.CreatedAt.After(latest) {
+			latest = post.CreatedAt
+		}
+	}
+	if latest.IsZero() {
+		return time.Now()
+	}
+	return latest
 }

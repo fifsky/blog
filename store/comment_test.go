@@ -14,7 +14,7 @@ import (
 
 func TestStore_ListComments(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts"))
 		s := New(db)
 
 		// comments.yml 中 post_id=7 的评论共 5 条
@@ -50,7 +50,7 @@ func TestStore_ListComments(t *testing.T) {
 
 	t.Run("不存在的文章返回空列表", func(t *testing.T) {
 		dbunit.New(t, func(d *dbunit.DBUnit) {
-			db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments")...)
+			db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments"))
 			s := New(db)
 
 			list, err := s.ListComments(context.Background(), 999)
@@ -62,7 +62,7 @@ func TestStore_ListComments(t *testing.T) {
 
 func TestStore_CreateComment(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments"))
 		s := New(db)
 
 		beforeList, err := s.ListComments(context.Background(), 7)
@@ -117,7 +117,7 @@ func TestStore_ListAllComments(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dbunit.New(t, func(d *dbunit.DBUnit) {
-				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts")...)
+				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts"))
 				s := New(db)
 
 				list, err := s.ListAllComments(context.Background(), tt.keyword, 1, 10)
@@ -135,7 +135,7 @@ func TestStore_ListAllComments(t *testing.T) {
 
 func TestStore_CountComments(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments"))
 		s := New(db)
 
 		total, err := s.CountComments(context.Background(), "")
@@ -150,7 +150,7 @@ func TestStore_CountComments(t *testing.T) {
 
 func TestStore_ListNewComments(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments", "posts"))
 		s := New(db)
 
 		list, err := s.ListNewComments(context.Background(), 10)
@@ -167,7 +167,7 @@ func TestStore_ListNewComments(t *testing.T) {
 
 func TestStore_DeleteComment(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments"))
 		s := New(db)
 
 		beforeTotal, err := s.CountComments(context.Background(), "")
@@ -183,7 +183,7 @@ func TestStore_DeleteComment(t *testing.T) {
 
 	t.Run("空ID不报错", func(t *testing.T) {
 		dbunit.New(t, func(d *dbunit.DBUnit) {
-			db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments")...)
+			db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("comments"))
 			s := New(db)
 
 			err := s.DeleteComment(context.Background(), []int{})

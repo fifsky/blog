@@ -96,6 +96,19 @@ func Files(files ...string) func(*Loader) error {
 	}
 }
 
+// Content 从内容映射加载 fixture（key 为文件名含扩展名，value 为 YAML 内容）
+// 适用于 go:embed 嵌入的 fixture 数据
+func Content(content map[string][]byte) func(*Loader) error {
+	return func(l *Loader) error {
+		fixtureFiles, err := l.fixturesFromContent(content)
+		if err != nil {
+			return err
+		}
+		l.fixturesFiles = append(l.fixturesFiles, fixtureFiles...)
+		return nil
+	}
+}
+
 // Location makes Loader use the given location by default when parsing
 // dates. If not given, by default it uses the value of time.Local.
 func Location(location *time.Location) func(*Loader) error {
@@ -267,5 +280,23 @@ func (l *Loader) fixturesFromFiles(fileNames ...string) ([]*fixtureFile, error) 
 		fixtureFiles = append(fixtureFiles, fixture)
 	}
 
+	return fixtureFiles, nil
+}
+
+// fixturesFromContent 从内容映射构建 fixtureFile（key 为文件名含扩展名，value 为 YAML 内容）
+func (l *Loader) fixturesFromContent(content map[string][]byte) ([]*fixtureFile, error) {
+	fixtureFiles := make([]*fixtureFile, 0, len(content))
+	for fileName, data := range content {
+		fixture := &fixtureFile{
+			path:     fileName,
+			fileName: fileName,
+		}
+		parsed, err := l.template.Parse(data)
+		if err != nil {
+			return nil, fmt.Errorf(`testfixtures: error on parsing template in %s: %w`, fileName, err)
+		}
+		fixture.content = parsed
+		fixtureFiles = append(fixtureFiles, fixture)
+	}
 	return fixtureFiles, nil
 }

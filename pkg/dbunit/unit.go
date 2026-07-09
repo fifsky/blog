@@ -3,8 +3,7 @@ package dbunit
 import (
 	"database/sql"
 	"fmt"
-	"os"
-	"strings"
+	"io"
 
 	"app/pkg/dbunit/fixtures"
 
@@ -16,7 +15,7 @@ type Testing struct {
 	db  *sql.DB
 }
 
-func NewTest(schema string) *Testing {
+func NewTest(schema io.Reader) *Testing {
 	tdb := newDatabase(schema)
 
 	// 打开 SQLite 测试数据库连接
@@ -47,43 +46,26 @@ func (d *Testing) Drop() {
 	}
 }
 
-// Load 加载 YAML fixture 文件到测试数据库
-func (d *Testing) Load(files ...string) {
+// Load 加载 YAML fixture 数据到测试数据库
+// data 为文件名到内容的映射，文件名需包含 .yml 扩展名（用于推断表名）
+func (d *Testing) Load(data map[string][]byte) {
+	if len(data) == 0 {
+		return
+	}
+
 	options := make([]func(*fixtures.Loader) error, 0)
 	options = append(options, fixtures.Database(d.db))
 	options = append(options, fixtures.SkipTestDatabaseCheck()) // 内存数据库跳过测试库检查
-
-	fs := make([]string, 0)
-	for _, file := range files {
-		if isDir(file) {
-			options = append(options, fixtures.Directory(file))
-		} else {
-			fs = append(fs, file)
-		}
-	}
-
-	if len(fs) > 0 {
-		options = append(options, fixtures.Files(fs...))
-	}
+	options = append(options, fixtures.Content(data))
 
 	f, err := fixtures.New(options...)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("db Load fixtures:%s\n", strings.Join(files, ","))
+	fmt.Printf("db Load fixtures:%d files\n", len(data))
 
 	if err := f.Load(); err != nil {
 		panic(err)
 	}
-}
-
-// isDir 判断路径是否为目录
-func isDir(path string) bool {
-	fio, err := os.Lstat(path)
-	if nil != err {
-		return false
-	}
-
-	return fio.IsDir()
 }

@@ -62,7 +62,7 @@ func TestGuestbook_List(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dbunit.New(t, func(d *dbunit.DBUnit) {
-				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook")...)
+				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook"))
 				svc := NewGuestbook(store.New(db), WithModerator(&MockModerator{ShouldPass: true}))
 
 				resp, err := svc.List(context.Background(), apiv1.GuestbookListRequest_builder{Page: tt.page}.Build())
@@ -134,7 +134,7 @@ func TestGuestbook_Create(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			dbunit.New(t, func(d *dbunit.DBUnit) {
 				// 加载schema，并加载guestbook fixtures
-				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook")...)
+				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook"))
 				ctx := context.Background()
 
 				svc := NewGuestbook(store.New(db), WithModerator(tt.moderator))
@@ -181,7 +181,7 @@ func TestGuestbook_Create(t *testing.T) {
 
 func TestGuestbook_Create_WithoutModerator(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook"))
 		ctx := context.Background()
 
 		// 不设置自定义审核器，应该也能正常创建

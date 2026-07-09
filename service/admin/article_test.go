@@ -7,7 +7,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 
@@ -24,7 +23,7 @@ import (
 
 func TestAdminArticle_CreateDeleteUpload(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts"))
 		conf := &config.Config{}
 		conf.OSS.Endpoint = "oss-cn-shanghai-internal.aliyuncs.com"
 		conf.OSS.AccessKey = "test"
@@ -52,19 +51,13 @@ func TestAdminArticle_CreateDeleteUpload(t *testing.T) {
 		svc.upl = mockUploader
 		mockUploader.EXPECT().Put(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 
-		rrf, err := os.Open(testutil.TestDataPath("go.png"))
-		if err != nil {
-			t.Fatalf("open file: %v", err)
-		}
-		defer rrf.Close()
-
 		bb := &bytes.Buffer{}
 		writer := multipart.NewWriter(bb)
 		part, err := writer.CreateFormFile("uploadFile", "go.png")
 		if err != nil {
 			t.Fatalf("formfile: %v", err)
 		}
-		if _, err = io.Copy(part, rrf); err != nil {
+		if _, err = io.Copy(part, bytes.NewReader(testutil.Image())); err != nil {
 			t.Fatalf("copy: %v", err)
 		}
 		writer.Close()

@@ -35,7 +35,7 @@ func (m *MockAIProvider) Generate(ctx context.Context, prompt, content string) (
 func TestMotto_GenerateDailyMotto(t *testing.T) {
 	// Prepare DB
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("moods", "users")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("moods", "users"))
 		s := store.New(db)
 
 		// Prepare Mock AI
@@ -79,7 +79,7 @@ func TestOpenAIProvider_GenerateWrapsAgentRun(t *testing.T) {
 	defer ts.Close()
 
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options"))
 		_, err := db.ExecContext(context.Background(), `insert into options (id, option_key, option_value) values
 			(20, 'ai_token', 'test-token'),
 			(21, 'ai_endpoint', ?),

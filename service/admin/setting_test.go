@@ -14,7 +14,7 @@ import (
 
 func TestAdminSetting_Update(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options"))
 		svc := NewSetting(store.New(db))
 
 		resp, err := svc.Update(context.Background(), adminv1.AdminSetting_builder{SiteName: "abc",

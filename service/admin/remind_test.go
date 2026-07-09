@@ -12,7 +12,7 @@ import (
 
 func TestAdminRemind_ListCreateDelete(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("reminds")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("reminds"))
 		svc := NewRemind(store.New(db))
 		resp, err := svc.List(context.Background(), adminv1.RemindListRequest_builder{Page: 1}.Build())
 		if err != nil || len(resp.GetList()) == 0 {

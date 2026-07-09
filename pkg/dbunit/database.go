@@ -3,7 +3,7 @@ package dbunit
 import (
 	"database/sql"
 	"fmt"
-	"os"
+	"io"
 	"regexp"
 	"sync/atomic"
 	"time"
@@ -21,13 +21,13 @@ type database struct {
 	db   *sql.DB
 }
 
-func newDatabase(schema string) *database {
+func newDatabase(schema io.Reader) *database {
 	atomic.AddInt32(&id, 1)
 	name := fmt.Sprintf("test_%d_%d", time.Now().UnixNano(), id)
 	return newDatabaseWithName(name, schema)
 }
 
-func newDatabaseWithName(name string, schema string) *database {
+func newDatabaseWithName(name string, schema io.Reader) *database {
 	d := &database{name: name}
 
 	err := d.connection()
@@ -64,15 +64,11 @@ func (d *database) Drop() error {
 	return nil
 }
 
-// Import 导入 schema 文件，执行所有 CREATE TABLE 语句
-func (d *database) Import(schema string) error {
-	if !isExists(schema) {
-		return fmt.Errorf("sql file not found:%s", schema)
-	}
-
-	content, err := os.ReadFile(schema)
+// Import 导入 schema，从 io.Reader 读取 SQL 并执行所有 CREATE TABLE/INDEX/TRIGGER 语句
+func (d *database) Import(r io.Reader) error {
+	content, err := io.ReadAll(r)
 	if err != nil {
-		return err
+		return fmt.Errorf("read schema error: %w", err)
 	}
 
 	// 提取所有 CREATE TABLE 语句

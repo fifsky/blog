@@ -12,7 +12,7 @@ import (
 
 func TestSetting_GetOptions(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
-		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options")...)
+		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options"))
 		s := New(db)
 		ret, err := s.GetOptions(context.Background())
 		assert.NoError(t, err)
@@ -50,7 +50,7 @@ func TestSetting_UpdateOptions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dbunit.New(t, func(d *dbunit.DBUnit) {
-				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options")...)
+				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options"))
 				s := New(db)
 
 				_, err := s.UpdateOptions(context.Background(), tt.kv)
