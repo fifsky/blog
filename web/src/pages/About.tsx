@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { CalendarDays, CircleDot, Clock, Sparkles } from "lucide-react";
+import { CalendarDays, Clock } from "lucide-react";
 import { Comment } from "@/components/Comment";
 import { PageTransition } from "@/components/PageTransition";
 import { SkeletonArticle } from "@/components/Skeleton";
@@ -109,63 +109,32 @@ export default function About() {
       <PageTransition loading={loading}>
         <div className="mx-auto mb-[10px] max-w-[720px]">
           {/* 标题区域 */}
-          <header className="relative mb-9 overflow-hidden border-b border-primary/15 pb-7">
+          <header className="relative mb-9 min-h-[58px] overflow-hidden border-b border-primary/15 pb-7">
             <div className="pointer-events-none absolute right-0 top-0 hidden select-none text-[58px] font-black leading-none tracking-normal text-primary/5 sm:block">
               ABOUT
-            </div>
-            <div className="relative">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                <div className="min-w-0">
-                  <h1 className="text-[28px] font-bold leading-tight tracking-normal text-foreground">
-                    {article.title}
-                  </h1>
-                </div>
-              </div>
             </div>
           </header>
 
           {/* 时间轴 */}
           <div className="relative">
             <div
-              className="absolute bottom-14 left-[21px] top-1 w-px bg-gradient-to-b from-primary/10 via-primary/35 to-primary/10 sm:left-1/2 sm:-translate-x-1/2"
+              className="absolute bottom-14 left-[70px] top-1 w-px bg-gradient-to-b from-primary/10 via-primary/35 to-primary/10 sm:left-1/2 sm:-translate-x-1/2"
               aria-hidden="true"
             />
             <ol aria-label="关于我的时间线">
               {entries.map((entry, index) => {
-                const isLast = index === entries.length - 1;
                 const cardOnRight = index % 2 === 1;
 
                 return (
                   <li
                     key={`${entry.date}-${index}`}
-                    className="group relative grid grid-cols-[44px_minmax(0,1fr)] gap-4 pb-6 sm:grid-cols-[minmax(0,1fr)_70px_minmax(0,1fr)] sm:gap-0"
+                    className="group relative grid grid-cols-[140px_minmax(0,1fr)] items-center gap-6 pb-6 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:gap-0"
                   >
-                    <div
-                      className={cn(
-                        "hidden pt-2 sm:flex sm:flex-col",
-                        cardOnRight
-                          ? "sm:col-start-1 sm:items-end sm:pr-5 sm:text-right"
-                          : "sm:col-start-3 sm:items-start sm:pl-5",
-                      )}
-                      aria-hidden="true"
-                    >
-                      <span className="font-mono text-[28px] font-bold leading-none tracking-normal text-primary/35">
-                        {entry.year}
-                      </span>
-                      <span className="mt-1 text-xs font-semibold text-muted-foreground/70">
-                        {entry.detail}
-                      </span>
-                    </div>
-
-                    {/* 时间脊线节点 */}
+                    {/* 日期节点 */}
                     <div className="relative z-10 col-start-1 row-start-1 flex justify-center sm:col-start-2">
-                      <span
-                        className={cn(
-                          "flex items-center justify-center rounded-full bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110",
-                          isLast ? "size-7" : "size-6",
-                        )}
-                      >
-                        <CircleDot className="size-4" aria-hidden="true" />
+                      <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
+                        <CalendarDays className="size-3.5" aria-hidden="true" />
+                        {entry.date}
                       </span>
                     </div>
 
@@ -174,35 +143,13 @@ export default function About() {
                       className={cn(
                         "col-start-2 row-start-1 min-w-0",
                         cardOnRight
-                          ? "sm:col-start-3 sm:pl-5"
-                          : "sm:col-start-1 sm:pr-5 sm:text-right",
+                          ? "sm:col-start-3 sm:pl-6"
+                          : "sm:col-start-1 sm:pr-6 sm:text-right",
                       )}
                     >
-                      <div>
-                        <div
-                          className={cn(
-                            "flex flex-wrap items-center gap-2",
-                            !cardOnRight && "sm:justify-end",
-                          )}
-                        >
-                          <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-                            <CalendarDays className="size-3.5" aria-hidden="true" />
-                            {entry.date}
-                          </span>
-                          <span className="inline-flex items-center rounded-full border border-border/70 px-2 py-0.5 font-mono text-[11px] text-muted-foreground">
-                            #{entry.sequence}
-                          </span>
-                          {isLast ? (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
-                              <Sparkles className="size-3" aria-hidden="true" />
-                              现在
-                            </span>
-                          ) : null}
-                        </div>
-                        <p className="mt-3 text-[15px] leading-[1.9] text-foreground/85 transition-colors duration-300 group-hover:text-foreground">
-                          {entry.description}
-                        </p>
-                      </div>
+                      <p className="text-[15px] leading-[1.9] text-foreground/85 transition-colors duration-300 group-hover:text-foreground">
+                        {entry.description}
+                      </p>
                     </article>
                   </li>
                 );
@@ -210,7 +157,7 @@ export default function About() {
             </ol>
 
             {/* 结尾标记 */}
-            <div className="relative grid grid-cols-[44px_minmax(0,1fr)] gap-4 sm:grid-cols-[minmax(0,1fr)_70px_minmax(0,1fr)] sm:gap-y-1">
+            <div className="relative grid grid-cols-[140px_minmax(0,1fr)] gap-6 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:gap-y-1">
               <div className="relative z-10 col-start-1 flex justify-center sm:col-start-2">
                 <div className="flex size-10 items-center justify-center text-primary/60">
                   <Clock className="size-5" aria-hidden="true" />

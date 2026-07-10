@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -79,6 +80,11 @@ func (m *Manager) Start(ctx context.Context) error {
 		return fmt.Errorf("[litestream] failed to open store: %w", err)
 	}
 
+	// 设置自定义日志处理器，过滤无数据变更时的冗余 "replica sync" 日志
+	// Litestream 每次同步周期都会输出 replica sync 日志，即使 txid.replica == txid.db（无变更），
+	// 这里拦截并丢弃这些无意义的冗余日志
+	m.db.SetLogger(slog.New(&noopSyncFilterHandler{inner: m.db.Logger.Handler()}))
+
 	log.Printf("[litestream] replication started → %s", m.replicaURI)
 	return nil
 }
@@ -113,4 +119,48 @@ func replicaPath(conf *config.Config) string {
 		suffix = "prod"
 	}
 	return strings.TrimRight(conf.Litestream.Path, "/") + "/" + suffix
+}
+
+// noopSyncFilterHandler 包装 slog.Handler，过滤掉 txid.replica == txid.db 的冗余 "replica sync" 日志。
+// Litestream 每个同步周期都会输出 replica sync 日志，当副本位置与数据库位置一致时表示无数据变更，
+// 此类日志无意义且刷屏，故拦截丢弃。
+type noopSyncFilterHandler struct {
+	inner slog.Handler
+}
+
+func (h *noopSyncFilterHandler) Enabled(ctx context.Context, level slog.Level) bool {
+	return h.inner.Enabled(ctx, level)
+}
+
+func (h *noopSyncFilterHandler) Handle(ctx context.Context, r slog.Record) error {
+	// 仅过滤 "replica sync" 日志中 txid.replica == txid.db 的情况（无数据变更）
+	if r.Message == "replica sync" {
+		var replicaTXID, dbTXID string
+		r.Attrs(func(a slog.Attr) bool {
+			if a.Key == "txid" && a.Value.Kind() == slog.KindGroup {
+				for _, sub := range a.Value.Group() {
+					switch sub.Key {
+					case "replica":
+						replicaTXID = sub.Value.String()
+					case "db":
+						dbTXID = sub.Value.String()
+					}
+				}
+			}
+			return true
+		})
+		// 副本位置与数据库位置一致，说明无新数据需要同步，丢弃冗余日志
+		if replicaTXID != "" && replicaTXID == dbTXID {
+			return nil
+		}
+	}
+	return h.inner.Handle(ctx, r)
+}
+
+func (h *noopSyncFilterHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
+	return &noopSyncFilterHandler{inner: h.inner.WithAttrs(attrs)}
+}
+
+func (h *noopSyncFilterHandler) WithGroup(name string) slog.Handler {
+	return &noopSyncFilterHandler{inner: h.inner.WithGroup(name)}
 }
