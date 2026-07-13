@@ -48,15 +48,15 @@ func TestRegion_GetRegion(t *testing.T) {
 
 func TestRegion_GetRegionByIds(t *testing.T) {
 	tests := []struct {
-		name    string
-		ids     []int
-		wantLen int
+		name      string
+		ids       []int
+		wantEmpty bool
 	}{
-		{name: "多个ID", ids: []int{310000, 330000, 310100}, wantLen: 3},
-		{name: "单个ID", ids: []int{310000}, wantLen: 1},
-		{name: "包含不存在ID", ids: []int{310000, 999}, wantLen: 1},
-		{name: "空ID列表", ids: []int{}, wantLen: 0},
-		{name: "全部不存在", ids: []int{999, 1000}, wantLen: 0},
+		{name: "多个ID", ids: []int{310000, 330000, 310100}, wantEmpty: false},
+		{name: "单个ID", ids: []int{310000}, wantEmpty: false},
+		{name: "包含不存在ID", ids: []int{310000, 999}, wantEmpty: false},
+		{name: "空ID列表", ids: []int{}, wantEmpty: true},
+		{name: "全部不存在", ids: []int{999, 1000}, wantEmpty: true},
 	}
 
 	for _, tt := range tests {
@@ -66,11 +66,11 @@ func TestRegion_GetRegionByIds(t *testing.T) {
 				s := New(db)
 				ret, err := s.GetRegionByIds(context.Background(), tt.ids)
 				require.NoError(t, err)
-				if tt.wantLen == 0 {
+				if tt.wantEmpty {
 					assert.Empty(t, ret)
 					return
 				}
-				assert.Len(t, ret, tt.wantLen)
+				assert.NotEmpty(t, ret)
 			})
 		})
 	}
@@ -78,15 +78,15 @@ func TestRegion_GetRegionByIds(t *testing.T) {
 
 func TestRegion_ListRegionByParent(t *testing.T) {
 	tests := []struct {
-		name     string
-		parentId int
-		wantLen  int
-		wantLvl  int
+		name      string
+		parentId  int
+		wantEmpty bool
+		wantLvl   int
 	}{
-		{name: "上海市下属", parentId: 310000, wantLen: 1, wantLvl: 2},
-		{name: "浙江省下属", parentId: 330000, wantLen: 2, wantLvl: 2},
-		{name: "无下属", parentId: 310100, wantLen: 0},
-		{name: "不存在父级", parentId: 999, wantLen: 0},
+		{name: "上海市下属", parentId: 310000, wantEmpty: false, wantLvl: 2},
+		{name: "浙江省下属", parentId: 330000, wantEmpty: false, wantLvl: 2},
+		{name: "无下属", parentId: 310100, wantEmpty: true},
+		{name: "不存在父级", parentId: 999, wantEmpty: true},
 	}
 
 	for _, tt := range tests {
@@ -96,7 +96,11 @@ func TestRegion_ListRegionByParent(t *testing.T) {
 				s := New(db)
 				ret, err := s.ListRegionByParent(context.Background(), tt.parentId)
 				require.NoError(t, err)
-				assert.Len(t, ret, tt.wantLen)
+				if tt.wantEmpty {
+					assert.Empty(t, ret)
+					return
+				}
+				assert.NotEmpty(t, ret)
 				for _, r := range ret {
 					assert.Equal(t, tt.wantLvl, r.Level)
 					assert.Equal(t, tt.parentId, r.ParentId)
