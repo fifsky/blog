@@ -9,6 +9,7 @@ import (
 	"app/store"
 	"app/store/model"
 
+	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -29,8 +30,7 @@ func (f *Footprint) List(ctx context.Context, req *adminv1.FootprintListRequest)
 		return nil, err
 	}
 
-	items := make([]*adminv1.FootprintItem, 0, len(footprints))
-	for _, v := range footprints {
+	items := lo.Map(footprints, func(v *model.Footprint, _ int) *adminv1.FootprintItem {
 		item := adminv1.FootprintItem_builder{Id: int32(v.Id),
 			Name:        v.Name,
 			Description: v.Description,
@@ -44,14 +44,13 @@ func (f *Footprint) List(ctx context.Context, req *adminv1.FootprintListRequest)
 
 		item.SetCategories(append(item.GetCategories(), v.Categories...))
 
-		for _, p := range v.Photos {
-			item.SetPhotos(append(item.GetPhotos(), adminv1.FootprintPhotoItem_builder{Src: p.Src,
-				Thumbnail: p.Thumbnail}.Build(),
-			))
-		}
+		photos := lo.Map(v.Photos, func(p model.FootprintPhoto, _ int) *adminv1.FootprintPhotoItem {
+			return adminv1.FootprintPhotoItem_builder{Src: p.Src, Thumbnail: p.Thumbnail}.Build()
+		})
+		item.SetPhotos(photos)
 
-		items = append(items, item)
-	}
+		return item
+	})
 
 	total, err := f.store.CountFootprintTotal(ctx)
 	if err != nil {
@@ -94,39 +93,31 @@ func (f *Footprint) Update(ctx context.Context, req *adminv1.FootprintUpdateRequ
 	u := &model.UpdateFootprint{Id: int(req.GetId())}
 
 	if req.GetName() != "" {
-		v := req.GetName()
-		u.Name = &v
+		u.Name = new(req.GetName())
 	}
 	if req.GetDescription() != "" {
-		v := req.GetDescription()
-		u.Description = &v
+		u.Description = new(req.GetDescription())
 	}
 	if req.GetLongitude() != "" {
-		v := req.GetLongitude()
-		u.Longitude = &v
+		u.Longitude = new(req.GetLongitude())
 	}
 	if req.GetLatitude() != "" {
-		v := req.GetLatitude()
-		u.Latitude = &v
+		u.Latitude = new(req.GetLatitude())
 	}
 	if req.GetDate() != "" {
-		v := req.GetDate()
-		u.Date = &v
+		u.Date = new(req.GetDate())
 	}
 	if req.GetMarkerColor() != "" {
-		v := req.GetMarkerColor()
-		u.MarkerColor = &v
+		u.MarkerColor = new(req.GetMarkerColor())
 	}
 	if req.GetCategories() != nil {
 		u.Categories = req.GetCategories()
 	}
 	if req.GetUrl() != "" {
-		v := req.GetUrl()
-		u.Url = &v
+		u.Url = new(req.GetUrl())
 	}
 	if req.GetUrlLabel() != "" {
-		v := req.GetUrlLabel()
-		u.UrlLabel = &v
+		u.UrlLabel = new(req.GetUrlLabel())
 	}
 	if req.GetPhotoUrls() != nil {
 		u.PhotoUrls = req.GetPhotoUrls()

@@ -6,7 +6,9 @@ import (
 
 	adminv1 "app/proto/gen/admin/v1"
 	"app/store"
+	"app/store/model"
 
+	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -30,9 +32,8 @@ func (c *Comment) List(ctx context.Context, req *adminv1.CommentListRequest) (*a
 		return nil, err
 	}
 
-	items := make([]*adminv1.CommentItem, 0, len(comments))
-	for _, cm := range comments {
-		items = append(items, adminv1.CommentItem_builder{
+	items := lo.Map(comments, func(cm model.CommentWithPost, _ int) *adminv1.CommentItem {
+		return adminv1.CommentItem_builder{
 			Id:        int32(cm.Id),
 			PostId:    int32(cm.PostId),
 			Pid:       int32(cm.Pid),
@@ -45,8 +46,8 @@ func (c *Comment) List(ctx context.Context, req *adminv1.CommentListRequest) (*a
 			CreatedAt: cm.CreatedAt.Format(time.DateTime),
 			PostTitle: cm.PostTitle,
 			PostUrl:   cm.PostUrl,
-		}.Build())
-	}
+		}.Build()
+	})
 
 	total, err := c.store.CountComments(ctx, req.GetKeyword())
 	if err != nil {
@@ -58,10 +59,7 @@ func (c *Comment) List(ctx context.Context, req *adminv1.CommentListRequest) (*a
 
 // Delete 批量删除评论
 func (c *Comment) Delete(ctx context.Context, req *adminv1.CommentDeleteRequest) (*emptypb.Empty, error) {
-	ids := make([]int, len(req.GetIds()))
-	for i, id := range req.GetIds() {
-		ids[i] = int(id)
-	}
+	ids := lo.Map(req.GetIds(), func(id int32, _ int) int { return int(id) })
 	if err := c.store.DeleteComment(ctx, ids); err != nil {
 		return nil, err
 	}

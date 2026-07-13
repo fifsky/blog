@@ -9,6 +9,7 @@ import (
 	"app/store"
 	"app/store/model"
 
+	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -40,8 +41,7 @@ func (m *Mood) Create(ctx context.Context, req *adminv1.MoodCreateRequest) (*typ
 func (m *Mood) Update(ctx context.Context, req *adminv1.MoodUpdateRequest) (*types.IDResponse, error) {
 	u := &model.UpdateMood{Id: int(req.GetId())}
 	if req.GetContent() != "" {
-		v := req.GetContent()
-		u.Content = &v
+		u.Content = new(req.GetContent())
 	}
 	if err := m.store.UpdateMood(ctx, u); err != nil {
 		return nil, err
@@ -50,10 +50,7 @@ func (m *Mood) Update(ctx context.Context, req *adminv1.MoodUpdateRequest) (*typ
 }
 
 func (m *Mood) Delete(ctx context.Context, req *adminv1.MoodDeleteRequest) (*emptypb.Empty, error) {
-	ids := make([]int, len(req.GetIds()))
-	for i, id := range req.GetIds() {
-		ids[i] = int(id)
-	}
+	ids := lo.Map(req.GetIds(), func(id int32, _ int) int { return int(id) })
 	if err := m.store.DeleteMood(ctx, ids); err != nil {
 		return nil, err
 	}

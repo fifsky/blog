@@ -12,6 +12,7 @@ import (
 	"app/store"
 	"app/store/model"
 
+	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -31,17 +32,15 @@ func (r *Remind) List(ctx context.Context, req *adminv1.RemindListRequest) (*adm
 	if err != nil {
 		return nil, err
 	}
-	items := make([]*adminv1.RemindItem, 0, len(reminds))
-	for _, v := range reminds {
-		items = append(items, adminv1.RemindItem_builder{Id: int32(v.Id),
+	items := lo.Map(reminds, func(v *model.Remind, _ int) *adminv1.RemindItem {
+		return adminv1.RemindItem_builder{Id: int32(v.Id),
 			Cron:      v.Cron,
 			Content:   v.Content,
 			Status:    string(v.Status),
 			NextTime:  v.NextTime.Format(time.DateTime),
 			CreatedAt: v.CreatedAt.Format(time.DateTime),
-			UpdatedAt: v.UpdatedAt.Format(time.DateTime)}.Build(),
-		)
-	}
+			UpdatedAt: v.UpdatedAt.Format(time.DateTime)}.Build()
+	})
 	total, err := r.store.CountRemindTotal(ctx)
 	if err != nil {
 		return nil, err
@@ -77,16 +76,13 @@ func (r *Remind) Update(ctx context.Context, req *adminv1.RemindUpdateRequest) (
 	u := &model.UpdateRemind{Id: int(req.GetId())}
 
 	if req.GetCron() != "" {
-		v := req.GetCron()
-		u.Cron = &v
+		u.Cron = new(req.GetCron())
 	}
 	if req.GetContent() != "" {
-		v := req.GetContent()
-		u.Content = &v
+		u.Content = new(req.GetContent())
 	}
 	if req.GetStatus() != "" {
-		v := model.RemindStatus(req.GetStatus())
-		u.Status = &v
+		u.Status = new(model.RemindStatus(req.GetStatus()))
 	}
 
 	nextTime := remindutil.NextTimeFromRule(time.Now(), &model.Remind{

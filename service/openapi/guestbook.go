@@ -10,6 +10,8 @@ import (
 	"app/server/middleware"
 	"app/store"
 	"app/store/model"
+
+	"github.com/samber/lo"
 )
 
 var _ apiv1.GuestbookServiceHTTPServer = (*Guestbook)(nil)
@@ -59,17 +61,14 @@ func (g *Guestbook) List(ctx context.Context, req *apiv1.GuestbookListRequest) (
 		return nil, err
 	}
 
-	items := make([]*apiv1.GuestbookItem, 0, len(guestbooks))
-	for _, gb := range guestbooks {
-		item := apiv1.GuestbookItem_builder{Id: int32(gb.Id),
+	items := lo.Map(guestbooks, func(gb model.Guestbook, _ int) *apiv1.GuestbookItem {
+		return apiv1.GuestbookItem_builder{Id: int32(gb.Id),
 			Name:      gb.Name,
 			Content:   gb.Content,
 			Ip:        gb.Ip,
 			CreatedAt: gb.CreatedAt.Format(time.DateTime),
 			Top:       int32(gb.Top)}.Build()
-
-		items = append(items, item)
-	}
+	})
 
 	total, err := g.store.CountGuestbookTotal(ctx, req.GetKeyword())
 	if err != nil {

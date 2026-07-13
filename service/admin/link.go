@@ -9,6 +9,7 @@ import (
 	"app/store"
 	"app/store/model"
 
+	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -27,17 +28,15 @@ func (l *Link) List(ctx context.Context, _ *emptypb.Empty) (*adminv1.LinkListRes
 	if err != nil {
 		return nil, err
 	}
-	items := make([]*adminv1.LinkItem, 0, len(links))
-	for _, v := range links {
-		items = append(items, adminv1.LinkItem_builder{Id: int32(v.Id),
+	items := lo.Map(links, func(v *model.Link, _ int) *adminv1.LinkItem {
+		return adminv1.LinkItem_builder{Id: int32(v.Id),
 			Name:      v.Name,
 			Url:       v.Url,
 			Desc:      v.Desc,
 			Status:    string(v.Status),
 			CreatedAt: v.CreatedAt.Format(time.DateTime),
-			UpdatedAt: v.UpdatedAt.Format(time.DateTime)}.Build(),
-		)
-	}
+			UpdatedAt: v.UpdatedAt.Format(time.DateTime)}.Build()
+	})
 	return adminv1.LinkListResponse_builder{List: items,
 			Total: int32(len(items))}.Build(),
 		nil
@@ -62,16 +61,13 @@ func (l *Link) Create(ctx context.Context, req *adminv1.LinkCreateRequest) (*typ
 func (l *Link) Update(ctx context.Context, req *adminv1.LinkUpdateRequest) (*types.IDResponse, error) {
 	u := &model.UpdateLink{Id: int(req.GetId())}
 	if req.GetName() != "" {
-		v := req.GetName()
-		u.Name = &v
+		u.Name = new(req.GetName())
 	}
 	if req.GetUrl() != "" {
-		v := req.GetUrl()
-		u.Url = &v
+		u.Url = new(req.GetUrl())
 	}
 	if req.GetDesc() != "" {
-		v := req.GetDesc()
-		u.Desc = &v
+		u.Desc = new(req.GetDesc())
 	}
 	if err := l.store.UpdateLink(ctx, u); err != nil {
 		return nil, err

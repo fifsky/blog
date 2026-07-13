@@ -18,6 +18,7 @@ import (
 	"app/store"
 	"app/store/model"
 
+	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -67,31 +68,24 @@ func (a *Article) Update(ctx context.Context, req *adminv1.ArticleUpdateRequest)
 	now := time.Now()
 	u := &model.UpdatePost{Id: int(req.GetId())}
 	if req.GetCateId() > 0 {
-		v := int(req.GetCateId())
-		u.CateId = &v
+		u.CateId = new(int(req.GetCateId()))
 	}
 	if req.GetType() > 0 {
-		v := int(req.GetType())
-		u.Type = &v
+		u.Type = new(int(req.GetType()))
 	}
 	if req.GetStatus() != "" {
-		v := model.PostStatus(req.GetStatus())
-		u.Status = &v
+		u.Status = new(model.PostStatus(req.GetStatus()))
 	}
 	if req.GetTitle() != "" {
-		v := req.GetTitle()
-		u.Title = &v
+		u.Title = new(req.GetTitle())
 	}
 	// 始终更新 url 字段，允许清空自定义路径
-	urlVal := req.GetUrl()
-	u.Url = &urlVal
+	u.Url = new(req.GetUrl())
 	if req.GetContent() != "" {
-		v := req.GetContent()
-		u.Content = &v
+		u.Content = new(req.GetContent())
 	}
 	if req.GetTags() != nil {
-		v := model.Tags(req.GetTags())
-		u.Tags = &v
+		u.Tags = new(model.Tags(req.GetTags()))
 	}
 	u.UpdatedAt = &now
 	if err := a.store.UpdatePost(ctx, u); err != nil {
@@ -101,12 +95,9 @@ func (a *Article) Update(ctx context.Context, req *adminv1.ArticleUpdateRequest)
 }
 
 func (a *Article) Delete(ctx context.Context, req *adminv1.ArticleDeleteRequest) (*emptypb.Empty, error) {
-	ids := make([]int, 0, len(req.GetIds()))
-	for _, id := range req.GetIds() {
-		if id > 0 {
-			ids = append(ids, int(id))
-		}
-	}
+	ids := lo.FilterMap(req.GetIds(), func(id int32, _ int) (int, bool) {
+		return int(id), id > 0
+	})
 	if len(ids) == 0 {
 		return &emptypb.Empty{}, nil
 	}
@@ -117,12 +108,9 @@ func (a *Article) Delete(ctx context.Context, req *adminv1.ArticleDeleteRequest)
 }
 
 func (a *Article) Restore(ctx context.Context, req *adminv1.ArticleRestoreRequest) (*types.IDResponse, error) {
-	ids := make([]int, 0, len(req.GetIds()))
-	for _, id := range req.GetIds() {
-		if id > 0 {
-			ids = append(ids, int(id))
-		}
-	}
+	ids := lo.FilterMap(req.GetIds(), func(id int32, _ int) (int, bool) {
+		return int(id), id > 0
+	})
 	if len(ids) == 0 {
 		return types.IDResponse_builder{}.Build(), nil
 	}
@@ -137,12 +125,9 @@ func (a *Article) Restore(ctx context.Context, req *adminv1.ArticleRestoreReques
 }
 
 func (a *Article) Destroy(ctx context.Context, req *adminv1.ArticleDestroyRequest) (*emptypb.Empty, error) {
-	ids := make([]int, 0, len(req.GetIds()))
-	for _, id := range req.GetIds() {
-		if id > 0 {
-			ids = append(ids, int(id))
-		}
-	}
+	ids := lo.FilterMap(req.GetIds(), func(id int32, _ int) (int, bool) {
+		return int(id), id > 0
+	})
 	if len(ids) == 0 {
 		return &emptypb.Empty{}, nil
 	}
@@ -195,22 +180,17 @@ func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*a
 	if err != nil {
 		return nil, err
 	}
-	items := make([]*adminv1.ArticleItem, 0, len(posts))
-	uids := make([]int, 0, len(posts))
-	cids := make([]int, 0, len(posts))
-	for _, p := range posts {
-		uids = append(uids, p.UserId)
-		cids = append(cids, p.CateId)
-	}
-	um, err := a.store.GetUserByIds(ctx, uids)
+	uids := lo.Map(posts, func(p model.Post, _ int) int { return p.UserId })
+	cids := lo.Map(posts, func(p model.Post, _ int) int { return p.CateId })
+	um, err := a.store.GetUserByIds(ctx, lo.Uniq(uids))
 	if err != nil {
 		return nil, err
 	}
-	cm, err := a.store.GetCatesByIds(ctx, cids)
+	cm, err := a.store.GetCatesByIds(ctx, lo.Uniq(cids))
 	if err != nil {
 		return nil, err
 	}
-	for _, p := range posts {
+	items := lo.Map(posts, func(p model.Post, _ int) *adminv1.ArticleItem {
 		item := adminv1.ArticleItem_builder{Id: int32(p.Id),
 			CateId:    int32(p.CateId),
 			Type:      int32(p.Type),
@@ -230,8 +210,8 @@ func (a *Article) List(ctx context.Context, req *adminv1.ArticleListRequest) (*a
 		if c, ok := cm[p.CateId]; ok {
 			item.SetCate(types.CateSummary_builder{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}.Build())
 		}
-		items = append(items, item)
-	}
+		return item
+	})
 	total, err := a.store.CountPostsForAdmin(ctx, &model.Post{
 		Type:   int(req.GetType()),
 		Status: model.PostStatus(req.GetStatus()),

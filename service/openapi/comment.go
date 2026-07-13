@@ -17,6 +17,7 @@ import (
 	"app/store/model"
 
 	"github.com/goapt/logger"
+	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -69,9 +70,8 @@ func (c *Comment) List(ctx context.Context, req *apiv1.CommentListRequest) (*api
 		return nil, err
 	}
 
-	items := make([]*apiv1.CommentItem, 0, len(comments))
-	for _, cm := range comments {
-		items = append(items, apiv1.CommentItem_builder{
+	items := lo.Map(comments, func(cm model.Comment, _ int) *apiv1.CommentItem {
+		return apiv1.CommentItem_builder{
 			Id:        int32(cm.Id),
 			Pid:       int32(cm.Pid),
 			Name:      cm.Name,
@@ -80,8 +80,8 @@ func (c *Comment) List(ctx context.Context, req *apiv1.CommentListRequest) (*api
 			Content:   cm.Content,
 			ReplyName: cm.ReplyName,
 			CreatedAt: cm.CreatedAt.Format(time.DateTime),
-		}.Build())
-	}
+		}.Build()
+	})
 
 	return apiv1.CommentListResponse_builder{List: items}.Build(), nil
 }
@@ -156,9 +156,8 @@ func (c *Comment) New(ctx context.Context, _ *emptypb.Empty) (*apiv1.CommentNewR
 		return nil, err
 	}
 
-	items := make([]*apiv1.CommentNewItem, 0, len(comments))
-	for _, cm := range comments {
-		items = append(items, apiv1.CommentNewItem_builder{
+	items := lo.Map(comments, func(cm model.CommentWithPost, _ int) *apiv1.CommentNewItem {
+		return apiv1.CommentNewItem_builder{
 			Id:        int32(cm.Id),
 			PostId:    int32(cm.PostId),
 			Name:      cm.Name,
@@ -167,8 +166,8 @@ func (c *Comment) New(ctx context.Context, _ *emptypb.Empty) (*apiv1.CommentNewR
 			CreatedAt: cm.CreatedAt.Format(time.DateTime),
 			PostTitle: cm.PostTitle,
 			PostUrl:   cm.PostUrl,
-		}.Build())
-	}
+		}.Build()
+	})
 
 	return apiv1.CommentNewResponse_builder{List: items}.Build(), nil
 }

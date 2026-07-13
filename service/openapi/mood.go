@@ -32,8 +32,7 @@ func (m *Mood) List(ctx context.Context, req *apiv1.MoodListRequest) (*apiv1.Moo
 	uids := lo.Map(moods, func(item model.Mood, index int) int { return item.UserId })
 	um, _ := m.store.GetUserByIds(ctx, uids)
 
-	items := make([]*apiv1.MoodItem, 0, len(moods))
-	for _, md := range moods {
+	items := lo.Map(moods, func(md model.Mood, _ int) *apiv1.MoodItem {
 		item := apiv1.MoodItem_builder{Id: int32(md.Id),
 			Content:   md.Content,
 			CreatedAt: md.CreatedAt.Format(time.DateTime)}.Build()
@@ -41,8 +40,8 @@ func (m *Mood) List(ctx context.Context, req *apiv1.MoodListRequest) (*apiv1.Moo
 		if u, ok := um[md.UserId]; ok {
 			item.SetUser(types.UserSummary_builder{Id: int32(u.Id), Name: u.Name, NickName: u.NickName}.Build())
 		}
-		items = append(items, item)
-	}
+		return item
+	})
 	total, err := m.store.CountMoodTotal(ctx)
 	if err != nil {
 		return nil, err

@@ -12,6 +12,7 @@ import (
 	"app/store/model"
 
 	"github.com/goapt/logger"
+	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -39,13 +40,10 @@ func (l *Link) All(ctx context.Context, _ *emptypb.Empty) (*apiv1.LinkMenuRespon
 	if err != nil {
 		return nil, err
 	}
-	resp := apiv1.LinkMenuResponse_builder{}.Build()
-	for _, v := range links {
-		resp.SetList(append(resp.GetList(), apiv1.LinkMenuItem_builder{Url: v.Url,
-			Content: v.Name}.Build(),
-		))
-	}
-	return resp, nil
+	items := lo.Map(links, func(v *model.Link, _ int) *apiv1.LinkMenuItem {
+		return apiv1.LinkMenuItem_builder{Url: v.Url, Content: v.Name}.Build()
+	})
+	return apiv1.LinkMenuResponse_builder{List: items}.Build(), nil
 }
 
 // Submit 提交友情链接申请（状态为审核中），并发送飞书审核通知

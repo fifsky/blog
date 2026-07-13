@@ -100,7 +100,6 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 	if err != nil {
 		return nil, err
 	}
-	items := make([]*apiv1.ArticleItem, 0, len(posts))
 	uids := lo.Map(posts, func(item model.Post, index int) int {
 		return item.UserId
 	})
@@ -115,7 +114,7 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 	if err != nil {
 		return nil, err
 	}
-	for _, p := range posts {
+	items := lo.Map(posts, func(p model.Post, _ int) *apiv1.ArticleItem {
 		item := apiv1.ArticleItem_builder{Id: int32(p.Id),
 			CateId:    int32(p.CateId),
 			Type:      int32(p.Type),
@@ -134,8 +133,8 @@ func (a *Article) List(ctx context.Context, req *apiv1.ArticleListRequest) (*api
 		if c, ok := cm[p.CateId]; ok {
 			item.SetCate(types.CateSummary_builder{Id: int32(c.Id), Name: c.Name, Domain: c.Domain}.Build())
 		}
-		items = append(items, item)
-	}
+		return item
+	})
 	total, err := a.store.CountPosts(ctx, &model.Post{CateId: cateId, Type: int(req.GetType())}, artdate, req.GetKeyword(), req.GetTag())
 	if err != nil {
 		return nil, err
@@ -248,14 +247,11 @@ func (a *Article) Feed(ctx context.Context, _ *emptypb.Empty) (*httpbody.HttpBod
 }
 
 func latestPostCreatedAt(posts []model.Post) time.Time {
-	var latest time.Time
-	for _, post := range posts {
-		if post.CreatedAt.After(latest) {
-			latest = post.CreatedAt
-		}
-	}
-	if latest.IsZero() {
+	latest := lo.MaxBy(posts, func(a, b model.Post) bool {
+		return a.CreatedAt.After(b.CreatedAt)
+	})
+	if latest.CreatedAt.IsZero() {
 		return time.Now()
 	}
-	return latest
+	return latest.CreatedAt
 }

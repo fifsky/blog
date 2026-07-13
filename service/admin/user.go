@@ -14,6 +14,7 @@ import (
 	"app/store"
 	"app/store/model"
 
+	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -80,24 +81,19 @@ func (u *User) Update(ctx context.Context, in *adminv1.UserUpdateRequest) (*type
 		UpdatedAt: &now,
 	}
 	if in.GetName() != "" {
-		v := in.GetName()
-		uReq.Name = &v
+		uReq.Name = new(in.GetName())
 	}
 	if in.GetPassword() != "" {
-		v := hashed
-		uReq.Password = &v
+		uReq.Password = new(hashed)
 	}
 	if in.GetNickName() != "" {
-		v := in.GetNickName()
-		uReq.NickName = &v
+		uReq.NickName = new(in.GetNickName())
 	}
 	if in.GetEmail() != "" {
-		v := in.GetEmail()
-		uReq.Email = &v
+		uReq.Email = new(in.GetEmail())
 	}
 	if in.GetType() > 0 {
-		v := int(in.GetType())
-		uReq.Type = &v
+		uReq.Type = new(int(in.GetType()))
 	}
 	if err := u.store.UpdateUser(ctx, uReq); err != nil {
 		return nil, err
@@ -111,9 +107,8 @@ func (u *User) List(ctx context.Context, req *adminv1.UserListRequest) (*adminv1
 	if err != nil {
 		return nil, err
 	}
-	items := make([]*adminv1.UserItem, 0, len(users))
-	for _, user := range users {
-		items = append(items, adminv1.UserItem_builder{Id: int32(user.Id),
+	items := lo.Map(users, func(user model.User, _ int) *adminv1.UserItem {
+		return adminv1.UserItem_builder{Id: int32(user.Id),
 			Name:      user.Name,
 			NickName:  user.NickName,
 			Email:     user.Email,
@@ -121,9 +116,8 @@ func (u *User) List(ctx context.Context, req *adminv1.UserListRequest) (*adminv1
 			Type:      int32(user.Type),
 			HasTotp:   user.TotpSecret != "",
 			CreatedAt: user.CreatedAt.Format(time.DateTime),
-			UpdatedAt: user.UpdatedAt.Format(time.DateTime)}.Build(),
-		)
-	}
+			UpdatedAt: user.UpdatedAt.Format(time.DateTime)}.Build()
+	})
 	total, err := u.store.CountUserTotal(ctx)
 	if err != nil {
 		return nil, err

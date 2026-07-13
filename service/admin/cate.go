@@ -10,6 +10,7 @@ import (
 	"app/store"
 	"app/store/model"
 
+	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -28,17 +29,15 @@ func (c *Cate) List(ctx context.Context, _ *emptypb.Empty) (*adminv1.CateListRes
 	if err != nil {
 		return nil, err
 	}
-	items := make([]*adminv1.CateListItem, 0, len(cates))
-	for _, v := range cates {
-		items = append(items, adminv1.CateListItem_builder{Id: int32(v.Id),
+	items := lo.Map(cates, func(v model.CateArtivleCount, _ int) *adminv1.CateListItem {
+		return adminv1.CateListItem_builder{Id: int32(v.Id),
 			Name:      v.Name,
 			Desc:      v.Desc,
 			Domain:    v.Domain,
 			CreatedAt: v.CreatedAt.Format(time.DateTime),
 			UpdatedAt: v.UpdatedAt.Format(time.DateTime),
-			Num:       int32(v.Num)}.Build(),
-		)
-	}
+			Num:       int32(v.Num)}.Build()
+	})
 	return adminv1.CateListResponse_builder{List: items,
 			Total: int32(len(items))}.Build(),
 		nil
@@ -64,16 +63,13 @@ func (c *Cate) Update(ctx context.Context, req *adminv1.CateUpdateRequest) (*typ
 	now := time.Now()
 	u := &model.UpdateCate{Id: int(req.GetId())}
 	if req.GetName() != "" {
-		v := req.GetName()
-		u.Name = &v
+		u.Name = new(req.GetName())
 	}
 	if req.GetDesc() != "" {
-		v := req.GetDesc()
-		u.Desc = &v
+		u.Desc = new(req.GetDesc())
 	}
 	if req.GetDomain() != "" {
-		v := req.GetDomain()
-		u.Domain = &v
+		u.Domain = new(req.GetDomain())
 	}
 	u.UpdatedAt = &now
 	if err := c.store.UpdateCate(ctx, u); err != nil {
