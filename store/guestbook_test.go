@@ -167,3 +167,92 @@ func TestStore_CreateGuestbook(t *testing.T) {
 		assert.Equal(t, "127.0.0.1", got.Ip)
 	})
 }
+
+func TestStore_GetGuestbook(t *testing.T) {
+	tests := []struct {
+		name     string
+		id       int64
+		wantErr  bool
+		wantName string
+	}{
+		{name: "存在留言", id: 1, wantErr: false, wantName: "张三"},
+		{name: "不存在留言", id: 999, wantErr: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dbunit.New(t, func(d *dbunit.DBUnit) {
+				db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook"))
+				s := New(db)
+				ret, err := s.GetGuestbook(context.Background(), tt.id)
+				if tt.wantErr {
+					require.Error(t, err)
+					assert.Nil(t, ret)
+					return
+				}
+				require.NoError(t, err)
+				assert.NotNil(t, ret)
+				assert.Equal(t, tt.wantName, ret.Name)
+			})
+		})
+	}
+}
+
+func TestStore_DeleteGuestbook(t *testing.T) {
+	t.Run("删除单条留言", func(t *testing.T) {
+		dbunit.New(t, func(d *dbunit.DBUnit) {
+			db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook"))
+			s := New(db)
+
+			beforeTotal, err := s.CountGuestbookTotal(context.Background(), "")
+			require.NoError(t, err)
+
+			err = s.DeleteGuestbook(context.Background(), []int{1})
+			require.NoError(t, err)
+
+			afterTotal, err := s.CountGuestbookTotal(context.Background(), "")
+			require.NoError(t, err)
+			assert.Equal(t, beforeTotal-1, afterTotal)
+
+			// 验证已删除
+			_, err = s.GetGuestbook(context.Background(), 1)
+			require.Error(t, err)
+		})
+	})
+
+	t.Run("删除多条留言", func(t *testing.T) {
+		dbunit.New(t, func(d *dbunit.DBUnit) {
+			db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook"))
+			s := New(db)
+
+			err := s.DeleteGuestbook(context.Background(), []int{1, 2, 3})
+			require.NoError(t, err)
+
+			total, err := s.CountGuestbookTotal(context.Background(), "")
+			require.NoError(t, err)
+			assert.Equal(t, 0, total)
+		})
+	})
+
+	t.Run("空ID列表不报错", func(t *testing.T) {
+		dbunit.New(t, func(d *dbunit.DBUnit) {
+			db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook"))
+			s := New(db)
+			err := s.DeleteGuestbook(context.Background(), []int{})
+			require.NoError(t, err)
+		})
+	})
+
+	t.Run("删除不存在ID不报错", func(t *testing.T) {
+		dbunit.New(t, func(d *dbunit.DBUnit) {
+			db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("guestbook"))
+			s := New(db)
+			err := s.DeleteGuestbook(context.Background(), []int{999})
+			require.NoError(t, err)
+
+			total, err := s.CountGuestbookTotal(context.Background(), "")
+			require.NoError(t, err)
+			assert.Equal(t, 3, total)
+		})
+	})
+}

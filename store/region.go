@@ -65,64 +65,6 @@ func (s *Store) ListRegionByParent(ctx context.Context, parentId int) ([]*model.
 	return ret, nil
 }
 
-// ListProvincesWithPhotos returns provinces that have at least one photo
-func (s *Store) ListProvincesWithPhotos(ctx context.Context) ([]*model.Region, error) {
-	query := `
-		SELECT DISTINCT r.region_id, r.parent_id, r.level, r.region_name, r.longitude, r.latitude, r.pinyin, r.az_no 
-		FROM regions r 
-		INNER JOIN photos p ON r.region_id = p.province 
-		WHERE r.level = 1 
-		ORDER BY r.region_id
-	`
-	rows, err := s.db.QueryContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	ret := make([]*model.Region, 0)
-	for rows.Next() {
-		var item model.Region
-		if err := rows.Scan(&item.RegionId, &item.ParentId, &item.Level, &item.RegionName, &item.Longitude, &item.Latitude, &item.Pinyin, &item.AzNo); err != nil {
-			return nil, err
-		}
-		tmp := item
-		ret = append(ret, &tmp)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return ret, nil
-}
-
-// ListCitiesWithPhotos returns cities that have at least one photo
-func (s *Store) ListCitiesWithPhotos(ctx context.Context) ([]*model.Region, error) {
-	query := `
-		SELECT DISTINCT r.region_id, r.parent_id, r.level, r.region_name, r.longitude, r.latitude, r.pinyin, r.az_no 
-		FROM regions r 
-		INNER JOIN photos p ON r.region_id = p.city 
-		WHERE r.level = 2 
-		ORDER BY r.region_id
-	`
-	rows, err := s.db.QueryContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	ret := make([]*model.Region, 0)
-	for rows.Next() {
-		var item model.Region
-		if err := rows.Scan(&item.RegionId, &item.ParentId, &item.Level, &item.RegionName, &item.Longitude, &item.Latitude, &item.Pinyin, &item.AzNo); err != nil {
-			return nil, err
-		}
-		tmp := item
-		ret = append(ret, &tmp)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return ret, nil
-}
-
 func (s *Store) FindNearestCity(ctx context.Context, latitude, longitude float64) (*model.Region, *model.Region, error) {
 	rows, err := s.db.QueryContext(ctx, "SELECT region_id, parent_id, level, region_name, longitude, latitude, pinyin, az_no FROM regions WHERE level = 2")
 	if err != nil {
