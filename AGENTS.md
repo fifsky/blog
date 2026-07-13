@@ -342,6 +342,42 @@ All Golang unit tests should prioritize the table-driven style to enhance readab
 - Test cases should cover: success paths, failure paths, and boundary conditions
 - Use `t.Run()` to make each sub-test independently executable
 
+#### Assertion Principles
+
+单元测试断言应避免对 fixture 数据的绝对值产生耦合，确保 fixture 变化时测试不会脆弱地失败：
+
+**Count 断言:**
+
+- 有数据场景：使用 `assert.Greater(t, count, 0)` 而非 `assert.Equal(t, N, count)`
+- 无数据场景（空表、无匹配）：使用 `assert.Equal(t, 0, count)` — 这是确定性的
+- 增减场景（创建/删除后）：使用相对比较 `assert.Equal(t, beforeTotal+1, afterTotal)` 或 `assert.Less(t, afterTotal, beforeTotal)` — 不依赖 fixture 绝对数量
+
+**列表长度断言:**
+
+- 有数据场景：使用 `assert.NotEmpty(t, list)` 而非 `assert.Len(t, list, N)`
+- 分页场景：使用 `assert.LessOrEqual(t, len(ret), num)` 验证不超过每页数量，而非断言精确条数
+- 空结果场景：使用 `assert.Empty(t, list)`
+
+**分页边界用例:**
+
+- 禁止编写 "第N页无数据" 这类依赖精确总数的用例（如 fixture 有 3 条，断言第 4 页返回 0）
+- 分页测试仅验证有效页返回数据 + 每页数量上限
+
+**排序断言:**
+
+- 禁止断言特定 ID 在首位（如 `assert.Equal(t, 10, list[0].Id)`）— 依赖 fixture 具体数据
+- 改为验证排序方向：遍历比较相邻元素的 `CreatedAt`（正序/倒序）
+
+**字段值断言:**
+
+- 按 ID 查询后验证字段值（如 `assert.Equal(t, "test", ret.Name)`）是合理的 — 测试读取正确性
+- 但避免对列表中特定位置的元素断言具体值（依赖 fixture 排序），应先按 ID 查找再断言
+
+**自建数据测试:**
+
+- 测试中自行创建数据（空表 + Create）后断言精确值是合理的 — 数据完全可控
+- 相对比较（`beforeTotal+1`）优于绝对值（`assert.Equal(t, 3, total)`）
+
 ### General
 
 - Commit messages should follow conventional commit format
