@@ -22,6 +22,9 @@ func (s *Store) GetAllLinks(ctx context.Context) ([]*model.Link, error) {
 		tmp := item
 		ret = append(ret, &tmp)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return ret, nil
 }
 
@@ -40,6 +43,9 @@ func (s *Store) GetApprovedLinks(ctx context.Context) ([]*model.Link, error) {
 		}
 		tmp := item
 		ret = append(ret, &tmp)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return ret, nil
 }

@@ -31,6 +31,9 @@ func (s *Store) GetAllCates(ctx context.Context) ([]model.CateArtivleCount, erro
 		}
 		cs = append(cs, c)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return cs, nil
 }
 
@@ -92,6 +95,9 @@ func (s *Store) GetCatesByIds(ctx context.Context, ids []int) (map[int]model.Cat
 			return nil, err
 		}
 		cm[c.Id] = c
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return cm, nil
 }

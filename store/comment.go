@@ -24,6 +24,9 @@ func (s *Store) ListComments(ctx context.Context, postId int) ([]model.Comment, 
 		}
 		list = append(list, c)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return list, nil
 }
 
@@ -45,6 +48,9 @@ func (s *Store) ListNewComments(ctx context.Context, num int) ([]model.CommentWi
 			return nil, err
 		}
 		list = append(list, c)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return list, nil
 }
@@ -88,6 +94,9 @@ func (s *Store) ListAllComments(ctx context.Context, keyword string, start int, 
 			return nil, err
 		}
 		list = append(list, c)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return list, nil
 }

@@ -22,6 +22,9 @@ func (s *Store) ListMood(ctx context.Context, start int, num int) ([]model.Mood,
 		}
 		ms = append(ms, md)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return ms, nil
 }
 

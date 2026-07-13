@@ -51,6 +51,9 @@ func (s *Store) GetPostDaysInMonth(ctx context.Context, year, month int) ([]int3
 		}
 		days = append(days, day)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return days, nil
 }
 
@@ -88,6 +91,9 @@ func (s *Store) PostArchive(ctx context.Context) ([]model.PostArchive, error) {
 			Ym:    ym,
 			Total: total,
 		})
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return res, nil
 }
@@ -138,6 +144,9 @@ func (s *Store) ListPost(ctx context.Context, p *model.Post, start int, num int,
 			return nil, err
 		}
 		posts = append(posts, bp)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return posts, nil
 }
@@ -285,6 +294,9 @@ func (s *Store) ListPostForAdmin(ctx context.Context, p *model.Post, start int, 
 			return nil, err
 		}
 		posts = append(posts, bp)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return posts, nil
 }

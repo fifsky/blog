@@ -35,6 +35,9 @@ func (s *Store) ListUser(ctx context.Context, start int, num int) ([]model.User,
 		}
 		users = append(users, user)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return users, nil
 }
 
@@ -116,6 +119,9 @@ func (s *Store) GetUserByIds(ctx context.Context, ids []int) (map[int]model.User
 			return nil, err
 		}
 		um[user.Id] = user
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return um, nil
 }

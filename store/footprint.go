@@ -45,6 +45,9 @@ func (s *Store) ListFootprint(ctx context.Context, start int, num int) ([]*model
 		tmp := item
 		ret = append(ret, &tmp)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return ret, nil
 }
 
@@ -136,6 +139,9 @@ func (s *Store) ListAllFootprints(ctx context.Context) ([]*model.Footprint, erro
 		_ = item.ScanPhotos(photoRaw)
 		tmp := item
 		ret = append(ret, &tmp)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return ret, nil
 }

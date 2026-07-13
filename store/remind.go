@@ -34,6 +34,9 @@ func (s *Store) ListRemind(ctx context.Context, start int, num int) ([]*model.Re
 		tmp := item
 		ret = append(ret, &tmp)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return ret, nil
 }
 
@@ -50,6 +53,9 @@ func (s *Store) RemindAll(ctx context.Context) ([]model.Remind, error) {
 			return nil, err
 		}
 		ret = append(ret, item)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return ret, nil
 }

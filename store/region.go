@@ -38,6 +38,9 @@ func (s *Store) GetRegionByIds(ctx context.Context, ids []int) (map[int]model.Re
 		}
 		rm[m.RegionId] = m
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return rm, nil
 }
 
@@ -55,6 +58,9 @@ func (s *Store) ListRegionByParent(ctx context.Context, parentId int) ([]*model.
 		}
 		tmp := item
 		ret = append(ret, &tmp)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return ret, nil
 }
@@ -82,6 +88,9 @@ func (s *Store) ListProvincesWithPhotos(ctx context.Context) ([]*model.Region, e
 		tmp := item
 		ret = append(ret, &tmp)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return ret, nil
 }
 
@@ -107,6 +116,9 @@ func (s *Store) ListCitiesWithPhotos(ctx context.Context) ([]*model.Region, erro
 		}
 		tmp := item
 		ret = append(ret, &tmp)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return ret, nil
 }
@@ -136,6 +148,9 @@ func (s *Store) FindNearestCity(ctx context.Context, latitude, longitude float64
 			best = &tmp
 			bestDist = d
 		}
+	}
+	if err := rows.Err(); err != nil {
+		return nil, nil, err
 	}
 	if best == nil {
 		return nil, nil, sql.ErrNoRows

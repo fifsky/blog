@@ -34,6 +34,9 @@ func (s *Store) ListGuestbook(ctx context.Context, keyword string, start int, nu
 		}
 		gs = append(gs, g)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return gs, nil
 }
 

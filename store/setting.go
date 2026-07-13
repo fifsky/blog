@@ -49,6 +49,9 @@ func (s *Store) GetOptions(ctx context.Context) (map[string]string, error) {
 		}
 		options2[k] = v
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 
 	s.optionsMu.Lock()
 	s.optionsCache = options2
