@@ -244,7 +244,7 @@ func (a *AIChat) createStreamingCard(ctx context.Context, messageID string) (str
 			Build()).
 		Build()
 
-	replyResp, err := a.larkClient.Im.V1.Message.Reply(ctx, replyReq)
+	replyResp, err := a.larkClient.Im.Message.Reply(ctx, replyReq)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to send card message: %w", err)
 	}

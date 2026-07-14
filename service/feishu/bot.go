@@ -71,7 +71,7 @@ func NewBot(conf *config.Config, s *store.Store, agent *aiagent.Agent, registry 
 func (b *Bot) Start(ctx context.Context) {
 	fmt.Println("[Feishu Bot] Starting WebSocket connection...")
 	err := b.wsClient.Start(ctx)
-	if err != nil {
+	if err != nil { //nolint:staticcheck // SA4023 wsClient.Start 永远阻塞，仅在出错时返回，保留防御性检查
 		fmt.Printf("[Feishu Bot] wsClient.Start failed: %s\n", err.Error())
 	}
 }
@@ -215,7 +215,7 @@ func (b *Bot) downloadImageAsBase64(ctx context.Context, messageID, imageKey str
 		Type("image").
 		Build()
 
-	resp, err := b.larkClient.Im.V1.MessageResource.Get(ctx, req)
+	resp, err := b.larkClient.Im.MessageResource.Get(ctx, req)
 	if err != nil {
 		return "", fmt.Errorf("failed to get message resource: %w", err)
 	}

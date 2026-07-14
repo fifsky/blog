@@ -41,7 +41,7 @@ func (f *FeishuSender) Send(ctx context.Context, cardJSON string) error {
 			Build()).
 		Build()
 
-	resp, err := f.client.Im.V1.Message.Create(ctx, req)
+	resp, err := f.client.Im.Message.Create(ctx, req)
 	if err != nil {
 		return err
 	}
