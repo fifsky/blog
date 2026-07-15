@@ -1,4 +1,4 @@
-FROM registry.cn-shanghai.aliyuncs.com/fifsky/golang:1.26 AS builder
+FROM --platform=$BUILDPLATFORM registry.cn-shanghai.aliyuncs.com/fifsky/golang:1.26 AS builder
 ARG PROJECT_NAME
 WORKDIR /build
 ENV GOPROXY=https://goproxy.cn,direct \
