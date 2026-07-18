@@ -5,6 +5,8 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"app/cmd"
 	"app/config"
@@ -22,6 +24,9 @@ import (
 )
 
 func main() {
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
+	defer stop()
+
 	conf := config.New()
 
 	// 1. 先启动 Litestream（作为 Go library 嵌入），从 OSS 自动恢复 + 实时备份 SQLite
@@ -78,7 +83,7 @@ func main() {
 	// Feishu bot service
 	if conf.Feishu.Appid != "" {
 		feishuBot := feishu.NewBot(conf, s, agent, registry)
-		go feishuBot.Start(context.Background())
+		go feishuBot.Start(ctx)
 	}
 
 	// TODO 临时停用自动生成心情
@@ -95,7 +100,7 @@ func main() {
 		},
 	}
 
-	if err := app.Run(context.Background(), os.Args); err != nil {
+	if err := app.Run(ctx, os.Args); err != nil {
 		log.Fatal(err)
 	}
 }

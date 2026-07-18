@@ -58,6 +58,8 @@ func NewHttp(s *store.Store, conf *config.Config, agent *aiagent.Agent) *cli.Com
 			return server.New(
 				server.Handler(route.Handler()),
 				server.Address(cli.String("addr")),
+				// AI 对话使用 SSE 长连接，不设置全局写入截止时间。
+				server.WriteTimeout(0),
 			).Start(ctx)
 		},
 	}
