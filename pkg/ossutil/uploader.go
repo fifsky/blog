@@ -17,13 +17,13 @@ type Uploader interface {
 }
 
 type AliyunUploader struct {
-	conf   *config.Config
+	conf   config.OssConfig
 	client *oss.Client
 }
 
-func NewAliyunUploader(conf *config.Config) *AliyunUploader {
+func NewAliyunUploader(conf config.OssConfig) *AliyunUploader {
 	// Extract region from endpoint (e.g., "oss-cn-shanghai.aliyuncs.com" -> "cn-shanghai")
-	endpoint := conf.OSS.Endpoint
+	endpoint := conf.Endpoint
 	region := ""
 	if strings.HasPrefix(endpoint, "oss-") {
 		parts := strings.Split(endpoint, ".")
@@ -36,8 +36,8 @@ func NewAliyunUploader(conf *config.Config) *AliyunUploader {
 	// Create OSS client using new SDK v2
 	cfg := oss.LoadDefaultConfig().
 		WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
-			conf.OSS.AccessKey,
-			conf.OSS.AccessSecret,
+			conf.AccessKey,
+			conf.AccessSecret,
 		)).
 		WithRegion(region)
 
@@ -49,7 +49,7 @@ func NewAliyunUploader(conf *config.Config) *AliyunUploader {
 func (u *AliyunUploader) Put(ctx context.Context, filename string, body io.Reader) error {
 	// Create upload request
 	putRequest := &oss.PutObjectRequest{
-		Bucket: new(u.conf.OSS.Bucket),
+		Bucket: new(u.conf.Bucket),
 		Key:    new(filename),
 		Body:   body,
 	}

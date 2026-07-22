@@ -13,8 +13,8 @@ import (
 	"github.com/openai/openai-go/v3/shared"
 )
 
-// MCPConf 描述一个 MCP StreamHttp 服务端点的配置。
-type MCPConf struct {
+// MCPConfig 描述一个 MCP StreamHttp 服务端点的配置。
+type MCPConfig struct {
 	Name  string `yaml:"name"`  // MCP名称，用于前端展示
 	URL   string `yaml:"url"`   // MCP StreamHttp地址
 	Token string `yaml:"token"` // MCP Token
@@ -133,7 +133,7 @@ func WithConfigProvider(provider func(ctx context.Context) (openai.Client, strin
 }
 
 // WithMCP 设置 MCP 配置
-func WithMCP(mcp map[string]MCPConf) Option {
+func WithMCP(mcp map[string]MCPConfig) Option {
 	return func(a *Agent) {
 		manager := mcpclient.NewManager()
 		for key, mcpConf := range mcp {

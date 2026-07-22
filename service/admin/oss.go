@@ -17,16 +17,16 @@ import (
 var _ adminv1.OSSServiceHTTPServer = (*OSS)(nil)
 
 type OSS struct {
-	conf *config.Config
+	conf config.OssConfig
 }
 
-func NewOSS(conf *config.Config) *OSS {
+func NewOSS(conf config.OssConfig) *OSS {
 	return &OSS{conf: conf}
 }
 
 func (o *OSS) GetPresignURL(ctx context.Context, req *adminv1.GetPresignURLRequest) (*adminv1.GetPresignURLResponse, error) {
 	// Extract region from endpoint (e.g., "oss-cn-shanghai.aliyuncs.com" -> "cn-shanghai")
-	endpoint := o.conf.OSS.Endpoint
+	endpoint := o.conf.Endpoint
 	region := ""
 	if strings.HasPrefix(endpoint, "oss-") {
 		parts := strings.Split(endpoint, ".")
@@ -39,8 +39,8 @@ func (o *OSS) GetPresignURL(ctx context.Context, req *adminv1.GetPresignURLReque
 	// Create OSS client using new SDK v2
 	cfg := oss.LoadDefaultConfig().
 		WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
-			o.conf.OSS.AccessKey,
-			o.conf.OSS.AccessSecret,
+			o.conf.AccessKey,
+			o.conf.AccessSecret,
 		)).
 		WithRegion(region).WithUseInternalEndpoint(false)
 
@@ -74,7 +74,7 @@ func (o *OSS) GetPresignURL(ctx context.Context, req *adminv1.GetPresignURLReque
 	// Generate presigned PUT URL
 	expiration := 10 * time.Minute
 	result, err := client.Presign(ctx, &oss.PutObjectRequest{
-		Bucket:      new(o.conf.OSS.Bucket),
+		Bucket:      new(o.conf.Bucket),
 		Key:         new(objectKey),
 		ContentType: new(contentType), // 请确保在服务端生成该签名URL时设置的ContentType与在使用URL时设置的ContentType一致
 	}, oss.PresignExpires(expiration))

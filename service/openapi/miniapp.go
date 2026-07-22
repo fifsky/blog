@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"app/config"
 	"app/pkg/errors"
 	"app/pkg/miniapp"
 	apiv1 "app/proto/gen/api/v1"
@@ -17,21 +16,23 @@ import (
 var _ apiv1.MiniAppServiceHTTPServer = (*MiniApp)(nil)
 
 type MiniApp struct {
-	store  *store.Store
-	conf   *config.Config
-	client *miniapp.Client
+	store       *store.Store
+	conf        miniapp.Config
+	tokenSecret string
+	client      *miniapp.Client
 }
 
-func NewMiniApp(s *store.Store, conf *config.Config, httpClient *http.Client) *MiniApp {
+func NewMiniApp(s *store.Store, conf miniapp.Config, tokenSecret string, httpClient *http.Client) *MiniApp {
 	return &MiniApp{
-		store:  s,
-		conf:   conf,
-		client: miniapp.NewClient(conf.MiniAPP.Appid, conf.MiniAPP.AppSecret, httpClient),
+		store:       s,
+		conf:        conf,
+		tokenSecret: tokenSecret,
+		client:      miniapp.NewClient(conf.Appid, conf.AppSecret, httpClient),
 	}
 }
 
 func (m *MiniApp) LoginCode(ctx context.Context, req *apiv1.MiniAppLoginRequest) (*apiv1.MiniAppLoginResponse, error) {
-	if m.conf.MiniAPP.Appid == "" || m.conf.MiniAPP.AppSecret == "" {
+	if m.conf.Appid == "" || m.conf.AppSecret == "" {
 		return nil, errors.ErrSystem.WithCause(fmt.Errorf("miniapp config missing"))
 	}
 
@@ -56,7 +57,7 @@ func (m *MiniApp) LoginCode(ctx context.Context, req *apiv1.MiniAppLoginRequest)
 		return nil, errors.BadRequest("USER_DISABLED", "用户已停用")
 	}
 
-	token, _, err := signAccessToken(m.conf.Common.TokenSecret, user.Id, defaultTokenExpiry)
+	token, _, err := signAccessToken(m.tokenSecret, user.Id, defaultTokenExpiry)
 	if err != nil {
 		return nil, errors.ErrSystem.WithCause(err)
 	}

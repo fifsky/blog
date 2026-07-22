@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"app/config"
 	"app/pkg/agent"
 	"app/pkg/doubaoasr"
 	"app/pkg/errors"
@@ -37,18 +36,15 @@ type remindSpeechTranscriber interface {
 type AI struct {
 	agent             *agent.Agent
 	store             *store.Store
-	conf              *config.Config
+	asrConf           doubaoasr.Config
 	speechTranscriber remindSpeechTranscriber
 }
 
-func NewAI(aiAgent *agent.Agent, s *store.Store, conf *config.Config) *AI {
-	if conf == nil {
-		conf = &config.Config{}
-	}
+func NewAI(aiAgent *agent.Agent, s *store.Store, asrConf doubaoasr.Config) *AI {
 	return &AI{
-		agent: aiAgent,
-		store: s,
-		conf:  conf,
+		agent:   aiAgent,
+		store:   s,
+		asrConf: asrConf,
 	}
 }
 
@@ -324,14 +320,10 @@ func (a *AI) getSpeechTranscriber() remindSpeechTranscriber {
 		return a.speechTranscriber
 	}
 
-	conf := config.DoubaoASRConf{}
-	if a.conf != nil {
-		conf = a.conf.DoubaoASR
-	}
 	return doubaoasr.Client{
-		APIKey:     firstNonEmpty(os.Getenv("DOUBAO_ASR_API_KEY"), conf.APIKey),
-		Endpoint:   firstNonEmpty(os.Getenv("DOUBAO_ASR_ENDPOINT"), conf.Endpoint),
-		ResourceID: firstNonEmpty(os.Getenv("DOUBAO_ASR_RESOURCE_ID"), conf.ResourceID),
+		APIKey:     firstNonEmpty(os.Getenv("DOUBAO_ASR_API_KEY"), a.asrConf.APIKey),
+		Endpoint:   firstNonEmpty(os.Getenv("DOUBAO_ASR_ENDPOINT"), a.asrConf.Endpoint),
+		ResourceID: firstNonEmpty(os.Getenv("DOUBAO_ASR_RESOURCE_ID"), a.asrConf.ResourceID),
 	}
 }
 

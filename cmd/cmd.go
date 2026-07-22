@@ -36,7 +36,7 @@ func (c *Command) Init(ctx context.Context) (func(), error) {
 	c.conf = config.New()
 	// 1. 先启动 Litestream（作为 Go library 嵌入），从 OSS 自动恢复 + 实时备份 SQLite
 	dbPath := c.conf.DB.ExtractDBPath()
-	ls := litestream.New(c.conf, dbPath)
+	ls := litestream.New(c.conf.Litestream, c.conf.Env, dbPath)
 	if err := ls.Start(ctx); err != nil {
 		return nil, fmt.Errorf("[litestream] start failed: %w", err)
 	}

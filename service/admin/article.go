@@ -34,7 +34,7 @@ func NewArticle(s *store.Store, conf *config.Config) *Article {
 	return &Article{
 		store: s,
 		conf:  conf,
-		upl:   ossutil.NewAliyunUploader(conf),
+		upl:   ossutil.NewAliyunUploader(conf.OSS),
 	}
 }
 

@@ -9,6 +9,12 @@ import (
 	"time"
 )
 
+// Config 微信小程序配置
+type Config struct {
+	Appid     string `yaml:"appid"`
+	AppSecret string `yaml:"app_secret"`
+}
+
 type Client struct {
 	Appid      string
 	AppSecret  string

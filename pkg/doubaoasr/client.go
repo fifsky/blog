@@ -22,6 +22,13 @@ const (
 	successCodePrefix = "200"
 )
 
+// Config 豆包语音识别配置
+type Config struct {
+	APIKey     string `yaml:"api_key"`     // 新版控制台的 X-Api-Key
+	Endpoint   string `yaml:"endpoint"`    // 语音识别极速版接口地址
+	ResourceID string `yaml:"resource_id"` // 资源 ID，默认 volc.bigasr.auc_turbo
+}
+
 // Client 是豆包语音识别 HTTP 客户端。
 type Client struct {
 	// APIKey 是新版控制台提供的 X-Api-Key。

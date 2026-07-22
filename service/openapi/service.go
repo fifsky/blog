@@ -30,7 +30,7 @@ func New(s *store.Store, conf *config.Config, httpClient *http.Client) *Service 
 		Mood:      NewMood(s),
 		Setting:   NewSetting(s),
 		Travel:    NewTravel(s),
-		MiniApp:   NewMiniApp(s, conf, httpClient),
+		MiniApp:   NewMiniApp(s, conf.MiniAPP, conf.Common.TokenSecret, httpClient),
 		Geo:       NewGeo(s),
 		Guestbook: NewGuestbook(s),
 		Comment:   NewComment(s, conf),

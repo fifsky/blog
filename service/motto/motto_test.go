@@ -115,7 +115,7 @@ func TestOpenAIProvider_Generate(t *testing.T) {
 	ai := NewOpenAIProvider(agent.New(
 		agent.WithClient(client),
 		agent.WithModel(os.Getenv("AI_MODEL")),
-		agent.WithMCP(map[string]agent.MCPConf{
+		agent.WithMCP(map[string]agent.MCPConfig{
 			"web_search": {
 				Name: "联网搜索",
 				URL:  os.Getenv("WEBSEARCH_MCP"),

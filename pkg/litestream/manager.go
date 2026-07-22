@@ -10,11 +10,19 @@ import (
 	"strings"
 	"time"
 
-	"app/config"
-
 	"github.com/benbjohnson/litestream"
 	"github.com/benbjohnson/litestream/s3"
 )
+
+// Config Litestream 备份配置
+type Config struct {
+	Bucket       string `yaml:"bucket"`        // 备份 OSS bucket（fifsky-backup）
+	Path         string `yaml:"path"`          // 备份路径（blog/sqlite）
+	Endpoint     string `yaml:"endpoint"`      // s3 endpoint
+	Region       string `yaml:"region"`        // s3 region
+	AccessKey    string `yaml:"access_key"`    // s3 access key
+	AccessSecret string `yaml:"access_secret"` // s3 access secret
+}
 
 // Manager 管理 Litestream 复制生命周期。
 // 用法：
@@ -30,17 +38,18 @@ type Manager struct {
 
 // New 创建 Litestream 管理器
 // 备份路径自动根据环境区分：开发环境 blog/sqlite/local，线上 blog/sqlite/prod
-func New(conf *config.Config, dbPath string) *Manager {
-	rPath := replicaPath(conf)
+// accessKey/accessSecret 为阿里云 OSS 凭证，env 用于区分备份路径后缀
+func New(conf Config, env, dbPath string) *Manager {
+	rPath := replicaPath(conf.Path, env)
 
 	// 创建 S3 客户端，通过自定义 Endpoint 对接阿里云 OSS（虚拟主机式访问）
 	client := s3.NewReplicaClient()
-	client.Bucket = conf.Litestream.Bucket
+	client.Bucket = conf.Bucket
 	client.Path = rPath
-	client.Endpoint = conf.Litestream.Endpoint
-	client.Region = conf.Litestream.Region
-	client.AccessKeyID = conf.OSS.AccessKey
-	client.SecretAccessKey = conf.OSS.AccessSecret
+	client.Endpoint = conf.Endpoint
+	client.Region = conf.Region
+	client.AccessKeyID = conf.AccessKey
+	client.SecretAccessKey = conf.AccessKey
 	// 阿里云 OSS 要求虚拟主机式访问（bucket.oss-cn-xxx.aliyuncs.com），
 	// 不能使用 ForcePathStyle，保持默认 false
 
@@ -59,7 +68,7 @@ func New(conf *config.Config, dbPath string) *Manager {
 	return &Manager{
 		store:      store,
 		db:         db,
-		replicaURI: fmt.Sprintf("s3://%s/%s", conf.Litestream.Bucket, rPath),
+		replicaURI: fmt.Sprintf("s3://%s/%s", conf.Bucket, rPath),
 	}
 }
 
@@ -112,13 +121,13 @@ func (m *Manager) Stop() error {
 // replicaPath 根据环境生成备份路径
 // 开发环境（非 prod）: blog/sqlite/local
 // 线上环境（prod）:    blog/sqlite/prod
-func replicaPath(conf *config.Config) string {
-	env := strings.ToLower(conf.Env)
+func replicaPath(path, env string) string {
+	env = strings.ToLower(env)
 	suffix := "local"
 	if env == "prod" || env == "production" {
 		suffix = "prod"
 	}
-	return strings.TrimRight(conf.Litestream.Path, "/") + "/" + suffix
+	return strings.TrimRight(path, "/") + "/" + suffix
 }
 
 // noopSyncFilterHandler 包装 slog.Handler，过滤掉 txid.replica == txid.db 的冗余 "replica sync" 日志。
