@@ -67,10 +67,7 @@ func NewBot(conf Config, s *store.Store, aiAgent *agent.Agent, registry *CardReg
 // This method blocks until the connection is closed or an error occurs.
 func (b *Bot) Start(ctx context.Context) {
 	fmt.Println("[Feishu Bot] Starting WebSocket connection...")
-	err := b.wsClient.Start(ctx)
-	if err != nil { //nolint:staticcheck // SA4023 wsClient.Start 永远阻塞，仅在出错时返回，保留防御性检查
-		fmt.Printf("[Feishu Bot] wsClient.Start failed: %s\n", err.Error())
-	}
+	_ = b.wsClient.Start(ctx)
 }
 
 // handleCardAction handles card button callback actions.
