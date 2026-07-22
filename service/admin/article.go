@@ -26,15 +26,13 @@ var _ adminv1.ArticleServiceHTTPServer = (*Article)(nil)
 
 type Article struct {
 	store *store.Store
-	conf  *config.Config
 	upl   ossutil.Uploader
 }
 
-func NewArticle(s *store.Store, conf *config.Config) *Article {
+func NewArticle(s *store.Store, ossConf config.OssConfig) *Article {
 	return &Article{
 		store: s,
-		conf:  conf,
-		upl:   ossutil.NewAliyunUploader(conf.OSS),
+		upl:   ossutil.NewAliyunUploader(ossConf),
 	}
 }
 

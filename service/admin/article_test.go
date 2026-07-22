@@ -24,11 +24,12 @@ import (
 func TestAdminArticle_CreateDeleteUpload(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts"))
-		conf := &config.Config{}
-		conf.OSS.Endpoint = "oss-cn-shanghai-internal.aliyuncs.com"
-		conf.OSS.AccessKey = "test"
-		conf.OSS.AccessSecret = "test"
-		conf.OSS.Bucket = "test"
+		conf := config.OssConfig{
+			Endpoint:     "oss-cn-shanghai-internal.aliyuncs.com",
+			AccessKey:    "test",
+			AccessSecret: "test",
+			Bucket:       "test",
+		}
 		svc := NewArticle(store.New(db), conf)
 
 		// Create

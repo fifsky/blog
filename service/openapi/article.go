@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"app/config"
 	"app/pkg/errors"
 	apiv1 "app/proto/gen/api/v1"
 	"app/proto/gen/types"
@@ -32,7 +31,7 @@ type Article struct {
 	store *store.Store
 }
 
-func NewArticle(s *store.Store, _ *config.Config) *Article {
+func NewArticle(s *store.Store) *Article {
 	return &Article{
 		store: s,
 	}

@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"app/pkg/agent"
-	"app/store"
 
 	lark "github.com/larksuite/oapi-sdk-go/v3"
 	larkcore "github.com/larksuite/oapi-sdk-go/v3/core"
@@ -29,7 +28,7 @@ type Bot struct {
 }
 
 // NewBot creates a new Feishu bot instance.
-func NewBot(conf Config, s *store.Store, aiAgent *agent.Agent, registry *CardRegistry) *Bot {
+func NewBot(conf Config, aiAgent *agent.Agent, registry *CardRegistry) *Bot {
 	// Create Lark client for API calls
 	larkClient := lark.NewClient(
 		conf.Appid,

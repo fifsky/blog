@@ -24,15 +24,15 @@ type Service struct {
 func New(s *store.Store, conf *config.Config, httpClient *http.Client) *Service {
 	return &Service{
 		User:      NewUser(s, conf, httpClient),
-		Article:   NewArticle(s, conf),
+		Article:   NewArticle(s),
 		Cate:      NewCate(s),
-		Link:      NewLink(s, conf),
+		Link:      NewLink(s, conf.Feishu),
 		Mood:      NewMood(s),
 		Setting:   NewSetting(s),
 		Travel:    NewTravel(s),
 		MiniApp:   NewMiniApp(s, conf.MiniAPP, conf.Common.TokenSecret, httpClient),
 		Geo:       NewGeo(s),
 		Guestbook: NewGuestbook(s),
-		Comment:   NewComment(s, conf),
+		Comment:   NewComment(s, conf.Feishu),
 	}
 }

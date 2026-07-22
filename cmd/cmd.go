@@ -88,7 +88,7 @@ func (c *Command) runRemind(ctx context.Context) {
 	registry.Register(linkCard)
 	// Feishu bot service
 	if c.conf.Feishu.Appid != "" {
-		feishuBot := feishu.NewBot(c.conf.Feishu, c.store, c.agent, registry)
+		feishuBot := feishu.NewBot(c.conf.Feishu, c.agent, registry)
 		c.wg.Go(func() {
 			feishuBot.Start(ctx)
 		})

@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"time"
 
-	"app/config"
 	apiv1 "app/proto/gen/api/v1"
 	"app/service/feishu"
 	"app/store"
@@ -20,15 +19,13 @@ var _ apiv1.LinkServiceHTTPServer = (*Link)(nil)
 
 type Link struct {
 	store    *store.Store
-	conf     *config.Config
 	linkCard *feishu.LinkCard
 }
 
-func NewLink(s *store.Store, conf *config.Config) *Link {
+func NewLink(s *store.Store, feishuConf feishu.Config) *Link {
 	return &Link{
 		store:    s,
-		conf:     conf,
-		linkCard: feishu.NewLinkCard(s, conf.Feishu),
+		linkCard: feishu.NewLinkCard(s, feishuConf),
 	}
 }
 

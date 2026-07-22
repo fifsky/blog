@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"app/config"
 	"app/pkg/gravatar"
 	apiv1 "app/proto/gen/api/v1"
 	"app/server/middleware"
@@ -26,7 +25,6 @@ var _ apiv1.CommentServiceHTTPServer = (*Comment)(nil)
 // Comment 文章评论服务
 type Comment struct {
 	store     *store.Store
-	conf      *config.Config
 	moderator ContentModerator
 	card      *feishu.CommentCard
 }
@@ -42,11 +40,10 @@ func WithCommentModerator(m ContentModerator) CommentOption {
 }
 
 // NewComment 创建评论服务，默认使用 AI 审核器
-func NewComment(s *store.Store, conf *config.Config, opts ...CommentOption) *Comment {
+func NewComment(s *store.Store, feishuConf feishu.Config, opts ...CommentOption) *Comment {
 	c := &Comment{
 		store: s,
-		conf:  conf,
-		card:  feishu.NewCommentCard(conf.Feishu),
+		card:  feishu.NewCommentCard(feishuConf),
 	}
 
 	for _, opt := range opts {

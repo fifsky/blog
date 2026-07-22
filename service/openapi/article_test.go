@@ -16,7 +16,7 @@ import (
 func TestArticle_Archive(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts"))
-		svc := NewArticle(store.New(db), nil)
+		svc := NewArticle(store.New(db))
 		resp, err := svc.Archive(context.Background(), &emptypb.Empty{})
 		if err != nil || len(resp.GetList()) == 0 {
 			t.Fatalf("unexpected err=%v list=%v", err, resp.GetList())
@@ -27,7 +27,7 @@ func TestArticle_Archive(t *testing.T) {
 func TestArticle_Calendar(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts"))
-		svc := NewArticle(store.New(db), nil)
+		svc := NewArticle(store.New(db))
 		resp, err := svc.Calendar(context.Background(), apiv1.ArticleCalendarRequest_builder{Year: 2012, Month: 9}.Build())
 		if err != nil {
 			t.Fatalf("unexpected err=%v", err)
@@ -42,7 +42,7 @@ func TestArticle_Calendar(t *testing.T) {
 func TestArticle_List(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates"))
-		svc := NewArticle(store.New(db), nil)
+		svc := NewArticle(store.New(db))
 		resp, err := svc.List(context.Background(), apiv1.ArticleListRequest_builder{Page: 1}.Build())
 		if err != nil || len(resp.GetList()) == 0 {
 			t.Fatalf("unexpected err=%v list=%v", err, resp.GetList())
@@ -53,7 +53,7 @@ func TestArticle_List(t *testing.T) {
 func TestArticle_List_Day(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates"))
-		svc := NewArticle(store.New(db), nil)
+		svc := NewArticle(store.New(db))
 		resp, err := svc.List(context.Background(), apiv1.ArticleListRequest_builder{Year: "2012", Month: "09", Day: "10", Page: 1}.Build())
 		if err != nil || len(resp.GetList()) != 1 {
 			t.Fatalf("unexpected err=%v list_len=%d", err, len(resp.GetList()))
@@ -64,7 +64,7 @@ func TestArticle_List_Day(t *testing.T) {
 func TestArticle_PrevNext(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts"))
-		svc := NewArticle(store.New(db), nil)
+		svc := NewArticle(store.New(db))
 		resp, err := svc.PrevNext(context.Background(), apiv1.PrevNextRequest_builder{Id: 7}.Build())
 		if err != nil || resp.GetPrev() == nil || resp.GetNext() == nil {
 			t.Fatalf("unexpected err=%v prev=%v,next=%v", err, resp.GetPrev(), resp.GetNext())
@@ -75,7 +75,7 @@ func TestArticle_PrevNext(t *testing.T) {
 func TestArticle_Detail(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users", "cates"))
-		svc := NewArticle(store.New(db), nil)
+		svc := NewArticle(store.New(db))
 		item, err := svc.Detail(context.Background(), apiv1.ArticleDetailRequest_builder{Id: 7}.Build())
 		if err != nil || item == nil || item.GetId() == 0 {
 			t.Fatalf("unexpected err=%v item=%v", err, item)
@@ -86,7 +86,7 @@ func TestArticle_Detail(t *testing.T) {
 func TestArticle_Feed(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users"))
-		svc := NewArticle(store.New(db), nil)
+		svc := NewArticle(store.New(db))
 		resp, err := svc.Feed(context.Background(), &emptypb.Empty{})
 		if err != nil || resp == nil || len(resp.Data) == 0 {
 			t.Fatalf("unexpected err=%v resp=%v", err, resp)
@@ -97,7 +97,7 @@ func TestArticle_Feed(t *testing.T) {
 func TestArticle_FeedUsesPostPublishedTimestamps(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options", "posts", "users"))
-		svc := NewArticle(store.New(db), nil)
+		svc := NewArticle(store.New(db))
 		resp, err := svc.Feed(context.Background(), &emptypb.Empty{})
 		if err != nil {
 			t.Fatalf("unexpected err=%v", err)
@@ -143,7 +143,7 @@ func TestArticle_FeedUsesPostPublishedTimestamps(t *testing.T) {
 func TestArticle_FeedWithoutPostsHasUpdated(t *testing.T) {
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("options"))
-		svc := NewArticle(store.New(db), nil)
+		svc := NewArticle(store.New(db))
 		resp, err := svc.Feed(context.Background(), &emptypb.Empty{})
 		if err != nil {
 			t.Fatalf("unexpected err=%v", err)

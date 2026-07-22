@@ -26,7 +26,7 @@ type Service struct {
 func New(s *store.Store, conf *config.Config, aiAgent *agent.Agent) *Service {
 	return &Service{
 		User:      NewUser(s, conf),
-		Article:   NewArticle(s, conf),
+		Article:   NewArticle(s, conf.OSS),
 		Cate:      NewCate(s),
 		Link:      NewLink(s),
 		Mood:      NewMood(s),
