@@ -15,7 +15,7 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
-type common struct {
+type Common struct {
 	StoragePath string `yaml:"storage_path"`
 	TokenSecret string `yaml:"token_secret"`
 	MCPToken    string `yaml:"mcp_token"`
@@ -32,7 +32,7 @@ type Config struct {
 	Env        string
 	LogLevel   string                     `yaml:"log_level"`
 	AppName    string                     `yaml:"app_name"`
-	Common     common                     `yaml:"common"`
+	Common     Common                     `yaml:"common"`
 	DB         Database                   `yaml:"database"`
 	OSS        OssConfig                  `yaml:"oss"`
 	Litestream litestream.Config          `yaml:"litestream"`
