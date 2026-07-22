@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"app/config"
-	"app/pkg/aiagent"
+	"app/pkg/agent"
 	"app/pkg/doubaoasr"
 	"app/pkg/errors"
 	adminv1 "app/proto/gen/admin/v1"
@@ -35,18 +35,18 @@ type remindSpeechTranscriber interface {
 }
 
 type AI struct {
-	agent             *aiagent.Agent
+	agent             *agent.Agent
 	store             *store.Store
 	conf              *config.Config
 	speechTranscriber remindSpeechTranscriber
 }
 
-func NewAI(agent *aiagent.Agent, s *store.Store, conf *config.Config) *AI {
+func NewAI(aiAgent *agent.Agent, s *store.Store, conf *config.Config) *AI {
 	if conf == nil {
 		conf = &config.Config{}
 	}
 	return &AI{
-		agent: agent,
+		agent: aiAgent,
 		store: s,
 		conf:  conf,
 	}
@@ -140,7 +140,7 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 	for _, msg := range req.Messages {
 		if len(msg.ContextMessages) > 0 {
 			for _, rawMessage := range msg.ContextMessages {
-				openAIMessage, err := aiagent.DecodeMessageParam(rawMessage)
+				openAIMessage, err := agent.DecodeMessageParam(rawMessage)
 				if err != nil {
 					response.Fail(w, errors.BadRequest("INVALID_CONTEXT_MESSAGE", "Invalid context message"))
 					return
@@ -161,11 +161,11 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	result, err := a.agent.Run(ctx, aiagent.Request{
+	result, err := a.agent.Run(ctx, agent.Request{
 		SystemPrompt: prompt,
 		Messages:     openAIMessages,
 		UseTools:     true,
-	}, aiagent.EventHandler{
+	}, agent.EventHandler{
 		OnContent: func(_ context.Context, content string) error {
 			a.sendStreamEvent(w, flusher, StreamEvent{Type: "content", Content: content})
 			return nil
@@ -174,7 +174,7 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 			a.sendStreamEvent(w, flusher, StreamEvent{Type: "reasoning", Content: content})
 			return nil
 		},
-		OnToolStart: func(_ context.Context, event aiagent.ToolEvent) error {
+		OnToolStart: func(_ context.Context, event agent.ToolEvent) error {
 			a.sendStreamEvent(w, flusher, StreamEvent{
 				Type: "tool_start",
 				Data: ToolStartEvent{
@@ -186,7 +186,7 @@ func (a *AI) Chat(w http.ResponseWriter, r *http.Request) {
 			})
 			return nil
 		},
-		OnToolEnd: func(_ context.Context, event aiagent.ToolEvent) error {
+		OnToolEnd: func(_ context.Context, event agent.ToolEvent) error {
 			a.sendStreamEvent(w, flusher, StreamEvent{
 				Type: "tool_end",
 				Data: ToolEndEvent{

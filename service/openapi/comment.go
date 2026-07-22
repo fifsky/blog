@@ -29,7 +29,6 @@ type Comment struct {
 	conf      *config.Config
 	moderator ContentModerator
 	card      *feishu.CommentCard
-	sender    *feishu.Sender
 }
 
 // CommentOption 用于配置 Comment 的选项函数
@@ -43,12 +42,11 @@ func WithCommentModerator(m ContentModerator) CommentOption {
 }
 
 // NewComment 创建评论服务，默认使用 AI 审核器
-func NewComment(s *store.Store, conf *config.Config, sender *feishu.Sender, opts ...CommentOption) *Comment {
+func NewComment(s *store.Store, conf *config.Config, opts ...CommentOption) *Comment {
 	c := &Comment{
-		store:  s,
-		conf:   conf,
-		card:   feishu.NewCommentCard(),
-		sender: sender,
+		store: s,
+		conf:  conf,
+		card:  feishu.NewCommentCard(conf.Feishu),
 	}
 
 	for _, opt := range opts {
@@ -124,10 +122,6 @@ func (c *Comment) Create(ctx context.Context, req *apiv1.CommentCreateRequest) (
 
 // notifyComment 发送新评论飞书通知
 func (c *Comment) notifyComment(ctx context.Context, name, content string, postID int, createdAt time.Time) {
-	if c.sender == nil || c.card == nil {
-		return
-	}
-
 	// 查询文章信息用于展示
 	post, err := c.store.GetPost(ctx, postID, "")
 	if err != nil {
@@ -142,9 +136,7 @@ func (c *Comment) notifyComment(ctx context.Context, name, content string, postI
 		PostURL:   fmt.Sprintf("https://fifsky.com/article/%d/%s", post.Id, post.Url),
 		Time:      createdAt.Format("2006-01-02 15:04"),
 	}
-	cardJSON := c.card.BuildCard(msg)
-
-	if err := c.sender.Send(ctx, cardJSON); err != nil {
+	if err := c.card.Send(ctx, msg); err != nil {
 		logger.Error("comment notify send error", slog.String("err", err.Error()))
 	}
 }

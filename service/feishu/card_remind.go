@@ -6,7 +6,6 @@ import (
 	"text/template"
 	"time"
 
-	"app/config"
 	"app/pkg/remindutil"
 	"app/store"
 	"app/store/model"
@@ -29,29 +28,37 @@ type RemindMessage struct {
 // RemindCard 提醒卡片处理器，合并卡片构建和回调处理
 type RemindCard struct {
 	tplBuilder
-	store *store.Store
-	conf  *config.Config
+	store  *store.Store
+	sender *Sender
 }
 
 // NewRemindCard 创建提醒卡片处理器
-func NewRemindCard(store *store.Store, conf *config.Config) *RemindCard {
+func NewRemindCard(store *store.Store, conf Config) *RemindCard {
 	return &RemindCard{
 		tplBuilder: tplBuilder{
 			cardTpl:   template.Must(template.New("remind").Funcs(tplFuncs).Parse(remindCardTemplate)),
 			resultTpl: template.Must(template.New("remindResult").Funcs(tplFuncs).Parse(remindResultCardTemplate)),
 		},
-		store: store,
-		conf:  conf,
+		store:  store,
+		sender: NewSender(conf),
 	}
 }
 
 func (c *RemindCard) Actions() []string { return []string{"remind_completed", "remind_later"} }
 
-// BuildCard 构建提醒卡片
-func (c *RemindCard) BuildCard(msg RemindMessage) string { return c.execCard(msg) }
+// Send 构建提醒卡片并发送到飞书
+func (c *RemindCard) Send(ctx context.Context, msg RemindMessage) error {
+	if c.sender == nil {
+		return nil
+	}
+	return c.sender.Send(ctx, c.buildCard(msg))
+}
 
-// BuildResultCard 构建提醒结果卡片
-func (c *RemindCard) BuildResultCard(msg RemindMessage) string { return c.execResult(msg) }
+// buildCard 构建提醒卡片
+func (c *RemindCard) buildCard(msg RemindMessage) string { return c.execCard(msg) }
+
+// buildResultCard 构建提醒结果卡片
+func (c *RemindCard) buildResultCard(msg RemindMessage) string { return c.execResult(msg) }
 
 // Handle 处理提醒卡片回调，返回结果卡片 JSON 和结果文本
 func (c *RemindCard) Handle(ctx context.Context, actionValue map[string]any) (string, string, error) {
@@ -89,7 +96,7 @@ func (c *RemindCard) Handle(ctx context.Context, actionValue map[string]any) (st
 		Time:    remind.NextTime.Format("2006-01-02 15:04"),
 		Result:  resultText,
 	}
-	return c.BuildResultCard(msg), resultText, nil
+	return c.buildResultCard(msg), resultText, nil
 }
 
 // handleChange 标记完成：固定时间任务设为已完成，周期性任务恢复状态并计算下次时间

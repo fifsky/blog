@@ -1,6 +1,9 @@
 package feishu
 
-import "text/template"
+import (
+	"context"
+	"text/template"
+)
 
 // NotifyMessage 通用通知卡片消息
 type NotifyMessage struct {
@@ -11,20 +14,30 @@ type NotifyMessage struct {
 // NotifyCard 通用通知卡片处理器，纯展示无回调操作
 type NotifyCard struct {
 	tplBuilder
+	sender *Sender
 }
 
 // NewNotifyCard 创建通用通知卡片处理器
-func NewNotifyCard() *NotifyCard {
+func NewNotifyCard(conf Config) *NotifyCard {
 	return &NotifyCard{
 		tplBuilder: tplBuilder{
 			cardTpl:   template.Must(template.New("notify").Funcs(tplFuncs).Parse(notifyCardTemplate)),
 			resultTpl: nil, // 无回调，无结果卡片
 		},
+		sender: NewSender(conf),
 	}
 }
 
-// BuildCard 构建通用通知卡片
-func (c *NotifyCard) BuildCard(msg NotifyMessage) string { return c.execCard(msg) }
+// Send 构建通用通知卡片并发送到飞书
+func (c *NotifyCard) Send(ctx context.Context, msg NotifyMessage) error {
+	if c.sender == nil {
+		return nil
+	}
+	return c.sender.Send(ctx, c.buildCard(msg))
+}
+
+// buildCard 构建通用通知卡片
+func (c *NotifyCard) buildCard(msg NotifyMessage) string { return c.execCard(msg) }
 
 // notifyCardTemplate 通用通知卡片模板，纯展示无按钮
 const notifyCardTemplate = `{

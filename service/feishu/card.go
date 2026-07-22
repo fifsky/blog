@@ -9,8 +9,8 @@ import (
 )
 
 // CardHandler 卡片回调处理器接口，每种业务卡片实现并注册到 CardRegistry。
-// 卡片构建（BuildCard/BuildResultCard）是具体方法，不在接口上，
-// 各卡片可定义自己的消息结构体，调用方直接调用具体卡片的构建方法。
+// 卡片构建（buildCard/buildResultCard）是不导出的具体方法，
+// 各卡片可定义自己的消息结构体，外部通过 Send 方法发送卡片。
 type CardHandler interface {
 	// Actions 返回该处理器负责的回调 action 列表
 	Actions() []string

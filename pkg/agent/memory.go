@@ -1,4 +1,4 @@
-package aiagent
+package agent
 
 import (
 	"sync"

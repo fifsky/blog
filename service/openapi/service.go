@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"app/config"
-	"app/service/feishu"
 	"app/store"
 )
 
@@ -23,18 +22,17 @@ type Service struct {
 }
 
 func New(s *store.Store, conf *config.Config, httpClient *http.Client) *Service {
-	sender := feishu.NewSender(conf.Feishu)
 	return &Service{
-		User:      NewUser(s, conf, sender, httpClient),
+		User:      NewUser(s, conf, httpClient),
 		Article:   NewArticle(s, conf),
 		Cate:      NewCate(s),
-		Link:      NewLink(s, conf, sender),
+		Link:      NewLink(s, conf),
 		Mood:      NewMood(s),
 		Setting:   NewSetting(s),
 		Travel:    NewTravel(s),
 		MiniApp:   NewMiniApp(s, conf, httpClient),
 		Geo:       NewGeo(s),
 		Guestbook: NewGuestbook(s),
-		Comment:   NewComment(s, conf, sender),
+		Comment:   NewComment(s, conf),
 	}
 }

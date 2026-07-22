@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"app/pkg/aiagent"
+	"app/pkg/agent"
 	"app/store"
 	"app/store/model"
 
@@ -33,11 +33,11 @@ type AIProvider interface {
 }
 
 type OpenAIProvider struct {
-	agent *aiagent.Agent
+	agent *agent.Agent
 }
 
-func NewOpenAIProvider(agent *aiagent.Agent) *OpenAIProvider {
-	agent2 := agent.Clone(aiagent.WithDisableReasoning())
+func NewOpenAIProvider(aiAgent *agent.Agent) *OpenAIProvider {
+	agent2 := aiAgent.Clone(agent.WithDisableReasoning())
 
 	return &OpenAIProvider{
 		agent: agent2,
@@ -50,16 +50,16 @@ func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (
 	}
 
 	var response strings.Builder
-	result, err := p.agent.Run(ctx, aiagent.Request{
+	result, err := p.agent.Run(ctx, agent.Request{
 		SystemPrompt: prompt,
 		Messages:     messages,
 		UseTools:     true,
-	}, aiagent.EventHandler{
+	}, agent.EventHandler{
 		OnContent: func(_ context.Context, delta string) error {
 			response.WriteString(delta)
 			return nil
 		},
-		OnToolStart: func(ctx context.Context, event aiagent.ToolEvent) error {
+		OnToolStart: func(ctx context.Context, event agent.ToolEvent) error {
 			fmt.Println(event)
 			return nil
 		},

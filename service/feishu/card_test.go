@@ -8,18 +8,18 @@ import (
 )
 
 func TestRemindCard_BuildCard(t *testing.T) {
-	card := NewRemindCard(nil, nil)
+	card := NewRemindCard(nil, Config{})
 	msg := RemindMessage{
 		Content: "喝水时间到了",
 		Time:    "2026-07-01 12:00",
 		ID:      123,
 	}
 
-	cardJSON := card.BuildCard(msg)
+	cardJSON := card.buildCard(msg)
 
 	var data map[string]any
 	if err := json.Unmarshal([]byte(cardJSON), &data); err != nil {
-		t.Fatalf("BuildCard 生成的 JSON 无效: %v\n%s", err, cardJSON)
+		t.Fatalf("buildCard 生成的 JSON 无效: %v\n%s", err, cardJSON)
 	}
 	if data["schema"] != "2.0" {
 		t.Errorf("schema 应为 2.0, got %v", data["schema"])
@@ -36,18 +36,18 @@ func TestRemindCard_BuildCard(t *testing.T) {
 }
 
 func TestRemindCard_BuildResultCard(t *testing.T) {
-	card := NewRemindCard(nil, nil)
+	card := NewRemindCard(nil, Config{})
 	msg := RemindMessage{
 		Content: "喝水时间到了",
 		Time:    "2026-07-01 12:00",
 		Result:  "已确认收到提醒",
 	}
 
-	cardJSON := card.BuildResultCard(msg)
+	cardJSON := card.buildResultCard(msg)
 
 	var data map[string]any
 	if err := json.Unmarshal([]byte(cardJSON), &data); err != nil {
-		t.Fatalf("BuildResultCard 生成的 JSON 无效: %v\n%s", err, cardJSON)
+		t.Fatalf("buildResultCard 生成的 JSON 无效: %v\n%s", err, cardJSON)
 	}
 	if !strings.Contains(cardJSON, "已确认收到提醒") {
 		t.Error("卡片内容应包含结果文本")
@@ -58,14 +58,14 @@ func TestRemindCard_BuildResultCard(t *testing.T) {
 }
 
 func TestRemindCard_SpecialChars(t *testing.T) {
-	card := NewRemindCard(nil, nil)
+	card := NewRemindCard(nil, Config{})
 	msg := RemindMessage{
 		Content: `包含"引号"和\反斜杠`,
 		Time:    "2026-07-01 12:00",
 		ID:      123,
 	}
 
-	cardJSON := card.BuildCard(msg)
+	cardJSON := card.buildCard(msg)
 
 	var data map[string]any
 	if err := json.Unmarshal([]byte(cardJSON), &data); err != nil {
@@ -74,7 +74,7 @@ func TestRemindCard_SpecialChars(t *testing.T) {
 }
 
 func TestLinkCard_BuildCard(t *testing.T) {
-	card := NewLinkCard(nil, nil)
+	card := NewLinkCard(nil, Config{})
 	msg := LinkMessage{
 		Name: "测试站点",
 		URL:  "https://example.com",
@@ -82,7 +82,7 @@ func TestLinkCard_BuildCard(t *testing.T) {
 		ID:   123,
 	}
 
-	cardJSON := card.BuildCard(msg)
+	cardJSON := card.buildCard(msg)
 
 	var data map[string]any
 	if err := json.Unmarshal([]byte(cardJSON), &data); err != nil {
@@ -106,7 +106,7 @@ func TestLinkCard_BuildCard(t *testing.T) {
 }
 
 func TestLinkCard_BuildResultCard(t *testing.T) {
-	card := NewLinkCard(nil, nil)
+	card := NewLinkCard(nil, Config{})
 	msg := LinkMessage{
 		Name:   "测试站点",
 		URL:    "https://example.com",
@@ -114,7 +114,7 @@ func TestLinkCard_BuildResultCard(t *testing.T) {
 		Result: "已通过审核",
 	}
 
-	cardJSON := card.BuildResultCard(msg)
+	cardJSON := card.buildResultCard(msg)
 
 	var data map[string]any
 	if err := json.Unmarshal([]byte(cardJSON), &data); err != nil {
@@ -133,8 +133,8 @@ func TestLinkCard_BuildResultCard(t *testing.T) {
 
 func TestCardRegistry_Handle(t *testing.T) {
 	registry := NewCardRegistry()
-	registry.Register(NewRemindCard(nil, nil))
-	registry.Register(NewLinkCard(nil, nil))
+	registry.Register(NewRemindCard(nil, Config{}))
+	registry.Register(NewLinkCard(nil, Config{}))
 
 	// 未注册的 action 返回空
 	cardJSON, _, _ := registry.Handle(context.TODO(), map[string]any{"action": "unknown_action", "id": 1})
@@ -186,23 +186,23 @@ func TestParseActionValue(t *testing.T) {
 func TestCardRegistry_Register(t *testing.T) {
 	// 正常注册
 	r1 := NewCardRegistry()
-	r1.Register(NewRemindCard(nil, nil))
-	r1.Register(NewLinkCard(nil, nil))
+	r1.Register(NewRemindCard(nil, Config{}))
+	r1.Register(NewLinkCard(nil, Config{}))
 
 	// 重复注册同一个 action 应触发 panic
 	r2 := NewCardRegistry()
-	r2.Register(NewRemindCard(nil, nil))
+	r2.Register(NewRemindCard(nil, Config{}))
 
 	defer func() {
 		if r := recover(); r == nil {
 			t.Error("重复注册 action 应触发 panic")
 		}
 	}()
-	r2.Register(NewRemindCard(nil, nil))
+	r2.Register(NewRemindCard(nil, Config{}))
 }
 
 func TestCommentCard_BuildCard(t *testing.T) {
-	card := NewCommentCard()
+	card := NewCommentCard(Config{})
 	msg := CommentMessage{
 		Name:      "张三",
 		Content:   "文章写得不错",
@@ -211,7 +211,7 @@ func TestCommentCard_BuildCard(t *testing.T) {
 		Time:      "2026-07-01 14:00",
 	}
 
-	cardJSON := card.BuildCard(msg)
+	cardJSON := card.buildCard(msg)
 
 	var data map[string]any
 	if err := json.Unmarshal([]byte(cardJSON), &data); err != nil {

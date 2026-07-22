@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"text/template"
 
-	"app/config"
 	"app/store"
 	"app/store/model"
 )
@@ -28,29 +27,37 @@ type LinkMessage struct {
 // LinkCard 友情链接卡片处理器，合并卡片构建和回调处理
 type LinkCard struct {
 	tplBuilder
-	store *store.Store
-	conf  *config.Config
+	store  *store.Store
+	sender *Sender
 }
 
 // NewLinkCard 创建友情链接卡片处理器
-func NewLinkCard(store *store.Store, conf *config.Config) *LinkCard {
+func NewLinkCard(store *store.Store, conf Config) *LinkCard {
 	return &LinkCard{
 		tplBuilder: tplBuilder{
 			cardTpl:   template.Must(template.New("link").Funcs(tplFuncs).Parse(linkCardTemplate)),
 			resultTpl: template.Must(template.New("linkResult").Funcs(tplFuncs).Parse(linkResultCardTemplate)),
 		},
-		store: store,
-		conf:  conf,
+		store:  store,
+		sender: NewSender(conf),
 	}
 }
 
 func (c *LinkCard) Actions() []string { return []string{"link_approve", "link_reject"} }
 
-// BuildCard 构建友情链接审核卡片
-func (c *LinkCard) BuildCard(msg LinkMessage) string { return c.execCard(msg) }
+// Send 构建友情链接审核卡片并发送到飞书
+func (c *LinkCard) Send(ctx context.Context, msg LinkMessage) error {
+	if c.sender == nil {
+		return nil
+	}
+	return c.sender.Send(ctx, c.buildCard(msg))
+}
 
-// BuildResultCard 构建友情链接审核结果卡片
-func (c *LinkCard) BuildResultCard(msg LinkMessage) string { return c.execResult(msg) }
+// buildCard 构建友情链接审核卡片
+func (c *LinkCard) buildCard(msg LinkMessage) string { return c.execCard(msg) }
+
+// buildResultCard 构建友情链接审核结果卡片
+func (c *LinkCard) buildResultCard(msg LinkMessage) string { return c.execResult(msg) }
 
 // Handle 处理友情链接卡片回调，返回结果卡片 JSON 和结果文本
 func (c *LinkCard) Handle(ctx context.Context, actionValue map[string]any) (string, string, error) {
@@ -88,7 +95,7 @@ func (c *LinkCard) Handle(ctx context.Context, actionValue map[string]any) (stri
 		Desc:   link.Desc,
 		Result: responseText,
 	}
-	return c.BuildResultCard(msg), responseText, nil
+	return c.buildResultCard(msg), responseText, nil
 }
 
 // linkCardTemplate 友情链接审核卡片模板，包含"通过"和"拒绝"两个回调按钮

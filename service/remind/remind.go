@@ -15,18 +15,16 @@ import (
 )
 
 type Remind struct {
-	store  *store.Store
-	conf   *config.Config
-	card   *feishu.RemindCard
-	sender *feishu.Sender
+	store *store.Store
+	conf  *config.Config
+	card  *feishu.RemindCard
 }
 
-func New(s *store.Store, conf *config.Config, card *feishu.RemindCard, sender *feishu.Sender) *Remind {
+func New(s *store.Store, conf *config.Config, card *feishu.RemindCard) *Remind {
 	return &Remind{
-		store:  s,
-		conf:   conf,
-		card:   card,
-		sender: sender,
+		store: s,
+		conf:  conf,
+		card:  card,
 	}
 }
 
@@ -59,14 +57,8 @@ func (r *Remind) buildMessage(content string, v *model.Remind) feishu.RemindMess
 }
 
 func (r *Remind) message(content string, v *model.Remind) {
-	if r.sender == nil {
-		return
-	}
-
 	msg := r.buildMessage(content, v)
-	cardJSON := r.card.BuildCard(msg)
-
-	if err := r.sender.Send(context.Background(), cardJSON); err != nil {
+	if err := r.card.Send(context.Background(), msg); err != nil {
 		logger.Error("remind send message error", slog.String("err", err.Error()))
 	}
 }

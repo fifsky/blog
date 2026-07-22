@@ -1,6 +1,8 @@
 package config
 
 import (
+	"app/pkg/agent"
+	"app/service/feishu"
 	"log"
 	"log/slog"
 	"os"
@@ -23,21 +25,9 @@ type ossConf struct {
 	Bucket       string `yaml:"bucket"`
 }
 
-type MCPConf struct {
-	Name  string `yaml:"name"`  // MCP名称，用于前端展示
-	URL   string `yaml:"url"`   // MCP StreamHttp地址
-	Token string `yaml:"token"` // MCP Token
-}
-
 type MiniAPPConf struct {
 	Appid     string `yaml:"appid"`
 	AppSecret string `yaml:"app_secret"`
-}
-
-type FeishuConf struct {
-	Appid     string `yaml:"appid"`
-	AppSecret string `yaml:"app_secret"`
-	UserID    string `yaml:"user_id"`
 }
 
 // DoubaoASRConf 豆包语音识别配置
@@ -57,16 +47,16 @@ type LitestreamConf struct {
 
 type Config struct {
 	Env        string
-	LogLevel   string             `yaml:"log_level"`
-	AppName    string             `yaml:"app_name"`
-	Common     common             `yaml:"common"`
-	DB         Database           `yaml:"database"`
-	OSS        ossConf            `yaml:"oss"`
-	Litestream LitestreamConf     `yaml:"litestream"`
-	MCP        map[string]MCPConf `yaml:"mcp"`
-	MiniAPP    MiniAPPConf        `yaml:"miniapp"`
-	Feishu     FeishuConf         `yaml:"feishu"`
-	DoubaoASR  DoubaoASRConf      `yaml:"doubao_asr"`
+	LogLevel   string                   `yaml:"log_level"`
+	AppName    string                   `yaml:"app_name"`
+	Common     common                   `yaml:"common"`
+	DB         Database                 `yaml:"database"`
+	OSS        ossConf                  `yaml:"oss"`
+	Litestream LitestreamConf           `yaml:"litestream"`
+	MCP        map[string]agent.MCPConf `yaml:"mcp"`
+	MiniAPP    MiniAPPConf              `yaml:"miniapp"`
+	Feishu     feishu.Config            `yaml:"feishu"`
+	DoubaoASR  DoubaoASRConf            `yaml:"doubao_asr"`
 }
 
 func (c *Config) GetLogLevel() slog.Level {

@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"app/pkg/aiagent"
+	"app/pkg/agent"
 	"app/store"
 
 	"github.com/google/uuid"
@@ -27,17 +27,17 @@ const maxContextMessages = 20
 // AIChat handles AI chat interactions with streaming card updates.
 type AIChat struct {
 	larkClient *lark.Client
-	agent      *aiagent.Agent
-	memory     *aiagent.Memory
+	agent      *agent.Agent
+	memory     *agent.Memory
 	store      *store.Store
 }
 
 // NewAIChat creates a new AIChat instance.
-func NewAIChat(agent *aiagent.Agent, larkClient *lark.Client, s *store.Store) *AIChat {
+func NewAIChat(aiAgent *agent.Agent, larkClient *lark.Client, s *store.Store) *AIChat {
 	return &AIChat{
 		larkClient: larkClient,
-		agent:      agent,
-		memory:     aiagent.NewMemory(contextCacheTTL, maxContextMessages),
+		agent:      aiAgent,
+		memory:     agent.NewMemory(contextCacheTTL, maxContextMessages),
 		store:      s,
 	}
 }
@@ -342,11 +342,11 @@ Please answer the user's questions in a concise and friendly manner.`, time.Now(
 	updateInterval := 300 * time.Millisecond
 	lastUpdate := time.Now()
 
-	result, err := a.agent.Run(ctx, aiagent.Request{
+	result, err := a.agent.Run(ctx, agent.Request{
 		SystemPrompt: prompt,
 		Messages:     messages,
 		UseTools:     true,
-	}, aiagent.EventHandler{
+	}, agent.EventHandler{
 		OnContent: func(ctx context.Context, delta string) error {
 			content.WriteString(delta)
 			// Update card at intervals to avoid rate limiting
@@ -358,7 +358,7 @@ Please answer the user's questions in a concise and friendly manner.`, time.Now(
 			}
 			return nil
 		},
-		OnToolStart: func(ctx context.Context, event aiagent.ToolEvent) error {
+		OnToolStart: func(ctx context.Context, event agent.ToolEvent) error {
 			tipText := fmt.Sprintf("正在调用%s工具", event.MCPName)
 			if err := updater.UpdateTip(ctx, tipText); err != nil {
 				fmt.Printf("[Feishu Bot] Failed to update tip: %v\n", err)
@@ -366,7 +366,7 @@ Please answer the user's questions in a concise and friendly manner.`, time.Now(
 			fmt.Printf("[Feishu Bot] Calling tool: %s (%s)\n", event.Name, event.MCPName)
 			return nil
 		},
-		OnToolEnd: func(ctx context.Context, event aiagent.ToolEvent) error {
+		OnToolEnd: func(ctx context.Context, event agent.ToolEvent) error {
 			if err := updater.UpdateTip(ctx, "努力回答中…"); err != nil {
 				fmt.Printf("[Feishu Bot] Failed to restore tip: %v\n", err)
 			}

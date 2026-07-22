@@ -1,6 +1,9 @@
 package feishu
 
-import "text/template"
+import (
+	"context"
+	"text/template"
+)
 
 // CommentMessage 评论通知卡片消息
 type CommentMessage struct {
@@ -14,20 +17,30 @@ type CommentMessage struct {
 // CommentCard 评论通知卡片处理器，仅通知无回调操作
 type CommentCard struct {
 	tplBuilder
+	sender *Sender
 }
 
 // NewCommentCard 创建评论通知卡片处理器
-func NewCommentCard() *CommentCard {
+func NewCommentCard(conf Config) *CommentCard {
 	return &CommentCard{
 		tplBuilder: tplBuilder{
 			cardTpl:   template.Must(template.New("comment").Funcs(tplFuncs).Parse(commentCardTemplate)),
 			resultTpl: nil, // 无结果卡片
 		},
+		sender: NewSender(conf),
 	}
 }
 
-// BuildCard 构建评论通知卡片
-func (c *CommentCard) BuildCard(msg CommentMessage) string { return c.execCard(msg) }
+// Send 构建评论通知卡片并发送到飞书
+func (c *CommentCard) Send(ctx context.Context, msg CommentMessage) error {
+	if c.sender == nil {
+		return nil
+	}
+	return c.sender.Send(ctx, c.buildCard(msg))
+}
+
+// buildCard 构建评论通知卡片
+func (c *CommentCard) buildCard(msg CommentMessage) string { return c.execCard(msg) }
 
 // commentCardTemplate 评论通知卡片模板，纯展示无按钮
 const commentCardTemplate = `{

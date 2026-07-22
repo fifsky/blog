@@ -1,5 +1,5 @@
-// Package aiagent 提供 OpenAI 与 MCP 工具调用的通用编排流程。
-package aiagent
+// Package agent 提供 OpenAI 与 MCP 工具调用的通用编排流程。
+package agent
 
 import (
 	"context"
@@ -7,12 +7,18 @@ import (
 	"fmt"
 	"strings"
 
-	"app/config"
 	mcpclient "app/pkg/mcp"
 
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/shared"
 )
+
+// MCPConf 描述一个 MCP StreamHttp 服务端点的配置。
+type MCPConf struct {
+	Name  string `yaml:"name"`  // MCP名称，用于前端展示
+	URL   string `yaml:"url"`   // MCP StreamHttp地址
+	Token string `yaml:"token"` // MCP Token
+}
 
 type toolProvider interface {
 	HasClients() bool
@@ -127,7 +133,7 @@ func WithConfigProvider(provider func(ctx context.Context) (openai.Client, strin
 }
 
 // WithMCP 设置 MCP 配置
-func WithMCP(mcp map[string]config.MCPConf) Option {
+func WithMCP(mcp map[string]MCPConf) Option {
 	return func(a *Agent) {
 		manager := mcpclient.NewManager()
 		for key, mcpConf := range mcp {

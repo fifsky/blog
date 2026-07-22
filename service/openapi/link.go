@@ -22,15 +22,13 @@ type Link struct {
 	store    *store.Store
 	conf     *config.Config
 	linkCard *feishu.LinkCard
-	sender   *feishu.Sender
 }
 
-func NewLink(s *store.Store, conf *config.Config, sender *feishu.Sender) *Link {
+func NewLink(s *store.Store, conf *config.Config) *Link {
 	return &Link{
 		store:    s,
 		conf:     conf,
-		linkCard: feishu.NewLinkCard(s, conf),
-		sender:   sender,
+		linkCard: feishu.NewLinkCard(s, conf.Feishu),
 	}
 }
 
@@ -69,19 +67,13 @@ func (l *Link) Submit(ctx context.Context, req *apiv1.LinkSubmitRequest) (*empty
 
 // notifyLinkSubmit 发送友情链接提交审核通知
 func (l *Link) notifyLinkSubmit(id int64, name, url, desc string) {
-	if l.sender == nil {
-		return
-	}
-
 	msg := feishu.LinkMessage{
 		Name: name,
 		URL:  url,
 		Desc: desc,
 		ID:   int(id),
 	}
-	cardJSON := l.linkCard.BuildCard(msg)
-
-	if err := l.sender.Send(context.Background(), cardJSON); err != nil {
+	if err := l.linkCard.Send(context.Background(), msg); err != nil {
 		logger.Error("link notify send error", slog.String("err", err.Error()))
 	}
 }

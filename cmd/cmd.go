@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"app/config"
-	"app/pkg/aiagent"
+	"app/pkg/agent"
 	"app/pkg/litestream"
 	"app/service/feishu"
 	"app/service/remind"
@@ -24,7 +24,7 @@ import (
 type Command struct {
 	store *store.Store
 	conf  *config.Config
-	agent *aiagent.Agent
+	agent *agent.Agent
 	wg    sync.WaitGroup
 }
 
@@ -45,8 +45,8 @@ func (c *Command) Init(ctx context.Context) (func(), error) {
 	db := c.conf.DB.Connect()
 	c.store = store.New(db)
 
-	c.agent = aiagent.New(
-		aiagent.WithConfigProvider(func(ctx context.Context) (openai.Client, string) {
+	c.agent = agent.New(
+		agent.WithConfigProvider(func(ctx context.Context) (openai.Client, string) {
 			aiCfg := c.store.GetAIConfig(ctx)
 			logger.Debug("ai config", slog.Any("config", aiCfg))
 			client := openai.NewClient(
@@ -55,7 +55,7 @@ func (c *Command) Init(ctx context.Context) (func(), error) {
 			)
 			return client, aiCfg.Model
 		}),
-		aiagent.WithMCP(c.conf.MCP),
+		agent.WithMCP(c.conf.MCP),
 	)
 
 	return func() {
@@ -73,12 +73,11 @@ func (c *Command) Init(ctx context.Context) (func(), error) {
 }
 
 func (c *Command) runRemind(ctx context.Context) {
-	// 创建飞书发送器和卡片处理器（仅保留跨服务共享的部分）
-	sender := feishu.NewSender(c.conf.Feishu)
-	remindCard := feishu.NewRemindCard(c.store, c.conf)
-	linkCard := feishu.NewLinkCard(c.store, c.conf)
+	// 卡片处理器内部自行创建飞书发送器，无需外部注入
+	remindCard := feishu.NewRemindCard(c.store, c.conf.Feishu)
+	linkCard := feishu.NewLinkCard(c.store, c.conf.Feishu)
 
-	r := remind.New(c.store, c.conf, remindCard, sender)
+	r := remind.New(c.store, c.conf, remindCard)
 	c.wg.Go(func() {
 		r.Start(ctx)
 	})
@@ -89,7 +88,7 @@ func (c *Command) runRemind(ctx context.Context) {
 	registry.Register(linkCard)
 	// Feishu bot service
 	if c.conf.Feishu.Appid != "" {
-		feishuBot := feishu.NewBot(c.conf, c.store, c.agent, registry)
+		feishuBot := feishu.NewBot(c.conf.Feishu, c.store, c.agent, registry)
 		c.wg.Go(func() {
 			feishuBot.Start(ctx)
 		})

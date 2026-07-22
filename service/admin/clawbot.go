@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"app/config"
-	"app/pkg/aiagent"
+	"app/pkg/agent"
 	"app/pkg/clawbot"
 	apperrors "app/pkg/errors"
 	adminv1 "app/proto/gen/admin/v1"
@@ -67,8 +67,8 @@ func WithClawBotMonitor(enabled bool) ClawBotOption {
 type ClawBot struct {
 	store  *store.Store
 	conf   *config.Config
-	agent  *aiagent.Agent
-	memory *aiagent.Memory
+	agent  *agent.Agent
+	memory *agent.Memory
 
 	baseURL    string
 	botType    string
@@ -87,7 +87,7 @@ type ClawBot struct {
 	lastError      string
 }
 
-func NewClawBot(s *store.Store, conf *config.Config, agent *aiagent.Agent, opts ...ClawBotOption) *ClawBot {
+func NewClawBot(s *store.Store, conf *config.Config, aiAgent *agent.Agent, opts ...ClawBotOption) *ClawBot {
 	if conf == nil {
 		conf = &config.Config{}
 	}
@@ -95,8 +95,8 @@ func NewClawBot(s *store.Store, conf *config.Config, agent *aiagent.Agent, opts 
 	c := &ClawBot{
 		store:          s,
 		conf:           conf,
-		agent:          agent,
-		memory:         aiagent.NewMemory(clawBotContextTTL, clawBotMaxContextLength),
+		agent:          aiAgent,
+		memory:         agent.NewMemory(clawBotContextTTL, clawBotMaxContextLength),
 		botType:        clawbot.DefaultBotType,
 		httpClient:     &http.Client{},
 		sessions:       make(map[string]*clawbot.LoginSession),
@@ -425,7 +425,7 @@ func (c *ClawBot) sendMessageTyping(ctx context.Context, client *clawbot.Client,
 
 func (c *ClawBot) runAI(ctx context.Context, memoryKey, userMessage string) (string, error) {
 	if c.agent == nil {
-		return "", fmt.Errorf("clawbot aiagent is nil")
+		return "", fmt.Errorf("clawbot agent is nil")
 	}
 
 	c.memory.CleanExpired()
@@ -435,11 +435,11 @@ func (c *ClawBot) runAI(ctx context.Context, memoryKey, userMessage string) (str
 	messages = append(messages, openai.UserMessage(userMessage))
 
 	var content strings.Builder
-	result, err := c.agent.Run(ctx, aiagent.Request{
+	result, err := c.agent.Run(ctx, agent.Request{
 		SystemPrompt: c.buildSystemPrompt(),
 		Messages:     messages,
 		UseTools:     true,
-	}, aiagent.EventHandler{
+	}, agent.EventHandler{
 		OnContent: func(_ context.Context, delta string) error {
 			content.WriteString(delta)
 			return nil

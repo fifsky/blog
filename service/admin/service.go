@@ -2,7 +2,7 @@ package admin
 
 import (
 	"app/config"
-	"app/pkg/aiagent"
+	"app/pkg/agent"
 
 	"app/store"
 )
@@ -23,7 +23,7 @@ type Service struct {
 	Comment   *Comment
 }
 
-func New(s *store.Store, conf *config.Config, agent *aiagent.Agent) *Service {
+func New(s *store.Store, conf *config.Config, aiAgent *agent.Agent) *Service {
 	return &Service{
 		User:      NewUser(s, conf),
 		Article:   NewArticle(s, conf),
@@ -32,9 +32,9 @@ func New(s *store.Store, conf *config.Config, agent *aiagent.Agent) *Service {
 		Mood:      NewMood(s),
 		Remind:    NewRemind(s),
 		Setting:   NewSetting(s),
-		AI:        NewAI(agent, s, conf),
+		AI:        NewAI(aiAgent, s, conf),
 		OSS:       NewOSS(conf),
-		ClawBot:   NewClawBot(s, conf, agent),
+		ClawBot:   NewClawBot(s, conf, aiAgent),
 		Guestbook: NewGuestbook(s),
 		Footprint: NewFootprint(s),
 		Comment:   NewComment(s),

@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"app/config"
-	"app/pkg/aiagent"
+	"app/pkg/agent"
 	"app/pkg/clawbot"
 	"app/pkg/dbunit"
 	adminv1 "app/proto/gen/admin/v1"
@@ -212,11 +212,11 @@ func TestClawBotHandleMessageSendsTypingAndCancelsBeforeReply(t *testing.T) {
 	}))
 	defer server.Close()
 
-	agent := aiagent.New(
-		aiagent.WithClient(openai.NewClient(option.WithAPIKey("test"), option.WithBaseURL(server.URL))),
-		aiagent.WithModel("test-model"),
+	aiAgent := agent.New(
+		agent.WithClient(openai.NewClient(option.WithAPIKey("test"), option.WithBaseURL(server.URL))),
+		agent.WithModel("test-model"),
 	)
-	svc := NewClawBot(nil, &config.Config{}, agent, WithClawBotMonitor(false))
+	svc := NewClawBot(nil, &config.Config{}, aiAgent, WithClawBotMonitor(false))
 	account := &clawbot.Account{
 		AccountID: "bot@im.bot",
 		BotToken:  "bot-token",

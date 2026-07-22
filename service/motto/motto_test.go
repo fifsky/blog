@@ -10,8 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"app/config"
-	"app/pkg/aiagent"
+	"app/pkg/agent"
 	"app/pkg/dbunit"
 	"app/store"
 	"app/testutil"
@@ -86,9 +85,9 @@ func TestOpenAIProvider_GenerateWrapsAgentRun(t *testing.T) {
 			(22, 'ai_model', 'test-model')`, ts.URL)
 		require.NoError(t, err)
 
-		provider := NewOpenAIProvider(aiagent.New(
-			aiagent.WithClient(openai.NewClient(option.WithAPIKey("test"), option.WithBaseURL(ts.URL))),
-			aiagent.WithModel("test"),
+		provider := NewOpenAIProvider(agent.New(
+			agent.WithClient(openai.NewClient(option.WithAPIKey("test"), option.WithBaseURL(ts.URL))),
+			agent.WithModel("test"),
 		))
 		got, err := provider.Generate(context.Background(), "system prompt", "2026-05-22")
 		require.NoError(t, err)
@@ -113,10 +112,10 @@ func TestOpenAIProvider_Generate(t *testing.T) {
 		option.WithAPIKey(os.Getenv("AI_TOKEN")),
 		option.WithBaseURL(os.Getenv("AI_ENDPOINT")),
 	)
-	ai := NewOpenAIProvider(aiagent.New(
-		aiagent.WithClient(client),
-		aiagent.WithModel(os.Getenv("AI_MODEL")),
-		aiagent.WithMCP(map[string]config.MCPConf{
+	ai := NewOpenAIProvider(agent.New(
+		agent.WithClient(client),
+		agent.WithModel(os.Getenv("AI_MODEL")),
+		agent.WithMCP(map[string]agent.MCPConf{
 			"web_search": {
 				Name: "联网搜索",
 				URL:  os.Getenv("WEBSEARCH_MCP"),

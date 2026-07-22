@@ -27,16 +27,14 @@ type User struct {
 	store      *store.Store
 	conf       *config.Config
 	notifyCard *feishu.NotifyCard
-	sender     *feishu.Sender
 	httpClient *http.Client
 }
 
-func NewUser(s *store.Store, conf *config.Config, sender *feishu.Sender, httpClient *http.Client) *User {
+func NewUser(s *store.Store, conf *config.Config, httpClient *http.Client) *User {
 	return &User{
 		store:      s,
 		conf:       conf,
-		notifyCard: feishu.NewNotifyCard(),
-		sender:     sender,
+		notifyCard: feishu.NewNotifyCard(conf.Feishu),
 		httpClient: httpClient,
 	}
 }
@@ -87,10 +85,6 @@ func (u *User) Login(ctx context.Context, in *apiv1.LoginRequest) (*apiv1.LoginR
 
 // notifyLogin 异步发送登录通知到飞书
 func (u *User) notifyLogin(ctx context.Context, userName string) {
-	if u.sender == nil || u.notifyCard == nil {
-		return
-	}
-
 	ip := middleware.ClientIPFromContext(ctx)
 
 	go func() {
@@ -132,9 +126,7 @@ func (u *User) notifyLogin(ctx context.Context, userName string) {
 			Content: content,
 			Time:    time.Now().Format("2006-01-02 15:04:05"),
 		}
-		cardJSON := u.notifyCard.BuildCard(msg)
-
-		if err := u.sender.Send(context.Background(), cardJSON); err != nil {
+		if err := u.notifyCard.Send(context.Background(), msg); err != nil {
 			logger.Error("login notify send error", slog.String("err", err.Error()))
 		}
 	}()

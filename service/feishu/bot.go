@@ -8,8 +8,7 @@ import (
 	"io"
 	"strings"
 
-	"app/config"
-	"app/pkg/aiagent"
+	"app/pkg/agent"
 	"app/store"
 
 	lark "github.com/larksuite/oapi-sdk-go/v3"
@@ -23,7 +22,6 @@ import (
 // Bot represents the Feishu bot service that listens for messages via WebSocket
 // and responds with AI-generated content using streaming card updates.
 type Bot struct {
-	conf       *config.Config
 	larkClient *lark.Client
 	wsClient   *ws.Client
 	aiChat     *AIChat
@@ -31,20 +29,19 @@ type Bot struct {
 }
 
 // NewBot creates a new Feishu bot instance.
-func NewBot(conf *config.Config, s *store.Store, agent *aiagent.Agent, registry *CardRegistry) *Bot {
+func NewBot(conf Config, s *store.Store, aiAgent *agent.Agent, registry *CardRegistry) *Bot {
 	// Create Lark client for API calls
 	larkClient := lark.NewClient(
-		conf.Feishu.Appid,
-		conf.Feishu.AppSecret,
+		conf.Appid,
+		conf.AppSecret,
 		lark.WithLogLevel(larkcore.LogLevelInfo),
 	)
 
 	// Create AI chat handler
-	aiChat := NewAIChat(agent, larkClient, s)
+	aiChat := NewAIChat(aiAgent, larkClient, s)
 
 	// Create bot instance first so we can reference it in the handler
 	bot := &Bot{
-		conf:       conf,
 		larkClient: larkClient,
 		aiChat:     aiChat,
 		registry:   registry,
@@ -57,8 +54,8 @@ func NewBot(conf *config.Config, s *store.Store, agent *aiagent.Agent, registry 
 
 	// Create WebSocket client
 	bot.wsClient = ws.NewClient(
-		conf.Feishu.Appid,
-		conf.Feishu.AppSecret,
+		conf.Appid,
+		conf.AppSecret,
 		ws.WithEventHandler(eventHandler),
 		ws.WithLogLevel(larkcore.LogLevelInfo),
 	)

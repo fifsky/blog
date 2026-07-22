@@ -1,12 +1,17 @@
 package feishu
 
 import (
-	"app/config"
 	"context"
 
 	lark "github.com/larksuite/oapi-sdk-go/v3"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
 )
+
+type Config struct {
+	Appid     string `yaml:"appid"`
+	AppSecret string `yaml:"app_secret"`
+	UserID    string `yaml:"user_id"`
+}
 
 // Sender 通过飞书机器人发送卡片消息，只负责发送 JSON 字符串
 type Sender struct {
@@ -15,7 +20,7 @@ type Sender struct {
 }
 
 // NewSender 创建飞书发送器，飞书配置缺失时返回 nil
-func NewSender(conf config.FeishuConf) *Sender {
+func NewSender(conf Config) *Sender {
 	if conf.Appid == "" || conf.AppSecret == "" || conf.UserID == "" {
 		return nil
 	}
