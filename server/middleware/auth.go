@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"app/config"
 	"app/pkg/errors"
 	"app/server/response"
 	"app/service/admin"
@@ -16,7 +15,7 @@ import (
 
 type AuthLogin = func(next http.Handler) http.Handler
 
-func NewAuthLogin(s *store.Store, conf *config.Config) AuthLogin {
+func NewAuthLogin(s *store.Store, tokenSecret string) AuthLogin {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			accessToken := readBearerToken(r)
@@ -27,7 +26,7 @@ func NewAuthLogin(s *store.Store, conf *config.Config) AuthLogin {
 			}
 
 			token, err := jwt.ParseWithClaims(accessToken, &jwt.RegisteredClaims{}, func(token *jwt.Token) (any, error) {
-				return []byte(conf.Common.TokenSecret), nil
+				return []byte(tokenSecret), nil
 			})
 
 			if err != nil {

@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"app/config"
 	"app/pkg/dbunit"
 	"app/store"
 	"app/testutil"
@@ -16,20 +15,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func getUserTestToken(id int, conf *config.Config) string {
+func getUserTestToken(id int, tokenSecret string) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		Issuer:    fmt.Sprint(id),
 	})
 
-	tokenString, _ := token.SignedString([]byte(conf.Common.TokenSecret))
+	tokenString, _ := token.SignedString([]byte(tokenSecret))
 	// fmt.Println("===>", tokenString, err)
 	return tokenString
 }
 
 func TestNewAuthLogin(t *testing.T) {
-	conf := &config.Config{}
-	conf.Common.TokenSecret = "abcdabcdabcdabcd"
+	tokenSecret := "abcdabcdabcdabcd"
 
 	dbunit.New(t, func(d *dbunit.DBUnit) {
 		db := d.NewDatabase(testutil.Schema(), testutil.Fixtures("users"))
@@ -40,7 +38,7 @@ func TestNewAuthLogin(t *testing.T) {
 		}{
 			// 1. 正常登录，Token 有效且用户存在
 			{
-				getUserTestToken(1, conf),
+				getUserTestToken(1, tokenSecret),
 				`{"code":10000,"msg":"success"}`,
 			},
 			// 2. 未提供 Token
@@ -55,7 +53,7 @@ func TestNewAuthLogin(t *testing.T) {
 			},
 			// 4. Token 有效但用户不存在
 			{
-				getUserTestToken(999, conf),
+				getUserTestToken(999, tokenSecret),
 				`{"code":"UNAUTHORIZED","message":"登录过期，请重新登录","details":{"user_id":"999"}}`,
 			},
 		}
@@ -67,7 +65,7 @@ func TestNewAuthLogin(t *testing.T) {
 		})
 
 		for _, tt := range tests {
-			m := NewAuthLogin(store.New(db), conf)
+			m := NewAuthLogin(store.New(db), tokenSecret)
 
 			handler := m(next)
 
