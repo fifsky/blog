@@ -22,10 +22,10 @@ type Link struct {
 	store    *store.Store
 	conf     *config.Config
 	linkCard *feishu.LinkCard
-	sender   *feishu.FeishuSender
+	sender   *feishu.Sender
 }
 
-func NewLink(s *store.Store, conf *config.Config, sender *feishu.FeishuSender) *Link {
+func NewLink(s *store.Store, conf *config.Config, sender *feishu.Sender) *Link {
 	return &Link{
 		store:    s,
 		conf:     conf,

@@ -23,7 +23,7 @@ type Service struct {
 }
 
 func New(s *store.Store, conf *config.Config, httpClient *http.Client) *Service {
-	sender := feishu.NewFeishuSender(conf.Feishu)
+	sender := feishu.NewSender(conf.Feishu)
 	return &Service{
 		User:      NewUser(s, conf, sender, httpClient),
 		Article:   NewArticle(s, conf),

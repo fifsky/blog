@@ -18,10 +18,10 @@ type Remind struct {
 	store  *store.Store
 	conf   *config.Config
 	card   *feishu.RemindCard
-	sender *feishu.FeishuSender
+	sender *feishu.Sender
 }
 
-func New(s *store.Store, conf *config.Config, card *feishu.RemindCard, sender *feishu.FeishuSender) *Remind {
+func New(s *store.Store, conf *config.Config, card *feishu.RemindCard, sender *feishu.Sender) *Remind {
 	return &Remind{
 		store:  s,
 		conf:   conf,
@@ -30,11 +30,18 @@ func New(s *store.Store, conf *config.Config, card *feishu.RemindCard, sender *f
 	}
 }
 
-func (r *Remind) Start() {
+// Start 启动定时提醒轮询，ctx 取消后优雅退出
+func (r *Remind) Start(ctx context.Context) {
 	t := time.NewTicker(60 * time.Second)
+	defer t.Stop()
 
-	for t1 := range t.C {
-		r.run(t1)
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case t1 := <-t.C:
+			r.run(t1)
+		}
 	}
 }
 

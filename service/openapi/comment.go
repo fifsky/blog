@@ -29,7 +29,7 @@ type Comment struct {
 	conf      *config.Config
 	moderator ContentModerator
 	card      *feishu.CommentCard
-	sender    *feishu.FeishuSender
+	sender    *feishu.Sender
 }
 
 // CommentOption 用于配置 Comment 的选项函数
@@ -43,7 +43,7 @@ func WithCommentModerator(m ContentModerator) CommentOption {
 }
 
 // NewComment 创建评论服务，默认使用 AI 审核器
-func NewComment(s *store.Store, conf *config.Config, sender *feishu.FeishuSender, opts ...CommentOption) *Comment {
+func NewComment(s *store.Store, conf *config.Config, sender *feishu.Sender, opts ...CommentOption) *Comment {
 	c := &Comment{
 		store:  s,
 		conf:   conf,

@@ -27,11 +27,11 @@ type User struct {
 	store      *store.Store
 	conf       *config.Config
 	notifyCard *feishu.NotifyCard
-	sender     *feishu.FeishuSender
+	sender     *feishu.Sender
 	httpClient *http.Client
 }
 
-func NewUser(s *store.Store, conf *config.Config, sender *feishu.FeishuSender, httpClient *http.Client) *User {
+func NewUser(s *store.Store, conf *config.Config, sender *feishu.Sender, httpClient *http.Client) *User {
 	return &User{
 		store:      s,
 		conf:       conf,

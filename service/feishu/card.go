@@ -6,58 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"text/template"
-
-	"app/config"
-
-	lark "github.com/larksuite/oapi-sdk-go/v3"
-	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
 )
-
-// FeishuSender 通过飞书机器人发送卡片消息，只负责发送 JSON 字符串
-type FeishuSender struct {
-	client *lark.Client
-	userID string
-}
-
-// NewFeishuSender 创建飞书发送器，飞书配置缺失时返回 nil
-func NewFeishuSender(conf config.FeishuConf) *FeishuSender {
-	if conf.Appid == "" || conf.AppSecret == "" || conf.UserID == "" {
-		return nil
-	}
-	return &FeishuSender{
-		client: lark.NewClient(conf.Appid, conf.AppSecret),
-		userID: conf.UserID,
-	}
-}
-
-// Send 发送卡片 JSON 到飞书
-func (f *FeishuSender) Send(ctx context.Context, cardJSON string) error {
-	req := larkim.NewCreateMessageReqBuilder().
-		ReceiveIdType("open_id").
-		Body(larkim.NewCreateMessageReqBodyBuilder().
-			ReceiveId(f.userID).
-			MsgType("interactive").
-			Content(cardJSON).
-			Build()).
-		Build()
-
-	resp, err := f.client.Im.Message.Create(ctx, req)
-	if err != nil {
-		return err
-	}
-	if !resp.Success() {
-		return &FeishuError{Code: resp.Code, Msg: resp.Msg}
-	}
-	return nil
-}
-
-// FeishuError 飞书 API 错误
-type FeishuError struct {
-	Code int
-	Msg  string
-}
-
-func (e *FeishuError) Error() string { return e.Msg }
 
 // CardHandler 卡片回调处理器接口，每种业务卡片实现并注册到 CardRegistry。
 // 卡片构建（BuildCard/BuildResultCard）是具体方法，不在接口上，
