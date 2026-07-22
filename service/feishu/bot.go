@@ -38,7 +38,7 @@ func NewBot(conf Config, s *store.Store, aiAgent *agent.Agent, registry *CardReg
 	)
 
 	// Create AI chat handler
-	aiChat := NewAIChat(aiAgent, larkClient, s)
+	aiChat := NewAIChat(aiAgent, larkClient)
 
 	// Create bot instance first so we can reference it in the handler
 	bot := &Bot{

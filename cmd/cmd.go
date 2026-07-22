@@ -77,7 +77,7 @@ func (c *Command) runRemind(ctx context.Context) {
 	remindCard := feishu.NewRemindCard(c.store, c.conf.Feishu)
 	linkCard := feishu.NewLinkCard(c.store, c.conf.Feishu)
 
-	r := remind.New(c.store, c.conf, remindCard)
+	r := remind.New(c.store, remindCard)
 	c.wg.Go(func() {
 		r.Start(ctx)
 	})

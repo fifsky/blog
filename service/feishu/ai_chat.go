@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"app/pkg/agent"
-	"app/store"
 
 	"github.com/google/uuid"
 	lark "github.com/larksuite/oapi-sdk-go/v3"
@@ -29,16 +28,14 @@ type AIChat struct {
 	larkClient *lark.Client
 	agent      *agent.Agent
 	memory     *agent.Memory
-	store      *store.Store
 }
 
 // NewAIChat creates a new AIChat instance.
-func NewAIChat(aiAgent *agent.Agent, larkClient *lark.Client, s *store.Store) *AIChat {
+func NewAIChat(aiAgent *agent.Agent, larkClient *lark.Client) *AIChat {
 	return &AIChat{
 		larkClient: larkClient,
 		agent:      aiAgent,
 		memory:     agent.NewMemory(contextCacheTTL, maxContextMessages),
-		store:      s,
 	}
 }
 

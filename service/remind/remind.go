@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"time"
 
-	"app/config"
 	"app/pkg/remindutil"
 	"app/service/feishu"
 	"app/store"
@@ -16,14 +15,12 @@ import (
 
 type Remind struct {
 	store *store.Store
-	conf  *config.Config
 	card  *feishu.RemindCard
 }
 
-func New(s *store.Store, conf *config.Config, card *feishu.RemindCard) *Remind {
+func New(s *store.Store, card *feishu.RemindCard) *Remind {
 	return &Remind{
 		store: s,
-		conf:  conf,
 		card:  card,
 	}
 }
