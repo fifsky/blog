@@ -37,8 +37,8 @@ func New(sched *scheduler.Scheduler, s *store.Store, card *feishu.RemindCard) (*
 }
 
 // handler 是调度器触发的任务处理函数，扫描到期提醒并发送飞书消息。
-func (r *Remind) handler(_ context.Context) error {
-	r.run(time.Now())
+func (r *Remind) handler(ctx context.Context) error {
+	r.run(ctx, time.Now())
 	return nil
 }
 
@@ -64,8 +64,8 @@ func (r *Remind) changeNextTime(v *model.Remind) {
 	_ = r.store.UpdateRemindNextTime(context.Background(), v.Id, nextTime)
 }
 
-func (r *Remind) run(t time.Time) {
-	reminds, _ := r.store.RemindAll(context.Background())
+func (r *Remind) run(ctx context.Context, t time.Time) {
+	reminds, _ := r.store.RemindAll(ctx)
 
 	for _, v := range reminds {
 		content := v.Content
