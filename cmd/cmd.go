@@ -6,13 +6,14 @@ import (
 	"log"
 	"log/slog"
 	"os"
-	"sync"
 
 	"app/config"
 	"app/pkg/agent"
 	"app/pkg/litestream"
+	"app/runner"
+	"app/runner/feishu"
+	"app/runner/remind"
 	"app/service/feishu"
-	"app/service/remind"
 	"app/store"
 
 	"github.com/goapt/logger"
@@ -25,7 +26,6 @@ type Command struct {
 	store *store.Store
 	conf  *config.Config
 	agent *agent.Agent
-	wg    sync.WaitGroup
 }
 
 func NewCommand() *Command {
@@ -59,8 +59,7 @@ func (c *Command) Init(ctx context.Context) (func(), error) {
 	)
 
 	return func() {
-		// 等待后台 goroutine（remind、feishu bot）退出，避免使用已关闭的 DB
-		c.wg.Wait()
+		// 后台任务已由调用方通过 runner.Stop/Wait 退出（见 httpCommand 中的 defer）
 		// 先关闭应用层数据库连接
 		if err := db.Close(); err != nil {
 			log.Printf("[db] database close error: %s", err)
@@ -72,34 +71,33 @@ func (c *Command) Init(ctx context.Context) (func(), error) {
 	}, nil
 }
 
-func (c *Command) runRemind(ctx context.Context) {
+// runBackground 装配并启动后台任务（提醒轮询、飞书机器人），返回 runner 供调用方优雅停止。
+// 卡片处理器与注册表在此集中装配并注入相关 task，保持依赖解耦。
+func (c *Command) runBackground(ctx context.Context) *runner.Runner {
 	// 卡片处理器内部自行创建飞书发送器，无需外部注入
 	remindCard := feishu.NewRemindCard(c.store, c.conf.Feishu)
 	linkCard := feishu.NewLinkCard(c.store, c.conf.Feishu)
 
-	r := remind.New(c.store, remindCard)
-	c.wg.Go(func() {
-		r.Start(ctx)
-	})
-
-	// 创建卡片注册表（用于 bot 回调分发）
+	// 卡片注册表（用于 bot 回调分发），注册提醒与友情链接卡片
 	registry := feishu.NewCardRegistry()
 	registry.Register(remindCard)
 	registry.Register(linkCard)
-	// Feishu bot service
-	if c.conf.Feishu.Appid != "" {
-		feishuBot := feishu.NewBot(c.conf.Feishu, c.agent, registry)
-		c.wg.Go(func() {
-			feishuBot.Start(ctx)
-		})
-	}
-}
 
-func (c *Command) runMotto(ctx context.Context) {
-	// TODO 临时停用自动生成心情
-	// ai := motto.NewOpenAIProvider(agent)
-	// m := motto.New(s, ai)
-	// go m.Start("0 7 * * *")
+	r := runner.New()
+	// 提醒定时轮询
+	r.Register(remind.New(c.store, remindCard))
+	// 飞书机器人（仅配置了 Appid 时启动）
+	if c.conf.Feishu.Appid != "" {
+		r.Register(feishubot.New(c.conf.Feishu, c.agent, registry))
+	}
+	// motto 临时停用；如需启用：
+	//   import (
+	//     "app/runner/motto"
+	//     aimotto "app/service/motto"
+	//   )
+	//   r.Register(motto.New(c.store, aimotto.NewOpenAIProvider(c.agent), "0 7 * * *"))
+	_ = r.Start(ctx)
+	return r
 }
 
 func (c *Command) Run(ctx context.Context) error {

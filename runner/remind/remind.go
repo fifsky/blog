@@ -13,11 +13,14 @@ import (
 	"github.com/goapt/logger"
 )
 
+// Remind 定时提醒轮询任务，每分钟扫描到期提醒并通过飞书卡片发送。
+// 实现 runner.Task 接口，ctx 取消后优雅退出。
 type Remind struct {
 	store *store.Store
 	card  *feishu.RemindCard
 }
 
+// New 创建提醒轮询任务，card 为发送提醒使用的飞书卡片处理器
 func New(s *store.Store, card *feishu.RemindCard) *Remind {
 	return &Remind{
 		store: s,
@@ -25,24 +28,22 @@ func New(s *store.Store, card *feishu.RemindCard) *Remind {
 	}
 }
 
-// Start 启动定时提醒轮询，ctx 取消后优雅退出
-func (r *Remind) Start(ctx context.Context) {
+// Name 返回任务名
+func (r *Remind) Name() string { return "remind" }
+
+// Start 启动定时提醒轮询，每 60 秒扫描一次，ctx 取消后退出。
+func (r *Remind) Start(ctx context.Context) error {
 	t := time.NewTicker(60 * time.Second)
 	defer t.Stop()
 
 	for {
 		select {
 		case <-ctx.Done():
-			return
+			return nil
 		case t1 := <-t.C:
 			r.run(t1)
 		}
 	}
-}
-
-// NextTimeFromRule 根据提醒规则计算下一次触发时间，委托给 remindutil 包
-func NextTimeFromRule(from time.Time, m *model.Remind) time.Time {
-	return remindutil.NextTimeFromRule(from, m)
 }
 
 func (r *Remind) buildMessage(content string, v *model.Remind) feishu.RemindMessage {
@@ -61,7 +62,7 @@ func (r *Remind) message(content string, v *model.Remind) {
 }
 
 func (r *Remind) changeNextTime(v *model.Remind) {
-	nextTime := NextTimeFromRule(time.Now(), v)
+	nextTime := remindutil.NextTimeFromRule(time.Now(), v)
 
 	_ = r.store.UpdateRemindStatus(context.Background(), v.Id, model.RemindStatusPending)
 	_ = r.store.UpdateRemindNextTime(context.Background(), v.Id, nextTime)

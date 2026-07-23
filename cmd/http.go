@@ -41,8 +41,12 @@ func httpCommand(c *Command) *cli.Command {
 			log.Println("[Env] Run profile:" + c.conf.Env)
 
 			// 启动后台服务（remind 定时提醒、feishu bot），与 http server 并发运行
-			c.runRemind(ctx)
-			c.runMotto(ctx)
+			bg := c.runBackground(ctx)
+			defer func() {
+				// 显式停止需释放资源的 task，并等待所有后台退出，避免使用已关闭的 DB
+				bg.Stop()
+				bg.Wait()
+			}()
 
 			// 日志和 HTTP 客户端在 http 命令内就近创建，避免从 main 一路透传
 			accessLogger := config.NewLogger(c.conf, "access.log")

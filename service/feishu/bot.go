@@ -69,6 +69,11 @@ func (b *Bot) Start(ctx context.Context) {
 	_ = b.wsClient.Start(ctx)
 }
 
+// Close 关闭 WebSocket 连接并禁用自动重连，应在 Start 返回后调用。
+func (b *Bot) Close() {
+	b.wsClient.Close()
+}
+
 // handleCardAction handles card button callback actions.
 // 逻辑固定不变：委托 registry 分发 -> 返回结果卡片。
 // 新增卡片类型只需实现 CardHandler 并在注册表中注册，无需修改此方法。

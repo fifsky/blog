@@ -3,20 +3,15 @@ package motto
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"strings"
-	"time"
 
 	"app/pkg/agent"
-	"app/store"
-	"app/store/model"
 
-	"github.com/goapt/logger"
 	"github.com/openai/openai-go/v3"
-	"github.com/robfig/cron/v3"
 )
 
 var (
+	// Prompt 每日心情生成的系统提示词
 	Prompt = `# 角色
 你是一个忧郁的诗人，在你的内心世界里，只有诗和远方。
 1. 根据各种平台（如抖音、微博、微信等）精选文案生成每日心情日志。
@@ -32,10 +27,12 @@ type AIProvider interface {
 	Generate(ctx context.Context, prompt, content string) (string, error)
 }
 
+// OpenAIProvider 基于 OpenAI 的 AIProvider 实现
 type OpenAIProvider struct {
 	agent *agent.Agent
 }
 
+// NewOpenAIProvider 创建 OpenAIProvider，克隆 agent 并禁用推理模式
 func NewOpenAIProvider(aiAgent *agent.Agent) *OpenAIProvider {
 	agent2 := aiAgent.Clone(agent.WithDisableReasoning())
 
@@ -44,6 +41,7 @@ func NewOpenAIProvider(aiAgent *agent.Agent) *OpenAIProvider {
 	}
 }
 
+// Generate 调用 agent 生成内容
 func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (string, error) {
 	messages := []openai.ChatCompletionMessageParamUnion{
 		openai.UserMessage(content),
@@ -74,60 +72,4 @@ func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (
 	}
 
 	return answer, nil
-}
-
-type Motto struct {
-	store *store.Store
-	ai    AIProvider
-}
-
-func New(s *store.Store, ai AIProvider) *Motto {
-	return &Motto{
-		store: s,
-		ai:    ai,
-	}
-}
-
-func (m *Motto) Start(spec string) {
-	c := cron.New()
-	// 每天上午9点准时调用
-	_, err := c.AddFunc(spec, func() {
-		if err := m.GenerateDailyMotto(); err != nil {
-			logger.Error("generate daily motto error", slog.String("err", err.Error()))
-		} else {
-			logger.Info("generate daily motto success")
-		}
-	})
-	if err != nil {
-		logger.Error("motto cron add func error", slog.String("err", err.Error()))
-		return
-	}
-	c.Start()
-}
-
-func (m *Motto) GenerateDailyMotto() error {
-	logger.Info("start generate daily motto")
-	dateStr := time.Now().Format("2006-01-02")
-
-	content, err := m.ai.Generate(context.Background(), Prompt, dateStr)
-	if err != nil {
-		return err
-	}
-
-	if content == "" {
-		return fmt.Errorf("generate daily motto empty")
-	}
-
-	// 写入数据库
-	md := &model.Mood{
-		Content:   content,
-		UserId:    3, // 固定位AI用户生成
-		CreatedAt: time.Now(),
-	}
-
-	if _, err := m.store.CreateMood(context.Background(), md); err != nil {
-		return err
-	}
-
-	return nil
 }
