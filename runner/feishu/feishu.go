@@ -26,8 +26,11 @@ func New(conf feishu.Config, aiAgent *agent.Agent, registry *feishu.CardRegistry
 func (b *BotTask) Name() string { return "feishu_bot" }
 
 // Start 启动飞书机器人 WebSocket 连接，阻塞直至 ctx 取消。
+// wsClient.Start 内部以 select{} 永久阻塞，不会因 ctx 取消或 Close 返回，
+// 因此在独立 goroutine 中启动，Start 本身阻塞在 ctx.Done() 等待退出信号。
 func (b *BotTask) Start(ctx context.Context) error {
-	b.bot.Start(ctx)
+	go b.bot.Start(ctx)
+	<-ctx.Done()
 	return nil
 }
 
