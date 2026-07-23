@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"app/pkg/scheduler"
-	"app/service/motto"
 	"app/store"
 	"app/store/model"
 
@@ -16,7 +15,7 @@ import (
 
 // AIProvider 定义 AI 接口，方便测试
 type AIProvider interface {
-	Generate(ctx context.Context, prompt, content string) (string, error)
+	Generate(ctx context.Context, content string) (string, error)
 }
 
 // Motto 定时生成心情日志的 cron 任务。
@@ -54,7 +53,7 @@ func (m *Motto) generateDailyMotto() error {
 	logger.Info("start generate daily motto")
 	dateStr := time.Now().Format("2006-01-02")
 
-	content, err := m.ai.Generate(context.Background(), motto.Prompt, dateStr)
+	content, err := m.ai.Generate(context.Background(), dateStr)
 	if err != nil {
 		return err
 	}

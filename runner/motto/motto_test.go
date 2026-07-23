@@ -18,7 +18,7 @@ type MockAIProvider struct {
 	Err    error
 }
 
-func (m *MockAIProvider) Generate(ctx context.Context, prompt, content string) (string, error) {
+func (m *MockAIProvider) Generate(ctx context.Context, content string) (string, error) {
 	return m.Result, m.Err
 }
 

@@ -53,7 +53,7 @@ func TestOpenAIProvider_GenerateWrapsAgentRun(t *testing.T) {
 			agent.WithClient(openai.NewClient(option.WithAPIKey("test"), option.WithBaseURL(ts.URL))),
 			agent.WithModel("test"),
 		))
-		got, err := provider.Generate(context.Background(), "system prompt", "2026-05-22")
+		got, err := provider.Generate(context.Background(), "2026-05-22")
 		require.NoError(t, err)
 		assert.Equal(t, "Test Motto", got)
 
@@ -87,7 +87,7 @@ func TestOpenAIProvider_Generate(t *testing.T) {
 		}),
 	))
 
-	content, err := ai.Generate(context.Background(), Prompt, time.Now().Format("2006-01-02"))
+	content, err := ai.Generate(context.Background(), time.Now().Format("2006-01-02"))
 	require.NoError(t, err)
 	fmt.Println(content)
 }

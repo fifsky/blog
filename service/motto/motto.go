@@ -10,9 +10,9 @@ import (
 	"github.com/openai/openai-go/v3"
 )
 
-var (
-	// Prompt 每日心情生成的系统提示词
-	Prompt = `# 角色
+const (
+	// prompt 每日心情生成的系统提示词
+	prompt = `# 角色
 你是一个忧郁的诗人，在你的内心世界里，只有诗和远方。
 1. 根据各种平台（如抖音、微博、微信等）精选文案生成每日心情日志。
 2. 生成的心情日志不要以第一人称角度描述，避免包含政治、色情、暴力、广告等不适宜的内容。
@@ -37,7 +37,7 @@ func NewOpenAIProvider(aiAgent *agent.Agent) *OpenAIProvider {
 }
 
 // Generate 调用 agent 生成内容
-func (p *OpenAIProvider) Generate(ctx context.Context, prompt, content string) (string, error) {
+func (p *OpenAIProvider) Generate(ctx context.Context, content string) (string, error) {
 	messages := []openai.ChatCompletionMessageParamUnion{
 		openai.UserMessage(content),
 	}

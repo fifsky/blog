@@ -306,7 +306,7 @@ func (a *AI) RemindSpeechTranscribe(ctx context.Context, req *adminv1.RemindSpee
 func (a *AI) GenerateMood(ctx context.Context, _ *emptypb.Empty) (*adminv1.GenerateMoodResponse, error) {
 	dateStr := time.Now().Format("2006-01-02")
 	provider := motto.NewOpenAIProvider(a.agent)
-	content, err := provider.Generate(ctx, motto.Prompt, dateStr)
+	content, err := provider.Generate(ctx, dateStr)
 	if err != nil {
 		return nil, err
 	}
