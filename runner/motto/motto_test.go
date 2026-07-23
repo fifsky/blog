@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"app/pkg/dbunit"
+	"app/pkg/scheduler"
 	"app/store"
 	"app/testutil"
 
@@ -32,10 +33,12 @@ func TestMotto_GenerateDailyMotto(t *testing.T) {
 			Result: "Test Motto Content",
 		}
 
-		m := New(s, ai, "0 7 * * *")
+		sched := scheduler.New()
+		m, err := New(sched, s, ai, "0 7 * * *")
+		assert.NoError(t, err)
 
 		// Execute
-		err := m.generateDailyMotto()
+		err = m.generateDailyMotto()
 		assert.NoError(t, err)
 
 		// Verify DB

@@ -10,6 +10,7 @@ import (
 	"app/config"
 	"app/pkg/agent"
 	"app/pkg/litestream"
+	"app/pkg/scheduler"
 	"app/runner"
 	feishubot "app/runner/feishu"
 	"app/runner/remind"
@@ -84,6 +85,8 @@ func (c *Command) runBackground(ctx context.Context) *runner.Runner {
 	registry.Register(linkCard)
 
 	r := runner.New()
+	// 共享 cron 调度器，多个 cron 任务统一注册到此实例，由 CronTask 集中启停
+	sched := scheduler.New(scheduler.WithTimezone("Asia/Shanghai"))
 	// 提醒定时轮询
 	r.Register(remind.New(c.store, remindCard))
 	// 飞书机器人（仅配置了 Appid 时启动）
@@ -95,7 +98,11 @@ func (c *Command) runBackground(ctx context.Context) *runner.Runner {
 	//     "app/runner/motto"
 	//     aimotto "app/service/motto"
 	//   )
-	//   r.Register(motto.New(c.store, aimotto.NewOpenAIProvider(c.agent), "0 7 * * *"))
+	//   if _, err := motto.New(sched, c.store, aimotto.NewOpenAIProvider(c.agent), "0 7 * * *"); err != nil {
+	//       logger.Error("motto register error", slog.String("err", err.Error()))
+	//   }
+	// cron 调度器作为 runner.Task 统一启停（须在所有 Job 注册之后）
+	r.Register(runner.NewCronTask(sched))
 	_ = r.Start(ctx)
 	return r
 }

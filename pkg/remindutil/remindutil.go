@@ -3,9 +3,8 @@ package remindutil
 import (
 	"time"
 
+	"app/pkg/scheduler"
 	"app/store/model"
-
-	"github.com/robfig/cron/v3"
 )
 
 // NextTimeFromRule 根据提醒规则计算下一次触发时间
@@ -28,8 +27,7 @@ func NextTimeFromRule(from time.Time, m *model.Remind) time.Time {
 		}
 	}
 
-	parser := cron.NewParser(cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow)
-	schedule, err := parser.Parse(m.Cron)
+	schedule, err := scheduler.ParseCronExpression(m.Cron)
 	if err != nil {
 		return time.Time{}
 	}

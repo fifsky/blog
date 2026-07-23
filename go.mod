@@ -15,7 +15,6 @@ require (
 	github.com/larksuite/oapi-sdk-go/v3 v3.9.7
 	github.com/modelcontextprotocol/go-sdk v1.6.1
 	github.com/openai/openai-go/v3 v3.37.0
-	github.com/robfig/cron/v3 v3.0.1
 	github.com/samber/lo v1.53.0
 	github.com/stretchr/testify v1.11.1
 	github.com/tidwall/gjson v1.19.0
