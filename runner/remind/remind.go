@@ -42,26 +42,21 @@ func (r *Remind) handler(ctx context.Context) error {
 	return nil
 }
 
-func (r *Remind) buildMessage(content string, v *model.Remind) feishu.RemindMessage {
-	return feishu.RemindMessage{
+func (r *Remind) message(ctx context.Context, content string, v *model.Remind) {
+	if err := r.card.Send(ctx, feishu.RemindMessage{
 		Content: content,
 		Time:    time.Now().Format("2006-01-02 15:04"),
 		ID:      v.Id,
-	}
-}
-
-func (r *Remind) message(content string, v *model.Remind) {
-	msg := r.buildMessage(content, v)
-	if err := r.card.Send(context.Background(), msg); err != nil {
+	}); err != nil {
 		logger.Error("remind send message error", slog.String("err", err.Error()))
 	}
 }
 
-func (r *Remind) changeNextTime(v *model.Remind) {
+func (r *Remind) changeNextTime(ctx context.Context, v *model.Remind) {
 	nextTime := remindutil.NextTimeFromRule(time.Now(), v)
 
-	_ = r.store.UpdateRemindStatus(context.Background(), v.Id, model.RemindStatusPending)
-	_ = r.store.UpdateRemindNextTime(context.Background(), v.Id, nextTime)
+	_ = r.store.UpdateRemindStatus(ctx, v.Id, model.RemindStatusPending)
+	_ = r.store.UpdateRemindNextTime(ctx, v.Id, nextTime)
 }
 
 func (r *Remind) run(ctx context.Context, t time.Time) {
@@ -75,17 +70,17 @@ func (r *Remind) run(ctx context.Context, t time.Time) {
 			// 未确认的消息每天都需要在相同的时间点提醒
 			if t.Format("15:04") == v.NextTime.Format("15:04") {
 				v2 := v
-				r.message(content, &v2)
-				r.changeNextTime(&v2)
+				r.message(ctx, content, &v2)
+				r.changeNextTime(ctx, &v2)
 			}
 			continue
 		}
 
 		if !v.NextTime.IsZero() && !t.Before(v.NextTime) {
 			v2 := v
-			r.message(content, &v2)
+			r.message(ctx, content, &v2)
 			// 如果发出提醒，在用户没有点击确认收到之前，会不断提醒，因此需要更新下一次提醒时间为次日相同时间点
-			r.changeNextTime(&v2)
+			r.changeNextTime(ctx, &v2)
 		}
 	}
 }

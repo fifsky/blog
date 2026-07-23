@@ -197,7 +197,7 @@ func (b *Bot) handleMessage(ctx context.Context, event *larkim.P2MessageReceiveV
 
 	// Handle AI chat in a goroutine to not block the event handler
 	go func() {
-		if err := b.aiChat.HandleMessage(context.Background(), senderID, messageID, userMessage, imageBase64); err != nil {
+		if err := b.aiChat.HandleMessage(ctx, senderID, messageID, userMessage, imageBase64); err != nil {
 			fmt.Printf("[Feishu Bot] Failed to handle AI chat: %v\n", err)
 		}
 	}()

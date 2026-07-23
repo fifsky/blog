@@ -38,7 +38,7 @@ func TestMotto_GenerateDailyMotto(t *testing.T) {
 		assert.NoError(t, err)
 
 		// Execute
-		err = m.generateDailyMotto()
+		err = m.generateDailyMotto(context.Background())
 		assert.NoError(t, err)
 
 		// Verify DB

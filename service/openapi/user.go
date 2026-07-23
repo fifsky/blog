@@ -90,7 +90,7 @@ func (u *User) notifyLogin(ctx context.Context, userName string) {
 	go func() {
 		region := ""
 		if ip != "" {
-			geo, err := ipgeo.Lookup(context.Background(), u.httpClient, ip)
+			geo, err := ipgeo.Lookup(ctx, u.httpClient, ip)
 			if err != nil {
 				logger.Error("login notify ipgeo lookup error", slog.String("err", err.Error()), slog.String("ip", ip))
 			} else {
@@ -126,7 +126,7 @@ func (u *User) notifyLogin(ctx context.Context, userName string) {
 			Content: content,
 			Time:    time.Now().Format("2006-01-02 15:04:05"),
 		}
-		if err := u.notifyCard.Send(context.Background(), msg); err != nil {
+		if err := u.notifyCard.Send(ctx, msg); err != nil {
 			logger.Error("login notify send error", slog.String("err", err.Error()))
 		}
 	}()

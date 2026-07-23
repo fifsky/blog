@@ -40,8 +40,8 @@ func New(sched *scheduler.Scheduler, s *store.Store, ai AIProvider, spec string)
 }
 
 // handler 是调度器触发的任务处理函数，生成每日心情并写入数据库。
-func (m *Motto) handler(_ context.Context) error {
-	if err := m.generateDailyMotto(); err != nil {
+func (m *Motto) handler(ctx context.Context) error {
+	if err := m.generateDailyMotto(ctx); err != nil {
 		logger.Error("generate daily motto error", slog.String("err", err.Error()))
 	} else {
 		logger.Info("generate daily motto success")
@@ -49,11 +49,11 @@ func (m *Motto) handler(_ context.Context) error {
 	return nil
 }
 
-func (m *Motto) generateDailyMotto() error {
+func (m *Motto) generateDailyMotto(ctx context.Context) error {
 	logger.Info("start generate daily motto")
 	dateStr := time.Now().Format("2006-01-02")
 
-	content, err := m.ai.Generate(context.Background(), dateStr)
+	content, err := m.ai.Generate(ctx, dateStr)
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func (m *Motto) generateDailyMotto() error {
 		CreatedAt: time.Now(),
 	}
 
-	if _, err := m.store.CreateMood(context.Background(), md); err != nil {
+	if _, err := m.store.CreateMood(ctx, md); err != nil {
 		return err
 	}
 
