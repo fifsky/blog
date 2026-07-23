@@ -87,8 +87,10 @@ func (c *Command) runBackground(ctx context.Context) *runner.Runner {
 	r := runner.New()
 	// 共享 cron 调度器，多个 cron 任务统一注册到此实例，由 CronTask 集中启停
 	sched := scheduler.New(scheduler.WithTimezone("Asia/Shanghai"))
-	// 提醒定时轮询
-	r.Register(remind.New(c.store, remindCard))
+	// 提醒定时轮询（每分钟扫描到期提醒）
+	if _, err := remind.New(sched, c.store, remindCard); err != nil {
+		logger.Error("remind register error", slog.String("err", err.Error()))
+	}
 	// 飞书机器人（仅配置了 Appid 时启动）
 	if c.conf.Feishu.Appid != "" {
 		r.Register(feishubot.New(c.conf.Feishu, c.agent, registry))

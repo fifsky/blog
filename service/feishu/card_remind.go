@@ -103,10 +103,8 @@ func (c *RemindCard) Handle(ctx context.Context, actionValue map[string]any) (st
 func (c *RemindCard) handleChange(ctx context.Context, remind *model.Remind) (string, error) {
 	nextTime := remindutil.NextTimeFromRule(time.Now(), remind)
 
-	// 判断是否是固定时间任务（cron 格式为 2006-01-02 15:04:xx）
-	isFixedDate := len(remind.Cron) >= 10 && remind.Cron[4] == '-'
-
-	if isFixedDate {
+	// 固定时间任务设为已完成，周期性任务恢复状态并计算下次时间
+	if remindutil.IsFixedDate(remind.Cron) {
 		if err := c.store.UpdateRemindStatus(ctx, remind.Id, model.RemindStatusDone); err != nil {
 			return "", err
 		}

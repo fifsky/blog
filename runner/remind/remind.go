@@ -2,10 +2,12 @@ package remind
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"time"
 
 	"app/pkg/remindutil"
+	"app/pkg/scheduler"
 	"app/service/feishu"
 	"app/store"
 	"app/store/model"
@@ -14,36 +16,30 @@ import (
 )
 
 // Remind 定时提醒轮询任务，每分钟扫描到期提醒并通过飞书卡片发送。
-// 实现 runner.Task 接口，ctx 取消后优雅退出。
+// 通过 New 注册到共享的 scheduler.Scheduler，调度器的生命周期由 runner.CronTask 统一管理。
 type Remind struct {
 	store *store.Store
 	card  *feishu.RemindCard
 }
 
-// New 创建提醒轮询任务，card 为发送提醒使用的飞书卡片处理器
-func New(s *store.Store, card *feishu.RemindCard) *Remind {
-	return &Remind{
-		store: s,
-		card:  card,
+// New 创建提醒轮询任务并注册到共享调度器，每分钟执行一次扫描。
+// 调度器的启动与停止由外部（runner.CronTask）统一控制，本任务不参与生命周期管理。
+func New(sched *scheduler.Scheduler, s *store.Store, card *feishu.RemindCard) (*Remind, error) {
+	r := &Remind{store: s, card: card}
+	if err := sched.Register(&scheduler.Job{
+		Name:     "remind",
+		Schedule: "* * * * *", // 每分钟扫描一次到期提醒
+		Handler:  r.handler,
+	}); err != nil {
+		return nil, fmt.Errorf("remind register job: %w", err)
 	}
+	return r, nil
 }
 
-// Name 返回任务名
-func (r *Remind) Name() string { return "remind" }
-
-// Start 启动定时提醒轮询，每 60 秒扫描一次，ctx 取消后退出。
-func (r *Remind) Start(ctx context.Context) error {
-	t := time.NewTicker(60 * time.Second)
-	defer t.Stop()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return nil
-		case t1 := <-t.C:
-			r.run(t1)
-		}
-	}
+// handler 是调度器触发的任务处理函数，扫描到期提醒并发送飞书消息。
+func (r *Remind) handler(_ context.Context) error {
+	r.run(time.Now())
+	return nil
 }
 
 func (r *Remind) buildMessage(content string, v *model.Remind) feishu.RemindMessage {

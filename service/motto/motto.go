@@ -22,11 +22,6 @@ var (
 `
 )
 
-// AIProvider 定义 AI 接口，方便测试
-type AIProvider interface {
-	Generate(ctx context.Context, prompt, content string) (string, error)
-}
-
 // OpenAIProvider 基于 OpenAI 的 AIProvider 实现
 type OpenAIProvider struct {
 	agent *agent.Agent
