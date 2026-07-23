@@ -11,7 +11,7 @@ import (
 	"app/pkg/agent"
 	"app/pkg/litestream"
 	"app/runner"
-	"app/runner/feishu"
+	feishubot "app/runner/feishu"
 	"app/runner/remind"
 	"app/service/feishu"
 	"app/store"

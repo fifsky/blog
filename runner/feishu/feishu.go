@@ -1,7 +1,7 @@
-// Package feishubot 将飞书机器人（service/feishu.Bot）的启动包装为 runner.Task。
+// Package feishu 将飞书机器人（service/feishu.Bot）的启动包装为 runner.Task。
 // service/feishu 包含卡片处理器、发送器等被多处复用的能力，保留在 service/ 下不迁移，
 // 本包仅负责后台 WebSocket 长连接的生命周期管理。
-package feishubot
+package feishu
 
 import (
 	"context"
