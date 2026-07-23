@@ -49,7 +49,7 @@ func New(conf Config, env, dbPath string) *Manager {
 	client.Endpoint = conf.Endpoint
 	client.Region = conf.Region
 	client.AccessKeyID = conf.AccessKey
-	client.SecretAccessKey = conf.AccessKey
+	client.SecretAccessKey = conf.AccessSecret
 	// 阿里云 OSS 要求虚拟主机式访问（bucket.oss-cn-xxx.aliyuncs.com），
 	// 不能使用 ForcePathStyle，保持默认 false
 

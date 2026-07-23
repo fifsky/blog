@@ -11,9 +11,9 @@
 package runner
 
 import (
-	"slices"
 	"context"
 	"log/slog"
+	"slices"
 	"sync"
 
 	"github.com/goapt/logger"
