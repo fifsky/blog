@@ -52,6 +52,7 @@ func main() {
 ## Cron Expression Format
 
 ### 5-Field Format (Standard)
+
 ```
 ┌───────────── minute (0 - 59)
 │ ┌───────────── hour (0 - 23)
@@ -63,6 +64,7 @@ func main() {
 ```
 
 ### 6-Field Format (With Seconds)
+
 ```
 ┌───────────── second (0 - 59)
 │ ┌───────────── minute (0 - 59)
@@ -83,16 +85,16 @@ func main() {
 
 ### Common Examples
 
-| Schedule | Description |
-|----------|-------------|
-| `* * * * *` | Every minute |
-| `0 * * * *` | Every hour |
-| `0 0 * * *` | Daily at midnight |
-| `0 9 * * 1-5` | Weekdays at 9 AM |
-| `*/15 * * * *` | Every 15 minutes |
-| `0 0 1 * *` | First day of every month |
-| `0 0 * * 0` | Every Sunday at midnight |
-| `30 14 * * *` | Every day at 2:30 PM |
+| Schedule       | Description              |
+| -------------- | ------------------------ |
+| `* * * * *`    | Every minute             |
+| `0 * * * *`    | Every hour               |
+| `0 0 * * *`    | Daily at midnight        |
+| `0 9 * * 1-5`  | Weekdays at 9 AM         |
+| `*/15 * * * *` | Every 15 minutes         |
+| `0 0 1 * *`    | First day of every month |
+| `0 0 * * 0`    | Every Sunday at midnight |
+| `30 14 * * *`  | Every day at 2:30 PM     |
 
 ## Timezone Support
 
@@ -127,7 +129,7 @@ Middleware wraps job handlers to add cross-cutting behavior. Multiple middleware
 ```go
 s := scheduler.New(
     scheduler.WithMiddleware(
-        scheduler.Recovery(func(jobName string, r interface{}) {
+        scheduler.Recovery(func(jobName string, r any) {
             log.Printf("Job %s panicked: %v", jobName, r)
         }),
     ),
@@ -138,8 +140,8 @@ s := scheduler.New(
 
 ```go
 type Logger interface {
-    Info(msg string, args ...interface{})
-    Error(msg string, args ...interface{})
+    Info(msg string, args ...any)
+    Error(msg string, args ...any)
 }
 
 s := scheduler.New(
@@ -172,6 +174,7 @@ s := scheduler.New(
 ```
 
 **Order matters**: Middleware are applied left-to-right. In the example above:
+
 1. Recovery (outermost) catches panics from everything
 2. Logging logs the execution
 3. Timeout (innermost) wraps the actual handler
@@ -294,6 +297,7 @@ Timezone: "America/New_York" // Good
 ### 7. Test Your Cron Expressions
 
 Use a cron expression calculator before deploying:
+
 - [crontab.guru](https://crontab.guru/)
 - Write unit tests with the parser
 
@@ -332,15 +336,15 @@ func TestScheduleParsing(t *testing.T) {
 
 ## Comparison to Other Solutions
 
-| Feature | scheduler | robfig/cron | github.com/go-co-op/gocron |
-|---------|-----------|-------------|----------------------------|
-| Standard cron syntax | ✅ | ✅ | ✅ |
-| Seconds support | ✅ | ✅ | ✅ |
-| Timezone support | ✅ | ✅ | ✅ |
-| Middleware pattern | ✅ | ⚠️ (basic) | ❌ |
-| Graceful shutdown | ✅ | ⚠️ (basic) | ✅ |
-| Zero dependencies | ✅ | ❌ | ❌ |
-| Job metadata | ✅ | ❌ | ⚠️ (limited) |
+| Feature              | scheduler | robfig/cron | github.com/go-co-op/gocron |
+| -------------------- | --------- | ----------- | -------------------------- |
+| Standard cron syntax | ✅        | ✅          | ✅                         |
+| Seconds support      | ✅        | ✅          | ✅                         |
+| Timezone support     | ✅        | ✅          | ✅                         |
+| Middleware pattern   | ✅        | ⚠️ (basic)  | ❌                         |
+| Graceful shutdown    | ✅        | ⚠️ (basic)  | ✅                         |
+| Zero dependencies    | ✅        | ❌          | ❌                         |
+| Job metadata         | ✅        | ❌          | ⚠️ (limited)               |
 
 ## API Reference
 

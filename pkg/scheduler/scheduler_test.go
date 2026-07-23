@@ -95,12 +95,12 @@ func TestSchedulerWithMiddleware(t *testing.T) {
 	var logMu sync.Mutex
 
 	logger := &testLogger{
-		onInfo: func(msg string, _ ...interface{}) {
+		onInfo: func(msg string, _ ...any) {
 			logMu.Lock()
 			executionLog = append(executionLog, fmt.Sprintf("INFO: %s", msg))
 			logMu.Unlock()
 		},
-		onError: func(msg string, _ ...interface{}) {
+		onError: func(msg string, _ ...any) {
 			logMu.Lock()
 			executionLog = append(executionLog, fmt.Sprintf("ERROR: %s", msg))
 			logMu.Unlock()
@@ -108,7 +108,7 @@ func TestSchedulerWithMiddleware(t *testing.T) {
 	}
 
 	s := New(WithMiddleware(
-		Recovery(func(jobName string, r interface{}) {
+		Recovery(func(jobName string, r any) {
 			logMu.Lock()
 			executionLog = append(executionLog, fmt.Sprintf("PANIC: %s - %v", jobName, r))
 			logMu.Unlock()

@@ -55,7 +55,7 @@ func TestMiddlewareChaining(t *testing.T) {
 func TestRecoveryMiddleware(t *testing.T) {
 	var panicRecovered atomic.Bool
 
-	onPanic := func(_ string, _ interface{}) {
+	onPanic := func(_ string, _ any) {
 		panicRecovered.Store(true)
 	}
 
@@ -82,14 +82,14 @@ func TestLoggingMiddleware(t *testing.T) {
 	var loggedError atomic.Bool
 
 	logger := &testLogger{
-		onInfo: func(msg string, _ ...interface{}) {
+		onInfo: func(msg string, _ ...any) {
 			if msg == "Job started" {
 				loggedStart.Store(true)
 			} else if msg == "Job completed" {
 				loggedEnd.Store(true)
 			}
 		},
-		onError: func(msg string, _ ...interface{}) {
+		onError: func(msg string, _ ...any) {
 			if msg == "Job failed" {
 				loggedError.Store(true)
 			}
@@ -129,17 +129,17 @@ func TestLoggingMiddleware(t *testing.T) {
 }
 
 type testLogger struct {
-	onInfo  func(msg string, args ...interface{})
-	onError func(msg string, args ...interface{})
+	onInfo  func(msg string, args ...any)
+	onError func(msg string, args ...any)
 }
 
-func (l *testLogger) Info(msg string, args ...interface{}) {
+func (l *testLogger) Info(msg string, args ...any) {
 	if l.onInfo != nil {
 		l.onInfo(msg, args...)
 	}
 }
 
-func (l *testLogger) Error(msg string, args ...interface{}) {
+func (l *testLogger) Error(msg string, args ...any) {
 	if l.onError != nil {
 		l.onError(msg, args...)
 	}

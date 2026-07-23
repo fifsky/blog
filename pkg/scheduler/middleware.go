@@ -23,7 +23,7 @@ func Chain(middlewares ...Middleware) Middleware {
 }
 
 // Recovery recovers from panics in job handlers and converts them to errors.
-func Recovery(onPanic func(jobName string, recovered interface{})) Middleware {
+func Recovery(onPanic func(jobName string, recovered any)) Middleware {
 	return func(next JobHandler) JobHandler {
 		return func(ctx context.Context) (err error) {
 			defer func() {
@@ -42,8 +42,8 @@ func Recovery(onPanic func(jobName string, recovered interface{})) Middleware {
 
 // Logger is a minimal logging interface.
 type Logger interface {
-	Info(msg string, args ...interface{})
-	Error(msg string, args ...interface{})
+	Info(msg string, args ...any)
+	Error(msg string, args ...any)
 }
 
 // Logging adds execution logging to jobs.

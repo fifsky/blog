@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/usememos/memos/internal/scheduler"
+	"app/pkg/scheduler"
 )
 
 // TestRealWorldScenario tests a realistic multi-job scenario.
@@ -23,12 +23,12 @@ func TestRealWorldScenario(t *testing.T) {
 	)
 
 	logger := &testLogger{
-		onInfo: func(msg string, _ ...interface{}) {
+		onInfo: func(msg string, _ ...any) {
 			logMu.Lock()
 			logEntries = append(logEntries, fmt.Sprintf("INFO: %s", msg))
 			logMu.Unlock()
 		},
-		onError: func(msg string, _ ...interface{}) {
+		onError: func(msg string, _ ...any) {
 			logMu.Lock()
 			logEntries = append(logEntries, fmt.Sprintf("ERROR: %s", msg))
 			logMu.Unlock()
@@ -38,7 +38,7 @@ func TestRealWorldScenario(t *testing.T) {
 	s := scheduler.New(
 		scheduler.WithTimezone("UTC"),
 		scheduler.WithMiddleware(
-			scheduler.Recovery(func(jobName string, r interface{}) {
+			scheduler.Recovery(func(jobName string, r any) {
 				t.Logf("Job %s panicked: %v", jobName, r)
 			}),
 			scheduler.Logging(logger),
@@ -217,7 +217,7 @@ func TestErrorPropagation(t *testing.T) {
 	var errorLogged atomic.Bool
 
 	logger := &testLogger{
-		onError: func(msg string, _ ...interface{}) {
+		onError: func(msg string, _ ...any) {
 			if msg == "Job failed" {
 				errorLogged.Store(true)
 			}
@@ -263,7 +263,7 @@ func TestPanicRecovery(t *testing.T) {
 
 	s := scheduler.New(
 		scheduler.WithMiddleware(
-			scheduler.Recovery(func(jobName string, r interface{}) {
+			scheduler.Recovery(func(jobName string, r any) {
 				panicRecovered.Store(true)
 				t.Logf("Recovered from panic in job %s: %v", jobName, r)
 			}),
@@ -372,17 +372,17 @@ func TestMultipleJobsWithDifferentSchedules(t *testing.T) {
 // Helpers
 
 type testLogger struct {
-	onInfo  func(msg string, args ...interface{})
-	onError func(msg string, args ...interface{})
+	onInfo  func(msg string, args ...any)
+	onError func(msg string, args ...any)
 }
 
-func (l *testLogger) Info(msg string, args ...interface{}) {
+func (l *testLogger) Info(msg string, args ...any) {
 	if l.onInfo != nil {
 		l.onInfo(msg, args...)
 	}
 }
 
-func (l *testLogger) Error(msg string, args ...interface{}) {
+func (l *testLogger) Error(msg string, args ...any) {
 	if l.onError != nil {
 		l.onError(msg, args...)
 	}

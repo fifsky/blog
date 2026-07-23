@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/usememos/memos/internal/scheduler"
+	"app/pkg/scheduler"
 )
 
 // Example demonstrates basic scheduler usage.
@@ -56,7 +56,7 @@ func Example_middleware() {
 
 	s := scheduler.New(
 		scheduler.WithMiddleware(
-			scheduler.Recovery(func(jobName string, r interface{}) {
+			scheduler.Recovery(func(jobName string, r any) {
 				logger.Error("Job panicked", "job", jobName, "panic", r)
 			}),
 			scheduler.Logging(&slogAdapter{logger}),
@@ -82,11 +82,11 @@ type slogAdapter struct {
 	logger *slog.Logger
 }
 
-func (a *slogAdapter) Info(msg string, args ...interface{}) {
+func (a *slogAdapter) Info(msg string, args ...any) {
 	a.logger.Info(msg, args...)
 }
 
-func (a *slogAdapter) Error(msg string, args ...interface{}) {
+func (a *slogAdapter) Error(msg string, args ...any) {
 	a.logger.Error(msg, args...)
 }
 
