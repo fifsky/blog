@@ -18,7 +18,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func httpCommand(c *Command) *cli.Command {
+func httpCommand(a *App) *cli.Command {
 	return &cli.Command{
 		Name:  "http",
 		Usage: "http command eg: ./app http --addr=:8080",
@@ -32,14 +32,14 @@ func httpCommand(c *Command) *cli.Command {
 			if !cli.IsSet("addr") {
 				_ = cli.Set("addr", ":8080")
 			}
-			if err := c.Init(ctx); err != nil {
+			if err := a.Init(ctx); err != nil {
 				return err
 			}
 
-			log.Println("[Env] Run profile:" + c.conf.Env)
+			log.Println("[Env] Run profile:" + a.conf.Env)
 
 			// 启动后台服务（remind 定时提醒、feishu bot），与 http server 并发运行
-			bg := c.runBackground(ctx)
+			bg := a.runBackground(ctx)
 			defer func() {
 				// 显式停止需释放资源的 task，并等待所有后台退出，避免使用已关闭的 DB
 				bg.Stop()
@@ -47,7 +47,7 @@ func httpCommand(c *Command) *cli.Command {
 			}()
 
 			// 日志和 HTTP 客户端在 http 命令内就近创建，避免从 main 一路透传
-			accessLogger := config.NewLogger(c.conf, "access.log")
+			accessLogger := config.NewLogger(a.conf, "access.log")
 			httpClient := httpx.NewClient(
 				httpx.WithTimeout(10*time.Second),
 				httpx.WithMiddleware(func(rt http.RoundTripper) http.RoundTripper {
@@ -62,9 +62,9 @@ func httpCommand(c *Command) *cli.Command {
 				}),
 			)
 
-			apiService := openapi.New(c.store, c.conf, httpClient)
-			adminService := admin.New(c.store, c.conf, c.agent)
-			route := router.New(apiService, adminService, c.conf, c.store, accessLogger)
+			apiService := openapi.New(a.store, a.conf, httpClient)
+			adminService := admin.New(a.store, a.conf, a.agent)
+			route := router.New(apiService, adminService, a.conf, a.store, accessLogger)
 			return server.New(
 				server.Handler(route.Handler()),
 				server.Address(cli.String("addr")),
