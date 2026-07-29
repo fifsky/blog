@@ -13,11 +13,9 @@ func tmpCommand(c *Command) *cli.Command {
 		Name:  "tmp",
 		Usage: "临时命令，按需修改逻辑后执行",
 		Action: func(ctx context.Context, cli *cli.Command) error {
-			clean, err := c.Init(ctx)
-			if err != nil {
+			if err := c.Init(ctx); err != nil {
 				return err
 			}
-			defer clean()
 			fmt.Println("tmp command running...")
 			// 在此处编写临时逻辑
 			return nil

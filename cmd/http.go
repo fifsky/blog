@@ -32,11 +32,9 @@ func httpCommand(c *Command) *cli.Command {
 			if !cli.IsSet("addr") {
 				_ = cli.Set("addr", ":8080")
 			}
-			clean, err := c.Init(ctx)
-			if err != nil {
+			if err := c.Init(ctx); err != nil {
 				return err
 			}
-			defer clean()
 
 			log.Println("[Env] Run profile:" + c.conf.Env)
 

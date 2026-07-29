@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"log/slog"
@@ -27,24 +29,26 @@ type Command struct {
 	store *store.Store
 	conf  *config.Config
 	agent *agent.Agent
+	db    *sql.DB
+	ls    *litestream.Manager
 }
 
 func NewCommand() *Command {
 	return &Command{}
 }
 
-func (c *Command) Init(ctx context.Context) (func(), error) {
+func (c *Command) Init(ctx context.Context) error {
 	c.conf = config.New()
 	// 1. 先启动 Litestream（作为 Go library 嵌入），从 OSS 自动恢复 + 实时备份 SQLite
 	dbPath := c.conf.DB.ExtractDBPath()
-	ls := litestream.New(c.conf.Litestream, c.conf.Env, dbPath)
-	if err := ls.Start(ctx); err != nil {
-		return nil, fmt.Errorf("[litestream] start failed: %w", err)
+	c.ls = litestream.New(c.conf.Litestream, c.conf.Env, dbPath)
+	if err := c.ls.Start(ctx); err != nil {
+		return fmt.Errorf("[litestream] start failed: %w", err)
 	}
 
 	// 2. 再打开应用层数据库连接（确保 litestream 已初始化）
-	db := c.conf.DB.Connect()
-	c.store = store.New(db)
+	c.db = c.conf.DB.Connect()
+	c.store = store.New(c.db)
 
 	c.agent = agent.New(
 		agent.WithConfigProvider(func(ctx context.Context) (openai.Client, string) {
@@ -59,17 +63,31 @@ func (c *Command) Init(ctx context.Context) (func(), error) {
 		agent.WithMCP(c.conf.MCP),
 	)
 
-	return func() {
-		// 后台任务已由调用方通过 runner.Stop/Wait 退出（见 httpCommand 中的 defer）
-		// 先关闭应用层数据库连接
-		if err := db.Close(); err != nil {
+	return nil
+}
+
+// Close 释放 Init 阶段申请的资源（数据库连接、litestream）。
+// 后台任务需由调用方通过 runner.Stop/Wait 先行退出（见 httpCommand 中的 defer），
+// 之后再调用本方法，避免使用已关闭的 DB。重复调用安全。
+func (c *Command) Close() error {
+	var errs []error
+	// 先关闭应用层数据库连接
+	if c.db != nil {
+		if err := c.db.Close(); err != nil {
 			log.Printf("[db] database close error: %s", err)
+			errs = append(errs, err)
 		}
-		// 再关闭 litestream store（确保所有应用连接已释放）
-		if err := ls.Stop(); err != nil {
+		c.db = nil
+	}
+	// 再关闭 litestream store（确保所有应用连接已释放）
+	if c.ls != nil {
+		if err := c.ls.Stop(); err != nil {
 			log.Printf("[litestream] stop failed: %s", err)
+			errs = append(errs, err)
 		}
-	}, nil
+		c.ls = nil
+	}
+	return errors.Join(errs...)
 }
 
 // runBackground 装配并启动后台任务（提醒轮询、飞书机器人），返回 runner 供调用方优雅停止。
