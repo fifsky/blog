@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"log/slog"
 	"os"
+	"slices"
 
 	"app/config"
 	"app/pkg/agent"
@@ -28,8 +28,7 @@ type App struct {
 	store *store.Store
 	conf  *config.Config
 	agent *agent.Agent
-	db    *sql.DB
-	ls    *litestream.Manager
+	clean []func()
 }
 
 func NewApp() *App {
@@ -40,14 +39,14 @@ func (a *App) Init(ctx context.Context) error {
 	a.conf = config.New()
 	// 1. 先启动 Litestream（作为 Go library 嵌入），从 OSS 自动恢复 + 实时备份 SQLite
 	dbPath := a.conf.DB.ExtractDBPath()
-	a.ls = litestream.New(a.conf.Litestream, a.conf.Env, dbPath)
-	if err := a.ls.Start(ctx); err != nil {
+	ls := litestream.New(a.conf.Litestream, a.conf.Env, dbPath)
+	if err := ls.Start(ctx); err != nil {
 		return fmt.Errorf("[litestream] start failed: %w", err)
 	}
 
 	// 2. 再打开应用层数据库连接（确保 litestream 已初始化）
-	a.db = a.conf.DB.Connect()
-	a.store = store.New(a.db)
+	db := a.conf.DB.Connect()
+	a.store = store.New(db)
 
 	a.agent = agent.New(
 		agent.WithConfigProvider(func(ctx context.Context) (openai.Client, string) {
@@ -62,6 +61,22 @@ func (a *App) Init(ctx context.Context) error {
 		agent.WithMCP(a.conf.MCP),
 	)
 
+	// 资源回收：按 Init 创建顺序注册清理函数，Close 时逆序执行。
+	// litestream 先创建、db 后创建；逆序后 db 先关闭、litestream 后停止，
+	// 符合"先关应用连接再关 litestream"的依赖顺序。
+	a.clean = append(a.clean,
+		func() {
+			if err := ls.Stop(); err != nil {
+				log.Printf("[litestream] stop failed: %s", err)
+			}
+		},
+		func() {
+			if err := db.Close(); err != nil {
+				log.Printf("[db] database close error: %s", err)
+			}
+		},
+	)
+
 	return nil
 }
 
@@ -69,20 +84,11 @@ func (a *App) Init(ctx context.Context) error {
 // 后台任务需由调用方通过 runner.Stop/Wait 先行退出（见 httpCommand 中的 defer），
 // 之后再调用本方法，避免使用已关闭的 DB。重复调用安全。
 func (a *App) Close() {
-	// 先关闭应用层数据库连接
-	if a.db != nil {
-		if err := a.db.Close(); err != nil {
-			log.Printf("[db] database close error: %s", err)
-		}
-		a.db = nil
+	// 逆序执行清理函数：后注册的先释放，保证 db 先关闭、litestream 后停止
+	for _, fn := range slices.Backward(a.clean) {
+		fn()
 	}
-	// 再关闭 litestream store（确保所有应用连接已释放）
-	if a.ls != nil {
-		if err := a.ls.Stop(); err != nil {
-			log.Printf("[litestream] stop failed: %s", err)
-		}
-		a.ls = nil
-	}
+	a.clean = nil
 }
 
 // runBackground 装配并启动后台任务（提醒轮询、飞书机器人），返回 runner 供调用方优雅停止。
