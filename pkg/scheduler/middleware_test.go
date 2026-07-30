@@ -83,9 +83,10 @@ func TestLoggingMiddleware(t *testing.T) {
 
 	logger := &testLogger{
 		onInfo: func(msg string, _ ...any) {
-			if msg == "Job started" {
+			switch msg {
+			case "Job started":
 				loggedStart.Store(true)
-			} else if msg == "Job completed" {
+			case "Job completed":
 				loggedEnd.Store(true)
 			}
 		},

@@ -14,7 +14,7 @@ import (
 func Example_basic() {
 	s := scheduler.New()
 
-	s.Register(&scheduler.Job{
+	_ = s.Register(&scheduler.Job{
 		Name:        "hello",
 		Schedule:    "*/5 * * * *", // Every 5 minutes
 		Description: "Say hello",
@@ -24,8 +24,8 @@ func Example_basic() {
 		},
 	})
 
-	s.Start()
-	defer s.Stop(context.Background())
+	_ = s.Start()
+	defer func() { _ = s.Stop(context.Background()) }()
 
 	// Scheduler runs in background
 	time.Sleep(100 * time.Millisecond)
@@ -37,7 +37,7 @@ func Example_timezone() {
 		scheduler.WithTimezone("America/New_York"),
 	)
 
-	s.Register(&scheduler.Job{
+	_ = s.Register(&scheduler.Job{
 		Name:     "daily-report",
 		Schedule: "0 9 * * *", // 9 AM in New York
 		Handler: func(_ context.Context) error {
@@ -46,8 +46,8 @@ func Example_timezone() {
 		},
 	})
 
-	s.Start()
-	defer s.Stop(context.Background())
+	_ = s.Start()
+	defer func() { _ = s.Stop(context.Background()) }()
 }
 
 // Example demonstrates middleware usage.
@@ -64,7 +64,7 @@ func Example_middleware() {
 		),
 	)
 
-	s.Register(&scheduler.Job{
+	_ = s.Register(&scheduler.Job{
 		Name:     "data-sync",
 		Schedule: "0 */2 * * *", // Every 2 hours
 		Handler: func(_ context.Context) error {
@@ -73,8 +73,8 @@ func Example_middleware() {
 		},
 	})
 
-	s.Start()
-	defer s.Stop(context.Background())
+	_ = s.Start()
+	defer func() { _ = s.Stop(context.Background()) }()
 }
 
 // slogAdapter adapts slog.Logger to scheduler.Logger interface.
@@ -95,7 +95,7 @@ func Example_multipleJobs() {
 	s := scheduler.New()
 
 	// Cleanup old data every night at 2 AM
-	s.Register(&scheduler.Job{
+	_ = s.Register(&scheduler.Job{
 		Name:     "cleanup",
 		Schedule: "0 2 * * *",
 		Tags:     []string{"maintenance"},
@@ -106,7 +106,7 @@ func Example_multipleJobs() {
 	})
 
 	// Health check every 5 minutes
-	s.Register(&scheduler.Job{
+	_ = s.Register(&scheduler.Job{
 		Name:     "health-check",
 		Schedule: "*/5 * * * *",
 		Tags:     []string{"monitoring"},
@@ -117,7 +117,7 @@ func Example_multipleJobs() {
 	})
 
 	// Weekly backup on Sundays at 1 AM
-	s.Register(&scheduler.Job{
+	_ = s.Register(&scheduler.Job{
 		Name:     "weekly-backup",
 		Schedule: "0 1 * * 0",
 		Tags:     []string{"backup"},
@@ -127,15 +127,15 @@ func Example_multipleJobs() {
 		},
 	})
 
-	s.Start()
-	defer s.Stop(context.Background())
+	_ = s.Start()
+	defer func() { _ = s.Stop(context.Background()) }()
 }
 
 // Example demonstrates graceful shutdown with timeout.
 func Example_gracefulShutdown() {
 	s := scheduler.New()
 
-	s.Register(&scheduler.Job{
+	_ = s.Register(&scheduler.Job{
 		Name:     "long-running",
 		Schedule: "* * * * *",
 		Handler: func(ctx context.Context) error {
@@ -150,7 +150,7 @@ func Example_gracefulShutdown() {
 		},
 	})
 
-	s.Start()
+	_ = s.Start()
 
 	// Simulate shutdown signal
 	time.Sleep(5 * time.Second)
