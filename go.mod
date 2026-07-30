@@ -13,7 +13,7 @@ require (
 	github.com/gorilla/feeds v1.2.0
 	github.com/gorilla/schema v1.4.1
 	github.com/larksuite/oapi-sdk-go/v3 v3.9.7
-	github.com/modelcontextprotocol/go-sdk v1.6.1
+	github.com/modelcontextprotocol/go-sdk v1.7.0
 	github.com/openai/openai-go/v3 v3.37.0
 	github.com/samber/lo v1.53.0
 	github.com/stretchr/testify v1.11.1
@@ -98,7 +98,7 @@ require (
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
 	golang.org/x/text v0.37.0 // indirect
-	golang.org/x/time v0.7.0 // indirect
+	golang.org/x/time v0.15.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260519071638-aa98bba5eb94 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/libc v1.73.4 // indirect

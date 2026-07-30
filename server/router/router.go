@@ -84,7 +84,7 @@ func (r *Router) Handler() http.Handler {
 	apiv1.RegisterGuestbookServiceHTTPServer(api, codec, r.service.Guestbook)
 	apiv1.RegisterCommentServiceHTTPServer(api, codec, r.service.Comment)
 
-	mcpAuth := api.Use(middleware.NewToken(r.conf.Common.MCPToken))
+	mcpAuth := api.Use(middleware.NewMCPToken(r.conf.Common.MCPToken))
 	mcpRemindHandler := mcptool.NewRemindHandler(r.store)
 	mcpAuth.Handle("POST /blog/mcp/remind", mcpRemindHandler)
 	mcpAuth.Handle("GET /blog/mcp/remind", mcpRemindHandler)
