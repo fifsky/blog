@@ -1,6 +1,6 @@
 GO ?= go
 GOFMT ?= gofmt "-s"
-GOFILES = $(shell find . -name "*.go" -type f -not -path "./vendor/*")
+GOFILES = $(shell find . -name "*.go" -type f -not -path "./vendor/*" -not -path "./proto/*")
 VETPACKAGES = $(shell $(GO) list ./... | grep -v /vendor/ | grep -v /examples/)
 
 .PHONY: build
