@@ -19,7 +19,14 @@ func NewServeMux() *ServeMux {
 	}
 }
 
-func (s *ServeMux) Use(middlewares ...Middleware) *ServeMux {
+// Use 原地追加中间件到当前 mux，影响后续注册的所有 handler
+func (s *ServeMux) Use(middlewares ...Middleware) {
+	s.middlewares = append(s.middlewares, middlewares...)
+}
+
+// Group 创建新的 ServeMux，共享底层 http.ServeMux，中间件栈继承父级并叠加新增中间件，
+// 仅影响分组内注册的 handler，不修改原 mux
+func (s *ServeMux) Group(middlewares ...Middleware) *ServeMux {
 	return &ServeMux{
 		ServeMux:    s.ServeMux,
 		middlewares: append(s.middlewares, middlewares...),

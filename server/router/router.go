@@ -64,27 +64,27 @@ func (r *Router) Handler() http.Handler {
 	}
 
 	mux := NewServeMux()
-	api := mux.Use(middleware.NewRecover, sloghttp.NewMiddleware(r.accessLogger, conf), middleware.NewHeader, middleware.NewCors)
+	mux.Use(middleware.NewRecover, sloghttp.NewMiddleware(r.accessLogger, conf), middleware.NewHeader, middleware.NewCors)
 
 	// 统一处理所有 /blog/ 路径的预检请求，确保中间件设置CORS响应头
-	api.HandleFunc("OPTIONS /blog/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("OPTIONS /blog/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
 
 	codec := codec.NewCodec()
-	apiv1.RegisterArticleServiceHTTPServer(api, codec, r.service.Article)
-	apiv1.RegisterMoodServiceHTTPServer(api, codec, r.service.Mood)
-	apiv1.RegisterCateServiceHTTPServer(api, codec, r.service.Cate)
-	apiv1.RegisterLinkServiceHTTPServer(api, codec, r.service.Link)
-	apiv1.RegisterUserServiceHTTPServer(api, codec, r.service.User)
-	apiv1.RegisterSettingServiceHTTPServer(api, codec, r.service.Setting)
-	apiv1.RegisterTravelServiceHTTPServer(api, codec, r.service.Travel)
-	apiv1.RegisterMiniAppServiceHTTPServer(api, codec, r.service.MiniApp)
-	apiv1.RegisterGeoServiceHTTPServer(api, codec, r.service.Geo)
-	apiv1.RegisterGuestbookServiceHTTPServer(api, codec, r.service.Guestbook)
-	apiv1.RegisterCommentServiceHTTPServer(api, codec, r.service.Comment)
+	apiv1.RegisterArticleServiceHTTPServer(mux, codec, r.service.Article)
+	apiv1.RegisterMoodServiceHTTPServer(mux, codec, r.service.Mood)
+	apiv1.RegisterCateServiceHTTPServer(mux, codec, r.service.Cate)
+	apiv1.RegisterLinkServiceHTTPServer(mux, codec, r.service.Link)
+	apiv1.RegisterUserServiceHTTPServer(mux, codec, r.service.User)
+	apiv1.RegisterSettingServiceHTTPServer(mux, codec, r.service.Setting)
+	apiv1.RegisterTravelServiceHTTPServer(mux, codec, r.service.Travel)
+	apiv1.RegisterMiniAppServiceHTTPServer(mux, codec, r.service.MiniApp)
+	apiv1.RegisterGeoServiceHTTPServer(mux, codec, r.service.Geo)
+	apiv1.RegisterGuestbookServiceHTTPServer(mux, codec, r.service.Guestbook)
+	apiv1.RegisterCommentServiceHTTPServer(mux, codec, r.service.Comment)
 
-	mcpAuth := api.Use(middleware.NewMCPToken(r.conf.Common.MCPToken))
+	mcpAuth := mux.Group(middleware.NewMCPToken(r.conf.Common.MCPToken))
 	mcpRemindHandler := mcptool.NewRemindHandler(r.store)
 	mcpAuth.Handle("POST /blog/mcp/remind", mcpRemindHandler)
 	mcpAuth.Handle("GET /blog/mcp/remind", mcpRemindHandler)
@@ -93,7 +93,7 @@ func (r *Router) Handler() http.Handler {
 	mcpAuth.Handle("POST /blog/mcp/mood", mcpMoodHandler)
 	mcpAuth.Handle("GET /blog/mcp/mood", mcpMoodHandler)
 
-	adminAuth := api.Use(middleware.NewAuthLogin(r.store, r.conf.Common.TokenSecret))
+	adminAuth := mux.Group(middleware.NewAuthLogin(r.store, r.conf.Common.TokenSecret))
 	adminAuth.HandleFunc("POST /blog/admin/upload", r.admin.Article.Upload)
 	adminv1.RegisterArticleServiceHTTPServer(adminAuth, codec, r.admin.Article)
 	adminv1.RegisterMoodServiceHTTPServer(adminAuth, codec, r.admin.Mood)
