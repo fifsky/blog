@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"maps"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -210,9 +211,7 @@ func (c *ClawBot) saveAccount(ctx context.Context, account *clawbot.Account) err
 	if err != nil {
 		return err
 	}
-	for key, value := range tokenValues {
-		values[key] = value
-	}
+	maps.Copy(values, tokenValues)
 
 	_, err = c.store.UpdateOptions(ctx, values)
 	return err

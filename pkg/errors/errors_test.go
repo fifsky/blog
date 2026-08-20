@@ -13,7 +13,6 @@ type TestError struct{ message string }
 func (e *TestError) Error() string { return e.message }
 
 func TestErrors(t *testing.T) {
-	var base *Error
 	err := Newf(http.StatusBadRequest, "reason", "message")
 	err2 := Newf(http.StatusBadRequest, "reason", "message")
 	err3 := err.WithMetadata(map[string]string{
@@ -31,7 +30,7 @@ func TestErrors(t *testing.T) {
 		t.Errorf("should be equal: %v", err)
 	}
 
-	if !errors.As(err, &base) {
+	if _, ok := errors.AsType[*Error](err); !ok {
 		t.Errorf("should be matches: %v", err)
 	}
 	if !IsBadRequest(err) {

@@ -251,7 +251,7 @@ func asSliceForIn(i any) (v reflect.Value, ok bool) {
 	}
 
 	// []byte is a driver.Value type so it should not be expanded
-	if t == reflect.TypeOf([]byte{}) {
+	if t == reflect.TypeFor[[]byte]() {
 		return reflect.Value{}, false
 
 	}
@@ -379,7 +379,7 @@ func appendReflectSlice(args []any, v reflect.Value, vlen int) []any {
 			args = append(args, val[i])
 		}
 	default:
-		for si := 0; si < vlen; si++ {
+		for si := range vlen {
 			args = append(args, v.Index(si).Interface())
 		}
 	}

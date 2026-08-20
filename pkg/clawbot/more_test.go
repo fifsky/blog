@@ -116,7 +116,6 @@ func TestContextTokenBodyAndContextHelpers(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			ctx := WeixinMessageToContext(msg, "acc-1", tc.opts)
 			if ctx.Body != "hello" || ctx.From != "user-1" || ctx.To != "user-1" || ctx.AccountID != "acc-1" || ctx.ContextToken != "ctx-9" {
@@ -946,7 +945,6 @@ func TestWaitLoginErrorBranches(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {

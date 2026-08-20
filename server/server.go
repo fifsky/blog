@@ -78,13 +78,11 @@ type Server struct {
 // New 创建 HTTP 服务并应用默认超时配置。
 func New(opts ...Option) *Server {
 	srv := &Server{
-		Server: http.Server{
-			ReadHeaderTimeout: defaultReadHeaderTimeout,
-			ReadTimeout:       defaultReadTimeout,
-			WriteTimeout:      defaultWriteTimeout,
-			IdleTimeout:       defaultIdleTimeout,
-		},
-		stopTimeout: defaultStopTimeout,
+		ReadHeaderTimeout: defaultReadHeaderTimeout,
+		ReadTimeout:       defaultReadTimeout,
+		WriteTimeout:      defaultWriteTimeout,
+		IdleTimeout:       defaultIdleTimeout,
+		stopTimeout:       defaultStopTimeout,
 	}
 
 	for _, o := range opts {

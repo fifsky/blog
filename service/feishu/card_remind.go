@@ -35,12 +35,10 @@ type RemindCard struct {
 // NewRemindCard 创建提醒卡片处理器
 func NewRemindCard(store *store.Store, conf Config) *RemindCard {
 	return &RemindCard{
-		tplBuilder: tplBuilder{
-			cardTpl:   template.Must(template.New("remind").Funcs(tplFuncs).Parse(remindCardTemplate)),
-			resultTpl: template.Must(template.New("remindResult").Funcs(tplFuncs).Parse(remindResultCardTemplate)),
-		},
-		store:  store,
-		sender: NewSender(conf),
+		cardTpl:   template.Must(template.New("remind").Funcs(tplFuncs).Parse(remindCardTemplate)),
+		resultTpl: template.Must(template.New("remindResult").Funcs(tplFuncs).Parse(remindResultCardTemplate)),
+		store:     store,
+		sender:    NewSender(conf),
 	}
 }
 

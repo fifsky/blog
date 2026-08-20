@@ -34,12 +34,10 @@ type LinkCard struct {
 // NewLinkCard 创建友情链接卡片处理器
 func NewLinkCard(store *store.Store, conf Config) *LinkCard {
 	return &LinkCard{
-		tplBuilder: tplBuilder{
-			cardTpl:   template.Must(template.New("link").Funcs(tplFuncs).Parse(linkCardTemplate)),
-			resultTpl: template.Must(template.New("linkResult").Funcs(tplFuncs).Parse(linkResultCardTemplate)),
-		},
-		store:  store,
-		sender: NewSender(conf),
+		cardTpl:   template.Must(template.New("link").Funcs(tplFuncs).Parse(linkCardTemplate)),
+		resultTpl: template.Must(template.New("linkResult").Funcs(tplFuncs).Parse(linkResultCardTemplate)),
+		store:     store,
+		sender:    NewSender(conf),
 	}
 }
 
