@@ -10,7 +10,8 @@ import (
 
 	"app/pkg/agent"
 
-	"github.com/google/uuid"
+	"uuid"
+
 	lark "github.com/larksuite/oapi-sdk-go/v3"
 	larkcardkit "github.com/larksuite/oapi-sdk-go/v3/service/cardkit/v1"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
@@ -66,7 +67,7 @@ func (u *CardUpdater) UpdateElement(ctx context.Context, elementID, content stri
 		ElementId(elementID).
 		Body(larkcardkit.NewContentCardElementReqBodyBuilder().
 			Content(content).
-			Uuid(uuid.NewString()).
+			Uuid(uuid.New().String()).
 			Sequence(u.getSeq()).
 			Build()).
 		Build()
@@ -107,7 +108,7 @@ func (u *CardUpdater) UpdateTip(ctx context.Context, tipText string) error {
 		ElementId("tip").
 		Body(larkcardkit.NewPatchCardElementReqBodyBuilder().
 			PartialElement(partialElement).
-			Uuid(uuid.NewString()).
+			Uuid(uuid.New().String()).
 			Sequence(u.getSeq()).
 			Build()).
 		Build()
@@ -137,7 +138,7 @@ func (u *CardUpdater) CloseStreaming(ctx context.Context) error {
 		CardId(u.cardID).
 		Body(larkcardkit.NewSettingsCardReqBodyBuilder().
 			Settings(string(settingsBytes)).
-			Uuid(uuid.NewString()).
+			Uuid(uuid.New().String()).
 			Sequence(u.getSeq()).
 			Build()).
 		Build()
