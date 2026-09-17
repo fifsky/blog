@@ -79,12 +79,12 @@ func TestServeMux_Group(t *testing.T) {
 		b.HandleFunc("GET /second", func(w http.ResponseWriter, r *http.Request) {})
 
 		firstRec := httptest.NewRecorder()
-		a.ServeMux.ServeHTTP(firstRec, httptest.NewRequest(http.MethodGet, "/first", nil))
+		a.ServeHTTP(firstRec, httptest.NewRequest(http.MethodGet, "/first", nil))
 		assert.Equal(t, "first", firstRec.Header().Get("X-Group"))
 		assert.Equal(t, "base", firstRec.Header().Get("X-Base"))
 
 		secondRec := httptest.NewRecorder()
-		b.ServeMux.ServeHTTP(secondRec, httptest.NewRequest(http.MethodGet, "/second", nil))
+		b.ServeHTTP(secondRec, httptest.NewRequest(http.MethodGet, "/second", nil))
 		assert.Equal(t, "second", secondRec.Header().Get("X-Group"))
 		assert.Equal(t, "base", secondRec.Header().Get("X-Base"))
 	})
