@@ -1,4 +1,4 @@
-package store
+package sqlext
 
 import (
 	"testing"
@@ -17,6 +17,14 @@ func TestIn(t *testing.T) {
 		want1 []any
 	}
 	tests := []testCase[int]{
+		{
+			name: "nil",
+			args: args[int]{
+				s: nil,
+			},
+			want:  "",
+			want1: nil,
+		},
 		{
 			name: "empty",
 			args: args[int]{
@@ -49,4 +57,11 @@ func TestIn(t *testing.T) {
 			assert.Equalf(t, tt.want1, got1, "In(%v)", tt.args.s)
 		})
 	}
+}
+
+func TestInWithStrings(t *testing.T) {
+	placeholders, args := In([]string{"a", "b"})
+
+	assert.Equal(t, "?,?", placeholders)
+	assert.EqualValues(t, []any{"a", "b"}, args)
 }

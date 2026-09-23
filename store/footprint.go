@@ -6,60 +6,77 @@ import (
 	"strings"
 	"time"
 
+	"app/pkg/sqlext"
 	"app/store/model"
 )
 
+// footprintColumns footprints 表查询列。categories/photos 是 JSON 列，
+// 加别名后由 footprintRow 先扫描成原始字节再解析，避免直接落到 []string / []FootprintPhoto 上
+const footprintColumns = "id, name, description, longitude, latitude, date, marker_color," +
+	" categories as categories_json, url, url_label, photos as photos_json, created_at, updated_at"
+
+// footprintRow 是 footprints 表的扫描载体：嵌入 Footprint 复用其字段匹配，
+// JSON 列单独用 []byte 接收后解析进 Categories / Photos
+type footprintRow struct {
+	model.Footprint
+	CategoriesJSON []byte `db:"categories_json"`
+	PhotosJSON     []byte `db:"photos_json"`
+}
+
+// footprint 把 JSON 列解析到嵌入式 Footprint（ScanCategories/ScanPhotos 由它提升而来）
+func (r *footprintRow) footprint() (*model.Footprint, error) {
+	if err := r.ScanCategories(r.CategoriesJSON); err != nil {
+		return nil, err
+	}
+	if err := r.ScanPhotos(r.PhotosJSON); err != nil {
+		return nil, err
+	}
+	return &r.Footprint, nil
+}
+
+// GetFootprint 按 ID 查询足迹，不存在时返回 sql.ErrNoRows
 func (s *Store) GetFootprint(ctx context.Context, id int) (*model.Footprint, error) {
-	query := "SELECT id, name, description, longitude, latitude, date, marker_color, categories, url, url_label, photos, created_at, updated_at FROM footprints WHERE id = ?"
-	var m model.Footprint
-	var catRaw, photoRaw []byte
-	err := s.db.QueryRowContext(ctx, query, id).Scan(&m.Id, &m.Name, &m.Description, &m.Longitude, &m.Latitude, &m.Date, &m.MarkerColor, &catRaw, &m.Url, &m.UrlLabel, &photoRaw, &m.CreatedAt, &m.UpdatedAt)
+	row, err := sqlext.QueryRow[footprintRow](ctx, s.db, "select "+footprintColumns+" from footprints where id = ?", id)
 	if err != nil {
 		return nil, err
 	}
-	if err := m.ScanCategories(catRaw); err != nil {
-		return nil, err
-	}
-	if err := m.ScanPhotos(photoRaw); err != nil {
-		return nil, err
-	}
-	return &m, nil
+	return row.footprint()
 }
 
+// ListFootprint 分页查询足迹，按 ID 倒序
 func (s *Store) ListFootprint(ctx context.Context, start int, num int) ([]*model.Footprint, error) {
-	offset := (start - 1) * num
-	rows, err := s.db.QueryContext(ctx, "SELECT id, name, description, longitude, latitude, date, marker_color, categories, url, url_label, photos, created_at, updated_at FROM footprints ORDER BY id DESC LIMIT ? OFFSET ?", num, offset)
+	q := sqlext.NewBuilder().
+		Select(footprintColumns).
+		From("footprints").
+		OrderBy("id desc").
+		Limit(num).
+		Offset((start - 1) * num)
+
+	rows, err := sqlext.Query[footprintRow](ctx, s.db, q.SQL(), q.Args()...)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	ret := make([]*model.Footprint, 0)
-	for rows.Next() {
-		var item model.Footprint
-		var catRaw, photoRaw []byte
-		if err := rows.Scan(&item.Id, &item.Name, &item.Description, &item.Longitude, &item.Latitude, &item.Date, &item.MarkerColor, &catRaw, &item.Url, &item.UrlLabel, &photoRaw, &item.CreatedAt, &item.UpdatedAt); err != nil {
-			return nil, err
-		}
-		_ = item.ScanCategories(catRaw)
-		_ = item.ScanPhotos(photoRaw)
-		tmp := item
-		ret = append(ret, &tmp)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return ret, nil
+	return footprints(rows)
 }
 
+// ListAllFootprints 查询全部足迹，按 ID 倒序
+func (s *Store) ListAllFootprints(ctx context.Context) ([]*model.Footprint, error) {
+	q := sqlext.NewBuilder().Select(footprintColumns).From("footprints").OrderBy("id desc")
+
+	rows, err := sqlext.Query[footprintRow](ctx, s.db, q.SQL(), q.Args()...)
+	if err != nil {
+		return nil, err
+	}
+	return footprints(rows)
+}
+
+// CountFootprintTotal 统计足迹总数
 func (s *Store) CountFootprintTotal(ctx context.Context) (int, error) {
-	var total int
-	err := s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM footprints").Scan(&total)
-	if err != nil {
-		return 0, err
-	}
-	return total, nil
+	q := sqlext.NewBuilder().Select("count(*)").From("footprints")
+	return sqlext.QueryRow[int](ctx, s.db, q.SQL(), q.Args()...)
 }
 
+// CreateFootprint 新增足迹，返回自增 ID
 func (s *Store) CreateFootprint(ctx context.Context, md *model.Footprint) (int64, error) {
 	catJSON, _ := json.Marshal(md.Categories)
 	photoJSON, _ := json.Marshal(md.Photos)
@@ -72,6 +89,7 @@ func (s *Store) CreateFootprint(ctx context.Context, md *model.Footprint) (int64
 	return res.LastInsertId()
 }
 
+// UpdateFootprint 按需更新足迹字段，只更新传入的非空字段
 func (s *Store) UpdateFootprint(ctx context.Context, md *model.UpdateFootprint) error {
 	set := make([]string, 0)
 	args := make([]any, 0)
@@ -117,31 +135,21 @@ func (s *Store) UpdateFootprint(ctx context.Context, md *model.UpdateFootprint) 
 	return err
 }
 
+// DeleteFootprint 按 ID 删除足迹
 func (s *Store) DeleteFootprint(ctx context.Context, id int) error {
 	_, err := s.db.ExecContext(ctx, "DELETE FROM footprints WHERE id = ?", id)
 	return err
 }
 
-func (s *Store) ListAllFootprints(ctx context.Context) ([]*model.Footprint, error) {
-	rows, err := s.db.QueryContext(ctx, "SELECT id, name, description, longitude, latitude, date, marker_color, categories, url, url_label, photos, created_at, updated_at FROM footprints ORDER BY id DESC")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	ret := make([]*model.Footprint, 0)
-	for rows.Next() {
-		var item model.Footprint
-		var catRaw, photoRaw []byte
-		if err := rows.Scan(&item.Id, &item.Name, &item.Description, &item.Longitude, &item.Latitude, &item.Date, &item.MarkerColor, &catRaw, &item.Url, &item.UrlLabel, &photoRaw, &item.CreatedAt, &item.UpdatedAt); err != nil {
+// footprints 把扫描出的行解析成足迹切片，空结果返回空切片而不是 nil
+func footprints(rows []footprintRow) ([]*model.Footprint, error) {
+	ret := make([]*model.Footprint, 0, len(rows))
+	for i := range rows {
+		item, err := rows[i].footprint()
+		if err != nil {
 			return nil, err
 		}
-		_ = item.ScanCategories(catRaw)
-		_ = item.ScanPhotos(photoRaw)
-		tmp := item
-		ret = append(ret, &tmp)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
+		ret = append(ret, item)
 	}
 	return ret, nil
 }

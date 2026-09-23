@@ -3,6 +3,9 @@ package store
 import (
 	"context"
 	"maps"
+
+	"app/pkg/sqlext"
+	"app/store/model"
 )
 
 // AIConfig AI 服务配置
@@ -26,6 +29,7 @@ func (s *Store) GetAIConfig(ctx context.Context) *AIConfig {
 	}
 }
 
+// GetOptions 获取全部配置项，结果会缓存；返回给调用方的是副本，可自由修改
 func (s *Store) GetOptions(ctx context.Context) (map[string]string, error) {
 	s.optionsMu.RLock()
 	if s.optionsCache != nil {
@@ -35,33 +39,28 @@ func (s *Store) GetOptions(ctx context.Context) (map[string]string, error) {
 	}
 	s.optionsMu.RUnlock()
 
-	rows, err := s.db.QueryContext(ctx, "select id,option_key,option_value from options")
+	q := sqlext.NewBuilder().Select("option_key, option_value").From("options")
+
+	list, err := sqlext.Query[model.Option](ctx, s.db, q.SQL(), q.Args()...)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	options2 := make(map[string]string)
-	for rows.Next() {
-		var id int
-		var k, v string
-		if err := rows.Scan(&id, &k, &v); err != nil {
-			return nil, err
-		}
-		options2[k] = v
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
+
+	options := make(map[string]string, len(list))
+	for _, opt := range list {
+		options[opt.OptionKey] = opt.OptionValue
 	}
 
 	s.optionsMu.Lock()
-	s.optionsCache = options2
+	s.optionsCache = options
 	s.optionsMu.Unlock()
 
-	// 既然已经把 options2 交给了缓存，为了防止外部修改它，
+	// 既然已经把 options 交给了缓存，为了防止外部修改它，
 	// 返回给调用方时我们拷贝一份返回
-	return maps.Clone(options2), nil
+	return maps.Clone(options), nil
 }
 
+// UpdateOptions 逐条写入配置项（存在则更新），并让缓存失效
 func (s *Store) UpdateOptions(ctx context.Context, m map[string]string) (map[string]string, error) {
 	for k, v := range m {
 		_, err := s.db.ExecContext(ctx, "insert into options (option_key, option_value) values (?, ?) on conflict(option_key) do update set option_value = excluded.option_value", k, v)

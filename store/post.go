@@ -2,200 +2,149 @@ package store
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
+	"app/pkg/sqlext"
 	"app/store/model"
 )
 
-func (s *Store) GetPost(ctx context.Context, id int, url string) (*model.Post, error) {
-	var p model.Post
+// postColumns posts 表完整查询列
+const postColumns = "id, cate_id, type, user_id, title, url, content, tags, status, view_num, created_at, updated_at"
 
-	var where string
-	var arg any
+// postBriefColumns 上下篇导航使用的查询列
+const postBriefColumns = "id, cate_id, type, user_id, title, url, content, status, created_at, updated_at"
+
+// GetPost 按 ID 或缩略名查询文章，ID 大于 0 时优先按 ID，不存在时返回 sql.ErrNoRows
+func (s *Store) GetPost(ctx context.Context, id int, url string) (*model.Post, error) {
+	q := sqlext.NewBuilder().Select(postColumns).From("posts").Limit(1)
 	if id > 0 {
-		where = "id = ?"
-		arg = id
+		q.Where("id = ?", id)
 	} else {
-		where = "url = ?"
-		arg = url
+		q.Where("url = ?", url)
 	}
 
-	query := "select id,cate_id,type,user_id,title,url,content,tags,status,view_num,created_at,updated_at from posts where " + where + " limit 1"
-	err := s.db.QueryRowContext(ctx, query, arg).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Tags, &p.Status, &p.ViewNum, &p.CreatedAt, &p.UpdatedAt)
+	p, err := sqlext.QueryRow[model.Post](ctx, s.db, q.SQL(), q.Args()...)
 	if err != nil {
 		return nil, err
 	}
-
 	return &p, nil
 }
 
+// IncrementPostViewNum 浏览次数加一
 func (s *Store) IncrementPostViewNum(ctx context.Context, id int) error {
 	_, err := s.db.ExecContext(ctx, "update posts set view_num = view_num + 1 where id = ?", id)
 	return err
 }
 
+// GetPostDaysInMonth 查询某年某月有文章的日期（去重后按日期返回）
 func (s *Store) GetPostDaysInMonth(ctx context.Context, year, month int) ([]int32, error) {
-	query := "select distinct cast(strftime('%d', substr(created_at, 1, 19)) as integer) from posts where status = 'ACTIVE' and cast(strftime('%Y', substr(created_at, 1, 19)) as integer) = ? and cast(strftime('%m', substr(created_at, 1, 19)) as integer) = ?"
-	rows, err := s.db.QueryContext(ctx, query, year, month)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+	q := sqlext.NewBuilder().
+		Select("distinct cast(strftime('%d', substr(created_at, 1, 19)) as integer)").
+		From("posts").
+		Where("status = ?", model.PostStatusActive).
+		Where("cast(strftime('%Y', substr(created_at, 1, 19)) as integer) = ?", year).
+		Where("cast(strftime('%m', substr(created_at, 1, 19)) as integer) = ?", month)
 
-	var days []int32
-	for rows.Next() {
-		var day int32
-		if err := rows.Scan(&day); err != nil {
-			return nil, err
-		}
-		days = append(days, day)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return days, nil
+	return sqlext.Query[int32](ctx, s.db, q.SQL(), q.Args()...)
 }
 
+// PrevPost 查询时间上的上一篇已发布文章，不存在时返回 sql.ErrNoRows
 func (s *Store) PrevPost(ctx context.Context, id int) (*model.Post, error) {
-	var p model.Post
-	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where (created_at > (select created_at from posts p2 where p2.id = ?) or (created_at = (select created_at from posts p3 where p3.id = ?) and id > ?)) and status = 'ACTIVE' order by created_at asc, id asc limit 1", id, id, id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
+	q := sqlext.NewBuilder().
+		Select(postBriefColumns).
+		From("posts").
+		Where("(created_at > (select created_at from posts p2 where p2.id = ?) or (created_at = (select created_at from posts p3 where p3.id = ?) and id > ?)) and status = ?",
+			id, id, id, model.PostStatusActive).
+		OrderBy("created_at asc, id asc").
+		Limit(1)
+
+	p, err := sqlext.QueryRow[model.Post](ctx, s.db, q.SQL(), q.Args()...)
 	if err != nil {
 		return nil, err
 	}
 	return &p, nil
 }
 
+// NextPost 查询时间上的下一篇已发布文章，不存在时返回 sql.ErrNoRows
 func (s *Store) NextPost(ctx context.Context, id int) (*model.Post, error) {
-	var p model.Post
-	err := s.db.QueryRowContext(ctx, "select id,cate_id,type,user_id,title,url,content,status,created_at,updated_at from posts where (created_at < (select created_at from posts p2 where p2.id = ?) or (created_at = (select created_at from posts p3 where p3.id = ?) and id < ?)) and status = 'ACTIVE' order by created_at desc, id desc limit 1", id, id, id).Scan(&p.Id, &p.CateId, &p.Type, &p.UserId, &p.Title, &p.Url, &p.Content, &p.Status, &p.CreatedAt, &p.UpdatedAt)
+	q := sqlext.NewBuilder().
+		Select(postBriefColumns).
+		From("posts").
+		Where("(created_at < (select created_at from posts p2 where p2.id = ?) or (created_at = (select created_at from posts p3 where p3.id = ?) and id < ?)) and status = ?",
+			id, id, id, model.PostStatusActive).
+		OrderBy("created_at desc, id desc").
+		Limit(1)
+
+	p, err := sqlext.QueryRow[model.Post](ctx, s.db, q.SQL(), q.Args()...)
 	if err != nil {
 		return nil, err
 	}
 	return &p, nil
 }
 
+// PostArchive 按月统计已发布文章数量，按年月倒序
 func (s *Store) PostArchive(ctx context.Context) ([]model.PostArchive, error) {
-	res := make([]model.PostArchive, 0)
-	rows, err := s.db.QueryContext(ctx, "select ym,count(ym) total from (select strftime('%Y/%m', substr(created_at, 1, 19)) as ym from posts where status = 'ACTIVE') s group by ym order by ym desc")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var ym, total string
-		if err := rows.Scan(&ym, &total); err != nil {
-			return nil, err
-		}
-		res = append(res, model.PostArchive{
-			Ym:    ym,
-			Total: total,
-		})
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return res, nil
+	q := sqlext.NewBuilder().
+		Select("ym, count(ym) total").
+		From("(select strftime('%Y/%m', substr(created_at, 1, 19)) as ym from posts where status = ?) s", model.PostStatusActive).
+		GroupBy("ym").
+		OrderBy("ym desc")
+
+	return sqlext.Query[model.PostArchive](ctx, s.db, q.SQL(), q.Args()...)
 }
 
+// ListPost 分页查询已发布文章，支持分类/类型/日期/关键字/标签过滤
 func (s *Store) ListPost(ctx context.Context, p *model.Post, start int, num int, artdate, keyword, tag string) ([]model.Post, error) {
-	posts := make([]model.Post, 0)
-	offset := (start - 1) * num
+	q := postListBuilder(p, artdate, keyword, tag).
+		Select(postColumns).
+		OrderBy("created_at desc, id desc").
+		Limit(num).
+		Offset((start - 1) * num)
 
-	args := make([]any, 0)
-	where := "status = 'ACTIVE'"
-
-	if p.CateId > 0 {
-		where += " and cate_id = ?"
-		args = append(args, p.CateId)
-	}
-	if p.Type > 0 {
-		where += " and type = ?"
-		args = append(args, p.Type)
-	}
-	if artdate != "" {
-		if len(artdate) == 7 {
-			where += " and strftime('%Y-%m', substr(created_at, 1, 19)) = ?"
-		} else {
-			where += " and strftime('%Y-%m-%d', substr(created_at, 1, 19)) = ?"
-		}
-		args = append(args, artdate)
-	}
-	if keyword != "" {
-		where += " and title like ?"
-		args = append(args, fmt.Sprintf("%%%s%%", keyword))
-	}
-	if tag != "" {
-		where += " and exists (select 1 from json_each(tags) where value = ?)"
-		args = append(args, tag)
-	}
-	args = append(args, num, offset)
-
-	query := "select id,cate_id,type,user_id,title,url,content,tags,status,created_at,updated_at from posts where " + where + " order by created_at desc, id desc limit ? offset ?"
-	rows, err := s.db.QueryContext(ctx, query, args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var bp model.Post
-		if err := rows.Scan(&bp.Id, &bp.CateId, &bp.Type, &bp.UserId, &bp.Title, &bp.Url, &bp.Content, &bp.Tags, &bp.Status, &bp.CreatedAt, &bp.UpdatedAt); err != nil {
-			return nil, err
-		}
-		posts = append(posts, bp)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return posts, nil
+	return sqlext.Query[model.Post](ctx, s.db, q.SQL(), q.Args()...)
 }
 
+// CountPosts 统计已发布文章数量，过滤条件与 ListPost 一致
 func (s *Store) CountPosts(ctx context.Context, p *model.Post, artdate, keyword, tag string) (int, error) {
-	args := make([]any, 0)
-	where := "status = 'ACTIVE'"
-	if p.CateId > 0 {
-		where += " and cate_id = ?"
-		args = append(args, p.CateId)
-	}
-	if p.Type > 0 {
-		where += " and type = ?"
-		args = append(args, p.Type)
-	}
-	if artdate != "" {
-		if len(artdate) == 7 {
-			where += " and strftime('%Y-%m', substr(created_at, 1, 19)) = ?"
-		} else {
-			where += " and strftime('%Y-%m-%d', substr(created_at, 1, 19)) = ?"
-		}
-		args = append(args, artdate)
-	}
-	if keyword != "" {
-		where += " and title like ?"
-		args = append(args, fmt.Sprintf("%%%s%%", keyword))
-	}
-	if tag != "" {
-		where += " and exists (select 1 from json_each(tags) where value = ?)"
-		args = append(args, tag)
-	}
-	q := "select count(*) from posts where " + where
-	var total int
-	err := s.db.QueryRowContext(ctx, q, args...).Scan(&total)
-	if err != nil {
-		return 0, err
-	}
-	return total, nil
+	q := postListBuilder(p, artdate, keyword, tag).Select("count(*)")
+
+	return sqlext.QueryRow[int](ctx, s.db, q.SQL(), q.Args()...)
 }
 
+// postListBuilder 组装前台文章列表的过滤条件
+func postListBuilder(p *model.Post, artdate, keyword, tag string) *sqlext.Builder {
+	q := sqlext.NewBuilder().
+		From("posts").
+		Where("status = ?", model.PostStatusActive).
+		WhereIf(p.CateId > 0, "cate_id = ?", p.CateId).
+		WhereIf(p.Type > 0, "type = ?", p.Type)
+
+	if artdate != "" {
+		// 长度为 7 时按月过滤（YYYY-MM），否则按天过滤（YYYY-MM-DD）
+		if len(artdate) == 7 {
+			q.Where("strftime('%Y-%m', substr(created_at, 1, 19)) = ?", artdate)
+		} else {
+			q.Where("strftime('%Y-%m-%d', substr(created_at, 1, 19)) = ?", artdate)
+		}
+	}
+
+	return q.
+		WhereIf(keyword != "", "title like ?", "%"+keyword+"%").
+		WhereIf(tag != "", "exists (select 1 from json_each(tags) where value = ?)", tag)
+}
+
+// GetCateByDomain 按域名查询分类，不存在时返回 sql.ErrNoRows
 func (s *Store) GetCateByDomain(ctx context.Context, domain string) (*model.Cate, error) {
-	var c model.Cate
-	err := s.db.QueryRowContext(ctx, "select id,name,`desc`,domain,created_at,updated_at from cates where domain = ? limit 1", domain).Scan(&c.Id, &c.Name, &c.Desc, &c.Domain, &c.CreatedAt, &c.UpdatedAt)
+	q := sqlext.NewBuilder().Select(cateColumns).From("cates").Where("domain = ?", domain).Limit(1)
+
+	cate, err := sqlext.QueryRow[model.Cate](ctx, s.db, q.SQL(), q.Args()...)
 	if err != nil {
 		return nil, err
 	}
-	return &c, nil
+	return &cate, nil
 }
 
+// CreatePost 新增文章，返回自增 ID
 func (s *Store) CreatePost(ctx context.Context, p *model.Post) (int64, error) {
 	res, err := s.db.ExecContext(ctx, "insert into posts (cate_id,type,user_id,title,url,content,tags,status,created_at,updated_at) values (?,?,?,?,?,?,?,?,?,?)",
 		p.CateId, p.Type, p.UserId, p.Title, p.Url, p.Content, p.Tags, p.Status, p.CreatedAt, p.UpdatedAt)
@@ -205,6 +154,7 @@ func (s *Store) CreatePost(ctx context.Context, p *model.Post) (int64, error) {
 	return res.LastInsertId()
 }
 
+// UpdatePost 按需更新文章字段，只更新传入的非空字段
 func (s *Store) UpdatePost(ctx context.Context, p *model.UpdatePost) error {
 	set := make([]string, 0)
 	args := make([]any, 0)
@@ -241,99 +191,57 @@ func (s *Store) UpdatePost(ctx context.Context, p *model.UpdatePost) error {
 	return err
 }
 
+// SoftDeletePost 根据ID列表软删除文章（状态改为 DELETED）
 func (s *Store) SoftDeletePost(ctx context.Context, ids []int) error {
 	if len(ids) == 0 {
 		return nil
 	}
-	placeholders, args := In(ids)
+	placeholders, args := sqlext.In(ids)
 	query := "update posts set status = 'DELETED' where id in (" + placeholders + ")"
 	_, err := s.db.ExecContext(ctx, query, args...)
 	return err
 }
 
+// RestorePost 把软删除的文章恢复为草稿
 func (s *Store) RestorePost(ctx context.Context, id int) error {
 	_, err := s.db.ExecContext(ctx, "update posts set status = 'DRAFT' where id = ?", id)
 	return err
 }
 
+// ListPostForAdmin 后台分页查询文章，支持分类/类型/状态/关键字过滤
 func (s *Store) ListPostForAdmin(ctx context.Context, p *model.Post, start int, num int, keyword string) ([]model.Post, error) {
-	posts := make([]model.Post, 0)
-	offset := (start - 1) * num
+	q := postAdminBuilder(p, keyword).
+		Select(postColumns).
+		OrderBy("created_at desc, id desc").
+		Limit(num).
+		Offset((start - 1) * num)
 
-	args := make([]any, 0)
-	where := "1=1"
-
-	if p.CateId > 0 {
-		where += " and cate_id = ?"
-		args = append(args, p.CateId)
-	}
-	if p.Type > 0 {
-		where += " and type = ?"
-		args = append(args, p.Type)
-	}
-	if p.Status != "" {
-		where += " and status = ?"
-		args = append(args, p.Status)
-	}
-	if keyword != "" {
-		where += " and title like ?"
-		args = append(args, fmt.Sprintf("%%%s%%", keyword))
-	}
-	args = append(args, num, offset)
-
-	query := "select id,cate_id,type,user_id,title,url,content,tags,status,view_num,created_at,updated_at from posts where " + where + " order by created_at desc, id desc limit ? offset ?"
-	rows, err := s.db.QueryContext(ctx, query, args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var bp model.Post
-		if err := rows.Scan(&bp.Id, &bp.CateId, &bp.Type, &bp.UserId, &bp.Title, &bp.Url, &bp.Content, &bp.Tags, &bp.Status, &bp.ViewNum, &bp.CreatedAt, &bp.UpdatedAt); err != nil {
-			return nil, err
-		}
-		posts = append(posts, bp)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return posts, nil
+	return sqlext.Query[model.Post](ctx, s.db, q.SQL(), q.Args()...)
 }
 
+// CountPostsForAdmin 统计后台文章数量，过滤条件与 ListPostForAdmin 一致
 func (s *Store) CountPostsForAdmin(ctx context.Context, p *model.Post, keyword string) (int, error) {
-	args := make([]any, 0)
-	where := "1=1"
-	if p.CateId > 0 {
-		where += " and cate_id = ?"
-		args = append(args, p.CateId)
-	}
-	if p.Type > 0 {
-		where += " and type = ?"
-		args = append(args, p.Type)
-	}
-	if p.Status != "" {
-		where += " and status = ?"
-		args = append(args, p.Status)
-	}
-	if keyword != "" {
-		where += " and title like ?"
-		args = append(args, fmt.Sprintf("%%%s%%", keyword))
-	}
-	q := "select count(*) from posts where " + where
-	var total int
-	err := s.db.QueryRowContext(ctx, q, args...).Scan(&total)
-	if err != nil {
-		return 0, err
-	}
-	return total, nil
+	q := postAdminBuilder(p, keyword).Select("count(*)")
+
+	return sqlext.QueryRow[int](ctx, s.db, q.SQL(), q.Args()...)
 }
 
+// postAdminBuilder 组装后台文章列表的过滤条件
+func postAdminBuilder(p *model.Post, keyword string) *sqlext.Builder {
+	return sqlext.NewBuilder().
+		From("posts").
+		WhereIf(p.CateId > 0, "cate_id = ?", p.CateId).
+		WhereIf(p.Type > 0, "type = ?", p.Type).
+		WhereIf(p.Status != "", "status = ?", p.Status).
+		WhereIf(keyword != "", "title like ?", "%"+keyword+"%")
+}
+
+// DestroyPost 根据ID列表物理删除已软删除的文章
 func (s *Store) DestroyPost(ctx context.Context, ids []int) error {
 	if len(ids) == 0 {
 		return nil
 	}
-	placeholders, args := In(ids)
+	placeholders, args := sqlext.In(ids)
 	query := "delete from posts where status = 'DELETED' and id in (" + placeholders + ")"
 	_, err := s.db.ExecContext(ctx, query, args...)
 	return err

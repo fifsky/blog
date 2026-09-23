@@ -4,39 +4,30 @@ import (
 	"context"
 	"strings"
 
+	"app/pkg/sqlext"
 	"app/store/model"
 )
 
-func (s *Store) GetCate(ctx context.Context, id int) (*model.Cate, error) {
-	row := s.db.QueryRowContext(ctx, "select id,name,`desc`,domain,created_at,updated_at from cates where id = ?", id)
-	c := model.Cate{}
-	if err := row.Scan(&c.Id, &c.Name, &c.Desc, &c.Domain, &c.CreatedAt, &c.UpdatedAt); err != nil {
-		return nil, err
-	}
-	return &c, nil
-}
+// cateColumns cates 表查询列，desc 是 SQL 保留字必须加反引号
+const cateColumns = "id, name, `desc`, domain, created_at, updated_at"
 
-func (s *Store) GetAllCates(ctx context.Context) ([]model.CateArtivleCount, error) {
-	rows, err := s.db.QueryContext(ctx, "select c.id,c.name,c.desc,c.domain,c.created_at,c.updated_at,ifnull(p.num,0) num from cates c left join (select count(*) num ,cate_id from posts where status = 'ACTIVE' and type = 1 group by cate_id) p on c.id = p.cate_id")
+// GetCate 按 ID 查询分类，不存在时返回 sql.ErrNoRows
+func (s *Store) GetCate(ctx context.Context, id int) (*model.Cate, error) {
+	cate, err := sqlext.QueryRow[model.Cate](ctx, s.db, "select "+cateColumns+" from cates where id = ?", id)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	var cs []model.CateArtivleCount
-	for rows.Next() {
-		c := model.CateArtivleCount{}
-		if err := rows.Scan(&c.Id, &c.Name, &c.Desc, &c.Domain, &c.CreatedAt, &c.UpdatedAt, &c.Num); err != nil {
-			return nil, err
-		}
-		cs = append(cs, c)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return cs, nil
+	return &cate, nil
 }
 
+// GetAllCates 查询全部分类及每个分类下的文章数量
+func (s *Store) GetAllCates(ctx context.Context) ([]model.CateArtivleCount, error) {
+	query := "select c.id, c.name, c.`desc`, c.domain, c.created_at, c.updated_at, ifnull(p.num, 0) as num" +
+		" from cates c left join (select count(*) num, cate_id from posts where status = 'ACTIVE' and type = 1 group by cate_id) p on c.id = p.cate_id"
+	return sqlext.Query[model.CateArtivleCount](ctx, s.db, query)
+}
+
+// CreateCate 新增分类，返回自增 ID
 func (s *Store) CreateCate(ctx context.Context, c *model.Cate) (int64, error) {
 	res, err := s.db.ExecContext(ctx, "insert into cates (name,`desc`,domain,created_at,updated_at) values (?,?,?,?,?)",
 		c.Name, c.Desc, c.Domain, c.CreatedAt, c.UpdatedAt)
@@ -46,6 +37,7 @@ func (s *Store) CreateCate(ctx context.Context, c *model.Cate) (int64, error) {
 	return res.LastInsertId()
 }
 
+// UpdateCate 按需更新分类字段，只更新传入的非空字段
 func (s *Store) UpdateCate(ctx context.Context, c *model.UpdateCate) error {
 	var (
 		set  []string
@@ -72,41 +64,33 @@ func (s *Store) UpdateCate(ctx context.Context, c *model.UpdateCate) error {
 	return nil
 }
 
+// DeleteCate 按 ID 删除分类
 func (s *Store) DeleteCate(ctx context.Context, id int) error {
 	_, err := s.db.ExecContext(ctx, "delete from cates where id = ?", id)
 	return err
 }
 
+// GetCatesByIds 按 ID 列表查询分类，返回以分类 ID 为键的map
 func (s *Store) GetCatesByIds(ctx context.Context, ids []int) (map[int]model.Cate, error) {
 	if len(ids) == 0 {
 		return nil, nil
 	}
-	ph, args := In(ids)
-	query := "select id,name,`desc`,domain,created_at,updated_at from cates where id in(" + ph + ")"
-	rows, err := s.db.QueryContext(ctx, query, args...)
+
+	q := sqlext.NewBuilder().Select(cateColumns).From("cates").Where("id in (?)", ids)
+	list, err := sqlext.Query[model.Cate](ctx, s.db, q.SQL(), q.Args()...)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	cm := make(map[int]model.Cate)
-	for rows.Next() {
-		var c model.Cate
-		if err := rows.Scan(&c.Id, &c.Name, &c.Desc, &c.Domain, &c.CreatedAt, &c.UpdatedAt); err != nil {
-			return nil, err
-		}
-		cm[c.Id] = c
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
+
+	cm := make(map[int]model.Cate, len(list))
+	for _, cate := range list {
+		cm[cate.Id] = cate
 	}
 	return cm, nil
 }
 
+// PostsCount 统计分类下的文章数量
 func (s *Store) PostsCount(ctx context.Context, cateId int) (int, error) {
-	var total int
-	err := s.db.QueryRowContext(ctx, "select count(*) from posts where cate_id = ?", cateId).Scan(&total)
-	if err != nil {
-		return 0, err
-	}
-	return total, nil
+	q := sqlext.NewBuilder().Select("count(*)").From("posts").Where("cate_id = ?", cateId)
+	return sqlext.QueryRow[int](ctx, s.db, q.SQL(), q.Args()...)
 }

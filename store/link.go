@@ -4,63 +4,49 @@ import (
 	"context"
 	"strings"
 
+	"app/pkg/sqlext"
 	"app/store/model"
 )
 
+// linkColumns links 表查询列，desc 是 SQL 保留字必须加反引号
+const linkColumns = "id, name, url, `desc`, status, created_at, updated_at"
+
+// GetAllLinks 查询全部友链
 func (s *Store) GetAllLinks(ctx context.Context) ([]*model.Link, error) {
-	rows, err := s.db.QueryContext(ctx, "select id,name,url,`desc`,status,created_at,updated_at from links order by id asc")
+	q := sqlext.NewBuilder().Select(linkColumns).From("links").OrderBy("id asc")
+
+	list, err := sqlext.Query[model.Link](ctx, s.db, q.SQL(), q.Args()...)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	ret := make([]*model.Link, 0)
-	for rows.Next() {
-		var item model.Link
-		if err := rows.Scan(&item.Id, &item.Name, &item.Url, &item.Desc, &item.Status, &item.CreatedAt, &item.UpdatedAt); err != nil {
-			return nil, err
-		}
-		tmp := item
-		ret = append(ret, &tmp)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return ret, nil
+	return linkPointers(list), nil
 }
 
 // GetApprovedLinks 获取审核通过的链接列表
 func (s *Store) GetApprovedLinks(ctx context.Context) ([]*model.Link, error) {
-	rows, err := s.db.QueryContext(ctx, "select id,name,url,`desc`,status,created_at,updated_at from links where status = ? order by id asc", model.LinkStatusApproved)
+	q := sqlext.NewBuilder().
+		Select(linkColumns).
+		From("links").
+		Where("status = ?", model.LinkStatusApproved).
+		OrderBy("id asc")
+
+	list, err := sqlext.Query[model.Link](ctx, s.db, q.SQL(), q.Args()...)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	ret := make([]*model.Link, 0)
-	for rows.Next() {
-		var item model.Link
-		if err := rows.Scan(&item.Id, &item.Name, &item.Url, &item.Desc, &item.Status, &item.CreatedAt, &item.UpdatedAt); err != nil {
-			return nil, err
-		}
-		tmp := item
-		ret = append(ret, &tmp)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return ret, nil
+	return linkPointers(list), nil
 }
 
-// GetLink 根据 ID 获取链接信息
+// GetLink 根据 ID 获取链接信息，不存在时返回 sql.ErrNoRows
 func (s *Store) GetLink(ctx context.Context, id int) (*model.Link, error) {
-	var item model.Link
-	err := s.db.QueryRowContext(ctx, "select id,name,url,`desc`,status,created_at,updated_at from links where id = ?", id).
-		Scan(&item.Id, &item.Name, &item.Url, &item.Desc, &item.Status, &item.CreatedAt, &item.UpdatedAt)
+	link, err := sqlext.QueryRow[model.Link](ctx, s.db, "select "+linkColumns+" from links where id = ?", id)
 	if err != nil {
 		return nil, err
 	}
-	return &item, nil
+	return &link, nil
 }
 
+// CreateLink 新增友链，返回自增 ID
 func (s *Store) CreateLink(ctx context.Context, link *model.Link) (int64, error) {
 	res, err := s.db.ExecContext(ctx, "insert into links (name,url,`desc`,status,created_at,updated_at) values (?,?,?,?,?,?)",
 		link.Name, link.Url, link.Desc, link.Status, link.CreatedAt, link.UpdatedAt)
@@ -70,6 +56,7 @@ func (s *Store) CreateLink(ctx context.Context, link *model.Link) (int64, error)
 	return res.LastInsertId()
 }
 
+// UpdateLink 按需更新友链字段，只更新传入的非空字段
 func (s *Store) UpdateLink(ctx context.Context, link *model.UpdateLink) error {
 	set := make([]string, 0)
 	args := make([]any, 0)
@@ -91,7 +78,17 @@ func (s *Store) UpdateLink(ctx context.Context, link *model.UpdateLink) error {
 	return err
 }
 
+// DeleteLink 按 ID 删除友链
 func (s *Store) DeleteLink(ctx context.Context, id int) error {
 	_, err := s.db.ExecContext(ctx, "delete from links where id = ?", id)
 	return err
+}
+
+// linkPointers 把链接值切片转成指针切片，空结果返回空切片而不是 nil
+func linkPointers(list []model.Link) []*model.Link {
+	ret := make([]*model.Link, 0, len(list))
+	for i := range list {
+		ret = append(ret, &list[i])
+	}
+	return ret
 }

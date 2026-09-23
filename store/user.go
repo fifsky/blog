@@ -4,61 +4,52 @@ import (
 	"context"
 	"strings"
 
+	"app/pkg/sqlext"
 	"app/store/model"
 )
 
+// userColumns users 表查询列，type 是 SQL 保留字必须加反引号
+const userColumns = "id, name, password, nick_name, email, status, `type`, totp_secret, created_at, updated_at"
+
+// GetUser 按 ID 查询用户，不存在时返回 sql.ErrNoRows
 func (s *Store) GetUser(ctx context.Context, uid int) (*model.User, error) {
-	query := "select id,name,password,nick_name,email,status,`type`,totp_secret,created_at,updated_at from users where id = ?"
-	row := s.db.QueryRowContext(ctx, query, uid)
-	if row.Err() != nil {
-		return nil, row.Err()
-	}
-	var user model.User
-	if err := row.Scan(&user.Id, &user.Name, &user.Password, &user.NickName, &user.Email, &user.Status, &user.Type, &user.TotpSecret, &user.CreatedAt, &user.UpdatedAt); err != nil {
+	user, err := sqlext.QueryRow[model.User](ctx, s.db, "select "+userColumns+" from users where id = ?", uid)
+	if err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
 
+// ListUser 分页查询用户，按 ID 倒序
 func (s *Store) ListUser(ctx context.Context, start int, num int) ([]model.User, error) {
-	query := "select id,name,password,nick_name,email,status,`type`,totp_secret,created_at,updated_at from users order by id desc limit ? offset ?"
-	rows, err := s.db.QueryContext(ctx, query, num, max((start-1)*num, 0))
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	users := make([]model.User, 0)
-	for rows.Next() {
-		var user model.User
-		if err := rows.Scan(&user.Id, &user.Name, &user.Password, &user.NickName, &user.Email, &user.Status, &user.Type, &user.TotpSecret, &user.CreatedAt, &user.UpdatedAt); err != nil {
-			return nil, err
-		}
-		users = append(users, user)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return users, nil
+	q := sqlext.NewBuilder().
+		Select(userColumns).
+		From("users").
+		OrderBy("id desc").
+		Limit(num).
+		Offset(max((start-1)*num, 0))
+
+	return sqlext.Query[model.User](ctx, s.db, q.SQL(), q.Args()...)
 }
 
+// CountUserTotal 统计用户总数
 func (s *Store) CountUserTotal(ctx context.Context) (int, error) {
-	var total int
-	err := s.db.QueryRowContext(ctx, "select count(*) from users").Scan(&total)
-	if err != nil {
-		return 0, err
-	}
-	return total, nil
+	q := sqlext.NewBuilder().Select("count(*)").From("users")
+	return sqlext.QueryRow[int](ctx, s.db, q.SQL(), q.Args()...)
 }
 
+// GetUserByName 按用户名查询用户，不存在时返回 sql.ErrNoRows
 func (s *Store) GetUserByName(ctx context.Context, name string) (*model.User, error) {
-	var user model.User
-	err := s.db.QueryRowContext(ctx, "select id,name,password,nick_name,email,status,`type`,totp_secret,created_at,updated_at from users where name = ? limit 1", name).Scan(&user.Id, &user.Name, &user.Password, &user.NickName, &user.Email, &user.Status, &user.Type, &user.TotpSecret, &user.CreatedAt, &user.UpdatedAt)
+	q := sqlext.NewBuilder().Select(userColumns).From("users").Where("name = ?", name).Limit(1)
+
+	user, err := sqlext.QueryRow[model.User](ctx, s.db, q.SQL(), q.Args()...)
 	if err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
 
+// CreateUser 新增用户，返回自增 ID
 func (s *Store) CreateUser(ctx context.Context, users *model.User) (int64, error) {
 	res, err := s.db.ExecContext(ctx, "insert into users (name,password,nick_name,email,status,type,totp_secret,created_at,updated_at) values (?,?,?,?,?,?,?,?,?)",
 		users.Name, users.Password, users.NickName, users.Email, users.Status, users.Type, users.TotpSecret, users.CreatedAt, users.UpdatedAt)
@@ -68,6 +59,7 @@ func (s *Store) CreateUser(ctx context.Context, users *model.User) (int64, error
 	return res.LastInsertId()
 }
 
+// UpdateUser 按需更新用户字段，只更新传入的非空字段
 func (s *Store) UpdateUser(ctx context.Context, users *model.UpdateUser) error {
 	set := make([]string, 0)
 	args := make([]any, 0)
@@ -101,36 +93,27 @@ func (s *Store) UpdateUser(ctx context.Context, users *model.UpdateUser) error {
 	return err
 }
 
+// GetUserByIds 按 ID 列表查询用户，返回以用户 ID 为键的map
 func (s *Store) GetUserByIds(ctx context.Context, ids []int) (map[int]model.User, error) {
 	if len(ids) == 0 {
 		return nil, nil
 	}
-	ph, args := In(ids)
-	query := "select id,name,password,nick_name,email,status,`type`,totp_secret,created_at,updated_at from users where id in(" + ph + ")"
-	rows, err := s.db.QueryContext(ctx, query, args...)
+
+	q := sqlext.NewBuilder().Select(userColumns).From("users").Where("id in (?)", ids)
+	list, err := sqlext.Query[model.User](ctx, s.db, q.SQL(), q.Args()...)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	um := make(map[int]model.User)
-	for rows.Next() {
-		var user model.User
-		if err := rows.Scan(&user.Id, &user.Name, &user.Password, &user.NickName, &user.Email, &user.Status, &user.Type, &user.TotpSecret, &user.CreatedAt, &user.UpdatedAt); err != nil {
-			return nil, err
-		}
+
+	um := make(map[int]model.User, len(list))
+	for _, user := range list {
 		um[user.Id] = user
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
 	}
 	return um, nil
 }
 
+// GetUserIDByOpenid 按小程序 openid 查询用户 ID，不存在时返回 sql.ErrNoRows
 func (s *Store) GetUserIDByOpenid(ctx context.Context, openid string) (int, error) {
-	var uid int
-	err := s.db.QueryRowContext(ctx, "select id from users where openid = ? limit 1", openid).Scan(&uid)
-	if err != nil {
-		return 0, err
-	}
-	return uid, nil
+	q := sqlext.NewBuilder().Select("id").From("users").Where("openid = ?", openid).Limit(1)
+	return sqlext.QueryRow[int](ctx, s.db, q.SQL(), q.Args()...)
 }

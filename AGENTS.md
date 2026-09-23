@@ -9,7 +9,7 @@ Full-stack blog application with Go backend, React frontend, and native iOS (Swi
 - **Go 1.26.0** - No framework, uses native `net/http`
 - **Protobuf** - API definitions with buf (googleapis)
 - **Validation** - buf protovalidate
-- **Database** - SQLite (`modernc.org/sqlite`，纯 Go 无 CGO) with native `database/sql` (no ORM)
+- **Database** - SQLite (`modernc.org/sqlite`，纯 Go 无 CGO) with native `database/sql` (no ORM)；SQL 查询统一走 `pkg/sqlext` 封装（用法见 `pkg/sqlext/README.md`）
 - **Backup** - Litestream（Go library 模式嵌入，实时流式备份到阿里云 OSS）
 - **Logging** - slog
 - **Testing** - standard Go testing + dbunit（SQLite 适配版）
@@ -83,7 +83,12 @@ import (
 
 **Database:**
 
-- Always use `QueryContext(ctx, query, args...)` or `QueryRowContext(ctx, query, args...)` for queries
+> ⚠️ **编写任何数据库读写代码前，必须先阅读 [`pkg/sqlext/README.md`](pkg/sqlext/README.md)**，了解 `Builder` / `Query` / `QueryRow` / `In` 的用法与字段（列名）映射规则。
+
+- 读查询统一使用 `sqlext.QueryRow[T](ctx, db, query, args...)`（单行，无数据返回 `sql.ErrNoRows`）和 `sqlext.Query[T](ctx, db, query, args...)`（多行，空结果返回空切片），由 sqlext 按 `db` tag 或字段名的 snake_case 自动映射列，不要再手写 `rows.Next()` + `Scan`
+- 动态条件、排序、分页用 `sqlext.NewBuilder()`（`Select/From/Where/WhereIf/OrWhere/GroupBy/Having/OrderBy/Limit/Offset`），切片参数会自动展开为 `IN (?,?,?)`
+- `Builder` 无法生成的非 SELECT 语句（如 `DELETE` 或批量 `UPDATE` 的 IN 列表）用 `sqlext.In(ids)` 生成占位符与参数
+- 只有 sqlext 覆盖不到的场景（事务、DDL、`pkg/dbunit` 等）才直接调用 `ExecContext` / `QueryContext` / `QueryRowContext`
 - Always `defer rows.Close()` after creating rows
 - Use context throughout: `ctx context.Context` as first param
 - Return errors directly, don't panic
@@ -309,6 +314,7 @@ cd build && zip -qry BlogApp.ipa Payload
 
 - No ORM - use raw SQL with `database/sql`
 - Database: SQLite (`modernc.org/sqlite`)，DSN 见 `config.yml`，Schema 定义在 `testdata/schema.sql`
+- **数据库读写统一使用 `pkg/sqlext`**，动手写代码前先阅读 `pkg/sqlext/README.md`（`Builder` 构造条件、`Query` / `QueryRow` 扫描、`In` 拼 IN 列表），参考 `store/` 下各模块的写法
 - Litestream 实时备份到阿里云 OSS（`fifsky-backup` bucket），Go library 模式嵌入，无需独立进程
 - K8s 部署使用 PVC 持久化 `/app/storage` 目录（SQLite 文件存储）
 - Always pass context through the call chain
