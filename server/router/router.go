@@ -37,19 +37,6 @@ func New(apiService *openapi.Service, adminService *adminsvc.Service, conf *conf
 	}
 }
 
-type NotFoundHandler struct {
-	mux *http.ServeMux
-}
-
-func (n *NotFoundHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	_, pattern := n.mux.Handler(r)
-	if pattern == "" || (pattern == "/" && r.URL.Path != "/") {
-		response.Fail(w, errors.ErrApiNotFound)
-		return
-	}
-	n.mux.ServeHTTP(w, r)
-}
-
 func (r *Router) Handler() http.Handler {
 	conf := sloghttp.Config{
 		Level:              slog.LevelInfo,
@@ -64,12 +51,7 @@ func (r *Router) Handler() http.Handler {
 	}
 
 	mux := NewServeMux()
-	mux.Use(middleware.NewRecover, sloghttp.NewMiddleware(r.accessLogger, conf), middleware.NewHeader, middleware.NewCors)
-
-	// 统一处理所有 /blog/ 路径的预检请求，确保中间件设置CORS响应头
-	mux.HandleFunc("OPTIONS /blog/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	})
+	mux.Use(middleware.NewRecover, sloghttp.NewMiddleware(r.accessLogger, conf), middleware.NewHeader, middleware.NewCors())
 
 	codec := codec.NewCodec()
 	apiv1.RegisterArticleServiceHTTPServer(mux, codec, r.service.Article)
@@ -112,5 +94,13 @@ func (r *Router) Handler() http.Handler {
 	// AI chat endpoint (SSE streaming)
 	adminAuth.HandleFunc("POST /blog/admin/ai/chat", r.admin.AI.Chat)
 
-	return &NotFoundHandler{mux: mux.ServeMux}
+	// 兜底路由：未匹配的路径，以及「路径存在但方法不匹配」的 OPTIONS 探测请求都会落到这里。
+	// ServeMux 对方法不匹配的请求会直接返回 405、不会进入注册 handler 的中间件链，
+	// 注册这条不带方法的兜底路由后，这类请求同样会经过上面的中间件栈：
+	// OPTIONS 由 CORS 统一收束为 204，其余未匹配路径仍返回 404
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		response.Fail(w, errors.ErrApiNotFound)
+	})
+
+	return mux.ServeMux
 }
