@@ -6,7 +6,7 @@ require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.1
 	buf.build/go/protovalidate v1.4.0
 	github.com/aliyun/alibabacloud-oss-go-sdk-v2 v1.5.1
-	github.com/benbjohnson/litestream v0.5.16
+	github.com/benbjohnson/litestream v0.5.17
 	github.com/goapt/logger v1.8.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gorilla/feeds v1.2.0
