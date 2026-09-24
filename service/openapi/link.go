@@ -35,7 +35,7 @@ func (l *Link) All(ctx context.Context, _ *emptypb.Empty) (*apiv1.LinkMenuRespon
 	if err != nil {
 		return nil, err
 	}
-	items := lo.Map(links, func(v *model.Link, _ int) *apiv1.LinkMenuItem {
+	items := lo.Map(links, func(v model.Link, _ int) *apiv1.LinkMenuItem {
 		return apiv1.LinkMenuItem_builder{Url: v.Url, Content: v.Name}.Build()
 	})
 	return apiv1.LinkMenuResponse_builder{List: items}.Build(), nil

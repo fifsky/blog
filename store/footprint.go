@@ -24,14 +24,14 @@ type footprintRow struct {
 }
 
 // footprint 把 JSON 列解析到嵌入式 Footprint（ScanCategories/ScanPhotos 由它提升而来）
-func (r *footprintRow) footprint() (*model.Footprint, error) {
+func (r *footprintRow) footprint() (model.Footprint, error) {
 	if err := r.ScanCategories(r.CategoriesJSON); err != nil {
-		return nil, err
+		return model.Footprint{}, err
 	}
 	if err := r.ScanPhotos(r.PhotosJSON); err != nil {
-		return nil, err
+		return model.Footprint{}, err
 	}
-	return &r.Footprint, nil
+	return r.Footprint, nil
 }
 
 // GetFootprint 按 ID 查询足迹，不存在时返回 sql.ErrNoRows
@@ -40,11 +40,15 @@ func (s *Store) GetFootprint(ctx context.Context, id int) (*model.Footprint, err
 	if err != nil {
 		return nil, err
 	}
-	return row.footprint()
+	fp, err := row.footprint()
+	if err != nil {
+		return nil, err
+	}
+	return &fp, nil
 }
 
 // ListFootprint 分页查询足迹，按 ID 倒序
-func (s *Store) ListFootprint(ctx context.Context, start int, num int) ([]*model.Footprint, error) {
+func (s *Store) ListFootprint(ctx context.Context, start int, num int) ([]model.Footprint, error) {
 	q := sqlext.NewBuilder().
 		Select(footprintColumns).
 		From("footprints").
@@ -60,7 +64,7 @@ func (s *Store) ListFootprint(ctx context.Context, start int, num int) ([]*model
 }
 
 // ListAllFootprints 查询全部足迹，按 ID 倒序
-func (s *Store) ListAllFootprints(ctx context.Context) ([]*model.Footprint, error) {
+func (s *Store) ListAllFootprints(ctx context.Context) ([]model.Footprint, error) {
 	q := sqlext.NewBuilder().Select(footprintColumns).From("footprints").OrderBy("id desc")
 
 	rows, err := sqlext.Query[footprintRow](ctx, s.db, q.SQL(), q.Args()...)
@@ -142,8 +146,8 @@ func (s *Store) DeleteFootprint(ctx context.Context, id int) error {
 }
 
 // footprints 把扫描出的行解析成足迹切片，空结果返回空切片而不是 nil
-func footprints(rows []footprintRow) ([]*model.Footprint, error) {
-	ret := make([]*model.Footprint, 0, len(rows))
+func footprints(rows []footprintRow) ([]model.Footprint, error) {
+	ret := make([]model.Footprint, 0, len(rows))
 	for i := range rows {
 		item, err := rows[i].footprint()
 		if err != nil {

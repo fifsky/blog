@@ -32,7 +32,7 @@ func (r *Remind) List(ctx context.Context, req *adminv1.RemindListRequest) (*adm
 	if err != nil {
 		return nil, err
 	}
-	items := lo.Map(reminds, func(v *model.Remind, _ int) *adminv1.RemindItem {
+	items := lo.Map(reminds, func(v model.Remind, _ int) *adminv1.RemindItem {
 		return adminv1.RemindItem_builder{Id: int32(v.Id),
 			Cron:      v.Cron,
 			Content:   v.Content,

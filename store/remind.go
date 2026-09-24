@@ -22,7 +22,7 @@ func (s *Store) GetRemind(ctx context.Context, id int) (*model.Remind, error) {
 }
 
 // ListRemind 分页查询提醒，按 ID 倒序
-func (s *Store) ListRemind(ctx context.Context, start int, num int) ([]*model.Remind, error) {
+func (s *Store) ListRemind(ctx context.Context, start int, num int) ([]model.Remind, error) {
 	q := sqlext.NewBuilder().
 		Select(remindColumns).
 		From("reminds").
@@ -30,11 +30,7 @@ func (s *Store) ListRemind(ctx context.Context, start int, num int) ([]*model.Re
 		Limit(num).
 		Offset((start - 1) * num)
 
-	list, err := sqlext.Query[model.Remind](ctx, s.db, q.SQL(), q.Args()...)
-	if err != nil {
-		return nil, err
-	}
-	return remindPointers(list), nil
+	return sqlext.Query[model.Remind](ctx, s.db, q.SQL(), q.Args()...)
 }
 
 // RemindAll 查询所有未完成的提醒（ACTIVE/PENDING），按 ID 倒序
@@ -102,13 +98,4 @@ func (s *Store) UpdateRemind(ctx context.Context, md *model.UpdateRemind) error 
 func (s *Store) DeleteRemind(ctx context.Context, id int) error {
 	_, err := s.db.ExecContext(ctx, "delete from reminds where id = ?", id)
 	return err
-}
-
-// remindPointers 把提醒值切片转成指针切片，空结果返回空切片而不是 nil
-func remindPointers(list []model.Remind) []*model.Remind {
-	ret := make([]*model.Remind, 0, len(list))
-	for i := range list {
-		ret = append(ret, &list[i])
-	}
-	return ret
 }

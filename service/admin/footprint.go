@@ -30,7 +30,7 @@ func (f *Footprint) List(ctx context.Context, req *adminv1.FootprintListRequest)
 		return nil, err
 	}
 
-	items := lo.Map(footprints, func(v *model.Footprint, _ int) *adminv1.FootprintItem {
+	items := lo.Map(footprints, func(v model.Footprint, _ int) *adminv1.FootprintItem {
 		item := adminv1.FootprintItem_builder{Id: int32(v.Id),
 			Name:        v.Name,
 			Description: v.Description,

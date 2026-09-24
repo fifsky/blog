@@ -42,18 +42,14 @@ func (s *Store) GetRegionByIds(ctx context.Context, ids []int) (map[int]model.Re
 }
 
 // ListRegionByParent 查询某上级区域下的所有区域，按区域 ID 正序
-func (s *Store) ListRegionByParent(ctx context.Context, parentId int) ([]*model.Region, error) {
+func (s *Store) ListRegionByParent(ctx context.Context, parentId int) ([]model.Region, error) {
 	q := sqlext.NewBuilder().
 		Select(regionColumns).
 		From("regions").
 		Where("parent_id = ?", parentId).
 		OrderBy("region_id")
 
-	list, err := sqlext.Query[model.Region](ctx, s.db, q.SQL(), q.Args()...)
-	if err != nil {
-		return nil, err
-	}
-	return regionPointers(list), nil
+	return sqlext.Query[model.Region](ctx, s.db, q.SQL(), q.Args()...)
 }
 
 // FindNearestCity 按经纬度查找最近的市级区域及其所属省份，无数据时返回 sql.ErrNoRows
@@ -89,15 +85,6 @@ func (s *Store) FindNearestCity(ctx context.Context, latitude, longitude float64
 		return nil, nil, err
 	}
 	return best, province, nil
-}
-
-// regionPointers 把区域值切片转成指针切片，空结果返回空切片而不是 nil
-func regionPointers(list []model.Region) []*model.Region {
-	ret := make([]*model.Region, 0, len(list))
-	for i := range list {
-		ret = append(ret, &list[i])
-	}
-	return ret
 }
 
 // haversine 计算两个经纬度坐标之间的球面距离（公里）

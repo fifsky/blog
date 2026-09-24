@@ -12,29 +12,21 @@ import (
 const linkColumns = "id, name, url, `desc`, status, created_at, updated_at"
 
 // GetAllLinks 查询全部友链
-func (s *Store) GetAllLinks(ctx context.Context) ([]*model.Link, error) {
+func (s *Store) GetAllLinks(ctx context.Context) ([]model.Link, error) {
 	q := sqlext.NewBuilder().Select(linkColumns).From("links").OrderBy("id asc")
 
-	list, err := sqlext.Query[model.Link](ctx, s.db, q.SQL(), q.Args()...)
-	if err != nil {
-		return nil, err
-	}
-	return linkPointers(list), nil
+	return sqlext.Query[model.Link](ctx, s.db, q.SQL(), q.Args()...)
 }
 
 // GetApprovedLinks 获取审核通过的链接列表
-func (s *Store) GetApprovedLinks(ctx context.Context) ([]*model.Link, error) {
+func (s *Store) GetApprovedLinks(ctx context.Context) ([]model.Link, error) {
 	q := sqlext.NewBuilder().
 		Select(linkColumns).
 		From("links").
 		Where("status = ?", model.LinkStatusApproved).
 		OrderBy("id asc")
 
-	list, err := sqlext.Query[model.Link](ctx, s.db, q.SQL(), q.Args()...)
-	if err != nil {
-		return nil, err
-	}
-	return linkPointers(list), nil
+	return sqlext.Query[model.Link](ctx, s.db, q.SQL(), q.Args()...)
 }
 
 // GetLink 根据 ID 获取链接信息，不存在时返回 sql.ErrNoRows
@@ -82,13 +74,4 @@ func (s *Store) UpdateLink(ctx context.Context, link *model.UpdateLink) error {
 func (s *Store) DeleteLink(ctx context.Context, id int) error {
 	_, err := s.db.ExecContext(ctx, "delete from links where id = ?", id)
 	return err
-}
-
-// linkPointers 把链接值切片转成指针切片，空结果返回空切片而不是 nil
-func linkPointers(list []model.Link) []*model.Link {
-	ret := make([]*model.Link, 0, len(list))
-	for i := range list {
-		ret = append(ret, &list[i])
-	}
-	return ret
 }

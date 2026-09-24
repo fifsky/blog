@@ -28,7 +28,7 @@ func (l *Link) List(ctx context.Context, _ *emptypb.Empty) (*adminv1.LinkListRes
 	if err != nil {
 		return nil, err
 	}
-	items := lo.Map(links, func(v *model.Link, _ int) *adminv1.LinkItem {
+	items := lo.Map(links, func(v model.Link, _ int) *adminv1.LinkItem {
 		return adminv1.LinkItem_builder{Id: int32(v.Id),
 			Name:      v.Name,
 			Url:       v.Url,
